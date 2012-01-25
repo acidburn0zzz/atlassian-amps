@@ -571,9 +571,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         systemPropertyVariables.putAll((Map) systemProperties);
 
         detectDeprecatedVersionOverrides();
-
-        // Create the product contexts once for all
-        createProductContexts();
         
         doExecute();
     }
@@ -598,11 +595,11 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * </ul>
      * @throws MojoExecutionException
      */
-    void createProductContexts() throws MojoExecutionException
+    Map<String, Product> createProductContexts() throws MojoExecutionException
     {
+        Map<String, Product> productMap = Maps.newHashMap();
         MavenContext mavenContext = getMavenContext();
         MavenGoals goals = getMavenGoals();
-        productMap = Maps.newHashMap();
 
         // Products in the <products> tag inherit from the upper settings, e.g. when there's a <httpPort> tag for all products
         makeProductsInheritDefaultConfiguration(products, productMap);
@@ -639,6 +636,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             }
         }
         productMap.putAll(missingProducts);
+        return productMap;
     }
 
     /**
@@ -646,6 +644,10 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      */
     protected Map<String, Product> getProductContexts() throws MojoExecutionException
     {
+        if (productMap == null)
+        {
+            productMap = createProductContexts();
+        }
         return productMap;
     }
 
