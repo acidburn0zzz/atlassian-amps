@@ -20,4 +20,10 @@ public class CreateMojo extends AbstractProductAwareMojo
 
         getMavenGoals().createPlugin(getProductId());
     }
+
+    @Override
+    protected String getDefaultProductId() throws MojoExecutionException
+    {
+        return "all";
+    }
 }

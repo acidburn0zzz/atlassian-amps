@@ -164,7 +164,7 @@ public class MavenGoals
                 goal("generate"),
                 configuration(
                         element(name("archetypeGroupId"), "com.atlassian.maven.archetypes"),
-                        element(name("archetypeArtifactId"), productId + "-plugin-archetype"),
+                        element(name("archetypeArtifactId"), (productId.equals("all") ? "" : productId + "-" ) + "plugin-archetype"),
                         element(name("archetypeVersion"), VersionUtils.getVersion())
                 ),
                 executionEnvironment());
