@@ -120,6 +120,14 @@
           <artifactId>atlassian-rest-doclet</artifactId>
           <version>2.5.0</version>
         </dependency>
+
+        <dependency>
+          <groupId>com.atlassian.amps</groupId>
+          <artifactId>standalone</artifactId>
+          <version>${project.version}</version>
+          <type>pom</type>
+          <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
