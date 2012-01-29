@@ -58,6 +58,7 @@
         <module>amps-product-plugins</module>
         <module>amps-product-archetypes</module>
         <module>standalone</module>
+        <module>maven-3-tests</module>
     </modules>
 
     <dependencyManagement>
