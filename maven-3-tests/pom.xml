@@ -30,6 +30,48 @@
             <type>tar.gz</type>
             <classifier>bin</classifier>
         </dependency>
+
+        <!-- These artifacts need to be in the local repo before
+              the integration tests run. Add them as dependencies
+              to ensure that they're fetched. -->
+        <dependency>
+            <groupId>com.atlassian.refapp</groupId>
+            <artifactId>atlassian-platform</artifactId>
+            <version>${refapp.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.refapp</groupId>
+            <artifactId>atlassian-refapp</artifactId>
+            <version>${refapp.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.labs.httpservice</groupId>
+            <artifactId>httpservice-bridge</artifactId>
+            <version>0.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.devrel</groupId>
+            <artifactId>developer-toolbox-plugin</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.labs</groupId>
+            <artifactId>fastdev-plugin</artifactId>
+            <version>1.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>apache-tomcat</artifactId>
+            <version>6.0.20</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.twdata.maven</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <version>1.0-beta-2-db2</version>
+        </dependency>
     </dependencies>
 
     <build>
