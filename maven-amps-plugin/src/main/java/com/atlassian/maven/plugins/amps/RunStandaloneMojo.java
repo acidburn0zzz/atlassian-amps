@@ -51,6 +51,11 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo
         return artifactFactory.createProjectArtifact(GROUP_ID, ARTIFACT_ID, version);
     }
 
+    protected String getAmpsGoal()
+    {
+        return "run";
+    }
+
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
         getGoogleTracker().track(GoogleAmpsTracker.RUN_STANDALONE);
@@ -81,7 +86,7 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo
                 configuration = new Xpp3Dom("configuration");
             }
 
-            goals.executeAmpsRecursively(getPluginInformation().getVersion(), "run", configuration);
+            goals.executeAmpsRecursively(getPluginInformation().getVersion(), getAmpsGoal(), configuration);
         }
         catch (Exception e)
         {

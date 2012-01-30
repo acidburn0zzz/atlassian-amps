@@ -1,0 +1,136 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.atlassian.amps</groupId>
+        <artifactId>atlassian-amps-parent</artifactId>
+        <version>3.7.3-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.atlassian.amps</groupId>
+    <artifactId>maven-3-tests</artifactId>
+    <packaging>pom</packaging>
+
+    <name>AMPS Maven Plugin - Maven 3 tests</name>
+
+    <properties>
+        <maven3.version>3.0.3</maven3.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.atlassian.maven.plugins</groupId>
+            <artifactId>maven-amps-plugin</artifactId>
+            <version>${project.version}</version>
+            <type>maven-plugin</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>apache-maven</artifactId>
+            <version>${maven3.version}</version>
+            <type>tar.gz</type>
+            <classifier>bin</classifier>
+        </dependency>
+
+        <!-- These artifacts need to be in the local repo before
+              the integration tests run. Add them as dependencies
+              to ensure that they're fetched. -->
+        <dependency>
+            <groupId>com.atlassian.refapp</groupId>
+            <artifactId>atlassian-platform</artifactId>
+            <version>${refapp.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.refapp</groupId>
+            <artifactId>atlassian-refapp</artifactId>
+            <version>${refapp.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.labs.httpservice</groupId>
+            <artifactId>httpservice-bridge</artifactId>
+            <version>0.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.devrel</groupId>
+            <artifactId>developer-toolbox-plugin</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.labs</groupId>
+            <artifactId>fastdev-plugin</artifactId>
+            <version>1.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>apache-tomcat</artifactId>
+            <version>6.0.20</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.twdata.maven</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <version>1.0-beta-2-db2</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.maven</groupId>
+                                    <artifactId>apache-maven</artifactId>
+                                    <version>${maven3.version}</version>
+                                    <type>tar.gz</type>
+                                    <classifier>bin</classifier>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>shitty</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-invoker-plugin</artifactId>
+                        <configuration>
+                            <mavenHome>${project.build.directory}/apache-maven-${maven3.version}</mavenHome>
+                            <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+                            <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
+                            <settingsFile>src/it/settings.xml</settingsFile>
+                            <pomIncludes>
+                                <pomInclude>*</pomInclude>
+                            </pomIncludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>install</goal>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
