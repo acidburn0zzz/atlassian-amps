@@ -12,6 +12,15 @@
 
     <name>Maven FishEye/Crucible Plugin</name>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.atlassian.maven.archetypes</groupId>
+            <artifactId>fecru-plugin-archetype</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <profiles>
         <profile>
             <id>shitty</id>

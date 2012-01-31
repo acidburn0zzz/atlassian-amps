@@ -1,2 +1,2 @@
 ${shitty.product}:debug org.codehaus.groovy.maven:gmaven-plugin::execute -Dallow.google.tracking=false
-clean
+clean -Dmaven.clean.failOnError=false
