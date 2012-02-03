@@ -322,11 +322,10 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected List<Product> products = new ArrayList<Product>();
     
     /**
-     * A map of {instanceId -> Product}, with all values initialized.
-     * Initialized by {@link #createProductContexts()}.
+     * A map of {instanceId -> Product}, initialized by {@link #createProductContexts()}.
+     * Cannot be set by the user. 
      */
-    @MojoParameter(readonly = true)
-    Map<String, Product> productMap;
+    private Map<String, Product> productMap;
 
     /**
      * File the container logging output will be sent to.
