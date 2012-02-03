@@ -8,7 +8,6 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -607,34 +606,22 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         {
             ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals);
             setDefaultValues(ctx, handler);
-        }
-        
-        // Check this Studio product has the dependant products declared in the pom
-        StudioProductHandler studioProductHandler = (StudioProductHandler) ProductHandlerFactory.create(ProductHandlerFactory.STUDIO, mavenContext, goals);
-        Map<String, Product> missingProducts = Maps.newHashMap();
-        for (Product studioProduct : productMap.values())
-        {
-            if (ProductHandlerFactory.STUDIO.equals(studioProduct.getId()))
+
+            // If it's a Studio product, check dependent instance are present
+            for (String instanceId : StudioProductHandler.getDependantInstances(ctx))
             {
-                List<String> dependantProductInstanceIds = studioProductHandler.getDependantInstances(studioProduct);
-                List<Product> dependantProducts = Lists.newArrayList();
-                for (String dependantProductInstanceId : dependantProductInstanceIds)
+                if (!productMap.containsKey(instanceId))
                 {
-                    Product product = productMap.get(dependantProductInstanceId);
-                    if (product == null)
-                    {
-                        ProductHandler handler = createProductHandler(dependantProductInstanceId);
-                        product = createProductContext(dependantProductInstanceId, dependantProductInstanceId, handler);
-                        missingProducts.put(dependantProductInstanceId, product);
-                    }
-                    dependantProducts.add(product);
+                    ProductHandler dependantHandler = createProductHandler(instanceId);
+                    productMap.put(instanceId, createProductContext(instanceId, instanceId, dependantHandler));
                 }
-                
-                // Submit the Studio products for configuration
-                studioProductHandler.configure(studioProduct, dependantProducts);
             }
         }
-        productMap.putAll(missingProducts);
+
+        // Submit the Studio products for configuration
+        StudioProductHandler studioProductHandler = (StudioProductHandler) ProductHandlerFactory.create(ProductHandlerFactory.STUDIO, mavenContext, goals);
+        studioProductHandler.configureStudioProducts(productMap);
+        
         return productMap;
     }
 
@@ -862,7 +849,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     /**
      * @return the list of instances for the product 'studio'
      */
-    private Iterator<ProductExecution> getStudioExecutions(final List<ProductExecution> productExecutions)
+    private Iterable<ProductExecution> getStudioExecutions(final List<ProductExecution> productExecutions)
     {
         return Iterables.filter(productExecutions, new Predicate<ProductExecution>(){
 
@@ -870,7 +857,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             public boolean apply(ProductExecution input)
             {
                 return input.getProductHandler() instanceof StudioProductHandler;
-            }}).iterator();
+            }});
     }
 
 
@@ -888,39 +875,30 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             throws MojoExecutionException
     {
         // If one of the products is Studio, ask him/her which other products he/she wants to run
-        Iterator<ProductExecution> studioExecutions = getStudioExecutions(productExecutions);
-        if (!studioExecutions.hasNext())
+        Iterable<ProductExecution> studioExecutions = getStudioExecutions(productExecutions);
+        if (Iterables.isEmpty(studioExecutions))
         {
             return productExecutions;
         }
 
         // We have studio execution(s), so we need to add all products requested by Studio
         List<ProductExecution> productExecutionsIncludingStudio = Lists.newArrayList(productExecutions);
-        while (studioExecutions.hasNext())
+        Map<String, Product> allContexts = getProductContexts();
+        for(ProductExecution execution : studioExecutions)
         {
-            ProductExecution studioExecution = studioExecutions.next();
-            Product studioProduct = studioExecution.getProduct();
-            StudioProductHandler studioProductHandler = (StudioProductHandler) studioExecution.getProductHandler();
-
-            // Ask the Studio Product Handler the list of required products
-            final List<String> dependantProductIds = studioProductHandler.getDependantInstances(studioProduct);
-
-            // Fetch the products
-            List<ProductExecution> dependantProducts = Lists.newArrayList();
-            Map<String, Product> allContexts = getProductContexts();
-            for (String instanceId : dependantProductIds)
+            for (String dependantProduct : StudioProductHandler.getDependantInstances(execution.getProduct()))
             {
-                Product product = allContexts.get(instanceId);
-                ProductHandler handler = createProductHandler(product.getId());
-                dependantProducts.add(new ProductExecution(product, handler));
+                Product product = allContexts.get(dependantProduct);
+                productExecutionsIncludingStudio.add(toProductExecution(product));
             }
-            
-            // Add everyone at the end of the list of products to execute. We don't check for duplicates, users shouldn't add studio products
-            // individually.
-            productExecutionsIncludingStudio.addAll(dependantProducts);
         }
 
         return productExecutionsIncludingStudio;
+    }
+    
+    protected ProductExecution toProductExecution(Product product)
+    {
+        return new ProductExecution(product, createProductHandler(product.getId()));
     }
 
     protected abstract void doExecute() throws MojoExecutionException, MojoFailureException;

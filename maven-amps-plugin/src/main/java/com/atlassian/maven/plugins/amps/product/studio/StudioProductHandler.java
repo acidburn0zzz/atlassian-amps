@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -101,13 +102,17 @@ final public class StudioProductHandler extends AmpsProductHandler
      * Returns the list of products that are configured in this studio instance, as defined in 'instanceIds'
      *
      * @param studioContext
-     *            the Studio product
+     *            the Studio product. If not a studio product, returns an empty list.
      * @return a list of instance ids. Never null.
      * @throws MojoExecutionException
      *             if the Studio product is misconfigured
      */
-    public List<String> getDependantInstances(Product studioContext) throws MojoExecutionException
+    public static List<String> getDependantInstances(Product studioContext) throws MojoExecutionException
     {
+        if (!STUDIO.equals(studioContext.getId()))
+        {
+            return Collections.emptyList();
+        }
         StudioProperties studioProperties = getStudioProperties(studioContext);
         studioProperties.setStudioProduct(studioContext);
         List<String> instanceIds = studioContext.getInstanceIds();
@@ -251,109 +256,112 @@ final public class StudioProductHandler extends AmpsProductHandler
     /**
      * Requests the Studio instance to configure its fellow products (home directory, ...)
      *
-     * Not thread safe.
+     * Not thread safe. The client should guarantee it calls this method once and only once for a productMap.
      *
-     * @param studioContext
-     *            the studio instance. There may be several Studio instances, so the products should be configured
-     *            with this instance in mind.
-     *
-     * @param dependantProducts
-     *            the list of products running 'in' this instance of studio (same home & applinked).
-     *            The client should guarantee it calls this method once and only once for all the product on one
-     *            Studio instance.
+     * @param productMap
+     *            The product map of { instanceId -> product }. 
      * @throws MojoExecutionException
      */
-    public void configure(Product studioContext, List<Product> dependantProducts) throws MojoExecutionException
+    public void configureStudioProducts(Map<String, Product> productMap) throws MojoExecutionException
     {
-        StudioProperties studioProperties = getStudioProperties(studioContext);
-
-        boolean confluenceStandalone = true;
-
-        // Sets properties for each product
-        for (Product product : dependantProducts)
+        // Find the Studio product, if any
+        for (Product studioContext : productMap.values())
         {
-            // Each product provides some configuration info
-
-            // JIRA, Confluence and Bamboo support the parallel startup;
-            // Crowd must be started synchronously because there's a race condition
-            // and Fisheye doesn't support parallel startup.
-
-            if (STUDIO_CROWD.equals(product.getId()))
+            if (STUDIO.equals(studioContext.getId()))
             {
-                studioProperties.setCrowd(product);
-                if (product.getSynchronousStartup() == null)
+                StudioProperties studioProperties = getStudioProperties(studioContext);
+        
+                boolean confluenceStandalone = true;
+        
+                // Sets properties for each product
+                for (String instanceId : getDependantInstances(studioContext))
                 {
-                    product.setSynchronousStartup(Boolean.TRUE);
+                    Product product = productMap.get(instanceId);
+                    
+                    // Each product provides some configuration info
+        
+                    // JIRA, Confluence and Bamboo support the parallel startup;
+                    // Crowd must be started synchronously because there's a race condition
+                    // and Fisheye doesn't support parallel startup.
+        
+                    if (STUDIO_CROWD.equals(product.getId()))
+                    {
+                        studioProperties.setCrowd(product);
+                        if (product.getSynchronousStartup() == null)
+                        {
+                            product.setSynchronousStartup(Boolean.TRUE);
+                        }
+                    }
+                    else if (STUDIO_CONFLUENCE.equals(product.getId()))
+                    {
+                        studioProperties.setConfluence(product);
+                        if (product.getSynchronousStartup() == null)
+                        {
+                            product.setSynchronousStartup(studioContext.getSynchronousStartup());
+                        }
+                    }
+                    else if (STUDIO_JIRA.equals(product.getId()))
+                    {
+                        studioProperties.setJira(product);
+                        confluenceStandalone = false;
+                        if (product.getSynchronousStartup() == null)
+                        {
+                            product.setSynchronousStartup(studioContext.getSynchronousStartup());
+                        }
+                    }
+                    else if (STUDIO_FECRU.equals(product.getId()))
+                    {
+                        studioProperties.setFisheye(product);
+                        confluenceStandalone = false;
+                    }
+                    else if (STUDIO_BAMBOO.equals(product.getId()))
+                    {
+                        studioProperties.setBamboo(product);
+                        confluenceStandalone = false;
+                        if (product.getSynchronousStartup() == null)
+                        {
+                            product.setSynchronousStartup(studioContext.getSynchronousStartup());
+                        }
+                    }
+                    else
+                    {
+                        throw new MojoExecutionException("A non-studio product was listed in a Studio instance: " + product.getInstanceId());
+                    }
+        
+                    studioProperties.setModeConfluenceStandalone(confluenceStandalone);
+        
+                    // And share the bean between all products
+                    product.setStudioProperties(studioProperties);
+        
+                    // Set the common Studio version
+                    if (STUDIO_VERSION_TOKEN.equals(product.getVersion()))
+                    {
+                        product.setVersion(studioProperties.getVersion());
+                    }
                 }
-            }
-            else if (STUDIO_CONFLUENCE.equals(product.getId()))
-            {
-                studioProperties.setConfluence(product);
-                if (product.getSynchronousStartup() == null)
-                {
-                    product.setSynchronousStartup(studioContext.getSynchronousStartup());
-                }
-            }
-            else if (STUDIO_JIRA.equals(product.getId()))
-            {
-                studioProperties.setJira(product);
-                confluenceStandalone = false;
-                if (product.getSynchronousStartup() == null)
-                {
-                    product.setSynchronousStartup(studioContext.getSynchronousStartup());
-                }
-            }
-            else if (STUDIO_FECRU.equals(product.getId()))
-            {
-                studioProperties.setFisheye(product);
-                confluenceStandalone = false;
-            }
-            else if (STUDIO_BAMBOO.equals(product.getId()))
-            {
-                studioProperties.setBamboo(product);
-                confluenceStandalone = false;
-                if (product.getSynchronousStartup() == null)
-                {
-                    product.setSynchronousStartup(studioContext.getSynchronousStartup());
-                }
-            }
-            else
-            {
-                throw new MojoExecutionException("A non-studio product was listed in a Studio instance: " + product.getInstanceId());
-            }
 
-            studioProperties.setModeConfluenceStandalone(confluenceStandalone);
+                // Sets the paths for non-products
+                File studioHomeDir = getHomeDirectory(studioContext);
+                File studioCommonsDir = studioHomeDir.getParentFile();
+                File svnHomeDir = new File(studioCommonsDir, "svn-home");
+                File webDavDir = new File(studioCommonsDir, "webdav-home");
+                String svnPublicUrl;
+                if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows"))
+                {
+                    svnPublicUrl = "file:///" + svnHomeDir.getAbsolutePath();
+                    log.warn("Studio is only designed to run on Linux systems.");
+                }
+                else
+                {
+                    svnPublicUrl = "file://" + svnHomeDir.getAbsolutePath();
+                }
 
-            // And share the bean between all products
-            product.setStudioProperties(studioProperties);
-
-            // Set the common Studio version
-            if (STUDIO_VERSION_TOKEN.equals(product.getVersion()))
-            {
-                product.setVersion(studioProperties.getVersion());
+                studioProperties.setStudioHome(studioHomeDir.getAbsolutePath());
+                studioProperties.setSvnRoot(svnHomeDir.getAbsolutePath());
+                studioProperties.setSvnPublicUrl(svnPublicUrl);
+                studioProperties.setWebDavHome(webDavDir.getAbsolutePath());
             }
         }
-
-        // Sets the paths for non-products
-        File studioHomeDir = getHomeDirectory(studioContext);
-        File studioCommonsDir = studioHomeDir.getParentFile();
-        File svnHomeDir = new File(studioCommonsDir, "svn-home");
-        File webDavDir = new File(studioCommonsDir, "webdav-home");
-        String svnPublicUrl;
-        if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows"))
-        {
-            svnPublicUrl = "file:///" + svnHomeDir.getAbsolutePath();
-            log.warn("Studio is only designed to run on Linux systems.");
-        }
-        else
-        {
-            svnPublicUrl = "file://" + svnHomeDir.getAbsolutePath();
-        }
-
-        studioProperties.setStudioHome(studioHomeDir.getAbsolutePath());
-        studioProperties.setSvnRoot(svnHomeDir.getAbsolutePath());
-        studioProperties.setSvnPublicUrl(svnPublicUrl);
-        studioProperties.setWebDavHome(webDavDir.getAbsolutePath());
     }
 
     /**
