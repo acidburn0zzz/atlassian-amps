@@ -6,11 +6,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 import org.jfrog.maven.annomojo.annotations.MojoParameter;
 import org.jfrog.maven.annomojo.annotations.MojoComponent;
-import org.shaded.mojoexecutor.MojoExecutor;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
@@ -18,16 +15,9 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.goal;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.executionEnvironment;
 
-import java.util.List;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.HashSet;
-
-import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
+import com.atlassian.maven.plugins.amps.util.MavenPropertiesUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 
 /**
@@ -58,9 +48,9 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
 
     public final void execute() throws MojoExecutionException, MojoFailureException
     {
-        String targetArtifactId = detectAmpsProduct();
+        String targetArtifact = MavenPropertiesUtils.detectAmpsProduct(project);
 
-        if (targetArtifactId != null && session.getGoals().size() > 0)
+        if (targetArtifact != null && session.getGoals().size() > 0)
         {
             // We only pass in the first goal since we know the shell scripts only pass in one goal
             String goal = determineGoal();
@@ -68,7 +58,7 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
             executeMojo(
                 plugin(
                         groupId("com.atlassian.maven.plugins"),
-                        artifactId(targetArtifactId),
+                        artifactId("maven-" + targetArtifact + "-plugin"),
                         version(VersionUtils.getVersion())  //ignored anyway
                 ),
                 goal(goal),
@@ -86,34 +76,5 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
         String goal = (String) session.getGoals().get(0);
         goal = goal.substring(goal.lastIndexOf(":") + 1);
         return goal;
-    }
-
-    final String detectAmpsProduct()
-    {
-        List buildPlugins = project.getBuildPlugins();
-
-        Set<String> possiblePluginTypes = new HashSet<String>(ProductHandlerFactory.getIds());
-        possiblePluginTypes.add("amps");
-
-        if (buildPlugins != null)
-        {
-            for (Iterator iterator = buildPlugins.iterator(); iterator.hasNext();)
-            {
-                Plugin pomPlugin = (Plugin) iterator.next();
-
-                if ("com.atlassian.maven.plugins".equals(pomPlugin.getGroupId()))
-                {
-                    for (String type : possiblePluginTypes)
-                    {
-                        if (("maven-" + type + "-plugin").equals(pomPlugin.getArtifactId()))
-                        {
-                            return pomPlugin.getArtifactId();
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-
     }
 }

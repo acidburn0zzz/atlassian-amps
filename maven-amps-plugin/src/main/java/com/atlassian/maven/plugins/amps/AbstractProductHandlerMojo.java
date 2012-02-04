@@ -22,6 +22,7 @@ import com.atlassian.maven.plugins.amps.product.ProductHandler;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
 import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
+import com.atlassian.maven.plugins.amps.util.MavenPropertiesUtils;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -569,7 +570,9 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         systemPropertyVariables.putAll((Map) systemProperties);
 
         detectDeprecatedVersionOverrides();
-        
+        MavenPropertiesUtils.checkUsingTheRightAmpsPlugin(getMavenContext());
+        MavenPropertiesUtils.checkUnusedConfiguration(this, getMavenContext());
+            
         doExecute();
     }
 
@@ -602,7 +605,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         // Products in the <products> tag inherit from the upper settings, e.g. when there's a <httpPort> tag for all products
         makeProductsInheritDefaultConfiguration(products, productMap);
 
-        for (Product ctx : productMap.values())
+        for (Product ctx : Lists.newArrayList(productMap.values()))
         {
             ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals);
             setDefaultValues(ctx, handler);

@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -50,6 +51,12 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     private String pluginVersion;
 
     /**
+     * The mojo being executed
+     */
+    @MojoParameter(expression = "${mojoExecution}", required = true, readonly = true)
+    private MojoExecution mojoExecution;
+
+    /**
      * the maven context
      */
     private MavenContext mavenContext;
@@ -68,12 +75,12 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
                 Object buildPluginManager = (BuildPluginManager) session.lookup("org.apache.maven.plugin.BuildPluginManager");
 
                 /* Maven 3 */
-                mavenContext = new MavenContext(project, reactor, session, (BuildPluginManager) buildPluginManager, getLog());
+                mavenContext = new MavenContext(project, reactor, session, mojoExecution, (BuildPluginManager) buildPluginManager, getLog());
             }
             catch (ComponentLookupException e)
             {
                 /* Maven 2 */
-                mavenContext = new MavenContext(project, reactor, session, pluginManager, getLog());
+                mavenContext = new MavenContext(project, reactor, session, mojoExecution, pluginManager, getLog());
             }
         }
         return mavenContext;

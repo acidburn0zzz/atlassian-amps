@@ -6,6 +6,9 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
+
+import com.atlassian.maven.plugins.amps.util.MavenPropertiesUtils;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -72,7 +75,14 @@ public class TestAbstractAmpsDispatcherMojo extends TestCase
         Build build = new Build();
         build.setPlugins(buildPlugins);
         project.setBuild(build);
-        assertEquals(expected, artifactId.equals(mojo.detectAmpsProduct()));
+        if (expected)
+        {
+            assertEquals(artifactId, "maven-" + MavenPropertiesUtils.detectAmpsProduct(project) + "-plugin");
+        }
+        else
+        {
+            assertNotSame(artifactId, "maven-" + MavenPropertiesUtils.detectAmpsProduct(project) + "-plugin");
+        }
     }
 
 }
