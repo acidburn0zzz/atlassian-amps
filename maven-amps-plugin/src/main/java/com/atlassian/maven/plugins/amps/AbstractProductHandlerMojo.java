@@ -602,7 +602,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         // Products in the <products> tag inherit from the upper settings, e.g. when there's a <httpPort> tag for all products
         makeProductsInheritDefaultConfiguration(products, productMap);
 
-        for (Product ctx : productMap.values())
+        for (Product ctx : Lists.newArrayList(productMap.values()))
         {
             ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals);
             setDefaultValues(ctx, handler);
