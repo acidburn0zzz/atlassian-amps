@@ -68,6 +68,16 @@
                 <artifactId>maven-core</artifactId>
                 <version>3.0</version>
             </dependency>
+            <dependency>
+                <groupId>com.atlassian.fugue</groupId>
+                <artifactId>fugue</artifactId>
+                <version>${fugue.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.googlecode.guava-osgi</groupId>
+                <artifactId>guava-osgi</artifactId>
+                <version>${guava.osgi.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -91,7 +101,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.7</version>
+            <version>1.8.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -304,6 +314,8 @@
         <refapp.version>2.12.0</refapp.version>
         <confluence.version>4.0</confluence.version>
         <confluence.data.version>3.5</confluence.data.version>
+        <fugue.version>1.0</fugue.version>
+        <guava.osgi.version>6.0.0</guava.osgi.version>
         <!-- TODO: Move jira to 5.0 and use ${jira.version} in jira-plugin-archetype once 5.0 final is released -->
         <jira.version>4.4.1</jira.version>
         <jira.data.version>4.4</jira.data.version>
