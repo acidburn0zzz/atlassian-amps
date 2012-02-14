@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
@@ -75,15 +76,31 @@ public class StudioJiraProductHandler extends JiraProductHandler implements Stud
 
         StudioProductHandler.addProductHandlerOverrides(log, ctx, homeDir, explodedWarDir);
 
-        // JIRA needs a bit more PermGen - default is -Xmx512m -XX:MaxPermSize=160m
-        if (ctx.getJvmArgs() == null)
+        fixMemorySettings(ctx);
+    }
+
+    // JIRA needs a bit more PermGen - default is -Xmx512m -XX:MaxPermSize=160m
+    protected void fixMemorySettings(Product ctx)
+    {
+        List<String> args = Lists.newArrayList();
+        String jvmArgs = ctx.getJvmArgs();
+        if (jvmArgs != null)
         {
-            ctx.setJvmArgs("-Xms256m -Xmx768m -XX:MaxPermSize=512m");
+            args.add(jvmArgs);
         }
-        else
+        if (!StringUtils.contains(jvmArgs, "-Xms"))
         {
-            ctx.setJvmArgs(ctx.getJvmArgs() + " -Xms256m -Xmx768m -XX:MaxPermSize=512m");
+            args.add("-Xms256m");
         }
+        if (!StringUtils.contains(jvmArgs, "-Xmx"))
+        {
+            args.add("-Xmx768m");
+        }
+        if (!StringUtils.contains(jvmArgs, "-XX:MaxPermSize="))
+        {
+            args.add("-XX:MaxPermSize=512m");
+        }
+        ctx.setJvmArgs(StringUtils.join(args, ' '));
     }
 
     @Override
