@@ -188,7 +188,7 @@
 
 #macro(action $action)
     #if($action)
-        <action name="$action.fullyQualifiedClassname" alias="$action.classname">
+        <action name="$action.classId.fullName" alias="$action.classId.name">
             #views($action.views)
         </action>
     #end

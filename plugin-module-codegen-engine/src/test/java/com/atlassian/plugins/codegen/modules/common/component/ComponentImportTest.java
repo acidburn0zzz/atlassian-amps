@@ -31,7 +31,7 @@ public class ComponentImportTest extends AbstractCodegenTestCase<ComponentImport
         setProps(new ComponentImportProperties("com.atlassian.SomeInterface"));
         props.setIncludeExamples(false);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
     }
 
 

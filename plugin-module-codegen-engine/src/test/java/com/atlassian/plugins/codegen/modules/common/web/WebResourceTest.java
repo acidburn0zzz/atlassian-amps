@@ -43,7 +43,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
     {
         String xpath = "/atlassian-plugin/web-resource[@name='Awesome Web Resource' and @key='awesome-web-resource' and @i18n-name-key='awesome-web-resource.name']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid web-resource not found", pluginDoc.selectSingleNode(xpath));
@@ -63,7 +63,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.addDependency("jira.web.resources:ajs");
         props.addDependency("jira.web.resources:jquery");
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
 
@@ -90,7 +90,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.addContext("atl.general");
         props.addContext("atl.userprofile");
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
 
@@ -119,7 +119,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
 
         props.addTransformation(transformation);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
 
@@ -155,7 +155,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
 
         props.addTransformation(transformation);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
 
@@ -196,7 +196,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.addTransformation(txtTrans);
         props.addTransformation(cssTrans);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
 
@@ -228,7 +228,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -251,7 +251,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -275,7 +275,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -302,7 +302,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -332,7 +332,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -365,7 +365,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -406,7 +406,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.getResources()
                 .add(resource2);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);

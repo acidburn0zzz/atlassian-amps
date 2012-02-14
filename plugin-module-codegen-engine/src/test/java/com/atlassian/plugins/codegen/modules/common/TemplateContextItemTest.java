@@ -41,7 +41,7 @@ public class TemplateContextItemTest extends AbstractCodegenTestCase<TemplateCon
     public void componentRefModuleIsValid() throws Exception
     {
         props.setComponentRef(COMPONENT_REF);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         String xpath = "/atlassian-plugin/template-context-item[@name='My Template Context Item' and @key='my-template-context-item' and @i18n-name-key='my-template-context-item.name' and @component-ref='" + COMPONENT_REF + "' and @global='false' and @context-key='" + CONTEXT_KEY + "']";
@@ -54,7 +54,7 @@ public class TemplateContextItemTest extends AbstractCodegenTestCase<TemplateCon
     public void classModuleIsValid() throws Exception
     {
         props.setFullyQualifiedClassname(CLASSNAME);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         String xpath = "/atlassian-plugin/template-context-item[@name='My Template Context Item' and @key='my-template-context-item' and @i18n-name-key='my-template-context-item.name' and @class='" + CLASSNAME + "' and @global='false' and @context-key='" + CONTEXT_KEY + "']";
@@ -68,7 +68,7 @@ public class TemplateContextItemTest extends AbstractCodegenTestCase<TemplateCon
     {
         props.setComponentRef(COMPONENT_REF);
         props.setGlobal(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         String xpath = "/atlassian-plugin/template-context-item[@name='My Template Context Item' and @key='my-template-context-item' and @i18n-name-key='my-template-context-item.name' and @component-ref='" + COMPONENT_REF + "' and @global='true' and @context-key='" + CONTEXT_KEY + "']";

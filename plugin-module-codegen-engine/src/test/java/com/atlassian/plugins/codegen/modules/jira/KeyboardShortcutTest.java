@@ -39,7 +39,7 @@ public class KeyboardShortcutTest extends AbstractCodegenTestCase<KeyboardShortc
     @Test
     public void allFilesAreGenerated() throws Exception
     {
-        creator.createModule(moduleLocation, props);
+        createModule();
         assertTrue("plugin.xml not generated", new File(resourcesDir, "atlassian-plugin.xml").exists());
 
     }
@@ -54,7 +54,7 @@ public class KeyboardShortcutTest extends AbstractCodegenTestCase<KeyboardShortc
 
         String xpath = "/atlassian-plugin/keyboard-shortcut[@name='My Keyboard Shortcut' and @key='my-keyboard-shortcut' and @i18n-name-key='my-keyboard-shortcut.name']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         Node rootNode = pluginDoc.selectSingleNode(xpath);

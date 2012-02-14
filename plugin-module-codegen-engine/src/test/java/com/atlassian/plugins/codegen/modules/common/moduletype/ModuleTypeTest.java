@@ -37,7 +37,7 @@ public class ModuleTypeTest extends AbstractCodegenTestCase<ModuleTypeProperties
         props.setFullyQualifiedInterface(PACKAGE_NAME + ".Dictionary");
         props.setIncludeExamples(false);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
     }
 
     @Test

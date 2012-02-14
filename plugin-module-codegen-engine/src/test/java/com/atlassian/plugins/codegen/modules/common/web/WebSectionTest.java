@@ -40,7 +40,7 @@ public class WebSectionTest extends AbstractWebFragmentTest<WebSectionProperties
     {
         String xpath = "/atlassian-plugin/web-section[@name='Awesome Web Section' and @key='awesome-web-section' and @i18n-name-key='awesome-web-section.name' and @location='system.admin/mysection' and @weight='1000']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid web-section not found", pluginDoc.selectSingleNode(xpath));
@@ -53,7 +53,7 @@ public class WebSectionTest extends AbstractWebFragmentTest<WebSectionProperties
 
         String xpath = "/atlassian-plugin/web-section[@name='Awesome Web Section' and @key='awesome-web-section' and @i18n-name-key='awesome-web-section.name' and @location='system.admin/mysection' and @weight='20']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid web-section with custom weight not found", pluginDoc.selectSingleNode(xpath));
@@ -72,7 +72,7 @@ public class WebSectionTest extends AbstractWebFragmentTest<WebSectionProperties
 
         String labelXpath = "/atlassian-plugin/web-section/label[@key='web.section.mysection']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         Node labelNode = pluginDoc.selectSingleNode(labelXpath);
@@ -100,7 +100,7 @@ public class WebSectionTest extends AbstractWebFragmentTest<WebSectionProperties
         String param1Xpath = "/atlassian-plugin/web-section/param[@name='isAwesomeSection' and @value='true']";
         String param2Xpath = "/atlassian-plugin/web-section/param[@name='isSuperAwesome' and @value='false']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("param 1 not found", pluginDoc.selectSingleNode(param1Xpath));
@@ -115,7 +115,7 @@ public class WebSectionTest extends AbstractWebFragmentTest<WebSectionProperties
 
         String xpath = "/atlassian-plugin/web-section/tooltip[@key='web.section.mysection.tooltip']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("tooltip not found", pluginDoc.selectSingleNode(xpath));

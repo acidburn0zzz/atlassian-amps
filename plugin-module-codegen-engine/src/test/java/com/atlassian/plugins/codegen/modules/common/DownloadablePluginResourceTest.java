@@ -46,12 +46,12 @@ public class DownloadablePluginResourceTest extends AbstractCodegenTestCase<Down
         resource.setType("download");
 
         setProps(new DownloadablePluginResourceProperties(resource));
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
 
-        assertEquals("expected single resource", 2, resourceList.size());
+        assertEquals("expected single resource", 1, resourceList.size());
 
         String nodeXpath = "//resource[@name='style.css' and @location='com/example/plugin/style.css' and @type='download']";
         assertNotNull("single resource not found", pluginDoc.selectSingleNode(nodeXpath));
@@ -67,12 +67,12 @@ public class DownloadablePluginResourceTest extends AbstractCodegenTestCase<Down
         resource.setType("download");
 
         setProps(new DownloadablePluginResourceProperties(resource));
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
 
-        assertEquals("expected single resource", 2, resourceList.size());
+        assertEquals("expected single resource", 1, resourceList.size());
 
         String nodeXpath = "//resource[@namePattern='*.css' and @location='com/example/plugin/style.css' and @type='download']";
         assertNotNull("single resource not found", pluginDoc.selectSingleNode(nodeXpath));
@@ -89,12 +89,12 @@ public class DownloadablePluginResourceTest extends AbstractCodegenTestCase<Down
         resource.setType("download");
 
         setProps(new DownloadablePluginResourceProperties(resource));
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
 
-        assertEquals("expected single resource", 2, resourceList.size());
+        assertEquals("expected single resource", 1, resourceList.size());
 
         String nodeXpath = "//resource[not(@namePattern) and @name='style.css' and @location='com/example/plugin/style.css' and @type='download']";
         assertNotNull("single resource not found", pluginDoc.selectSingleNode(nodeXpath));
@@ -114,12 +114,12 @@ public class DownloadablePluginResourceTest extends AbstractCodegenTestCase<Down
                 .put("awesome", "me");
 
         setProps(new DownloadablePluginResourceProperties(resource));
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
 
-        assertEquals("expected single resource", 2, resourceList.size());
+        assertEquals("expected single resource", 1, resourceList.size());
 
         String nodeXpath = "//resource[not(@namePattern) and @name='style.css' and @location='com/example/plugin/style.css' and @type='download']";
         Node resourceNode = pluginDoc.selectSingleNode(nodeXpath);

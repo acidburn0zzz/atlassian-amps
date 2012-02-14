@@ -43,7 +43,7 @@ public class ComponentTest extends AbstractCodegenTestCase<ComponentProperties>
         props.setFullyQualifiedInterface(PACKAGE_NAME + ".CustomInterface");
         props.setGenerateClass(true);
         props.setGenerateInterface(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         String itPackagePath = "it" + File.separator + packagePath;
@@ -61,7 +61,7 @@ public class ComponentTest extends AbstractCodegenTestCase<ComponentProperties>
         props.setFullyQualifiedInterface(PACKAGE_NAME + ".CustomInterface");
         props.setGenerateClass(true);
         props.setGenerateInterface(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         String compXPath = "/atlassian-plugin/component[@name='Custom Component' and @key='custom-component' and @i18n-name-key='custom-component.name' and @class='" + PACKAGE_NAME + ".CustomComponent']";

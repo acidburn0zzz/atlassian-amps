@@ -1,13 +1,15 @@
 package com.atlassian.plugins.codegen.modules.common;
 
-import java.io.File;
-
-import com.atlassian.plugins.codegen.annotations.*;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
+import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+
+import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 
 /**
  * @since 3.6
@@ -16,9 +18,6 @@ import org.apache.commons.lang.StringUtils;
 @JiraPluginModuleCreator
 @ConfluencePluginModuleCreator
 @FeCruPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-})
 public class GadgetModuleCreator extends AbstractPluginModuleCreator<GadgetProperties>
 {
 
@@ -31,37 +30,17 @@ public class GadgetModuleCreator extends AbstractPluginModuleCreator<GadgetPrope
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "gadget-plugin.xml.vtl";
 
     @Override
-    public void createModule(PluginModuleLocation location, GadgetProperties props) throws Exception
+    public PluginProjectChangeset createModule(GadgetProperties props) throws Exception
     {
+        String gadgetLocation = props.getLocation();
+        String gadgetFilename = FilenameUtils.getName(gadgetLocation);
+        String gadgetPath = FilenameUtils.getPath(gadgetLocation);
 
-
-        if (props.includeExamples())
-        {
-
-        } else
-        {
-            String gadgetLocation = props.getLocation();
-            String gadgetFilename = FilenameUtils.getName(gadgetLocation);
-            String gadgetPath = FilenameUtils.getPath(gadgetLocation);
-            File gadgetFolder;
-
-            if (StringUtils.isNotBlank(gadgetPath))
-            {
-                gadgetFolder = new File(location.getResourcesDir(), gadgetPath);
-            } else
-            {
-                gadgetFolder = location.getResourcesDir();
-            }
-
-            //gadget
-            templateHelper.writeFileFromTemplate(GADGET_TEMPLATE, gadgetFilename, gadgetFolder, props);
-
-        }
-
-
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
+        return new PluginProjectChangeset()
+            .withDependencies(MOCKITO_TEST)
+            .with(createModule(props, PLUGIN_MODULE_TEMPLATE))
+            .with(createResource(props, gadgetPath, gadgetFilename, GADGET_TEMPLATE));
     }
-
 
     @Override
     public String getModuleName()

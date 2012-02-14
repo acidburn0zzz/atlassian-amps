@@ -39,12 +39,12 @@ public class RPCTest extends AbstractCodegenTestCase<RPCProperties>
         props.setIncludeExamples(false);
         props.setSoap(true);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MySoapEndpointImpl.java").exists());
         assertTrue("interface not generated", new File(srcDir, packagePath + File.separator + "MySoapEndpoint.java").exists());
-        assertTrue("test class not generated", new File(testDir, packagePath + File.separator + "MySoapEndpointTest.java").exists());
+        assertTrue("test class not generated", new File(testDir, packagePath + File.separator + "MySoapEndpointImplTest.java").exists());
         assertTrue("plugin.xml not generated", new File(resourcesDir, "atlassian-plugin.xml").exists());
 
     }
@@ -56,12 +56,12 @@ public class RPCTest extends AbstractCodegenTestCase<RPCProperties>
         props.setIncludeExamples(false);
         props.setSoap(false);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyXmlEndpointImpl.java").exists());
         assertTrue("interface not generated", new File(srcDir, packagePath + File.separator + "MyXmlEndpoint.java").exists());
-        assertTrue("test class not generated", new File(testDir, packagePath + File.separator + "MyXmlEndpointTest.java").exists());
+        assertTrue("test class not generated", new File(testDir, packagePath + File.separator + "MyXmlEndpointImplTest.java").exists());
         assertTrue("plugin.xml not generated", new File(resourcesDir, "atlassian-plugin.xml").exists());
 
     }
@@ -77,7 +77,7 @@ public class RPCTest extends AbstractCodegenTestCase<RPCProperties>
         props.setIncludeExamples(false);
         props.setSoap(true);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         Node rpcNode = pluginDoc.selectSingleNode(xpath);
@@ -98,7 +98,7 @@ public class RPCTest extends AbstractCodegenTestCase<RPCProperties>
         props.setIncludeExamples(false);
         props.setSoap(false);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         Node rpcNode = pluginDoc.selectSingleNode(xpath);
@@ -114,7 +114,7 @@ public class RPCTest extends AbstractCodegenTestCase<RPCProperties>
         props.setIncludeExamples(false);
         props.setSoap(true);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         String compXPath = "/atlassian-plugin/component[@name='My Soap Endpoint Component' and @key='my-soap-endpoint-component' and @i18n-name-key='my-soap-endpoint.name.component' and @class='" + PACKAGE_NAME + ".MySoapEndpointImpl']";
@@ -133,7 +133,7 @@ public class RPCTest extends AbstractCodegenTestCase<RPCProperties>
         props.setIncludeExamples(false);
         props.setSoap(true);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         String compXPath = "/atlassian-plugin/component[@name='My Xml Endpoint Component' and @key='my-xml-endpoint-component' and @i18n-name-key='my-xml-endpoint.name.component' and @class='" + PACKAGE_NAME + ".MyXmlEndpointImpl']";

@@ -33,7 +33,7 @@ public class GadgetTest extends AbstractCodegenTestCase<GadgetProperties>
 
         props.setIncludeExamples(false);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
     }
 
     @Test

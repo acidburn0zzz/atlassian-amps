@@ -1,12 +1,22 @@
 package com.atlassian.plugins.codegen.modules.common;
 
-import com.atlassian.plugins.codegen.annotations.*;
+import com.atlassian.plugins.codegen.ComponentDeclaration;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
+import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-import com.atlassian.plugins.codegen.modules.common.component.ComponentImportModuleCreator;
-import com.atlassian.plugins.codegen.modules.common.component.ComponentImportProperties;
-import com.atlassian.plugins.codegen.modules.common.component.ComponentModuleCreator;
-import com.atlassian.plugins.codegen.modules.common.component.ComponentProperties;
+
+import com.google.common.collect.ImmutableMap;
+
+import static com.atlassian.fugue.Option.some;
+import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
+import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.PROVIDED;
+import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
+import static com.atlassian.plugins.codegen.ComponentImport.componentImport;
 
 /**
  * @since 3.7
@@ -17,45 +27,30 @@ import com.atlassian.plugins.codegen.modules.common.component.ComponentPropertie
 @BambooPluginModuleCreator
 @FeCruPluginModuleCreator
 @CrowdPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "com.atlassian.upm", artifactId = "licensing-api", version = "2.0", scope = "provided"),
-        @Dependency(groupId = "com.atlassian.upm", artifactId = "upm-api", version = "2.0", scope = "provided"),
-        @Dependency(groupId = "com.atlassian.plugins", artifactId = "atlassian-plugins-core", version = "2.9.0", scope = "provided"),
-        @Dependency(groupId = "com.atlassian.sal", artifactId = "sal-api", version = "2.6.0", scope = "provided")
-})
 public class LicensingModuleCreator extends AbstractPluginModuleCreator<LicensingProperties>
 {
     public static final String MODULE_NAME = "Atlassian License Management";
 
-    public static final String PLUGIN_LICENSE_MANAGER_CLASS = "com.atlassian.upm.api.license.PluginLicenseManager";
-    public static final String PLUGIN_CONTROLLER_CLASS = "com.atlassian.plugin.PluginController";
-    public static final String PLUGIN_LICENSE_EVENT_REGISTRY_CLASS = "com.atlassian.upm.api.license.PluginLicenseEventRegistry";
     public static final String LICENSE_CHECKER_DESCRIPTION = "Atlassian license management module";
     public static final String LICENSE_CHECKER_CLASS_TEMPLATE = "templates/common/licensing/LicenseChecker.java.vtl";
     
     @Override
-    public void createModule(PluginModuleLocation location, LicensingProperties props) throws Exception
+    public PluginProjectChangeset createModule(LicensingProperties props) throws Exception
     {
-        addPluginInfoParamToPluginXml(location, "atlassian-licensing-enabled", "true");
-        
-        ComponentImportModuleCreator importCreator = new ComponentImportModuleCreator();
-        importCreator.createModule(location, new ComponentImportProperties(PLUGIN_LICENSE_MANAGER_CLASS));
-        importCreator.createModule(location, new ComponentImportProperties(PLUGIN_CONTROLLER_CLASS));
-        importCreator.createModule(location, new ComponentImportProperties(PLUGIN_LICENSE_EVENT_REGISTRY_CLASS));
-        
-        ComponentModuleCreator componentCreator = new ComponentModuleCreator();
-        ComponentProperties componentProps = new ComponentProperties(props.getFullyQualifiedClassname());
-        componentProps.setGenerateClass(false);
-        componentProps.setGenerateInterface(false);
-        componentProps.setIncludeExamples(false);
-        componentProps.setDescription(LICENSE_CHECKER_DESCRIPTION);
-        componentCreator.createModule(location, componentProps);
-        
-        templateHelper.writeJavaClassFromTemplate(LICENSE_CHECKER_CLASS_TEMPLATE,
-                                                  props.getClassname(),
-                                                  location.getSourceDirectory(),
-                                                  props.getPackage(),
-                                                  props);
+        ComponentDeclaration licensingComponent = ComponentDeclaration.builder(props.getClassId(), props.getModuleKey())
+            .description(some(LICENSE_CHECKER_DESCRIPTION))
+            .build();
+        return new PluginProjectChangeset()
+            .withDependencies(dependency("com.atlassian.upm", "licensing-api", "2.0", PROVIDED),
+                                      dependency("com.atlassian.upm", "upm-api", "2.0", PROVIDED),
+                                      dependency("com.atlassian.plugins", "atlassian-plugins-core", "2.9.0", PROVIDED),
+                                      dependency("com.atlassian.sal", "sal-api", "2.6.0", PROVIDED))
+            .withPluginParameters(ImmutableMap.of("atlassian-licensing-enabled", "true"))
+            .withComponentImports(componentImport(fullyQualified("com.atlassian.upm.api.license.PluginLicenseManager")),
+                                  componentImport(fullyQualified("com.atlassian.upm.api.license.PluginLicenseEventRegistry")),
+                                  componentImport(fullyQualified("com.atlassian.plugin.PluginController")))
+            .withComponentDeclarations(licensingComponent)
+            .with(createClass(props, LICENSE_CHECKER_CLASS_TEMPLATE));
     }
 
     @Override

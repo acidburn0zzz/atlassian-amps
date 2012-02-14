@@ -44,7 +44,7 @@ public class VersionTabPanelTest extends AbstractCodegenTestCase<TabPanelPropert
     public void customFilesAreGenerated() throws Exception
     {
         props.setUseCustomClass(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyVersionTabPanel.java").exists());
@@ -60,7 +60,7 @@ public class VersionTabPanelTest extends AbstractCodegenTestCase<TabPanelPropert
         setProps(new TabPanelProperties(VersionTabPanelModuleCreator.FQ_GENERIC_CLASS));
         props.setUseCustomClass(false);
         props.setModuleNameAndKey("My Version Tab Panel");
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertFalse("main class should not be generated", new File(srcDir, packagePath + File.separator + "MyVersionTabPanel.java").exists());
@@ -75,7 +75,7 @@ public class VersionTabPanelTest extends AbstractCodegenTestCase<TabPanelPropert
     {
         String xpath = "/atlassian-plugin/version-tabpanel[@name='My Version Tab Panel' and @key='my-version-tab-panel' and @i18n-name-key='my-version-tab-panel.name' and @class='" + PACKAGE_NAME + ".MyVersionTabPanel']";
         props.setUseCustomClass(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid custom version-tabpanel not found", pluginDoc.selectSingleNode(xpath));
@@ -89,7 +89,7 @@ public class VersionTabPanelTest extends AbstractCodegenTestCase<TabPanelPropert
         setProps(new TabPanelProperties(VersionTabPanelModuleCreator.FQ_GENERIC_CLASS));
         props.setModuleNameAndKey("My Version Tab Panel");
         props.setUseCustomClass(false);
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid generic version-tabpanel not found", pluginDoc.selectSingleNode(xpath));
@@ -103,7 +103,7 @@ public class VersionTabPanelTest extends AbstractCodegenTestCase<TabPanelPropert
         Label label = new Label("common.concepts.version.tabpanel", "my version panel");
         props.setLabel(label);
         props.setUseCustomClass(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String labelXpath = "/atlassian-plugin/version-tabpanel/label[@key='common.concepts.version.tabpanel']";
         Document pluginDoc = getXmlDocument(pluginXml);
@@ -128,7 +128,7 @@ public class VersionTabPanelTest extends AbstractCodegenTestCase<TabPanelPropert
         String xpath = "/atlassian-plugin/version-tabpanel[@name='My Version Tab Panel' and @key='my-version-tab-panel' and @i18n-name-key='my-version-tab-panel.name' and @class='" + PACKAGE_NAME + ".MyVersionTabPanel']";
         props.setOrder(10);
         props.setUseCustomClass(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String orderXpath = "/atlassian-plugin/version-tabpanel/order[text() = '10']";
         Document pluginDoc = getXmlDocument(pluginXml);

@@ -35,7 +35,7 @@ public class ServletContextListenerTest extends AbstractCodegenTestCase<ServletC
 
         props.setIncludeExamples(false);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
     }
 
     @Test

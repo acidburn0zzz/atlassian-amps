@@ -46,7 +46,7 @@ public class SearchRequestViewTest extends AbstractCodegenTestCase<SearchRequest
     @Test
     public void allFilesAreGenerated() throws Exception
     {
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
 
@@ -63,7 +63,7 @@ public class SearchRequestViewTest extends AbstractCodegenTestCase<SearchRequest
         props.setContentType(CTYPE);
 
         String xpath = "/atlassian-plugin/search-request-view[@name='My Search Request View' and @key='my-search-request-view' and @i18n-name-key='my-search-request-view.name' and @class='" + PACKAGE_NAME + ".MySearchRequestView' and @fileExtension='html' and @contentType='text/html']";
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid search-request-view not found", pluginDoc.selectSingleNode(xpath));
@@ -81,7 +81,7 @@ public class SearchRequestViewTest extends AbstractCodegenTestCase<SearchRequest
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -104,7 +104,7 @@ public class SearchRequestViewTest extends AbstractCodegenTestCase<SearchRequest
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -128,7 +128,7 @@ public class SearchRequestViewTest extends AbstractCodegenTestCase<SearchRequest
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -155,7 +155,7 @@ public class SearchRequestViewTest extends AbstractCodegenTestCase<SearchRequest
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -195,7 +195,7 @@ public class SearchRequestViewTest extends AbstractCodegenTestCase<SearchRequest
         props.getResources()
                 .add(resource2);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);

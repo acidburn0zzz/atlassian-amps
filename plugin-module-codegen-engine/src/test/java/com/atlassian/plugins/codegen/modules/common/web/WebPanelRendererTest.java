@@ -34,7 +34,7 @@ public class WebPanelRendererTest extends AbstractCodegenTestCase<WebPanelRender
 
         props.setIncludeExamples(false);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
     }
 
     @Test
@@ -52,7 +52,7 @@ public class WebPanelRendererTest extends AbstractCodegenTestCase<WebPanelRender
     {
         String xpath = "/atlassian-plugin/web-panel-renderer[@name='My Web Panel Renderer' and @key='my-web-panel-renderer' and @i18n-name-key='my-web-panel-renderer.name' and @class='" + PACKAGE_NAME + ".MyWebPanelRenderer']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid web-panel-renderer not found", pluginDoc.selectSingleNode(xpath));

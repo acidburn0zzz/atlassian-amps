@@ -35,7 +35,7 @@ public class WebPanelTest extends AbstractWebFragmentTest<WebPanelProperties>
     {
         String xpath = "/atlassian-plugin/web-panel[@name='Awesome Web Panel' and @key='awesome-web-panel' and @i18n-name-key='awesome-web-panel.name' and @location='system.admin/mysection' and @weight='1000']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid web-panel not found", pluginDoc.selectSingleNode(xpath));
@@ -48,7 +48,7 @@ public class WebPanelTest extends AbstractWebFragmentTest<WebPanelProperties>
 
         String xpath = "/atlassian-plugin/web-panel[@name='Awesome Web Panel' and @key='awesome-web-panel' and @i18n-name-key='awesome-web-panel.name' and @location='system.admin/mysection' and @weight='20']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid web-panel with custom weight not found", pluginDoc.selectSingleNode(xpath));

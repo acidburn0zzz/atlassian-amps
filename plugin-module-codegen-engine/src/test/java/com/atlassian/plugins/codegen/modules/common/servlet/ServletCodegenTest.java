@@ -37,8 +37,7 @@ public class ServletCodegenTest extends AbstractCodegenTestCase<ServletPropertie
         props.setIncludeExamples(false);
         props.addInitParam("foo", "bar");
 
-        creator.createModule(moduleLocation, props);
-        creator.createModule(moduleLocation, props);
+        createModule();
     }
 
     @Test

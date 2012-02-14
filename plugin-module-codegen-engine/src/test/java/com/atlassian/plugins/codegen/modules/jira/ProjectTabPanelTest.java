@@ -44,7 +44,7 @@ public class ProjectTabPanelTest extends AbstractCodegenTestCase<TabPanelPropert
     public void customFilesAreGenerated() throws Exception
     {
         props.setUseCustomClass(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyProjectTabPanel.java").exists());
@@ -60,7 +60,7 @@ public class ProjectTabPanelTest extends AbstractCodegenTestCase<TabPanelPropert
         setProps(new TabPanelProperties(ProjectTabPanelModuleCreator.FQ_GENERIC_CLASS));
         props.setUseCustomClass(false);
         props.setModuleNameAndKey("My Project Tab Panel");
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertFalse("main class should not be generated", new File(srcDir, packagePath + File.separator + "MyProjectTabPanel.java").exists());
@@ -75,7 +75,7 @@ public class ProjectTabPanelTest extends AbstractCodegenTestCase<TabPanelPropert
     {
         String xpath = "/atlassian-plugin/project-tabpanel[@name='My Project Tab Panel' and @key='my-project-tab-panel' and @i18n-name-key='my-project-tab-panel.name' and @class='" + PACKAGE_NAME + ".MyProjectTabPanel']";
         props.setUseCustomClass(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid project-tabpanel not found", pluginDoc.selectSingleNode(xpath));
@@ -89,7 +89,7 @@ public class ProjectTabPanelTest extends AbstractCodegenTestCase<TabPanelPropert
         setProps(new TabPanelProperties(ProjectTabPanelModuleCreator.FQ_GENERIC_CLASS));
         props.setModuleNameAndKey("My Project Tab Panel");
         props.setUseCustomClass(false);
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid generic project-tabpanel not found", pluginDoc.selectSingleNode(xpath));
@@ -103,7 +103,7 @@ public class ProjectTabPanelTest extends AbstractCodegenTestCase<TabPanelPropert
         Label label = new Label("common.concepts.project.tabpanel", "my project panel");
         props.setLabel(label);
         props.setUseCustomClass(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String labelXpath = "/atlassian-plugin/project-tabpanel/label[@key='common.concepts.project.tabpanel']";
         Document pluginDoc = getXmlDocument(pluginXml);
@@ -128,7 +128,7 @@ public class ProjectTabPanelTest extends AbstractCodegenTestCase<TabPanelPropert
         String xpath = "/atlassian-plugin/project-tabpanel[@name='My Project Tab Panel' and @key='my-project-tab-panel' and @i18n-name-key='my-project-tab-panel.name' and @class='" + PACKAGE_NAME + ".MyProjectTabPanel']";
         props.setOrder(10);
         props.setUseCustomClass(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String orderXpath = "/atlassian-plugin/project-tabpanel/order[text() = '10']";
         Document pluginDoc = getXmlDocument(pluginXml);

@@ -45,7 +45,7 @@ public class IssueTabPanelTest extends AbstractCodegenTestCase<TabPanelPropertie
     @Test
     public void allFilesAreGenerated() throws Exception
     {
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyIssueTabPanel.java").exists());
@@ -60,7 +60,7 @@ public class IssueTabPanelTest extends AbstractCodegenTestCase<TabPanelPropertie
     {
         String xpath = "/atlassian-plugin/issue-tabpanel[@name='My Issue Tab Panel' and @key='my-issue-tab-panel' and @i18n-name-key='my-issue-tab-panel.name' and @class='" + PACKAGE_NAME + ".MyIssueTabPanel']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid issue-tabpanel not found", pluginDoc.selectSingleNode(xpath));
@@ -73,7 +73,7 @@ public class IssueTabPanelTest extends AbstractCodegenTestCase<TabPanelPropertie
 
         Label label = new Label("common.concepts.issue.tabpanel", "my issue panel");
         props.setLabel(label);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String labelXpath = "/atlassian-plugin/issue-tabpanel/label[@key='common.concepts.issue.tabpanel']";
         Document pluginDoc = getXmlDocument(pluginXml);
@@ -97,7 +97,7 @@ public class IssueTabPanelTest extends AbstractCodegenTestCase<TabPanelPropertie
     {
         String xpath = "/atlassian-plugin/issue-tabpanel[@name='My Issue Tab Panel' and @key='my-issue-tab-panel' and @i18n-name-key='my-issue-tab-panel.name' and @class='" + PACKAGE_NAME + ".MyIssueTabPanel']";
         props.setOrder(10);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String orderXpath = "/atlassian-plugin/issue-tabpanel/order[text() = '10']";
         Document pluginDoc = getXmlDocument(pluginXml);

@@ -2,7 +2,8 @@ package com.atlassian.plugins.codegen.modules;
 
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.Properties;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * @since 3.6
@@ -28,5 +29,5 @@ public interface PluginModuleProperties extends Map<Object, Object>
 
     void addI18nProperty(String name, String value);
 
-    Properties getI18nProperties();
+    ImmutableMap<String, String> getI18nProperties();
 }

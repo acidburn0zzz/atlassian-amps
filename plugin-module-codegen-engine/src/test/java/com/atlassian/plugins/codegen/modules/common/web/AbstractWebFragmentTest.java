@@ -28,7 +28,7 @@ public abstract class AbstractWebFragmentTest<T extends AbstractWebFragmentPrope
     public void contextProviderIsAdded() throws Exception
     {
         props.setContextProvider(JIRA_MODIFIER_KEY_CTX_PROVIDER);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
 
@@ -51,7 +51,7 @@ public abstract class AbstractWebFragmentTest<T extends AbstractWebFragmentPrope
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -74,7 +74,7 @@ public abstract class AbstractWebFragmentTest<T extends AbstractWebFragmentPrope
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -98,7 +98,7 @@ public abstract class AbstractWebFragmentTest<T extends AbstractWebFragmentPrope
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -125,7 +125,7 @@ public abstract class AbstractWebFragmentTest<T extends AbstractWebFragmentPrope
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -165,7 +165,7 @@ public abstract class AbstractWebFragmentTest<T extends AbstractWebFragmentPrope
         props.getResources()
                 .add(resource2);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);

@@ -1,20 +1,17 @@
 package fake.annotation.parser.modules.dependencies;
 
-import com.atlassian.plugins.codegen.annotations.Dependencies;
-import com.atlassian.plugins.codegen.annotations.Dependency;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
+
+import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
+import static com.atlassian.plugins.codegen.modules.Dependencies.SERVLET_API;
 
 /**
  * @since 3.6
  */
 @JiraPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "javax.servlet", artifactId = "servlet-api", version = "2.4", scope = "provided")
-        , @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-})
 public class ValidJiraWithDependencies implements PluginModuleCreator
 {
     public static final String MODULE_NAME = "Valid Jira Module With Dependencies";
@@ -26,8 +23,9 @@ public class ValidJiraWithDependencies implements PluginModuleCreator
     }
 
     @Override
-    public void createModule(PluginModuleLocation location, PluginModuleProperties props) throws Exception
+    public PluginProjectChangeset createModule(PluginModuleProperties props) throws Exception
     {
-
+        return new PluginProjectChangeset()
+            .withDependencies(SERVLET_API, MOCKITO_TEST);
     }
 }

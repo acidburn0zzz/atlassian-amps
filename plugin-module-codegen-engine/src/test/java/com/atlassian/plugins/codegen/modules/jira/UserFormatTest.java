@@ -44,7 +44,7 @@ public class UserFormatTest extends AbstractCodegenTestCase<UserFormatProperties
     @Test
     public void allFilesAreGenerated() throws Exception
     {
-        creator.createModule(moduleLocation, props);
+        createModule();
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyUserFormat.java").exists());
         assertTrue("test class not generated", new File(testDir, packagePath + File.separator + "MyUserFormatTest.java").exists());
@@ -61,7 +61,7 @@ public class UserFormatTest extends AbstractCodegenTestCase<UserFormatProperties
 
         String xpath = "/atlassian-plugin/user-format[@name='My User Format' and @key='my-user-format' and @i18n-name-key='my-user-format.name' and @class='" + PACKAGE_NAME + ".MyUserFormat']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         Node userFormatNode = pluginDoc.selectSingleNode(xpath);
@@ -82,7 +82,7 @@ public class UserFormatTest extends AbstractCodegenTestCase<UserFormatProperties
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -105,7 +105,7 @@ public class UserFormatTest extends AbstractCodegenTestCase<UserFormatProperties
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -129,7 +129,7 @@ public class UserFormatTest extends AbstractCodegenTestCase<UserFormatProperties
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -156,7 +156,7 @@ public class UserFormatTest extends AbstractCodegenTestCase<UserFormatProperties
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -196,7 +196,7 @@ public class UserFormatTest extends AbstractCodegenTestCase<UserFormatProperties
         props.getResources()
                 .add(resource2);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);

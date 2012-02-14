@@ -34,7 +34,7 @@ public class JqlFunctionTest extends AbstractCodegenTestCase<JqlFunctionProperti
 
         props.setIncludeExamples(false);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
     }
 
     @Test
@@ -53,7 +53,7 @@ public class JqlFunctionTest extends AbstractCodegenTestCase<JqlFunctionProperti
     {
         String xpath = "/atlassian-plugin/jql-function[@name='My Jql Function' and @key='my-jql-function' and @i18n-name-key='my-jql-function.name' and @class='" + PACKAGE_NAME + ".MyJqlFunction']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid jql-function not found", pluginDoc.selectSingleNode(xpath));

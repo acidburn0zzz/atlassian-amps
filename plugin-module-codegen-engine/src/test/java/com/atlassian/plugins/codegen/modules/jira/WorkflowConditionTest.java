@@ -46,7 +46,7 @@ public class WorkflowConditionTest extends AbstractCodegenTestCase<WorkflowEleme
     public void allFilesAreGenerated() throws Exception
     {
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
 
@@ -63,7 +63,7 @@ public class WorkflowConditionTest extends AbstractCodegenTestCase<WorkflowEleme
     public void moduleIsValid() throws Exception
     {
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
         Node moduleNode = pluginDoc.selectSingleNode(XPATH);
 
@@ -74,7 +74,7 @@ public class WorkflowConditionTest extends AbstractCodegenTestCase<WorkflowEleme
     public void moduleHasCondition() throws Exception
     {
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
         Node moduleNode = pluginDoc.selectSingleNode(XPATH);
 

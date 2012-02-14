@@ -45,7 +45,7 @@ public class WorkflowPostFunctionTest extends AbstractCodegenTestCase<WorkflowPo
     public void allFilesAreGenerated() throws Exception
     {
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
 
@@ -62,7 +62,7 @@ public class WorkflowPostFunctionTest extends AbstractCodegenTestCase<WorkflowPo
     public void moduleIsValid() throws Exception
     {
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
         Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
 
@@ -77,7 +77,7 @@ public class WorkflowPostFunctionTest extends AbstractCodegenTestCase<WorkflowPo
     public void moduleHasFunction() throws Exception
     {
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
         Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
 
@@ -92,7 +92,7 @@ public class WorkflowPostFunctionTest extends AbstractCodegenTestCase<WorkflowPo
     {
 
         props.setOrderable(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
         Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
 
@@ -107,7 +107,7 @@ public class WorkflowPostFunctionTest extends AbstractCodegenTestCase<WorkflowPo
     {
 
         props.setDeletable(false);
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
         Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
 
@@ -122,7 +122,7 @@ public class WorkflowPostFunctionTest extends AbstractCodegenTestCase<WorkflowPo
     {
 
         props.setUnique(true);
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
         Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
 
@@ -137,7 +137,7 @@ public class WorkflowPostFunctionTest extends AbstractCodegenTestCase<WorkflowPo
     {
 
         props.setAddable("global,common");
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
         Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
 
@@ -155,7 +155,7 @@ public class WorkflowPostFunctionTest extends AbstractCodegenTestCase<WorkflowPo
         props.setDeletable(false);
         props.setUnique(true);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
         Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
 

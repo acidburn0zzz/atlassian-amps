@@ -8,7 +8,11 @@ import java.util.Properties;
 import java.util.UUID;
 
 import com.atlassian.plugins.codegen.annotations.asm.ModuleCreatorAnnotationParser;
-import com.atlassian.plugins.codegen.modules.*;
+import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
+import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
+import com.atlassian.plugins.codegen.modules.PluginModuleCreatorRegistry;
+import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -86,6 +90,13 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
         FileUtils.deleteQuietly(tempDir);
     }
 
+    protected void createModule() throws Exception
+    {
+        PluginProjectChangeset changes = creator.createModule(props);
+        new PluginXmlRewriter(moduleLocation).applyChanges(changes);
+        new ProjectFilesRewriter(moduleLocation).applyChanges(changes);
+    }
+    
     protected Document getXmlDocument(File xmlFile) throws MalformedURLException, DocumentException
     {
         SAXReader reader = new SAXReader();

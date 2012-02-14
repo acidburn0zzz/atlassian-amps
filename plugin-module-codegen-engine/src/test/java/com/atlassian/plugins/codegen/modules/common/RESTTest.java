@@ -40,7 +40,7 @@ public class RESTTest extends AbstractCodegenTestCase<RESTProperties>
     @Test
     public void allFilesAreGenerated() throws Exception
     {
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         String itPackagePath = "it" + File.separator + packagePath;
@@ -57,7 +57,7 @@ public class RESTTest extends AbstractCodegenTestCase<RESTProperties>
     {
         String xpath = "/atlassian-plugin/rest[@name='My Rest Resource' and @key='my-rest-resource' and @i18n-name-key='my-rest-resource.name' and @path='/myrestresource' and @version='1.0']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid rest not found", pluginDoc.selectSingleNode(xpath));
@@ -69,7 +69,7 @@ public class RESTTest extends AbstractCodegenTestCase<RESTProperties>
         String xpath = "/atlassian-plugin/rest[@name='My Rest Resource' and @key='my-rest-resource' and @i18n-name-key='my-rest-resource.name' and @path='/helloworld' and @version='1.0']";
 
         props.setPath("/helloworld");
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("rest with custom path not found", pluginDoc.selectSingleNode(xpath));
@@ -81,7 +81,7 @@ public class RESTTest extends AbstractCodegenTestCase<RESTProperties>
         String xpath = "/atlassian-plugin/rest[@name='My Rest Resource' and @key='my-rest-resource' and @i18n-name-key='my-rest-resource.name' and @path='/myrestresource' and @version='1.1']";
 
         props.setVersion("1.1");
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("rest with custom version not found", pluginDoc.selectSingleNode(xpath));
@@ -98,7 +98,7 @@ public class RESTTest extends AbstractCodegenTestCase<RESTProperties>
         String package2Xpath = "package[text() = '" + package2 + "'";
 
         props.setPackagesToScan(Arrays.asList(package1, package2));
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         Node restNode = pluginDoc.selectSingleNode(xpath);
@@ -118,7 +118,7 @@ public class RESTTest extends AbstractCodegenTestCase<RESTProperties>
         String dispatcher2Xpath = "dispatcher[text() = '" + forwardDispatcher + "'";
 
         props.setDispatchers(Arrays.asList(requestDispatcher, forwardDispatcher));
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         Node restNode = pluginDoc.selectSingleNode(xpath);

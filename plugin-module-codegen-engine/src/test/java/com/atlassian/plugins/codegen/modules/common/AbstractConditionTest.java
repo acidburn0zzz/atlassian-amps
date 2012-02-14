@@ -29,7 +29,7 @@ public abstract class AbstractConditionTest<T extends AbstractConditionsProperti
     @Test
     public void emptyConditionsAreNotIncluded() throws Exception
     {
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> conditions = pluginDoc.selectNodes(XPATH_ALL_CONDITIONS);
         List<Node> condition = pluginDoc.selectNodes(XPATH_ALL_CONDITION);
@@ -43,7 +43,7 @@ public abstract class AbstractConditionTest<T extends AbstractConditionsProperti
     {
         props.getConditions()
                 .add(new Condition(JIRA_GLOBAL_PERMISSION));
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> conditions = pluginDoc.selectNodes(XPATH_ALL_CONDITIONS);
@@ -68,7 +68,7 @@ public abstract class AbstractConditionTest<T extends AbstractConditionsProperti
 
         props.getConditions()
                 .add(jiraCondition);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
 
@@ -92,7 +92,7 @@ public abstract class AbstractConditionTest<T extends AbstractConditionsProperti
         props.getConditions()
                 .add(conditionsRoot);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> conditions = pluginDoc.selectNodes(XPATH_ALL_CONDITIONS);
@@ -123,7 +123,7 @@ public abstract class AbstractConditionTest<T extends AbstractConditionsProperti
         props.getConditions()
                 .add(conditionsRoot);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> conditions = pluginDoc.selectNodes(XPATH_ALL_CONDITIONS);
@@ -158,7 +158,7 @@ public abstract class AbstractConditionTest<T extends AbstractConditionsProperti
         props.getConditions()
                 .add(conditionsRoot);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> conditionsList = pluginDoc.selectNodes(XPATH_TOP_CONDITIONS);
@@ -211,7 +211,7 @@ public abstract class AbstractConditionTest<T extends AbstractConditionsProperti
         props.getConditions()
                 .add(singleCondition);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> conditionsList = pluginDoc.selectNodes(XPATH_TOP_CONDITIONS);
@@ -254,7 +254,7 @@ public abstract class AbstractConditionTest<T extends AbstractConditionsProperti
         props.getConditions()
                 .add(condition);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> conditionList = pluginDoc.selectNodes(XPATH_ALL_CONDITION);

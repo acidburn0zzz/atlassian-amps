@@ -43,7 +43,7 @@ public class CustomFieldTest extends AbstractCodegenTestCase<CustomFieldProperti
     @Test
     public void allFilesAreGenerated() throws Exception
     {
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyCustomField.java").exists());
@@ -56,7 +56,7 @@ public class CustomFieldTest extends AbstractCodegenTestCase<CustomFieldProperti
     {
         String xpath = "/atlassian-plugin/customfield-type[@name='My Custom Field' and @key='my-custom-field' and @i18n-name-key='my-custom-field.name' and @class='" + PACKAGE_NAME + ".MyCustomField']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid customfield-type not found", pluginDoc.selectSingleNode(xpath));
@@ -73,7 +73,7 @@ public class CustomFieldTest extends AbstractCodegenTestCase<CustomFieldProperti
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -96,7 +96,7 @@ public class CustomFieldTest extends AbstractCodegenTestCase<CustomFieldProperti
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -120,7 +120,7 @@ public class CustomFieldTest extends AbstractCodegenTestCase<CustomFieldProperti
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -147,7 +147,7 @@ public class CustomFieldTest extends AbstractCodegenTestCase<CustomFieldProperti
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -187,7 +187,7 @@ public class CustomFieldTest extends AbstractCodegenTestCase<CustomFieldProperti
         props.getResources()
                 .add(resource2);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);

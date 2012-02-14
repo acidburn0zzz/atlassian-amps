@@ -1,8 +1,15 @@
 package com.atlassian.plugins.codegen.modules.common.moduletype;
 
-import com.atlassian.plugins.codegen.annotations.*;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
+import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+
+import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 
 /**
  * @since 3.6
@@ -13,12 +20,8 @@ import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 @BambooPluginModuleCreator
 @FeCruPluginModuleCreator
 @CrowdPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-})
 public class ModuleTypeModuleCreator extends AbstractPluginModuleCreator<ModuleTypeProperties>
 {
-
     public static final String MODULE_NAME = "Module Type";
     private static final String TEMPLATE_PREFIX = "templates/common/moduletype/";
 
@@ -32,35 +35,23 @@ public class ModuleTypeModuleCreator extends AbstractPluginModuleCreator<ModuleT
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "module-type-plugin.xml.vtl";
 
     @Override
-    public void createModule(PluginModuleLocation location, ModuleTypeProperties props) throws Exception
+    public PluginProjectChangeset createModule(ModuleTypeProperties props) throws Exception
     {
-        String packageName = props.getPackage();
-        String classname = props.getClassname();
-        String iClassname = props.getInterfaceClass();
-        String iPackage = props.getInterfacePackage();
+        PluginProjectChangeset ret = new PluginProjectChangeset()
+            .withDependencies(MOCKITO_TEST)
+            .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 
+        
         if (props.includeExamples())
         {
-            templateHelper.writeJavaClassFromTemplate(EXAMPLE_CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-        } else
-        {
-            //main interface
-            templateHelper.writeJavaClassFromTemplate(INTERFACE_TEMPLATE, iClassname, location.getSourceDirectory(), iPackage, props);
-
-            //main class
-            templateHelper.writeJavaClassFromTemplate(CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-
-            //unit test
-            templateHelper.writeJavaClassFromTemplate(GENERIC_TEST_TEMPLATE, testClassname(classname), location.getTestDirectory(), packageName, props);
-
-            //func test
-            templateHelper.writeJavaClassFromTemplate(GENERIC_TEST_TEMPLATE, funcTestClassname(classname), location.getTestDirectory(), funcTestPackageName(packageName), props);
+            return ret.with(createClass(props, EXAMPLE_CLASS_TEMPLATE));
         }
-
-
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
+        else
+        {
+            return ret.with(createClass(props, props.getInterfaceId(), INTERFACE_TEMPLATE))
+                .with(createClassAndTests(props, CLASS_TEMPLATE, GENERIC_TEST_TEMPLATE, GENERIC_TEST_TEMPLATE));
+        }
     }
-
 
     @Override
     public String getModuleName()

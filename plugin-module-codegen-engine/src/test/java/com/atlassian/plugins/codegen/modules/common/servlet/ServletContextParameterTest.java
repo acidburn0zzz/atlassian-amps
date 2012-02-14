@@ -30,7 +30,7 @@ public class ServletContextParameterTest extends AbstractCodegenTestCase<Servlet
 
         setProps(new ServletContextParameterProperties("MY Param Name"));
 
-        creator.createModule(moduleLocation, props);
+        createModule();
     }
 
     @Test

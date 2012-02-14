@@ -46,7 +46,7 @@ public class ReportTest extends AbstractCodegenTestCase<ReportProperties>
     @Test
     public void allFilesAreGenerated() throws Exception
     {
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyReport.java").exists());
@@ -66,7 +66,7 @@ public class ReportTest extends AbstractCodegenTestCase<ReportProperties>
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         assertTrue("i18n not generated", new File(resourcesDir, "MyReport.properties").exists());
     }
@@ -76,7 +76,7 @@ public class ReportTest extends AbstractCodegenTestCase<ReportProperties>
     {
         String xpath = "/atlassian-plugin/report[@name='My Report' and @key='my-report' and @i18n-name-key='my-report.name' and @class='" + PACKAGE_NAME + ".MyReport']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid report not found", pluginDoc.selectSingleNode(xpath));
@@ -95,7 +95,7 @@ public class ReportTest extends AbstractCodegenTestCase<ReportProperties>
 
         String labelXpath = "/atlassian-plugin/report/label[@key='common.concepts.create.new.issue']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         Node labelNode = pluginDoc.selectSingleNode(labelXpath);
@@ -125,7 +125,7 @@ public class ReportTest extends AbstractCodegenTestCase<ReportProperties>
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -148,7 +148,7 @@ public class ReportTest extends AbstractCodegenTestCase<ReportProperties>
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -172,7 +172,7 @@ public class ReportTest extends AbstractCodegenTestCase<ReportProperties>
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -199,7 +199,7 @@ public class ReportTest extends AbstractCodegenTestCase<ReportProperties>
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -239,7 +239,7 @@ public class ReportTest extends AbstractCodegenTestCase<ReportProperties>
         props.getResources()
                 .add(resource2);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);

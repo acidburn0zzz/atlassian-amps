@@ -34,7 +34,7 @@ public class WebResourceTransformerTest extends AbstractCodegenTestCase<WebResou
 
         props.setIncludeExamples(false);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
     }
 
     @Test
@@ -53,7 +53,7 @@ public class WebResourceTransformerTest extends AbstractCodegenTestCase<WebResou
     {
         String xpath = "/atlassian-plugin/web-resource-transformer[@name='My Web Resource Transformer' and @key='my-web-resource-transformer' and @i18n-name-key='my-web-resource-transformer.name' and @class='" + PACKAGE_NAME + ".MyWebResourceTransformer']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid web-resource-transformer not found", pluginDoc.selectSingleNode(xpath));

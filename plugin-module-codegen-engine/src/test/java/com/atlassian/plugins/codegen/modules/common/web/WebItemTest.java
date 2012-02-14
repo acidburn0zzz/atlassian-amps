@@ -43,7 +43,7 @@ public class WebItemTest extends AbstractWebFragmentTest<WebItemProperties>
     {
         String xpath = "/atlassian-plugin/web-item[@name='My Web Item' and @key='my-web-item' and @i18n-name-key='my-web-item.name' and @section='system.admin/globalsettings' and @weight='1000']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid web-item not found", pluginDoc.selectSingleNode(xpath));
@@ -56,7 +56,7 @@ public class WebItemTest extends AbstractWebFragmentTest<WebItemProperties>
 
         String xpath = "/atlassian-plugin/web-item[@name='My Web Item' and @key='my-web-item' and @i18n-name-key='my-web-item.name' and @section='system.admin/globalsettings' and @weight='20']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid web-item with custom weight not found", pluginDoc.selectSingleNode(xpath));
@@ -74,7 +74,7 @@ public class WebItemTest extends AbstractWebFragmentTest<WebItemProperties>
 
         String xpath = "/atlassian-plugin/web-item/icon[@width='16' and @height='16']/link";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         Node linkNode = pluginDoc.selectSingleNode(xpath);
@@ -96,7 +96,7 @@ public class WebItemTest extends AbstractWebFragmentTest<WebItemProperties>
 
         String labelXpath = "/atlassian-plugin/web-item/label[@key='common.concepts.create.new.issue']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         Node labelNode = pluginDoc.selectSingleNode(labelXpath);
@@ -126,7 +126,7 @@ public class WebItemTest extends AbstractWebFragmentTest<WebItemProperties>
 
         String linkXpath = "/atlassian-plugin/web-item/link[@linkId='create link']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         Node linkNode = pluginDoc.selectSingleNode(linkXpath);
@@ -144,7 +144,7 @@ public class WebItemTest extends AbstractWebFragmentTest<WebItemProperties>
         String param1Xpath = "/atlassian-plugin/web-item/param[@name='isPopupLink' and @value='true']";
         String param2Xpath = "/atlassian-plugin/web-item/param[@name='isSuperAwesome' and @value='false']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("param 1 not found", pluginDoc.selectSingleNode(param1Xpath));
@@ -159,7 +159,7 @@ public class WebItemTest extends AbstractWebFragmentTest<WebItemProperties>
 
         String xpath = "/atlassian-plugin/web-item/tooltip[@key='common.concepts.create.new.issue.tooltip']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("tooltip not found", pluginDoc.selectSingleNode(xpath));

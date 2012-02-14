@@ -42,7 +42,7 @@ public class WebworkTest extends AbstractCodegenTestCase<WebworkProperties>
     {
         ActionProperties action = new ActionProperties(PACKAGE_NAME + ".ActionOne");
         props.addAction(action);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertTrue("action class not generated", new File(srcDir, packagePath + File.separator + "ActionOne.java").exists());
@@ -58,7 +58,7 @@ public class WebworkTest extends AbstractCodegenTestCase<WebworkProperties>
         ActionProperties action2 = new ActionProperties(PACKAGE_NAME + ".ActionTwo");
         props.addAction(action1);
         props.addAction(action2);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertTrue("action one class not generated", new File(srcDir, packagePath + File.separator + "ActionOne.java").exists());
@@ -77,11 +77,10 @@ public class WebworkTest extends AbstractCodegenTestCase<WebworkProperties>
         View successView = new View("success", "templates/success.vm");
         action.addView(successView);
         props.addAction(action);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String webworkXpath = "/atlassian-plugin/webwork1[@name='My Webwork' and @key='my-webwork' and @i18n-name-key='my-webwork.name']";
 
-        creator.createModule(moduleLocation, props);
         Document pluginDoc = getXmlDocument(pluginXml);
         Node webworkNode = pluginDoc.selectSingleNode(webworkXpath);
 
@@ -113,11 +112,10 @@ public class WebworkTest extends AbstractCodegenTestCase<WebworkProperties>
         action.addView(successView);
         action.addView(errorView);
         props.addAction(action);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String webworkXpath = "/atlassian-plugin/webwork1[@name='My Webwork' and @key='my-webwork' and @i18n-name-key='my-webwork.name']";
 
-        creator.createModule(moduleLocation, props);
         Document pluginDoc = getXmlDocument(pluginXml);
         Node webworkNode = pluginDoc.selectSingleNode(webworkXpath);
 
@@ -163,11 +161,10 @@ public class WebworkTest extends AbstractCodegenTestCase<WebworkProperties>
 
         props.addAction(actionOne);
         props.addAction(actionTwo);
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String webworkXpath = "/atlassian-plugin/webwork1[@name='My Webwork' and @key='my-webwork' and @i18n-name-key='my-webwork.name']";
 
-        creator.createModule(moduleLocation, props);
         Document pluginDoc = getXmlDocument(pluginXml);
         Node webworkNode = pluginDoc.selectSingleNode(webworkXpath);
 

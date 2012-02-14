@@ -103,7 +103,7 @@ public class ReportPrompter extends AbstractResourcePrompter<ReportProperties>
     {
         Resource resource = new Resource();
         resource.setName("i18n");
-        resource.setLocation(props.getClassname());
+        resource.setLocation(props.getClassId().getName());
         resource.setType("i18n");
 
         props.addResource(resource);

@@ -44,7 +44,7 @@ public class CustomFieldSearcherTest extends AbstractCodegenTestCase<CustomField
         setProps(new CustomFieldSearcherProperties("com.atlassian.SomeBuiltInSearcher"));
         props.setIncludeExamples(false);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         String packagePath = "com.atlassian".replaceAll("\\.", Matcher.quoteReplacement(File.separator));
 
         assertFalse("main class was generated", new File(srcDir, packagePath + File.separator + "SomeBuiltInSearcher.java").exists());
@@ -58,7 +58,7 @@ public class CustomFieldSearcherTest extends AbstractCodegenTestCase<CustomField
     {
         props.setGenerateClass(true);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyCustomFieldSearcher.java").exists());
@@ -72,7 +72,7 @@ public class CustomFieldSearcherTest extends AbstractCodegenTestCase<CustomField
 
         String xpath = "/atlassian-plugin/customfield-searcher[@name='My Custom Field Searcher' and @key='my-custom-field-searcher' and @i18n-name-key='my-custom-field-searcher.name' and @class='" + PACKAGE_NAME + ".MyCustomFieldSearcher']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid customfield-searcher not found", pluginDoc.selectSingleNode(xpath));
@@ -86,7 +86,7 @@ public class CustomFieldSearcherTest extends AbstractCodegenTestCase<CustomField
 
         String xpath = "/atlassian-plugin/customfield-searcher/valid-customfield-type[@package='com.atlassian.customfields' and @key='some-searcher']";
 
-        creator.createModule(moduleLocation, props);
+        createModule();
         Document pluginDoc = getXmlDocument(pluginXml);
 
         assertNotNull("valid custom field not found", pluginDoc.selectSingleNode(xpath));
@@ -103,7 +103,7 @@ public class CustomFieldSearcherTest extends AbstractCodegenTestCase<CustomField
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -126,7 +126,7 @@ public class CustomFieldSearcherTest extends AbstractCodegenTestCase<CustomField
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -150,7 +150,7 @@ public class CustomFieldSearcherTest extends AbstractCodegenTestCase<CustomField
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -177,7 +177,7 @@ public class CustomFieldSearcherTest extends AbstractCodegenTestCase<CustomField
         props.getResources()
                 .add(resource);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
@@ -217,7 +217,7 @@ public class CustomFieldSearcherTest extends AbstractCodegenTestCase<CustomField
         props.getResources()
                 .add(resource2);
 
-        creator.createModule(moduleLocation, props);
+        createModule();
 
         Document pluginDoc = getXmlDocument(pluginXml);
         List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
