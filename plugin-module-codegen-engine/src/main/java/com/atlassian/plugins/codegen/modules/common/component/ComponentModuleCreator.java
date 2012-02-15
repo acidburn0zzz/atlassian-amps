@@ -40,7 +40,9 @@ public class ComponentModuleCreator extends AbstractPluginModuleCreator<Componen
     {
         ComponentDeclaration.Builder component = ComponentDeclaration.builder(props.getClassId(), props.getModuleKey())
             .name(option(props.getModuleName()))
-            .nameI18nKey(option(props.getNameI18nKey()));
+            .nameI18nKey(option(props.getNameI18nKey()))
+            .description(option(props.getDescription()))
+            .descriptionI18nKey(option(props.getDescriptionI18nKey()));
         if (props.generateInterface())
         {
             component.interfaceId(some(props.getInterfaceId()));

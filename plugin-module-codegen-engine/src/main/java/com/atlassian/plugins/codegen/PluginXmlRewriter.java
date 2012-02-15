@@ -46,7 +46,7 @@ public class PluginXmlRewriter implements ProjectRewriter
     public void applyPluginXmlChanges(InputStream in, PluginProjectChangeset changes, OutputStream out) throws IOException
     {
         try
-            {
+        {
             PluginXmlHelper pluginXmlHelper = new PluginXmlHelper(in);
         
             if (!changes.getI18nProperties().isEmpty())

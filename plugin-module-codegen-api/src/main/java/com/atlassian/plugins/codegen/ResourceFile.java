@@ -18,7 +18,7 @@ public class ResourceFile
     
     private ResourceFile(String relativePath, String name, String content)
     {
-        this.relativePath = checkNotNull(relativePath, "relativePath");
+        this.relativePath = normalizePath(checkNotNull(relativePath, "relativePath"));
         this.name = checkNotNull(name, "name");
         this.content = checkNotNull(content, "content");
     }
@@ -36,5 +36,10 @@ public class ResourceFile
     public String getContent()
     {
         return content;
+    }
+    
+    private String normalizePath(String path)
+    {
+        return (path.endsWith("/")) ? path.substring(0, path.length() - 1) : path;
     }
 }

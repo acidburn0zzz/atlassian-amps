@@ -23,7 +23,7 @@ public final class ComponentImport
     {
         this.interfaceClass = checkNotNull(interfaceClass, "interfaceClass");
         this.key = checkNotNull(key, "key");
-        this.filter = checkNotNull(key, "filter");
+        this.filter = checkNotNull(filter, "filter");
     }
     
     public ComponentImport key(Option<String> key)
