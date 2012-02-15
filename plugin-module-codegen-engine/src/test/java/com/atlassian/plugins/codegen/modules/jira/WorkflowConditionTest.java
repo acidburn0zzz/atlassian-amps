@@ -1,87 +1,76 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
-import java.io.File;
-import java.util.regex.Matcher;
+import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
-import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-
-import org.dom4j.Document;
-import org.dom4j.Node;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @since 3.6
  */
-public class WorkflowConditionTest extends AbstractCodegenTestCase<WorkflowElementProperties>
+public class WorkflowConditionTest extends AbstractModuleCreatorTestCase<WorkflowElementProperties>
 {
-    public static final String PACKAGE_NAME = "com.atlassian.plugins.workflow";
-    public static final String XPATH = "/atlassian-plugin/workflow-condition[@name='My Workflow Condition' and @key='my-workflow-condition' and @i18n-name-key='my-workflow-condition.name' and @class='" + PACKAGE_NAME + ".MyWorkflowConditionFactory']";
-
-    protected File templatePath;
+    public WorkflowConditionTest()
+    {
+        super("workflow-condition", new WorkflowConditionModuleCreator());
+    }
 
     @Before
-    public void runGenerator() throws Exception
+    public void setupProps() throws Exception
     {
-        setCreator(new WorkflowConditionModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
-
         setProps(new WorkflowElementProperties(PACKAGE_NAME + ".MyWorkflowCondition"));
-
         props.setIncludeExamples(false);
-
-        templatePath = new File(templateDir, "conditions");
-
     }
 
     @Test
-    public void allFilesAreGenerated() throws Exception
+    public void classFileIsGenerated() throws Exception
     {
-
-        createModule();
-
-        String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
-
-        assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyWorkflowCondition.java").exists());
-        assertTrue("factory class not generated", new File(srcDir, packagePath + File.separator + "MyWorkflowConditionFactory.java").exists());
-        assertTrue("test class not generated", new File(testDir, packagePath + File.separator + "MyWorkflowConditionTest.java").exists());
-        assertTrue("view template not generated", new File(templatePath, "my-workflow-condition.vm").exists());
-        assertTrue("input template not generated", new File(templatePath, "my-workflow-condition-input.vm").exists());
-        assertTrue("plugin.xml not generated", new File(resourcesDir, "atlassian-plugin.xml").exists());
-
+        getSourceFile(PACKAGE_NAME, "MyWorkflowCondition");
     }
 
     @Test
-    public void moduleIsValid() throws Exception
+    public void factoryClassFileIsGenerated() throws Exception
     {
-
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-        Node moduleNode = pluginDoc.selectSingleNode(XPATH);
-
-        assertNotNull("valid workflow-condition not found", moduleNode);
+        getSourceFile(PACKAGE_NAME, "MyWorkflowConditionFactory");
     }
-
+    
     @Test
-    public void moduleHasCondition() throws Exception
+    public void unitTestFileIsGenerated() throws Exception
     {
-
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-        Node moduleNode = pluginDoc.selectSingleNode(XPATH);
-
-        String subXpath = "condition-class[text() = '" + PACKAGE_NAME + ".MyWorkflowCondition']";
-
-        assertNotNull("valid workflow-condition not found", moduleNode);
-        assertNotNull("valid condition-class not found", moduleNode.selectSingleNode(subXpath));
+        getTestSourceFile(PACKAGE_NAME, "MyWorkflowConditionTest");
     }
-
+   
+    @Test
+    public void viewTemplateIsGenerated() throws Exception
+    {
+        getResourceFile("templates/conditions", "my-workflow-condition.vm");
+    }
+    
+    @Test
+    public void inputTemplateIsGenerated() throws Exception
+    {
+        getResourceFile("templates/conditions", "my-workflow-condition-input.vm");
+    }
+    
+    @Test
+    public void moduleHasDefaultKey() throws Exception
+    {
+        assertEquals("my-workflow-condition",
+                     getGeneratedModule().attributeValue("key"));
+    }
+    
+    @Test
+    public void moduleHasClass() throws Exception
+    {
+        assertEquals(PACKAGE_NAME + ".MyWorkflowConditionFactory",
+                     getGeneratedModule().attributeValue("class"));
+    }
+    
+    @Test
+    public void moduleHasConditionClass() throws Exception
+    {
+        assertEquals(PACKAGE_NAME + ".MyWorkflowCondition", getGeneratedModule().selectSingleNode("condition-class").getText());
+    }
 }

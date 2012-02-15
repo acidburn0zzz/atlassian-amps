@@ -1,62 +1,52 @@
 package com.atlassian.plugins.codegen.modules.common.web;
 
-import java.io.File;
-import java.util.regex.Matcher;
+import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
-import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-
-import org.dom4j.Document;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @since 3.6
  */
-public class WebPanelRendererTest extends AbstractCodegenTestCase<WebPanelRendererProperties>
+public class WebPanelRendererTest extends AbstractModuleCreatorTestCase<WebPanelRendererProperties>
 {
-    public static final String PACKAGE_NAME = "com.atlassian.plugins.web";
+    public WebPanelRendererTest()
+    {
+        super("web-panel-renderer", new WebPanelRendererModuleCreator());
+    }
 
     @Before
-    public void runGenerator() throws Exception
+    public void setupProps() throws Exception
     {
-        setCreator(new WebPanelRendererModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
-
         setProps(new WebPanelRendererProperties(PACKAGE_NAME + ".MyWebPanelRenderer"));
-
         props.setIncludeExamples(false);
-
-        createModule();
     }
 
     @Test
-    public void allFilesAreGenerated() throws Exception
+    public void classFileIsGenerated() throws Exception
     {
-        String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
-        assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyWebPanelRenderer.java").exists());
-        assertTrue("test class not generated", new File(testDir, packagePath + File.separator + "MyWebPanelRendererTest.java").exists());
-        assertTrue("plugin.xml not generated", new File(resourcesDir, "atlassian-plugin.xml").exists());
-
+        getSourceFile(PACKAGE_NAME, "MyWebPanelRenderer");
     }
 
     @Test
-    public void moduleIsValid() throws Exception
+    public void unitTestFileIsGenerated() throws Exception
     {
-        String xpath = "/atlassian-plugin/web-panel-renderer[@name='My Web Panel Renderer' and @key='my-web-panel-renderer' and @i18n-name-key='my-web-panel-renderer.name' and @class='" + PACKAGE_NAME + ".MyWebPanelRenderer']";
-
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("valid web-panel-renderer not found", pluginDoc.selectSingleNode(xpath));
+        getTestSourceFile(PACKAGE_NAME, "MyWebPanelRendererTest");
     }
-
-
+    
+    @Test
+    public void moduleHasDefaultKey() throws Exception
+    {
+        assertEquals("my-web-panel-renderer",
+                     getGeneratedModule().attributeValue("key"));
+    }
+    
+    @Test
+    public void moduleHasClass() throws Exception
+    {
+        assertEquals(PACKAGE_NAME + ".MyWebPanelRenderer",
+                     getGeneratedModule().attributeValue("class"));
+    }
 }

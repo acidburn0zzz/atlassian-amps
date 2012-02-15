@@ -1,47 +1,35 @@
 package com.atlassian.plugins.codegen.modules.common.component;
 
-import java.io.IOException;
-
 import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-//TODO: update test to use Dom4J
+import static org.junit.Assert.assertEquals;
 
 /**
  * @since 3.6
  */
 public class ComponentImportTest extends AbstractCodegenTestCase<ComponentImportProperties>
 {
-
     @Before
-    public void runGenerator() throws Exception
+    public void setup() throws Exception
     {
         setCreator(new ComponentImportModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
 
         setProps(new ComponentImportProperties("com.atlassian.SomeInterface"));
         props.setIncludeExamples(false);
-
-        createModule();
     }
-
 
     @Test
-    public void pluginXmlContainsModule() throws IOException
+    public void createdComponentImport() throws Exception
     {
-        String pluginXmlContent = FileUtils.readFileToString(pluginXml);
-
-        assertTrue("module not found in plugin xml", pluginXmlContent.contains("<component-import"));
-        assertTrue("module class not found in plugin xml", pluginXmlContent.contains("interface=\"com.atlassian.SomeInterface\""));
+        assertEquals("expected a component import declaration", 1, getChangesetForModule().getComponentImports().size());
     }
-
+    
+    @Test
+    public void componentImportHasInterface() throws Exception
+    {
+        assertEquals("com.atlassian.SomeInterface", getChangesetForModule().getComponentImports().get(0).getInterfaceClass().getFullName());
+    }
 }

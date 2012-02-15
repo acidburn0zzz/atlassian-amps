@@ -1,65 +1,69 @@
 package com.atlassian.plugins.codegen.modules.common.moduletype;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.regex.Matcher;
-
 import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
+import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-
-//TODO: update test to use Dom4J
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @since 3.6
  */
-public class ModuleTypeTest extends AbstractCodegenTestCase<ModuleTypeProperties>
+public class ModuleTypeTest extends AbstractModuleCreatorTestCase<ModuleTypeProperties>
 {
-    public static final String PACKAGE_NAME = "com.atlassian.plugins.modules";
-
-    @Before
-    public void runGenerator() throws Exception
+    public static final String MODULE_TYPE = "module-type";
+    
+    public ModuleTypeTest()
     {
-        setCreator(new ModuleTypeModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
-
-        setProps(new ModuleTypeProperties(PACKAGE_NAME + ".DictionaryModuleDescriptor"));
-
+        super("module-type", new ModuleTypeModuleCreator());
+    }
+    
+    @Before
+    public void setupProps() throws Exception
+    {
+        setProps(new ModuleTypeProperties(PACKAGE_NAME + ".DictionaryModuleDescriptor"));        
         props.setFullyQualifiedInterface(PACKAGE_NAME + ".Dictionary");
         props.setIncludeExamples(false);
-
-        createModule();
     }
 
     @Test
-    public void allFilesAreGenerated() throws Exception
+    public void classFileIsGenerated() throws Exception
     {
-        String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
-        String itPackagePath = "it" + File.separator + packagePath;
-        assertTrue("interface class not generated", new File(srcDir, packagePath + File.separator + "Dictionary.java").exists());
-        assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "DictionaryModuleDescriptor.java").exists());
-        assertTrue("test class not generated", new File(testDir, packagePath + File.separator + "DictionaryModuleDescriptorTest.java").exists());
-        assertTrue("funcTest class not generated", new File(testDir, itPackagePath + File.separator + "DictionaryModuleDescriptorFuncTest.java").exists());
-        assertTrue("plugin.xml not generated", new File(resourcesDir, "atlassian-plugin.xml").exists());
-
+        getSourceFile(PACKAGE_NAME, "DictionaryModuleDescriptor");
     }
 
     @Test
-    public void pluginXmlContainsModule() throws IOException
+    public void interfaceFileIsGenerated() throws Exception
     {
-        String pluginXmlContent = FileUtils.readFileToString(pluginXml);
-
-        assertTrue("module not found in plugin xml", pluginXmlContent.contains("<module-type"));
-        assertTrue("module class not found in plugin xml", pluginXmlContent.contains("class=\"" + PACKAGE_NAME + ".DictionaryModuleDescriptor\""));
+        getSourceFile(PACKAGE_NAME, "Dictionary");
     }
 
+    @Test
+    public void unitTestFileIsGenerated() throws Exception
+    {
+        getTestSourceFile(PACKAGE_NAME, "DictionaryModuleDescriptorTest");
+    }
+
+    @Test
+    public void functionalTestFileIsGenerated() throws Exception
+    {
+        getTestSourceFile(FUNC_TEST_PACKAGE_NAME, "DictionaryModuleDescriptorFuncTest");
+    }
+
+    @Test
+    public void moduleHasClass() throws Exception
+    {
+        assertEquals(PACKAGE_NAME + ".DictionaryModuleDescriptor",
+                     getGeneratedModule().attributeValue("class"));
+    }
+
+    @Test
+    public void moduleHasDefaultKey() throws Exception
+    {
+        assertEquals("dictionary-module-descriptor",
+                     getGeneratedModule().attributeValue("key"));
+    }
 }

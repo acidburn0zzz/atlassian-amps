@@ -1,172 +1,151 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
-import java.io.File;
-import java.util.regex.Matcher;
+import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
-import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-
-import org.dom4j.Document;
-import org.dom4j.Node;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @since 3.6
  */
-public class WorkflowPostFunctionTest extends AbstractCodegenTestCase<WorkflowPostFunctionProperties>
+public class WorkflowPostFunctionTest extends AbstractModuleCreatorTestCase<WorkflowPostFunctionProperties>
 {
-    public static final String PACKAGE_NAME = "com.atlassian.plugins.workflow";
-    public static final String XPATH = "/atlassian-plugin/workflow-function[@name='My Post Function' and @key='my-post-function' and @i18n-name-key='my-post-function.name' and @class='" + PACKAGE_NAME + ".MyPostFunctionFactory']";
-
-    protected File templatePath;
+    public WorkflowPostFunctionTest()
+    {
+        super("workflow-function", new WorkflowPostFunctionModuleCreator());
+    }
 
     @Before
-    public void runGenerator() throws Exception
+    public void setupProps() throws Exception
     {
-        setCreator(new WorkflowPostFunctionModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
-
-        setProps(new WorkflowPostFunctionProperties(PACKAGE_NAME + ".MyPostFunction"));
-
+        setProps(new WorkflowPostFunctionProperties(PACKAGE_NAME + ".MyWorkflowFunction"));
         props.setIncludeExamples(false);
-
-        templatePath = new File(templateDir, "postfunctions");
-
     }
 
     @Test
-    public void allFilesAreGenerated() throws Exception
+    public void classFileIsGenerated() throws Exception
     {
-
-        createModule();
-
-        String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
-
-        assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyPostFunction.java").exists());
-        assertTrue("factory class not generated", new File(srcDir, packagePath + File.separator + "MyPostFunctionFactory.java").exists());
-        assertTrue("test class not generated", new File(testDir, packagePath + File.separator + "MyPostFunctionTest.java").exists());
-        assertTrue("view template not generated", new File(templatePath, "my-post-function.vm").exists());
-        assertTrue("input template not generated", new File(templatePath, "my-post-function-input.vm").exists());
-        assertTrue("plugin.xml not generated", new File(resourcesDir, "atlassian-plugin.xml").exists());
-
+        getSourceFile(PACKAGE_NAME, "MyWorkflowFunction");
     }
 
     @Test
-    public void moduleIsValid() throws Exception
+    public void factoryClassFileIsGenerated() throws Exception
     {
-
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-        Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
-
-        assertNotNull("valid workflow-function not found", workflowFunction);
-        assertNull("found orderable but should be null", workflowFunction.selectSingleNode("orderable"));
-        assertNull("found unique but should be null", workflowFunction.selectSingleNode("unique"));
-        assertNull("found deletable but should be null", workflowFunction.selectSingleNode("deletable"));
-        assertNull("found addable but should be null", workflowFunction.selectSingleNode("addable"));
+        getSourceFile(PACKAGE_NAME, "MyWorkflowFunctionFactory");
+    }
+    
+    @Test
+    public void unitTestFileIsGenerated() throws Exception
+    {
+        getTestSourceFile(PACKAGE_NAME, "MyWorkflowFunctionTest");
+    }
+   
+    @Test
+    public void viewTemplateIsGenerated() throws Exception
+    {
+        getResourceFile("templates/postfunctions", "my-workflow-function-input.vm");
+    }
+    
+    @Test
+    public void inputTemplateIsGenerated() throws Exception
+    {
+        getResourceFile("templates/postfunctions", "my-workflow-function-input.vm");
+    }
+    
+    @Test
+    public void moduleHasDefaultKey() throws Exception
+    {
+        assertEquals("my-workflow-function",
+                     getGeneratedModule().attributeValue("key"));
+    }
+    
+    @Test
+    public void moduleHasClass() throws Exception
+    {
+        assertEquals(PACKAGE_NAME + ".MyWorkflowFunctionFactory",
+                     getGeneratedModule().attributeValue("class"));
+    }
+    
+    @Test
+    public void moduleHasFunctionClass() throws Exception
+    {
+        assertEquals(PACKAGE_NAME + ".MyWorkflowFunction", getGeneratedModule().selectSingleNode("function-class").getText());
+    }
+    
+    @Test
+    public void moduleIsNotOrderableByDefault() throws Exception
+    {
+        assertNull(getGeneratedModule().selectSingleNode("orderable"));
     }
 
     @Test
-    public void moduleHasFunction() throws Exception
+    public void moduleIsNotUniqueByDefault() throws Exception
     {
+        assertNull(getGeneratedModule().selectSingleNode("unique"));
+    }
 
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-        Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
+    @Test
+    public void moduleIsNotDeletableByDefault() throws Exception
+    {
+        assertNull(getGeneratedModule().selectSingleNode("deletable"));
+    }
 
-        String functionXpath = "function-class[text() = '" + PACKAGE_NAME + ".MyPostFunction']";
-
-        assertNotNull("valid workflow-function not found", workflowFunction);
-        assertNotNull("valid function-class not found", workflowFunction.selectSingleNode(functionXpath));
+    @Test
+    public void moduleIsNotAddableByDefault() throws Exception
+    {
+        assertNull(getGeneratedModule().selectSingleNode("addable"));
     }
 
     @Test
     public void moduleHasOrderable() throws Exception
     {
-
         props.setOrderable(true);
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-        Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
-
-        String subXpath = "orderable[text() = 'true']";
-
-        assertNotNull("valid workflow-function not found", workflowFunction);
-        assertNotNull("valid orderable not found", workflowFunction.selectSingleNode(subXpath));
+        
+        assertEquals("true", getGeneratedModule().selectSingleNode("orderable").getText());
     }
 
     @Test
     public void moduleHasDeletable() throws Exception
     {
-
         props.setDeletable(false);
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-        Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
 
-        String subXpath = "deletable[text() = 'false']";
-
-        assertNotNull("valid workflow-function not found", workflowFunction);
-        assertNotNull("valid deletable not found", workflowFunction.selectSingleNode(subXpath));
+        assertEquals("false", getGeneratedModule().selectSingleNode("deletable").getText());
     }
 
     @Test
     public void moduleHasUnique() throws Exception
     {
-
         props.setUnique(true);
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-        Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
 
-        String subXpath = "unique[text() = 'true']";
-
-        assertNotNull("valid workflow-function not found", workflowFunction);
-        assertNotNull("valid unique not found", workflowFunction.selectSingleNode(subXpath));
+        assertEquals("true", getGeneratedModule().selectSingleNode("unique").getText());
     }
 
     @Test
     public void moduleHasAddable() throws Exception
     {
-
         props.setAddable("global,common");
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-        Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
 
-        String subXpath = "addable[text() = 'global,common']";
-
-        assertNotNull("valid workflow-function not found", workflowFunction);
-        assertNotNull("valid addable not found", workflowFunction.selectSingleNode(subXpath));
+        assertEquals("global,common", getGeneratedModule().selectSingleNode("addable").getText());
     }
 
     @Test
-    public void moduleHasMultipleFlags() throws Exception
+    public void moduleWithMultipleFlagsHasAddable() throws Exception
     {
-
         props.setAddable("global,common");
-        props.setDeletable(false);
         props.setUnique(true);
 
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-        Node workflowFunction = pluginDoc.selectSingleNode(XPATH);
-
-        String addable = "addable[text() = 'global,common']";
-        String deletable = "deletable[text() = 'false']";
-        String unique = "unique[text() = 'true']";
-
-        assertNotNull("valid workflow-function not found", workflowFunction);
-        assertNotNull("valid addable not found", workflowFunction.selectSingleNode(addable));
-        assertNotNull("valid unique not found", workflowFunction.selectSingleNode(unique));
-        assertNotNull("valid deletable not found", workflowFunction.selectSingleNode(deletable));
+        assertEquals("global,common", getGeneratedModule().selectSingleNode("addable").getText());
     }
+    
+    @Test
+    public void moduleWithMultipleFlagsHasUnique() throws Exception
+    {
+        props.setAddable("global,common");
+        props.setUnique(true);
 
+        assertEquals("true", getGeneratedModule().selectSingleNode("unique").getText());
+    }
 }

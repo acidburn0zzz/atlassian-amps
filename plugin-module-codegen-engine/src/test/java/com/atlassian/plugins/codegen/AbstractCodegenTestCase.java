@@ -1,45 +1,34 @@
 package com.atlassian.plugins.codegen;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.LinkedList;
+import java.util.List;
 
-import com.atlassian.plugins.codegen.annotations.asm.ModuleCreatorAnnotationParser;
-import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleCreatorRegistry;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import com.google.common.base.Joiner;
+
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.io.SAXReader;
-import org.junit.After;
-import org.junit.Before;
+import org.dom4j.DocumentFactory;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  *
  */
 public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
 {
-    protected File tempDir;
-    protected File srcDir;
-    protected File testDir;
-    protected File resourcesDir;
-    protected File templateDir;
-    protected File pluginXml;
-    protected PluginModuleCreatorRegistry pluginModuleCreatorRegistry;
-    protected ModuleCreatorAnnotationParser parser;
+    public static final String PACKAGE_NAME = "com.atlassian.plugins.test";
+    public static final String FUNC_TEST_PACKAGE_NAME = "it.com.atlassian.plugins.test";
 
-    protected PluginModuleLocation moduleLocation;
     protected T props;
     protected PluginModuleCreator creator;
-
+    protected PluginProjectChangeset changeset;
+    
     public void setProps(T props)
     {
         this.props = props;
@@ -49,76 +38,90 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
     {
         this.creator = creator;
     }
-
-    public void setModuleLocation(PluginModuleLocation moduleLocation)
+    
+    protected PluginProjectChangeset getChangesetForModule() throws Exception
     {
-        this.moduleLocation = moduleLocation;
-    }
-
-    @Before
-    public void setup() throws Exception
-    {
-
-        pluginModuleCreatorRegistry = new PluginModuleCreatorRegistryImpl();
-        parser = new ModuleCreatorAnnotationParser(pluginModuleCreatorRegistry);
-        parser.parse();
-
-        final File sysTempDir = new File("target");
-        String dirName = UUID.randomUUID()
-                .toString();
-        tempDir = new File(sysTempDir, dirName);
-        srcDir = new File(tempDir, "src");
-        testDir = new File(tempDir, "test-src");
-        resourcesDir = new File(tempDir, "resources");
-        templateDir = new File(resourcesDir, "templates");
-        pluginXml = new File(resourcesDir, "atlassian-plugin.xml");
-
-        tempDir.mkdirs();
-        srcDir.mkdirs();
-        resourcesDir.mkdirs();
-        templateDir.mkdirs();
-
-        InputStream is = this.getClass()
-                .getResourceAsStream("/empty-plugin.xml");
-        IOUtils.copy(is, FileUtils.openOutputStream(pluginXml));
-
-    }
-
-    @After
-    public void removeTempDir() throws IOException
-    {
-        FileUtils.deleteQuietly(tempDir);
-    }
-
-    protected void createModule() throws Exception
-    {
-        PluginProjectChangeset changes = creator.createModule(props);
-        new PluginXmlRewriter(moduleLocation).applyChanges(changes);
-        new ProjectFilesRewriter(moduleLocation).applyChanges(changes);
+        return creator.createModule(props);
     }
     
-    protected Document getXmlDocument(File xmlFile) throws MalformedURLException, DocumentException
+    protected Document getAllGeneratedModulesOfType(String name) throws Exception
     {
-        SAXReader reader = new SAXReader();
-        return reader.read(xmlFile);
+        PluginProjectChangeset changeset = getChangesetForModule();
+        assertFalse("did not generate any module descriptors", changeset.getModuleDescriptors().isEmpty());
+        boolean found = false;
+        Document ret = DocumentFactory.getInstance().createDocument();
+        List<String> foundTypes = new LinkedList<String>();
+        for (ModuleDescriptor module : changeset.getModuleDescriptors())
+        {
+            Document parsed = DocumentHelper.parseText(module.getContent());
+            Element root = parsed.getRootElement();
+            String type = root.getName();
+            foundTypes.add(type);
+            if (type.equals(name))
+            {
+                root.detach();
+                ret.add(root);
+                found = true;
+            }
+        }
+        if (!found)
+        {
+            fail("did not generate any module descriptor of type \"" + name + "\"; generated modules were "
+                + Joiner.on(", ").join(foundTypes));
+        }
+        return ret;
+    }
+    
+    protected Element getGeneratedModule(String name) throws Exception
+    {
+        Document results = getAllGeneratedModulesOfType(name);
+        assertEquals("found too many modules of type \"" + name + "\"", 1, results.selectNodes("//" + name).size());
+        return (Element) results.selectSingleNode("//" + name);
+    }
+    
+    protected SourceFile getSourceFile(String packageName, String className) throws Exception
+    {
+        return getSourceFile(SourceFile.SourceGroup.MAIN, packageName, className);
     }
 
-    protected Properties loadI18nProperties() throws IOException
+    protected SourceFile getTestSourceFile(String packageName, String className) throws Exception
     {
-        File i18nFile = new File(resourcesDir, AbstractPluginModuleCreator.DEFAULT_I18N_NAME + ".properties");
-        Properties props = new Properties();
+        return getSourceFile(SourceFile.SourceGroup.TESTS, packageName, className);
+    }
 
-        InputStream is = null;
-        try
+    protected SourceFile getSourceFile(SourceFile.SourceGroup group, String packageName, String className) throws Exception
+    {
+        PluginProjectChangeset changeset = getChangesetForModule();
+        assertFalse("did not generate any source files", changeset.getSourceFiles().isEmpty());
+        List<String> foundFiles = new LinkedList<String>();
+        for (SourceFile sourceFile : changeset.getSourceFiles())
         {
-            is = FileUtils.openInputStream(i18nFile);
-            props.load(is);
-
-        } finally
-        {
-            IOUtils.closeQuietly(is);
+            if (sourceFile.getClassId().equals(ClassId.packageAndClass(packageName, className)) && sourceFile.getSourceGroup().equals(group))
+            {
+                return sourceFile;
+            }
+            foundFiles.add(sourceFile.getClassId().getFullName() + " (" + sourceFile.getSourceGroup() + ")");
         }
+        fail("did not generate a source file for " + packageName + "." + className + " in " + group + "; generated files were "
+             + Joiner.on(", ").join(foundFiles));
+        return null;
+    }
 
-        return props;
+    protected ResourceFile getResourceFile(String path, String filename) throws Exception
+    {
+        PluginProjectChangeset changeset = getChangesetForModule();
+        assertFalse("did not generate any resource files", changeset.getResourceFiles().isEmpty());
+        List<String> foundFiles = new LinkedList<String>();
+        for (ResourceFile resourceFile : changeset.getResourceFiles())
+        {
+            if (resourceFile.getRelativePath().equals(path) && resourceFile.getName().equals(filename))
+            {
+                return resourceFile;
+            }
+            foundFiles.add(resourceFile.getRelativePath() + "/" + resourceFile.getName());
+        }
+        fail("did not generate resource file " + path + "/" + filename + "; generated files were "
+             + Joiner.on(", ").join(foundFiles));
+        return null;
     }
 }

@@ -1,130 +1,111 @@
 package com.atlassian.plugins.codegen.modules.common;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.regex.Matcher;
+import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
-import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-
-import org.dom4j.Document;
-import org.dom4j.Node;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @since 3.6
  */
-public class RESTTest extends AbstractCodegenTestCase<RESTProperties>
+public class RESTTest extends AbstractModuleCreatorTestCase<RESTProperties>
 {
-    public static final String PACKAGE_NAME = "com.atlassian.plugins.rest";
-
+    public static final String PACKAGE1 = "com.atlassian.plugins.rest.hello";
+    public static final String PACKAGE2 = "com.atlassian.plugins.rest.message";
+    public static final String DISPATCHER1 = "REQUEST";
+    public static final String DISPATCHER2 = "FORWARD";
+    
+    public RESTTest()
+    {
+        super("rest", new RESTModuleCreator());
+    }
+    
     @Before
-    public void runGenerator() throws Exception
+    public void setupProps() throws Exception
     {
-        setCreator(new RESTModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
-
         setProps(new RESTProperties(PACKAGE_NAME + ".MyRestResource"));
-
         props.setIncludeExamples(false);
+        props.addPackageToScan(PACKAGE1);
+        props.addPackageToScan(PACKAGE2);
+        props.addDispatcher(DISPATCHER1);
+        props.addDispatcher(DISPATCHER2);
     }
 
     @Test
-    public void allFilesAreGenerated() throws Exception
+    public void classFileIsGenerated() throws Exception
     {
-        createModule();
-
-        String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
-        String itPackagePath = "it" + File.separator + packagePath;
-        assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyRestResource.java").exists());
-        assertTrue("model class not generated", new File(srcDir, packagePath + File.separator + "MyRestResourceModel.java").exists());
-        assertTrue("test class not generated", new File(testDir, packagePath + File.separator + "MyRestResourceTest.java").exists());
-        assertTrue("funcTest class not generated", new File(testDir, itPackagePath + File.separator + "MyRestResourceFuncTest.java").exists());
-        assertTrue("plugin.xml not generated", new File(resourcesDir, "atlassian-plugin.xml").exists());
-
+        getSourceFile(PACKAGE_NAME, "MyRestResource");
     }
 
     @Test
-    public void moduleIsValid() throws Exception
+    public void modelClassFileIsGenerated() throws Exception
     {
-        String xpath = "/atlassian-plugin/rest[@name='My Rest Resource' and @key='my-rest-resource' and @i18n-name-key='my-rest-resource.name' and @path='/myrestresource' and @version='1.0']";
-
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("valid rest not found", pluginDoc.selectSingleNode(xpath));
+        getSourceFile(PACKAGE_NAME, "MyRestResourceModel");
+    }
+    
+    @Test
+    public void unitTestFileIsGenerated() throws Exception
+    {
+        getTestSourceFile(PACKAGE_NAME, "MyRestResourceTest");
     }
 
     @Test
-    public void customPathIsValid() throws Exception
+    public void functionalTestTestFileIsGenerated() throws Exception
     {
-        String xpath = "/atlassian-plugin/rest[@name='My Rest Resource' and @key='my-rest-resource' and @i18n-name-key='my-rest-resource.name' and @path='/helloworld' and @version='1.0']";
+        getTestSourceFile(FUNC_TEST_PACKAGE_NAME, "MyRestResourceFuncTest");
+    }
+    
+    @Test
+    public void moduleHasDefaultPath() throws Exception
+    {
+        assertEquals("/myrestresource", getGeneratedModule().attributeValue("path"));
+    }
 
+    @Test
+    public void moduleHasSpecifiedPath() throws Exception
+    {
         props.setPath("/helloworld");
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("rest with custom path not found", pluginDoc.selectSingleNode(xpath));
+        
+        assertEquals("/helloworld", getGeneratedModule().attributeValue("path"));
     }
 
     @Test
-    public void customVersionIsValid() throws Exception
+    public void moduleHasDefaultVersion() throws Exception
     {
-        String xpath = "/atlassian-plugin/rest[@name='My Rest Resource' and @key='my-rest-resource' and @i18n-name-key='my-rest-resource.name' and @path='/myrestresource' and @version='1.1']";
+        assertEquals("1.0", getGeneratedModule().attributeValue("version"));
+    }
 
+    @Test
+    public void moduleHasSpecifiedVersion() throws Exception
+    {
         props.setVersion("1.1");
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("rest with custom version not found", pluginDoc.selectSingleNode(xpath));
+        
+        assertEquals("1.1", getGeneratedModule().attributeValue("version"));
+    }
+    
+    @Test
+    public void package1IsAdded() throws Exception
+    {
+        assertEquals(PACKAGE1, getGeneratedModule().selectSingleNode("package[1]").getText());
     }
 
     @Test
-    public void packagesAreAdded() throws Exception
+    public void package2IsAdded() throws Exception
     {
-        String package1 = "com.atlassian.plugins.rest.hello";
-        String package2 = "com.atlassian.plugins.rest.message";
-
-        String xpath = "/atlassian-plugin/rest[@name='My Rest Resource' and @key='my-rest-resource' and @i18n-name-key='my-rest-resource.name' and @path='/myrestresource' and @version='1.0']";
-        String package1Xpath = "package[text() = '" + package1 + "'";
-        String package2Xpath = "package[text() = '" + package2 + "'";
-
-        props.setPackagesToScan(Arrays.asList(package1, package2));
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        Node restNode = pluginDoc.selectSingleNode(xpath);
-        assertNotNull("rest not found", restNode);
-        assertNotNull("package 1 not found", restNode.selectSingleNode(package1Xpath));
-        assertNotNull("package 2 not found", restNode.selectSingleNode(package2Xpath));
+        assertEquals(PACKAGE2, getGeneratedModule().selectSingleNode("package[2]").getText());
     }
 
     @Test
-    public void dispatchersAreAdded() throws Exception
+    public void dispatcher1IsAdded() throws Exception
     {
-        String requestDispatcher = "REQUEST";
-        String forwardDispatcher = "FORWARD";
-
-        String xpath = "/atlassian-plugin/rest[@name='My Rest Resource' and @key='my-rest-resource' and @i18n-name-key='my-rest-resource.name' and @path='/myrestresource' and @version='1.0']";
-        String dispatcher1Xpath = "dispatcher[text() = '" + requestDispatcher + "'";
-        String dispatcher2Xpath = "dispatcher[text() = '" + forwardDispatcher + "'";
-
-        props.setDispatchers(Arrays.asList(requestDispatcher, forwardDispatcher));
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        Node restNode = pluginDoc.selectSingleNode(xpath);
-        assertNotNull("rest not found", restNode);
-        assertNotNull("request dispatcher not found", restNode.selectSingleNode(dispatcher1Xpath));
-        assertNotNull("forward dispatcher not found", restNode.selectSingleNode(dispatcher2Xpath));
+        assertEquals(DISPATCHER1, getGeneratedModule().selectSingleNode("dispatcher[1]").getText());
     }
 
+    @Test
+    public void dispatcher2IsAdded() throws Exception
+    {
+        assertEquals(DISPATCHER2, getGeneratedModule().selectSingleNode("dispatcher[2]").getText());
+    }
 }

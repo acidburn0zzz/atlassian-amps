@@ -1,171 +1,227 @@
 package com.atlassian.plugins.codegen.modules.common.web;
 
-import java.util.Properties;
-
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-import com.atlassian.plugins.codegen.modules.common.Icon;
-import com.atlassian.plugins.codegen.modules.common.Label;
-import com.atlassian.plugins.codegen.modules.common.Link;
-import com.atlassian.plugins.codegen.modules.common.Tooltip;
-
-import org.dom4j.Document;
-import org.dom4j.Node;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @since 3.6
  */
 public class WebItemTest extends AbstractWebFragmentTest<WebItemProperties>
 {
-    public static final String MODULE_NAME = "My Web Item";
     public static final String GLOBAL_SETTINGS_SECTION = "system.admin/globalsettings";
 
-    @Before
-    public void runGenerator() throws Exception
+    public WebItemTest()
     {
-        setCreator(new WebItemModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
-
+        super("web-item", new WebItemModuleCreator());
+    }
+    
+    @Before
+    public void setupProps() throws Exception
+    {
         setProps(new WebItemProperties(MODULE_NAME, GLOBAL_SETTINGS_SECTION));
         props.setIncludeExamples(false);
-
     }
 
     @Test
-    public void moduleIsValid() throws Exception
+    public void moduleHasDefaultKey() throws Exception
     {
-        String xpath = "/atlassian-plugin/web-item[@name='My Web Item' and @key='my-web-item' and @i18n-name-key='my-web-item.name' and @section='system.admin/globalsettings' and @weight='1000']";
-
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("valid web-item not found", pluginDoc.selectSingleNode(xpath));
+        assertEquals(MODULE_KEY, getGeneratedModule().attributeValue("key"));
+    }
+    
+    @Test
+    public void moduleHasSection() throws Exception
+    {
+        assertEquals(GLOBAL_SETTINGS_SECTION, getGeneratedModule().attributeValue("section"));
     }
 
     @Test
-    public void moduleIsValidWithCustomWeight() throws Exception
+    public void moduleHasDefaultWeight() throws Exception
+    {
+        assertEquals("1000", getGeneratedModule().attributeValue("weight"));
+    }
+    
+    @Test
+    public void moduleHasSpecifiedWeight() throws Exception
     {
         props.setWeight(20);
 
-        String xpath = "/atlassian-plugin/web-item[@name='My Web Item' and @key='my-web-item' and @i18n-name-key='my-web-item.name' and @section='system.admin/globalsettings' and @weight='20']";
-
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("valid web-item with custom weight not found", pluginDoc.selectSingleNode(xpath));
+        assertEquals("20", getGeneratedModule().attributeValue("weight"));
     }
 
     @Test
-    public void iconAdded() throws Exception
+    public void iconIsAdded() throws Exception
     {
-        String path = "/images/myicon.png";
-        Link link = new Link(path);
-        Icon icon = new Icon(16, 16);
-        icon.setLink(link);
-
         props.setIcon(icon);
 
-        String xpath = "/atlassian-plugin/web-item/icon[@width='16' and @height='16']/link";
-
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        Node linkNode = pluginDoc.selectSingleNode(xpath);
-
-        assertNotNull("icon link not found", linkNode);
-        assertEquals("wrong icon link", path, linkNode.getStringValue());
+        assertNotNull(getGeneratedModule().selectSingleNode("icon"));
     }
 
     @Test
-    public void labelAdded() throws Exception
+    public void iconHasLink() throws Exception
     {
-        String paramVal0 = "$helper.project.name";
-        String paramVal1 = "$helper.project.description";
-        Label label = new Label("common.concepts.create.new.issue", "create new issue");
-        label.addParam(paramVal0);
-        label.addParam(paramVal1);
+        props.setIcon(icon);
 
+        assertEquals(icon.getLink().getValue(), getGeneratedModule().selectSingleNode("icon/link").getText());
+    }
+    
+    @Test
+    public void iconHasWidth() throws Exception
+    {
+        props.setIcon(icon);
+
+        assertEquals(String.valueOf(icon.getWidth()), getGeneratedModule().selectSingleNode("icon/@width").getText());
+    }
+
+    @Test
+    public void iconHasHeight() throws Exception
+    {
+        props.setIcon(icon);
+
+        assertEquals(String.valueOf(icon.getHeight()), getGeneratedModule().selectSingleNode("icon/@height").getText());
+    }
+    
+    @Test
+    public void labelIsAdded() throws Exception
+    {
         props.setLabel(label);
 
-        String labelXpath = "/atlassian-plugin/web-item/label[@key='common.concepts.create.new.issue']";
-
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        Node labelNode = pluginDoc.selectSingleNode(labelXpath);
-
-        assertNotNull("label not found", labelNode);
-
-        Node param0 = labelNode.selectSingleNode("param[@name='param0' and @value='" + paramVal0 + "']");
-        Node param1 = labelNode.selectSingleNode("param[@name='param1' and @value='" + paramVal1 + "']");
-
-        assertNotNull("param 0 not found", param0);
-        assertNotNull("param 1 not found", param1);
-
-        Properties i18nprops = loadI18nProperties();
-        assertTrue("label i18n not found", i18nprops.containsKey(label.getKey()));
-        assertEquals("label i18n has wrong value", label.getValue(), i18nprops.getProperty(label.getKey()));
-
+        assertNotNull(getGeneratedModule().selectSingleNode("label"));
+    }
+    
+    @Test
+    public void labelHasI18nKey() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals(label.getKey(), getGeneratedModule().selectSingleNode("label/@key").getText());
     }
 
     @Test
-    public void linkAdded() throws Exception
+    public void labelHasParams() throws Exception
     {
-        String path = "/secure/CreateIssue!default.jspa";
-        Link link = new Link(path);
-        link.setLinkId("create link");
+        props.setLabel(label);
+        
+        assertEquals(2, getGeneratedModule().selectNodes("label/param").size());
+    }
 
+    @Test
+    public void labelParam0HasName() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals("param0", getGeneratedModule().selectSingleNode("label/param[1]/@name").getText());
+    }
+
+    @Test
+    public void labelParam0HasValue() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals(label.getParams().get("param0"), getGeneratedModule().selectSingleNode("label/param[1]/@value").getText());
+    }
+
+    @Test
+    public void labelParam1HasName() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals("param1", getGeneratedModule().selectSingleNode("label/param[2]/@name").getText());
+    }
+
+    @Test
+    public void labelParam1HasValue() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals(label.getParams().get("param1"), getGeneratedModule().selectSingleNode("label/param[2]/@value").getText());
+    }
+
+    @Test
+    public void labelStringIsAddedToI18nProperties() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals(label.getValue(), getChangesetForModule().getI18nProperties().get(label.getKey()));
+    }
+    
+    @Test
+    public void linkIsAdded() throws Exception
+    {
         props.setLink(link);
 
-        String linkXpath = "/atlassian-plugin/web-item/link[@linkId='create link']";
-
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        Node linkNode = pluginDoc.selectSingleNode(linkXpath);
-
-        assertNotNull("link not found", linkNode);
-        assertEquals("wrong link value", path, linkNode.getStringValue());
+        assertNotNull(getGeneratedModule().selectSingleNode("link"));
+    }
+    
+    @Test
+    public void linkHasId() throws Exception
+    {
+        props.setLink(link);
+        
+        assertEquals(link.getLinkId(), getGeneratedModule().selectSingleNode("link/@linkId").getText());
     }
 
     @Test
-    public void paramsAdded() throws Exception
+    public void linkHasLink() throws Exception
+    {
+        props.setLink(link);
+        
+        assertEquals(link.getValue(), getGeneratedModule().selectSingleNode("link").getText());
+    }
+
+    @Test
+    public void paramsAreAdded() throws Exception
+    {
+        createParams();
+
+        assertEquals(2, getGeneratedModule().selectNodes("param").size());
+    }
+    
+    @Test
+    public void param0HasValue() throws Exception
+    {
+        createParams();
+
+        assertEquals("true", getGeneratedModule().selectSingleNode("param[@name='isPopupLink']/@value").getText());
+    }
+
+    @Test
+    public void param1HasValue() throws Exception
+    {
+        createParams();
+
+        assertEquals("false", getGeneratedModule().selectSingleNode("param[@name='isSuperAwesome']/@value").getText());
+    }
+
+    @Test
+    public void tooltipIsAdded() throws Exception
+    {
+        props.setTooltip(tooltip);
+
+        assertNotNull(getGeneratedModule().selectSingleNode("tooltip"));
+    }
+    
+    @Test
+    public void tooltipHasKey() throws Exception
+    {
+        props.setTooltip(tooltip);
+        
+        assertEquals(tooltip.getKey(), getGeneratedModule().selectSingleNode("tooltip/@key").getText());
+    }
+    
+    @Test
+    public void tooltipStringIsAddedToI18nProperties() throws Exception
+    {
+        props.setTooltip(tooltip);
+        
+        assertEquals(tooltip.getValue(), getChangesetForModule().getI18nProperties().get(tooltip.getKey()));
+    }
+    
+    protected void createParams()
     {
         props.addParam("isPopupLink", "true");
         props.addParam("isSuperAwesome", "false");
-
-        String param1Xpath = "/atlassian-plugin/web-item/param[@name='isPopupLink' and @value='true']";
-        String param2Xpath = "/atlassian-plugin/web-item/param[@name='isSuperAwesome' and @value='false']";
-
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("param 1 not found", pluginDoc.selectSingleNode(param1Xpath));
-        assertNotNull("param 2 not found", pluginDoc.selectSingleNode(param2Xpath));
-    }
-
-    @Test
-    public void tooltipAdded() throws Exception
-    {
-        Tooltip tooltip = new Tooltip("common.concepts.create.new.issue.tooltip", "creates a new issue");
-        props.setTooltip(tooltip);
-
-        String xpath = "/atlassian-plugin/web-item/tooltip[@key='common.concepts.create.new.issue.tooltip']";
-
-        createModule();
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("tooltip not found", pluginDoc.selectSingleNode(xpath));
-
-        Properties i18nprops = loadI18nProperties();
-        assertTrue("tooltip i18n not found", i18nprops.containsKey(tooltip.getKey()));
-        assertEquals("tooltip i18n has wrong value", tooltip.getValue(), i18nprops.getProperty(tooltip.getKey()));
     }
 }
