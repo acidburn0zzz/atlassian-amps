@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import org.apache.maven.plugin.MojoExecutionException;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
@@ -82,25 +82,12 @@ public class StudioJiraProductHandler extends JiraProductHandler implements Stud
     // JIRA needs a bit more PermGen - default is -Xmx512m -XX:MaxPermSize=160m
     protected void fixMemorySettings(Product ctx)
     {
-        List<String> args = Lists.newArrayList();
-        String jvmArgs = ctx.getJvmArgs();
-        if (jvmArgs != null)
-        {
-            args.add(jvmArgs);
-        }
-        if (!StringUtils.contains(jvmArgs, "-Xms"))
-        {
-            args.add("-Xms256m");
-        }
-        if (!StringUtils.contains(jvmArgs, "-Xmx"))
-        {
-            args.add("-Xmx768m");
-        }
-        if (!StringUtils.contains(jvmArgs, "-XX:MaxPermSize="))
-        {
-            args.add("-XX:MaxPermSize=512m");
-        }
-        ctx.setJvmArgs(StringUtils.join(args, ' '));
+        final String jvmArgs = JvmArgsFix.empty()
+                .with("-Xms", "256m")
+                .with("-Xmx", "768m")
+                .with("-XX:MaxPermSize=", "512m")
+                .apply(ctx.getJvmArgs());
+        ctx.setJvmArgs(jvmArgs);
     }
 
     @Override
