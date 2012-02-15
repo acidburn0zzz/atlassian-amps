@@ -51,10 +51,11 @@ public class ServletModuleCreator extends AbstractPluginModuleCreator<ServletPro
         {
             return ret.with(createClass(props, EXAMPLE_CLASS_TEMPLATE));
         }
-        else
+        else if (props.isCreateClass())
         {
             return ret.with(createClassAndTests(props, CLASS_TEMPLATE, UNIT_TEST_TEMPLATE, FUNC_TEST_TEMPLATE));
         }
+        return ret;
     }
 
     @Override
