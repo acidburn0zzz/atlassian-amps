@@ -10,6 +10,7 @@ import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,6 +52,12 @@ public class ProjectFilesRewriterTest
             .build();
         
         rewriter = new ProjectFilesRewriter(moduleLocation);
+    }
+    
+    @After
+    public void deleteTempDir() throws Exception
+    {
+        FileUtils.deleteDirectory(tempDir);
     }
     
     @Test
