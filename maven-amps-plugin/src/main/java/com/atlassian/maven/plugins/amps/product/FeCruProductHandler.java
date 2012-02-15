@@ -15,6 +15,7 @@ import java.util.Map;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
 
+import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.tools.ant.taskdefs.Java;
@@ -191,10 +192,11 @@ public class FeCruProductHandler extends AbstractProductHandler
     @Override
     protected final int startApplication(Product ctx, final File app, final File homeDir, Map<String, String> properties) throws MojoExecutionException
     {
-        if (ctx.getJvmArgs() == null)
-        {
-            ctx.setJvmArgs("-Xmx512m -XX:MaxPermSize=160m");
-        }
+        final String fixedArgs = JvmArgsFix.empty()
+                .with("-Xmx", "512m")
+                .with("-XX:MaxPermSize=", "160m")
+                .apply(ctx.getJvmArgs());
+        ctx.setJvmArgs(fixedArgs);
 
         log.info("Starting " + ctx.getInstanceId() + " on ports "
                 + ctx.getHttpPort() + " (http) and " + controlPort(ctx.getHttpPort()) + " (control)");
