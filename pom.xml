@@ -9,7 +9,7 @@
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>3.8-caviar-SNAPSHOT</version>
+    <version>3.8-stash-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
@@ -148,7 +148,7 @@
                             <artifact>com.atlassian.maven.plugins:maven-bamboo-plugin:${project.version}</artifact>
                             <artifact>com.atlassian.maven.plugins:maven-fecru-plugin:${project.version}</artifact>
                             <artifact>com.atlassian.maven.plugins:maven-crowd-plugin:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.plugins:maven-caviar-plugin:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.plugins:maven-stash-plugin:${project.version}</artifact>
 
                             <!-- the archetypes -->
                             <artifact>com.atlassian.maven.archetypes:refapp-plugin-archetype:${project.version}</artifact>
@@ -157,7 +157,7 @@
                             <artifact>com.atlassian.maven.archetypes:bamboo-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:fecru-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:crowd-plugin-archetype:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.archetypes:caviar-plugin-archetype:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.archetypes:stash-plugin-archetype:${project.version}</artifact>
 
                             <!-- restricted artifacts -->
                             <artifact>javax.servlet:servlet-api:2.3</artifact>
@@ -169,8 +169,8 @@
                             <artifact>jta:jta:1.0.1B</artifact>
                             <artifact>jta:jta:1.0.1</artifact>
                             <artifact>javax.jms:jms:1.1</artifact>
-                            <artifact>com.atlassian.caviar:caviar-standalone-webapp:${caviar.version}:war</artifact>
-                            <artifact>com.atlassian.caviar:caviar-plugin-test-resources:${caviar.data.version}:zip</artifact>
+                            <artifact>com.atlassian.stash:stash-standalone-webapp:${stash.version}:war</artifact>
+                            <artifact>com.atlassian.stash:stash-plugin-test-resources:${stash.data.version}:zip</artifact>
                         </artifacts>
                     </configuration>
                 </plugin>
@@ -308,8 +308,8 @@
         <clover.version>3.1.0</clover.version>
         <studio.version>108.2</studio.version>
         <studio.data.version>108.2-m0</studio.data.version>
-        <caviar.version>1.0-SNAPSHOT</caviar.version>
-        <caviar.data.version>1.0-SNAPSHOT</caviar.data.version>
+        <stash.version>1.0-SNAPSHOT</stash.version>
+        <stash.data.version>1.0-SNAPSHOT</stash.data.version>
         <skipCodegenTests>false</skipCodegenTests>
     </properties>
 </project>

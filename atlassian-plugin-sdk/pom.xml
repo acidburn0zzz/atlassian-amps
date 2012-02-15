@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>3.8-caviar-SNAPSHOT</version>
+        <version>3.8-stash-SNAPSHOT</version>
     </parent>
 
     <groupId>com.atlassian.amps</groupId>
@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
-            <artifactId>maven-caviar-plugin</artifactId>
+            <artifactId>maven-stash-plugin</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -125,21 +125,21 @@
         </dependency>
         <dependency>
             <groupId>com.atlassian.maven.archetypes</groupId>
-            <artifactId>caviar-plugin-archetype</artifactId>
+            <artifactId>stash-plugin-archetype</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.atlassian.caviar</groupId>
-            <artifactId>caviar-plugin-test-resources</artifactId>
-            <version>${caviar.data.version}</version>
+            <groupId>com.atlassian.stash</groupId>
+            <artifactId>stash-plugin-test-resources</artifactId>
+            <version>${stash.data.version}</version>
             <type>zip</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.atlassian.caviar</groupId>
-            <artifactId>caviar-standalone-webapp</artifactId>
-            <version>${caviar.version}</version>
+            <groupId>com.atlassian.stash</groupId>
+            <artifactId>stash-standalone-webapp</artifactId>
+            <version>${stash.version}</version>
             <type>war</type>
             <scope>provided</scope>
         </dependency>

@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>3.8-caviar-SNAPSHOT</version>
+        <version>3.8-stash-SNAPSHOT</version>
     </parent>
 
     <artifactId>atlassian-amps-product-archetypes</artifactId>
@@ -20,7 +20,7 @@
         <module>fecru-plugin-archetype</module>
         <module>crowd-plugin-archetype</module>
         <module>studio-plugin-archetype</module>
-        <module>caviar-plugin-archetype</module>
+        <module>stash-plugin-archetype</module>
     </modules>
 
     <dependencies>

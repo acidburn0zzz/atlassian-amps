@@ -20,7 +20,7 @@ public class ProductHandlerFactory
     public static final String BAMBOO = "bamboo";
     public static final String FECRU = "fecru";
     public static final String CROWD = "crowd";
-    public static final String CAVIAR = "caviar";
+    public static final String STASH = "stash";
 
     public static final String STUDIO = "studio";
     public static final String STUDIO_CONFLUENCE = "studio-confluence";
@@ -58,9 +58,9 @@ public class ProductHandlerFactory
             return new CrowdProductHandler(context, goals);
         }
 
-        else if (CAVIAR.equals(id))
+        else if (STASH.equals(id))
         {
-            return new CaviarProductHandler(context, goals);
+            return new StashProductHandler(context, goals);
         }
 
         // The Studio product itself
@@ -98,7 +98,7 @@ public class ProductHandlerFactory
 
     public static Collection<String> getIds()
     {
-        return Arrays.asList(REFAPP, CONFLUENCE, JIRA, BAMBOO, FECRU, CROWD, CAVIAR,
+        return Arrays.asList(REFAPP, CONFLUENCE, JIRA, BAMBOO, FECRU, CROWD, STASH,
                 STUDIO, STUDIO_CONFLUENCE, STUDIO_JIRA, STUDIO_BAMBOO, STUDIO_FECRU, STUDIO_CROWD);
     }
 }

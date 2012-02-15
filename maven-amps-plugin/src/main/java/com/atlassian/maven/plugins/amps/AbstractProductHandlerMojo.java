@@ -467,7 +467,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         if (product.getDataVersion() == null)
         {
-            if (ProductHandlerFactory.CAVIAR.equals(product.getId()))
+            if (ProductHandlerFactory.STASH.equals(product.getId()))
             {
                 product.setDataVersion("1.0-SNAPSHOT");
             }
@@ -529,7 +529,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         if (product.getVersion() == null)
         {
-            if (ProductHandlerFactory.CAVIAR.equals(product.getId()))
+            if (ProductHandlerFactory.STASH.equals(product.getId()))
             {
                 product.setVersion("1.0-SNAPSHOT");
             }
