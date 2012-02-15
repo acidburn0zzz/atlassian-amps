@@ -89,7 +89,7 @@ public final class PluginProjectChangeset
     /**
      * Returns the {@link ArtifactDependency} objects for this changeset.
      */
-    public Iterable<ArtifactDependency> getDependencies()
+    public ImmutableList<ArtifactDependency> getDependencies()
     {
         return dependencies;
     }

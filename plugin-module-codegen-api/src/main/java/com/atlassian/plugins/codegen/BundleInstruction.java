@@ -1,5 +1,9 @@
 package com.atlassian.plugins.codegen;
 
+import com.atlassian.fugue.Option;
+
+import static com.atlassian.fugue.Option.none;
+import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -29,9 +33,24 @@ public final class BundleInstruction
     
     private Category category;
     private String packageName;
-    private String version;
+    private Option<String> version;
     
-    public BundleInstruction(Category category, String packageName, String version)
+    public static BundleInstruction importPackage(String packageName, String version)
+    {
+        return new BundleInstruction(Category.IMPORT, packageName, some(version));
+    }
+    
+    public static BundleInstruction dynamicImportPackage(String packageName, String version)
+    {
+        return new BundleInstruction(Category.DYNAMIC_IMPORT, packageName, some(version));
+    }
+    
+    public static BundleInstruction privatePackage(String packageName)
+    {
+        return new BundleInstruction(Category.PRIVATE, packageName, none(String.class));
+    }
+    
+    public BundleInstruction(Category category, String packageName, Option<String> version)
     {
         this.category = checkNotNull(category, "category");
         this.packageName = checkNotNull(packageName, "packageName");
@@ -48,7 +67,7 @@ public final class BundleInstruction
         return packageName;
     }
 
-    public String getVersion()
+    public Option<String> getVersion()
     {
         return version;
     }

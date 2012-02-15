@@ -26,6 +26,8 @@ import org.apache.maven.plugins.shade.pom.PomWriter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import static com.atlassian.fugue.Option.none;
+import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Iterables.any;
 import static com.google.common.collect.Iterables.concat;
@@ -108,7 +110,16 @@ public class MavenProjectRewriter implements ProjectRewriter
                 Dependency newDependency = new Dependency();
                 newDependency.setGroupId(descriptor.getGroupId());
                 newDependency.setArtifactId(descriptor.getArtifactId());
-                newDependency.setVersion(descriptor.getVersion());
+                String version = descriptor.getVersion();
+                for (String propertyName : descriptor.getPropertyName())
+                {
+                    version = "${" + propertyName + "}";
+                    if (!model.getProperties().containsKey(propertyName))
+                    {
+                        model.addProperty(propertyName, descriptor.getVersion());
+                    }
+                }
+                newDependency.setVersion(version);
                 newDependency.setScope(descriptor.getScope().name().toLowerCase());
 
                 model.addDependency(newDependency);
@@ -162,10 +173,14 @@ public class MavenProjectRewriter implements ProjectRewriter
         for (String instructionLine : body.split(","))
         {
             String[] instructionParts = instructionLine.trim().split(";");
-            if (instructionParts.length == 2 && instructionParts[1].startsWith("version=\"") && instructionParts[1].endsWith("\""))
+            if (instructionParts.length == 1)
+            {
+                ret.add(new BundleInstruction(category, instructionParts[0], none(String.class)));
+            }
+            else if (instructionParts.length == 2 && instructionParts[1].startsWith("version=\"") && instructionParts[1].endsWith("\""))
             {
                 String version = instructionParts[1].substring(9, instructionParts[1].length() - 1);
-                ret.add(new BundleInstruction(category, instructionParts[0], version));
+                ret.add(new BundleInstruction(category, instructionParts[0], some(version)));
             }
         }
         return ret.build();
@@ -181,7 +196,10 @@ public class MavenProjectRewriter implements ProjectRewriter
                 ret.append(",\n");
             }
             ret.append(instruction.getPackageName());
-            ret.append(";version=\"").append(instruction.getVersion()).append("\"");
+            for (String version : instruction.getVersion())
+            {
+                ret.append(";version=\"").append(version).append("\"");
+            }
         }
         return ret.append("\n").toString();
     }

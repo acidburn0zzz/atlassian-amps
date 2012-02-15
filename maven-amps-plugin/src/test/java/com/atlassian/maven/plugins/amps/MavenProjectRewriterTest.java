@@ -9,7 +9,6 @@ import java.util.UUID;
 import com.atlassian.plugins.codegen.ArtifactDependency;
 import com.atlassian.plugins.codegen.ArtifactDependency.Scope;
 import com.atlassian.plugins.codegen.BundleInstruction;
-import com.atlassian.plugins.codegen.BundleInstruction.Category;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 
 import org.apache.commons.io.FileUtils;
@@ -23,6 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
+import static com.atlassian.plugins.codegen.BundleInstruction.importPackage;
+import static com.atlassian.plugins.codegen.BundleInstruction.privatePackage;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -35,9 +36,9 @@ public class MavenProjectRewriterTest
     private static final ArtifactDependency NEW_DEPENDENCY =
         dependency("com.atlassian.dogs", "cooper", "1.0", Scope.PROVIDED);
     private static final BundleInstruction NEW_IMPORT_PACKAGE =
-        new BundleInstruction(Category.IMPORT, "com.atlassian.random", "2.0.1");
+        importPackage("com.atlassian.random", "2.0.1");
     private static final BundleInstruction NEW_PRIVATE_PACKAGE =
-        new BundleInstruction(Category.PRIVATE, "com.atlassian.random", "2.0.1");
+        privatePackage("com.atlassian.random");
     
     private File tempDir;
     private File pom;
@@ -118,6 +119,40 @@ public class MavenProjectRewriterTest
         Element xml = applyChanges(new PluginProjectChangeset().withDependencies(existing));
         
         assertEquals(2, xml.selectNodes("//m:dependencies/m:dependency").size());
+    }
+    
+    @Test
+    public void dependencyWithVersionPropertyUsesPropertyNameForVersion() throws Exception
+    {
+        ArtifactDependency dependency = dependency("com.atlassian.dogs", "cooper", "1.0", "dog.version", Scope.PROVIDED);
+        setupProject(TEST_POM);
+        Element xml = applyChanges(new PluginProjectChangeset().withDependencies(dependency));
+        
+        assertEquals("${dog.version}",
+                     xml.selectSingleNode("//m:dependencies/m:dependency[3]/m:version").getText());
+    }
+
+    @Test
+    public void dependencyWithVersionPropertyAddsPropertyNameAndValueToProperties() throws Exception
+    {
+        ArtifactDependency dependency = dependency("com.atlassian.dogs", "cooper", "1.0", "dog.version", Scope.PROVIDED);
+        setupProject(TEST_POM);
+        Element xml = applyChanges(new PluginProjectChangeset().withDependencies(dependency));
+        
+        assertEquals("1.0",
+                     xml.selectSingleNode("//m:properties/m:dog.version").getText());
+    }
+
+    @Test
+    public void dependencyWithVersionPropertyDoesNotOverwriteExistingProperty() throws Exception
+    {
+        ArtifactDependency dependency = dependency("com.atlassian.dogs", "cooper", "1.0", "dog.version", Scope.PROVIDED);
+        ArtifactDependency dependency2 = dependency("com.atlassian.dogs", "sailor", "3.5", "dog.version", Scope.PROVIDED);
+        setupProject(TEST_POM);
+        Element xml = applyChanges(new PluginProjectChangeset().withDependencies(dependency, dependency2));
+        
+        assertEquals("1.0",
+                     xml.selectSingleNode("//m:properties/m:dog.version").getText());
     }
     
     @Test
@@ -204,7 +239,7 @@ public class MavenProjectRewriterTest
         Element xml = applyChanges(new PluginProjectChangeset().withBundleInstructions(NEW_PRIVATE_PACKAGE));
         
         String instructions = xml.selectSingleNode("//m:build/m:plugins/m:plugin[1]/m:configuration/m:instructions/m:Private-Package").getText();
-        assertEquals("com.atlassian.random;version=\"2.0.1\"", instructions.trim());
+        assertEquals("com.atlassian.random", instructions.trim());
     }
 
     protected void setupProject(String pomTemplateName) throws Exception
