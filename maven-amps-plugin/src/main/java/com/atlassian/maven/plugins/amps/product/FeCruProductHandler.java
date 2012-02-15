@@ -192,12 +192,6 @@ public class FeCruProductHandler extends AbstractProductHandler
     @Override
     protected final int startApplication(Product ctx, final File app, final File homeDir, Map<String, String> properties) throws MojoExecutionException
     {
-        final String fixedArgs = JvmArgsFix.empty()
-                .with("-Xmx", "512m")
-                .with("-XX:MaxPermSize=", "160m")
-                .apply(ctx.getJvmArgs());
-        ctx.setJvmArgs(fixedArgs);
-
         log.info("Starting " + ctx.getInstanceId() + " on ports "
                 + ctx.getHttpPort() + " (http) and " + controlPort(ctx.getHttpPort()) + " (control)");
 

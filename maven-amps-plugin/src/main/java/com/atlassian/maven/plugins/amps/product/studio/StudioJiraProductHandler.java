@@ -75,12 +75,10 @@ public class StudioJiraProductHandler extends JiraProductHandler implements Stud
         }
 
         StudioProductHandler.addProductHandlerOverrides(log, ctx, homeDir, explodedWarDir);
-
-        fixMemorySettings(ctx);
     }
 
-    // JIRA needs a bit more PermGen - default is -Xmx512m -XX:MaxPermSize=160m
-    protected void fixMemorySettings(Product ctx)
+    // JIRA needs a bit more heap and PermGen - default is -Xmx512m -XX:MaxPermSize=256m (see JvmArgsFix)
+    protected void fixJvmArgs(Product ctx)
     {
         final String jvmArgs = JvmArgsFix.empty()
                 .with("-Xms", "256m")

@@ -1,8 +1,8 @@
 package com.atlassian.maven.plugins.amps.util;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.inject.internal.util.ImmutableMap;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.List;

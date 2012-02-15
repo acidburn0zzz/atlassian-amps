@@ -15,7 +15,7 @@ public class TestStudioJiraProductHandler
         StudioJiraProductHandler handler = new StudioJiraProductHandler(Mockito.mock(MavenContext.class), Mockito.mock(MavenGoals.class));
 
         product.setJvmArgs(null);
-        handler.fixMemorySettings(product);
+        handler.fixJvmArgs(product);
 
         org.junit.Assert.assertEquals("-Xms256m -Xmx768m -XX:MaxPermSize=512m", product.getJvmArgs());
     }
@@ -27,7 +27,7 @@ public class TestStudioJiraProductHandler
         StudioJiraProductHandler handler = new StudioJiraProductHandler(Mockito.mock(MavenContext.class), Mockito.mock(MavenGoals.class));
 
         product.setJvmArgs("-Xms1024m");
-        handler.fixMemorySettings(product);
+        handler.fixJvmArgs(product);
 
         org.junit.Assert.assertEquals("-Xms1024m -Xmx768m -XX:MaxPermSize=512m", product.getJvmArgs());
     }
@@ -39,7 +39,7 @@ public class TestStudioJiraProductHandler
         StudioJiraProductHandler handler = new StudioJiraProductHandler(Mockito.mock(MavenContext.class), Mockito.mock(MavenGoals.class));
 
         product.setJvmArgs("-Xmx1024m");
-        handler.fixMemorySettings(product);
+        handler.fixJvmArgs(product);
 
         org.junit.Assert.assertEquals("-Xmx1024m -Xms256m -XX:MaxPermSize=512m", product.getJvmArgs());
     }
@@ -51,7 +51,7 @@ public class TestStudioJiraProductHandler
         StudioJiraProductHandler handler = new StudioJiraProductHandler(Mockito.mock(MavenContext.class), Mockito.mock(MavenGoals.class));
 
         product.setJvmArgs("-XX:MaxPermSize=512m -Xmx1024m -Dother=val");
-        handler.fixMemorySettings(product);
+        handler.fixJvmArgs(product);
 
         org.junit.Assert.assertEquals("-XX:MaxPermSize=512m -Xmx1024m -Dother=val -Xms256m", product.getJvmArgs());
     }
