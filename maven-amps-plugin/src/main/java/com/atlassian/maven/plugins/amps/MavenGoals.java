@@ -423,10 +423,6 @@ public class MavenGoals
         final int rmiPort = pickFreePort(0);
         final int actualHttpPort = pickFreePort(webappContext.getHttpPort());
         final List<Element> sysProps = new ArrayList<Element>();
-        if (webappContext.getJvmArgs() == null)
-        {
-            webappContext.setJvmArgs("-Xmx512m -XX:MaxPermSize=256m");
-        }
 
         for (final Map.Entry<String, String> entry : systemProperties.entrySet())
         {
