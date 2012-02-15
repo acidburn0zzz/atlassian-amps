@@ -1,9 +1,10 @@
-package com.atlassian.maven.plugins.amps.codegen.prompter;
+package com.atlassian.maven.plugins.amps.codegen.prompter.licensing;
 
 import com.atlassian.maven.plugins.amps.codegen.annotations.ModuleCreatorClass;
+import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter;
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-import com.atlassian.plugins.codegen.modules.common.LicensingModuleCreator;
-import com.atlassian.plugins.codegen.modules.common.LicensingProperties;
+import com.atlassian.plugins.codegen.modules.common.licensing.LicensingUpm2ModuleCreator;
+import com.atlassian.plugins.codegen.modules.common.licensing.LicensingProperties;
 import com.atlassian.plugins.codegen.util.ClassnameUtil;
 
 import org.codehaus.plexus.components.interactivity.Prompter;
@@ -12,11 +13,11 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 /**
  * @since 3.7
  */
-@ModuleCreatorClass(LicensingModuleCreator.class)
-public class LicensingPrompter extends AbstractModulePrompter<LicensingProperties>
+@ModuleCreatorClass(LicensingUpm2ModuleCreator.class)
+public class LicensingUpm2Prompter extends AbstractModulePrompter<LicensingProperties>
 {
 
-    public LicensingPrompter(Prompter prompter)
+    public LicensingUpm2Prompter(Prompter prompter)
     {
         super(prompter);
         showAdvancedPrompt = false;

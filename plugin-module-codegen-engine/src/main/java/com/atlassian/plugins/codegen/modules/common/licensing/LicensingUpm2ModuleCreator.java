@@ -1,4 +1,4 @@
-package com.atlassian.plugins.codegen.modules.common;
+package com.atlassian.plugins.codegen.modules.common.licensing;
 
 import com.atlassian.plugins.codegen.ComponentDeclaration;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
@@ -27,9 +27,9 @@ import static com.atlassian.plugins.codegen.ComponentImport.componentImport;
 @BambooPluginModuleCreator
 @FeCruPluginModuleCreator
 @CrowdPluginModuleCreator
-public class LicensingModuleCreator extends AbstractPluginModuleCreator<LicensingProperties>
+public class LicensingUpm2ModuleCreator extends AbstractPluginModuleCreator<LicensingProperties>
 {
-    public static final String MODULE_NAME = "Atlassian License Management";
+    public static final String MODULE_NAME = "Atlassian License Management (UPM 2 API)";
 
     public static final String LICENSE_CHECKER_DESCRIPTION = "Atlassian license management module";
     public static final String LICENSE_CHECKER_CLASS_TEMPLATE = "templates/common/licensing/LicenseChecker.java.vtl";
@@ -41,10 +41,10 @@ public class LicensingModuleCreator extends AbstractPluginModuleCreator<Licensin
             .description(some(LICENSE_CHECKER_DESCRIPTION))
             .build();
         return new PluginProjectChangeset()
-            .withDependencies(dependency("com.atlassian.upm", "licensing-api", "2.0", PROVIDED),
-                                      dependency("com.atlassian.upm", "upm-api", "2.0", PROVIDED),
-                                      dependency("com.atlassian.plugins", "atlassian-plugins-core", "2.9.0", PROVIDED),
-                                      dependency("com.atlassian.sal", "sal-api", "2.6.0", PROVIDED))
+            .withDependencies(dependency("com.atlassian.upm", "licensing-api", "2.0", "upm.api.version", PROVIDED),
+                              dependency("com.atlassian.upm", "upm-api", "2.0", "upm.api.version", PROVIDED),
+                              dependency("com.atlassian.plugins", "atlassian-plugins-core", "2.9.0", PROVIDED),
+                              dependency("com.atlassian.sal", "sal-api", "2.6.0", PROVIDED))
             .withPluginParameters(ImmutableMap.of("atlassian-licensing-enabled", "true"))
             .withComponentImports(componentImport(fullyQualified("com.atlassian.upm.api.license.PluginLicenseManager")),
                                   componentImport(fullyQualified("com.atlassian.upm.api.license.PluginLicenseEventRegistry")),

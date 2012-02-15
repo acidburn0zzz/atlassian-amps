@@ -1,0 +1,124 @@
+package com.example.plugins.tutorial.servlet;
+ 
+import java.io.IOException;
+ 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+ 
+import com.atlassian.sal.api.ApplicationProperties;
+import com.atlassian.upm.api.license.entity.PluginLicense;
+import com.atlassian.upm.api.util.Option;
+import com.atlassian.upm.license.storage.lib.PluginLicenseStoragePluginUnresolvedException;
+import com.atlassian.upm.license.storage.lib.ThirdPartyPluginLicenseStorageManager;
+ 
+import org.apache.commons.lang.StringUtils;
+
+public class LicenseServlet extends HttpServlet
+{
+    private final ThirdPartyPluginLicenseStorageManager licenseManager;
+    private final ApplicationProperties applicationProperties;
+ 
+    public LicenseServlet(ThirdPartyPluginLicenseStorageManager licenseManager, ApplicationProperties applicationProperties)
+    {
+        this.licenseManager = licenseManager;
+        this.applicationProperties = applicationProperties;
+    }
+ 
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
+        resp.setContentType("text/html");
+        resp.getWriter().write("<html><body>");
+        outputBody(resp);
+        resp.getWriter().write("</body></html>");
+        resp.getWriter().close();
+    }
+ 
+    private void outputBody(HttpServletResponse resp) throws ServletException, IOException
+    {
+        try
+        {
+            resp.getWriter().write("<br><br>UPM is licensing-aware: " + licenseManager.isUpmLicensingAware());
+            resp.getWriter().write("<br>Plugin key: " + licenseManager.getPluginKey());
+     
+            if (!licenseManager.isUpmLicensingAware())
+            {
+                resp.getWriter().write("<br><br>Update your license");
+                resp.getWriter().write("<br><form action=\"" + applicationProperties.getBaseUrl() + "/plugins/servlet/licenseservlet\" method=\"POST\">");
+                resp.getWriter().write("<textarea name=\"license\" cols=\"80\" rows=\"10\">");
+                for (String storedRawLicense : licenseManager.getRawLicense())
+                {
+                    //enter the stored license into the textarea, if the license has been stored
+                    resp.getWriter().write(storedRawLicense);
+                }
+                resp.getWriter().write("</textarea>");
+                resp.getWriter().write("<br><input type=\"submit\" value=\"Save\" />");
+                resp.getWriter().write("</form>");
+            }
+            else
+            {
+                resp.getWriter().write("<br>Cannot modify plugin licenses with this API when UPM is licensing-aware. Please use ");
+                resp.getWriter().write("<a href=\"" + licenseManager.getPluginManagementUri() + "\">UPM's licensing UI</a>.");
+            }
+        }
+        catch (PluginLicenseStoragePluginUnresolvedException e)
+        {
+            resp.getWriter().write("<br>Sorry, but we cannot find the required licensing support to execute the requested operation. "
+                    + "Please ensure that the Plugin License Storage plugin is installed and enabled. Restarting this plugin " +
+                            "should resolve the problem.");
+        }
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
+        resp.setContentType("text/html");
+        resp.getWriter().write("<html><body><b>");
+ 
+        try
+        {
+            if (!licenseManager.isUpmLicensingAware())
+            {
+                String license = req.getParameter("license");
+                if (!StringUtils.isEmpty(license))
+                {
+                    //we have a non-empty license parameter - let's update the license if it is valid.
+                    Option<PluginLicense> validatedLicense = licenseManager.validateLicense(license);
+                    if (validatedLicense.isDefined())
+                    {
+                        licenseManager.setRawLicense(license);
+                        resp.getWriter().write("Valid license. License has been updated.");
+                    }
+                    else
+                    {
+                        resp.getWriter().write("Invalid license. License has not been updated.");
+                    }
+                }
+                else
+                {
+                    //we have an empty/null license parameter - let's remove the stored license
+                    licenseManager.removeRawLicense();
+                    resp.getWriter().write("License has been removed.");
+                }
+            }
+            else
+            {
+                //don't allow POSTs to occur to our license servlet if UPM is licensing-aware
+                resp.getWriter().write("Nice try! You cannot update your plugin license with this API when UPM is licensing-aware.");
+            }
+        }
+        catch (PluginLicenseStoragePluginUnresolvedException e)
+        {
+            resp.getWriter().write("<br>Sorry, but we cannot find the required licensing support to execute the requested operation. "
+                    + "Please ensure that the Plugin License Storage plugin is installed and enabled. Restarting this plugin " +
+                            "should resolve the problem.");
+        }
+ 
+        resp.getWriter().write("</b>");
+        outputBody(resp);
+        resp.getWriter().write("</body></html>");
+        resp.getWriter().close();
+    }
+}

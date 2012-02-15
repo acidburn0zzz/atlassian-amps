@@ -43,24 +43,38 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
     {
         return creator.createModule(props);
     }
-    
+
+    protected boolean hasGeneratedModulesOfType(String name) throws Exception
+    {
+        PluginProjectChangeset changeset = getChangesetForModule();
+        for (ModuleDescriptor module : changeset.getModuleDescriptors())
+        {
+            Element root = DocumentHelper.parseText(module.getContent()).getRootElement();
+            if (name.equals(root.getName()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected Document getAllGeneratedModulesOfType(String name) throws Exception
     {
         PluginProjectChangeset changeset = getChangesetForModule();
         assertFalse("did not generate any module descriptors", changeset.getModuleDescriptors().isEmpty());
         boolean found = false;
         Document ret = DocumentFactory.getInstance().createDocument();
+        ret.addElement("modules");
         List<String> foundTypes = new LinkedList<String>();
         for (ModuleDescriptor module : changeset.getModuleDescriptors())
         {
-            Document parsed = DocumentHelper.parseText(module.getContent());
-            Element root = parsed.getRootElement();
+            Element root = DocumentHelper.parseText(module.getContent()).getRootElement();
             String type = root.getName();
             foundTypes.add(type);
             if (type.equals(name))
             {
                 root.detach();
-                ret.add(root);
+                ret.getRootElement().add(root);
                 found = true;
             }
         }
@@ -71,12 +85,66 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
         }
         return ret;
     }
+
+    protected ComponentDeclaration getComponentOfClass(ClassId classId) throws Exception
+    {
+        PluginProjectChangeset changeset = getChangesetForModule();
+        assertFalse("did not generate any component declarations", changeset.getComponentDeclarations().isEmpty());
+        List<String> foundClasses = new LinkedList<String>();
+        for (ComponentDeclaration component : changeset.getComponentDeclarations())
+        {
+            if (component.getClassId().equals(classId))
+            {
+                return component;
+            }
+            foundClasses.add(component.getClassId().getFullName());
+        }
+        fail("did not generate any component declaration of type \"" + classId + "\"; generated components were "
+             + Joiner.on(", ").join(foundClasses));
+        return null;
+    }
+
+    protected ComponentImport getComponentImportOfInterface(ClassId interfaceId) throws Exception
+    {
+        PluginProjectChangeset changeset = getChangesetForModule();
+        assertFalse("did not generate any component imports", changeset.getComponentImports().isEmpty());
+        List<String> foundClasses = new LinkedList<String>();
+        for (ComponentImport component : changeset.getComponentImports())
+        {
+            if (component.getInterfaceClass().equals(interfaceId))
+            {
+                return component;
+            }
+            foundClasses.add(component.getInterfaceClass().getFullName());
+        }
+        fail("did not generate any component import for interface \"" + interfaceId + "\"; generated imports were "
+             + Joiner.on(", ").join(foundClasses));
+        return null;
+    }
+    
+    protected ArtifactDependency getDependency(String groupId, String artifactId) throws Exception
+    {
+        PluginProjectChangeset changeset = getChangesetForModule();
+        assertFalse("did not generate any dependencies", changeset.getDependencies().isEmpty());
+        List<String> foundDeps = new LinkedList<String>();
+        for (ArtifactDependency dependency : changeset.getDependencies())
+        {
+            if (dependency.getGroupId().equals(groupId) && dependency.getArtifactId().equals(artifactId))
+            {
+                return dependency;
+            }
+            foundDeps.add(dependency.getGroupId() + ":" + dependency.getArtifactId());
+        }
+        fail("did not generate any dependency for \"" + groupId + ":" + artifactId + "\"; generated depdendencies were "
+             + Joiner.on(", ").join(foundDeps));
+        return null;
+    }
     
     protected Element getGeneratedModule(String name) throws Exception
     {
         Document results = getAllGeneratedModulesOfType(name);
         assertEquals("found too many modules of type \"" + name + "\"", 1, results.selectNodes("//" + name).size());
-        return (Element) results.selectSingleNode("//" + name);
+        return (Element) results.selectSingleNode("//modules/" + name);
     }
     
     protected SourceFile getSourceFile(String packageName, String className) throws Exception
