@@ -7,34 +7,25 @@ import java.io.Reader;
 import java.util.UUID;
 
 import com.atlassian.plugins.codegen.ArtifactDependency;
-import com.atlassian.plugins.codegen.BundleInstruction;
-import com.atlassian.plugins.codegen.PluginProjectChangeset;
-import com.atlassian.plugins.codegen.ProjectFilesRewriter;
 import com.atlassian.plugins.codegen.ArtifactDependency.Scope;
+import com.atlassian.plugins.codegen.BundleInstruction;
 import com.atlassian.plugins.codegen.BundleInstruction.Category;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.dom4j.XPath;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
-
-import static junit.framework.Assert.assertNotNull;
-
-import static junit.framework.Assert.assertEquals;
-
-import junit.framework.Assert;
-
 import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class MavenProjectRewriterTest
 {
