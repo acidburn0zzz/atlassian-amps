@@ -58,7 +58,7 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
             executeMojo(
                 plugin(
                         groupId("com.atlassian.maven.plugins"),
-                        artifactId("maven-" + targetArtifact + "-plugin"),
+                        artifactId(targetArtifact),
                         version(VersionUtils.getVersion())  //ignored anyway
                 ),
                 goal(goal),
