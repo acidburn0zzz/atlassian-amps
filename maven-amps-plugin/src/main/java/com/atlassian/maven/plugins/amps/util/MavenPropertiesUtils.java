@@ -3,9 +3,11 @@ package com.atlassian.maven.plugins.amps.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -23,6 +25,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -37,34 +40,32 @@ public class MavenPropertiesUtils
      * Reflection - Finds the field represented by propertyName
      * 
      * @return the field or null.
-     * @throws MojoExecutionException
-     *             if the field exists but is not assignable with a system property
      */
     private static Field findField(Object target, String propertyName)
     {
+        
         Class<?> clazz = target.getClass();
-        Field field = null;
-        while (field == null && clazz != null)
+        while (clazz != null)
         {
-            try
+            for (Field declaredField : clazz.getDeclaredFields())
             {
-                field = clazz.getDeclaredField(propertyName);
+                if (propertyName.equals(declaredField.getName()))
+                {
+                    return declaredField;
+                }
             }
-            catch (NoSuchFieldException nsee)
+            // Look at the parent too
+            Type superClass = clazz.getGenericSuperclass();
+            if (superClass instanceof Class)
             {
-                // Look at the parent too
-                Type superClass = clazz.getGenericSuperclass();
-                if (superClass instanceof Class)
-                {
-                    clazz = (Class<?>) superClass;
-                }
-                else
-                {
-                    clazz = null;
-                }
+                clazz = (Class<?>) superClass;
+            }
+            else
+            {
+                clazz = null;
             }
         }
-        return field;
+        return null;
     }
     
     /**
@@ -84,25 +85,24 @@ public class MavenPropertiesUtils
         
         if (configuration == null)
         {
-            // The current plugin doesn't seem defined in the pom.xml. Is there any other Amps plugin defined in the pom.xml?
+            // No maven-*-plugin in pom.xml. Search for other Amps plugins in pom.xml.
             String suggestedAmpsArtifact = detectAmpsProduct(project);
             if (suggestedAmpsArtifact != null)
             {
                 // Check it's not the current plugin
-                if (!suggestedAmpsArtifact.equals(pluginDescriptor.getGoalPrefix()))
+                if (!suggestedAmpsArtifact.contains(pluginDescriptor.getGoalPrefix()))
                 {
                     // If there's another Amps plugin, it's fine to blow up, because we're not in a situation where the pom.xml is missing.
-                    throw new MojoExecutionException(String.format("You are using %s:%s but maven-%s-plugin is defined in the pom.xml. Use %s:%s, or define %s in your pom.xml.",
+                    throw new MojoExecutionException(String.format("You are using %s:%s but %s is defined in the pom.xml. Please define %s in your pom.xml.",
                             pluginDescriptor.getGoalPrefix(),
                             mojoDescriptor.getGoal(),
                             suggestedAmpsArtifact,
-                            suggestedAmpsArtifact,
-                            mojoDescriptor.getGoal(),
                             pluginDescriptor.getArtifactId()
                             ));
                 }
             }
-            else if (!"run-standalone".equals(mojoExecution.getGoal()))
+            // No Amps plugin in pom.xml. Just tell the user.
+            else if (!mojoExecution.getMojoDescriptor().isProjectRequired())
             {
                 mavenContext.getLog().info("No <configuration> is defined for " + pluginDescriptor.getArtifactId() + ". " +
                 		"Amps will work successfully, but you could set some parameters using a <configuration> tag in your pom.xml.");
@@ -172,22 +172,20 @@ public class MavenPropertiesUtils
     public final static String detectAmpsProduct(MavenProject project)
     {
         List<Plugin> buildPlugins = project.getBuildPlugins();
-
-        Set<String> possiblePluginTypes = new HashSet<String>(ProductHandlerFactory.getIds());
-        possiblePluginTypes.add("amps");
-
+        List<String> possiblePluginTypes = Lists.newArrayList("maven-amps-plugin");
+        for (String type : ProductHandlerFactory.getIds())
+        {
+            possiblePluginTypes.add("maven-" + type + "-plugin");
+        }
         if (buildPlugins != null)
         {
             for (Plugin pomPlugin : buildPlugins)
             {
                 if ("com.atlassian.maven.plugins".equals(pomPlugin.getGroupId()))
                 {
-                    for (String type : possiblePluginTypes)
+                    if (possiblePluginTypes.contains(pomPlugin.getArtifactId()))
                     {
-                        if (("maven-" + type + "-plugin").equals(pomPlugin.getArtifactId()))
-                        {
-                            return type;
-                        }
+                        return pomPlugin.getArtifactId();
                     }
                 }
             }
@@ -209,27 +207,25 @@ public class MavenPropertiesUtils
         return allParameters;
     }
 
-    private static String getAdviceWithClosestNames(final String name, Set<String> list, int max)
+    static String getAdviceWithClosestNames(final String name, Set<String> list, int max)
     {
         final String lowerCaseName = name.toLowerCase(Locale.ENGLISH);
-        // Unique elments ordered by decreasing distance
-        List<String> closest = Lists.newArrayList(new TreeSet<String>(new Comparator<String>()
+        ScoreSheet closestMatching = new ScoreSheet();
+        for (String item : list)
         {
-            @Override
-            public int compare(String first, String second)
-            {
-                return distance(first.toLowerCase(), lowerCaseName) - distance(second.toLowerCase(), lowerCaseName);
-            }
-        }));
-        closest.subList(0, Math.min(ADVICE_COUNT, closest.size()));
-        String advice;
-        if (closest.size() > 1)
-        {
-            advice = "The closest matching names are '" + StringUtils.join(closest, "', '") + "'.";
+            closestMatching.putScore(item, distance(item.toLowerCase(), lowerCaseName));
         }
-        else if (closest.size() == 1)
+        
+        List<String> firstThree = closestMatching.head(max);
+        
+        String advice;
+        if (firstThree.size() > 1)
         {
-            advice = "The closest matching name is '" + closest.get(0) + "'.";
+            advice = "The closest matching names are '" + StringUtils.join(firstThree, "', '") + "'.";
+        }
+        else if (firstThree.size() == 1)
+        {
+            advice = "The closest matching name is '" + firstThree.get(0) + "'.";
         }
         else
         {
@@ -238,6 +234,43 @@ public class MavenPropertiesUtils
         
         return advice;
     }
+    
+    /**
+     * Representation of a score sheet which allows taking the top n elements. 
+     */
+    static class ScoreSheet
+    {
+        Map<String, Integer> scoresMap = Maps.newHashMap();
+
+        public void putScore(String item, int score)
+        {
+            scoresMap.put(item, score);
+        }
+
+        public List<String> head(int count)
+        {
+            // Put elements into an ordered set
+            TreeSet<Map.Entry<String, Integer>> highestScores = new TreeSet<Map.Entry<String, Integer>>(new Comparator<Map.Entry<String, Integer>>()
+            {
+                @Override
+                public int compare(Map.Entry<String, Integer> first, Map.Entry<String, Integer> second)
+                {
+                    return first.getValue() - second.getValue();
+                }
+            });
+            highestScores.addAll(scoresMap.entrySet());
+
+            List<String> topItems = Lists.newArrayList();
+            Iterator<Entry<String, Integer>> topScoresIterator = highestScores.iterator();
+            int index = 0;
+            while (topScoresIterator.hasNext() && index++ < count)
+            {
+                topItems.add(topScoresIterator.next().getKey());
+            }
+            return topItems;
+        }
+    }
+    
 
     /**
      * Distance between two strings;<ul>

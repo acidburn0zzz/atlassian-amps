@@ -77,11 +77,11 @@ public class TestAbstractAmpsDispatcherMojo extends TestCase
         project.setBuild(build);
         if (expected)
         {
-            assertEquals(artifactId, "maven-" + MavenPropertiesUtils.detectAmpsProduct(project) + "-plugin");
+            assertEquals(artifactId, MavenPropertiesUtils.detectAmpsProduct(project));
         }
         else
         {
-            assertNotSame(artifactId, "maven-" + MavenPropertiesUtils.detectAmpsProduct(project) + "-plugin");
+            assertNotSame(artifactId, MavenPropertiesUtils.detectAmpsProduct(project));
         }
     }
 

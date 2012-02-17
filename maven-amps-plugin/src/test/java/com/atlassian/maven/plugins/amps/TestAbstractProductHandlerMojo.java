@@ -1,6 +1,7 @@
 package com.atlassian.maven.plugins.amps;
 
 import org.apache.maven.model.Build;
+
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -12,9 +13,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Assert;
 import org.junit.Test;
-import org.junit.matchers.JUnitMatchers;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
@@ -22,6 +21,7 @@ import com.atlassian.maven.plugins.amps.util.MavenPropertiesUtils;
 import com.google.common.collect.Lists;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +32,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.junit.matchers.JUnitMatchers.containsString;
 
 public class TestAbstractProductHandlerMojo
 {
@@ -125,7 +126,7 @@ public class TestAbstractProductHandlerMojo
         }
         catch (MojoExecutionException mee)
         {
-            Assert.assertThat(mee.getMessage(), JUnitMatchers.containsString("You are using amps:some but maven-jira-plugin is defined in the pom.xml"));
+            assertThat(mee.getMessage(), containsString("You are using amps:some but maven-jira-plugin is defined in the pom.xml"));
         }
     }
 
