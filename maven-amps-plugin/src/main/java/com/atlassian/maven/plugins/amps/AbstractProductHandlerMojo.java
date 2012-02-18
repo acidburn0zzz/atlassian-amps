@@ -53,6 +53,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     private static final String DEFAULT_WEB_CONSOLE_VERSION = "1.2.8";
     private static final String DEFAULT_FASTDEV_VERSION = "1.9";
     private static final String DEFAULT_DEV_TOOLBOX_VERSION = "1.1";
+    private static final String DEFAULT_PDE_VERSION = "1.2";
 
     /**
       * Default product startup timeout: three minutes
@@ -194,6 +195,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     @MojoParameter(expression = "${devtoolbox.version}", defaultValue = DEFAULT_DEV_TOOLBOX_VERSION)
     protected String devToolboxVersion;
 
+    /**
+     * The version of the PDE to bundle
+     */
+    @MojoParameter(expression = "${pde.version}", defaultValue = DEFAULT_PDE_VERSION)
+    protected String pdeVersion;
+    
     @MojoParameter
     private List<ProductArtifact> pluginArtifacts = new ArrayList<ProductArtifact>();
 
