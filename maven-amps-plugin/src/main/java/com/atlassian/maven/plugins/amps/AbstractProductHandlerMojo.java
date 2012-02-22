@@ -514,6 +514,11 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             product.setDevToolboxVersion(DEFAULT_DEV_TOOLBOX_VERSION);
         }
 
+        if (product.getPdeVersion() == null) 
+        {
+            product.setPdeVersion(DEFAULT_PDE_VERSION);
+        }
+        
         if (product.getOutput() == null)
         {
             product.setOutput(output);
