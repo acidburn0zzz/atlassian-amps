@@ -255,7 +255,7 @@ public class Product
         prod.setFastdevVersion(fastdevVersion == null ? product.getFastdevVersion() : fastdevVersion);
         prod.setEnableDevToolbox(enableDevToolbox == null ? product.isEnableDevToolbox() : enableDevToolbox);
         prod.setDevToolboxVersion(devToolboxVersion == null ? product.getDevToolboxVersion() : devToolboxVersion);
-        prod.setEnablePde(enablePde == null? product.isEnablePde() : enablePde);
+        prod.setEnablePde(enablePde == null ? product.isEnablePde() : enablePde);
         prod.setPdeVersion(pdeVersion == null ? product.getPdeVersion() : pdeVersion);
         prod.setRestVersion(restVersion == null ? product.getRestVersion() : restVersion);
         prod.setPdkVersion(pdkVersion == null ? product.getPdkVersion() : pdkVersion);

@@ -196,6 +196,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected String devToolboxVersion;
 
     /**
+     * If PDE should be enabled
+     */
+    @MojoParameter(expression = "${pde.enable}", defaultValue = "true")
+    protected boolean enablePde;
+
+    /**
      * The version of the PDE to bundle
      */
     @MojoParameter(expression = "${pde.version}", defaultValue = DEFAULT_PDE_VERSION)
@@ -388,6 +394,9 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         ctx.setEnableDevToolbox(enableDevToolbox);
         ctx.setDevToolboxVersion(devToolboxVersion);
+
+        ctx.setEnablePde(enablePde);
+        ctx.setPdeVersion(pdeVersion);
 
         ctx.setHttpPort(httpPort);
         return ctx;
