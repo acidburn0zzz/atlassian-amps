@@ -7,6 +7,7 @@
     </plugin-info>
 
     <macro name="${artifactId}" class="${package}.ExampleMacro" key="my-macro">
+        <parameters></parameters>
     <!-- TODO: Add macro description -->
     <!-- <description></description> -->
     </macro>
