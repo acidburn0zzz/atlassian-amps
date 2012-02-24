@@ -2,12 +2,10 @@ package ${package};
 
 import java.util.Map;
 import java.util.List;
-import java.util.Iterator;
 
-import com.atlassian.renderer.RenderContext;
-import com.atlassian.renderer.v2.macro.BaseMacro;
-import com.atlassian.renderer.v2.macro.MacroException;
-import com.atlassian.renderer.v2.RenderMode;
+import com.atlassian.confluence.content.render.xhtml.ConversionContext;
+import com.atlassian.confluence.macro.Macro;
+import com.atlassian.confluence.macro.MacroExecutionException;
 import com.atlassian.confluence.pages.PageManager;
 import com.atlassian.confluence.pages.Page;
 import com.atlassian.confluence.spaces.SpaceManager;
@@ -20,7 +18,7 @@ import com.opensymphony.util.TextUtils;
  * Use this example macro to toy around, and then quickly move on to the next example - this macro doesn't
  * really show you all the fun stuff you can do with Confluence.
  */
-public class ExampleMacro extends BaseMacro
+public class ExampleMacro implements Macro
 {
 
     // We just have to define the variables and the setters, then Spring injects the correct objects for us to use. Simple and efficient.
@@ -35,31 +33,15 @@ public class ExampleMacro extends BaseMacro
         this.spaceManager = spaceManager;
     }
 
-    public boolean isInline()
-    {
-        return false;
-    }
-
-    public boolean hasBody()
-    {
-        return false;
-    }
-
-    public RenderMode getBodyRenderMode()
-    {
-        return RenderMode.NO_RENDER;
-    }
-
     /**
      * This method returns XHTML to be displayed on the page that uses this macro
      * we just do random stuff here, trying to show how you can access the most basic
      * managers and model objects. No emphasis is put on beauty of code nor on
      * doing actually useful things :-)
      */
-    public String execute(Map params, String body, RenderContext renderContext)
-            throws MacroException
+    @Override
+    public String execute(Map<String, String> parameters, String body, ConversionContext context) throws MacroExecutionException
     {
-
         // in this most simple example, we build the result in memory, appending HTML code to it at will.
         // this is something you absolutely don't want to do once you start writing plugins for real. Refer
         // to the next example for better ways to render content.
@@ -69,29 +51,47 @@ public class ExampleMacro extends BaseMacro
         User user = AuthenticatedUserThreadLocal.getUser();
         if (user != null)
         {
-            String greeting = "Hello " + TextUtils.htmlEncode(user.getFullName()) + "<br><br>";
+            String greeting = "<p>Hello <b>" + TextUtils.htmlEncode(user.getFullName()) + "</b>.</p>";
             result.append(greeting);
         }
 
         //get the pages added in the last 55 days to the DS space ("Demo Space"), and display them
-        List list = pageManager.getRecentlyAddedPages(55, "DS");
-        result.append("Some stats for the Demo space: <br> ");
-        for (Iterator i = list.iterator(); i.hasNext();)
+        List<Page> list = pageManager.getRecentlyAddedPages(55, "DS");
+        result.append("<p>");
+        result.append("Some stats for <b>Demonstration Space</b>:");
+        result.append("<table class=\"confluenceTable\">");
+        result.append("<thead><tr><th class=\"confluenceTh\">Page</th><th class=\"confluenceTh\">Number of children</th></tr></thead>");
+        result.append("<tbody>");
+        for (Page page : list)
         {
-            Page page = (Page) i.next();
             int numberOfChildren = page.getChildren().size();
-            String pageWithChildren = "Page " + TextUtils.htmlEncode(page.getTitle()) + " has " + numberOfChildren + " children <br> ";
+            String pageWithChildren = "<tr><td class=\"confluenceTd\">" + TextUtils.htmlEncode(page.getTitle()) + "</td><td class=\"confluenceTd\" style=\"text-align:right\">" + numberOfChildren + "</td></tr>";
             result.append(pageWithChildren);
         }
+        result.append("</tbody>");
+        result.append("</table>");
+        result.append("</p>");
 
         // and show the number of all spaces in this installation.
-        String spaces = "<br>Altogether, this installation has " + spaceManager.getAllSpaces().size() + " spaces. <br>";
+        String spaces = "<p>Altogether, this installation has <b>" + spaceManager.getAllSpaces().size() + "</b> spaces.</p>";
         result.append(spaces);
 
         // this concludes our little demo. Now you should understand the basics of code injection use in Confluence, and how
         // to get a really simple macro running.
 
         return result.toString();
+    }
+
+    @Override
+    public BodyType getBodyType()
+    {
+        return BodyType.NONE;
+    }
+
+    @Override
+    public OutputType getOutputType()
+    {
+        return OutputType.BLOCK;
     }
 
 }
