@@ -10,7 +10,17 @@ import javax.servlet.http.HttpServletResponse;
 import com.atlassian.upm.api.license.entity.PluginLicense;
 import com.atlassian.upm.license.storage.lib.PluginLicenseStoragePluginUnresolvedException;
 import com.atlassian.upm.license.storage.lib.ThirdPartyPluginLicenseStorageManager;
- 
+
+/**
+ * A simple "Hello World" servlet that demonstrates how to use
+ * {@link ThirdPartyPluginLicenseStorageManager} to ensure plugin license
+ * existence/validity at a plugin entry point.
+ * <p>
+ * This servlet can be reached at http://localhost:2990/jira/plugins/servlet/helloworldservlet
+ * <p>
+ * For more information, see the "UPM Licensing Compatibility" tutorial:
+ * https://bitbucket.org/atlassian_tutorial/upm-licensing-compatibility/
+ */
 public class HelloWorldServlet extends HttpServlet
 {
     private final ThirdPartyPluginLicenseStorageManager licenseManager;

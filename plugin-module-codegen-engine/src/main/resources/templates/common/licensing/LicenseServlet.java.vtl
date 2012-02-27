@@ -15,6 +15,22 @@ import com.atlassian.upm.license.storage.lib.ThirdPartyPluginLicenseStorageManag
  
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * A simple license administration servlet that demonstrates how to use
+ * {@link ThirdPartyPluginLicenseStorageManager} to:
+ * <ul>
+ * <li> get the current plugin license,
+ * <li> update the plugin license,
+ * <li> remove the plugin license,
+ * <li> check for a licensing-aware UPM,
+ * <li> and properly handle if a licensing-aware UPM is detected.
+ * </ul>
+ * <p>
+ * This servlet can be reached at http://localhost:2990/jira/plugins/servlet/licenseservlet
+ * <p>
+ * For more information, see the "UPM Licensing Compatibility" tutorial:
+ * https://bitbucket.org/atlassian_tutorial/upm-licensing-compatibility/
+ */
 public class LicenseServlet extends HttpServlet
 {
     private final ThirdPartyPluginLicenseStorageManager licenseManager;
