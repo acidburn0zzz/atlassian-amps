@@ -300,6 +300,32 @@ public class MavenGoals
         return webappWarFile;
     }
 
+    public File copyArtifact(final String targetFileName, final File targetDirectory,
+                             final ProductArtifact artifact, String type) throws MojoExecutionException
+    {
+        final File targetFile = new File(targetDirectory, targetFileName);
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("copy"),
+                configuration(
+                        element(name("artifactItems"),
+                                element(name("artifactItem"),
+                                        element(name("groupId"), artifact.getGroupId()),
+                                        element(name("artifactId"), artifact.getArtifactId()),
+                                        element(name("type"), type),
+                                        element(name("version"), artifact.getVersion()),
+                                        element(name("destFileName"), targetFile.getName()))),
+                        element(name("outputDirectory"), targetDirectory.getPath())
+                ),
+                executionEnvironment()
+        );
+        return targetFile;
+    }
+
     /**
      * Copies {@code artifacts} to the {@code outputDirectory}. Artifacts are looked up in order: <ol> <li>in the maven
      * reactor</li> <li>in the maven repositories</li> </ol> This can't be used in a goal that happens before the

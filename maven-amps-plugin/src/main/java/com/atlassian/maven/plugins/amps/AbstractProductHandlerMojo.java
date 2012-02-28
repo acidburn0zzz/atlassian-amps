@@ -1,5 +1,25 @@
 package com.atlassian.maven.plugins.amps;
 
+import com.atlassian.maven.plugins.amps.product.ProductHandler;
+import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
+import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
+import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
+import com.atlassian.maven.plugins.amps.util.ProjectUtils;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.model.Resource;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
+import org.jfrog.maven.annomojo.annotations.MojoComponent;
+import org.jfrog.maven.annomojo.annotations.MojoParameter;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -17,27 +37,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import com.atlassian.maven.plugins.amps.product.ProductHandler;
-import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
-import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
-import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
-import com.atlassian.maven.plugins.amps.util.ProjectUtils;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.model.Resource;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
-import org.jfrog.maven.annomojo.annotations.MojoComponent;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
 
 /**
  * Base class for webapp mojos
@@ -523,7 +522,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             product.setDevToolboxVersion(DEFAULT_DEV_TOOLBOX_VERSION);
         }
 
-        if (product.getPdeVersion() == null) 
+        if (product.getPdeVersion() == null)
         {
             product.setPdeVersion(DEFAULT_PDE_VERSION);
         }
