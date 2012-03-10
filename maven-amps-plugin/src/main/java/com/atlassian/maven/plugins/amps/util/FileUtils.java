@@ -34,4 +34,9 @@ public class FileUtils
         }
     }
 
+    public static String fixWindowsSlashes(final String path)
+    {
+        return path.replaceAll("\\\\", "/");
+    }
+
 }

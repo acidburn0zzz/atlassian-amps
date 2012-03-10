@@ -27,6 +27,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
+import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
@@ -1043,7 +1044,7 @@ public class MavenGoals
         {
             Set<String> docletPaths = new HashSet<String>();
             StringBuffer docletPath = new StringBuffer(":" + prj.getBuild().getOutputDirectory());
-            String resourcedocPath = prj.getBuild().getOutputDirectory() + File.separator + "resourcedoc.xml";
+            String resourcedocPath = fixWindowsSlashes(prj.getBuild().getOutputDirectory() + File.separator + "resourcedoc.xml");
 
             PluginXmlUtils.PluginInfo pluginInfo = PluginXmlUtils.getPluginInfo(ctx);
 
