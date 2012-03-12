@@ -862,11 +862,6 @@ public class StudioProductHandler extends AmpsProductHandler
         }
     }
 
-    static String fixWindowsSlashes(final String path)
-    {
-        return path.replaceAll("\\\\", "/");
-    }
-
     static boolean checkFileExists(File file, Log log)
     {
         if (!file.exists())
