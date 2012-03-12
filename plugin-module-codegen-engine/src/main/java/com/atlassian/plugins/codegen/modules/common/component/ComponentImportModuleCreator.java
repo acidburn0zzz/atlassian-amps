@@ -1,9 +1,18 @@
 package com.atlassian.plugins.codegen.modules.common.component;
 
-import com.atlassian.plugins.codegen.annotations.*;
+import com.atlassian.plugins.codegen.ComponentImport;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
+import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
+
+import static com.atlassian.fugue.Option.option;
+import static com.atlassian.plugins.codegen.ComponentImport.componentImport;
+import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 
 /**
  * @since 3.6
@@ -14,23 +23,21 @@ import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
 @BambooPluginModuleCreator
 @FeCruPluginModuleCreator
 @CrowdPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-})
-public class ComponentImportModuleCreator extends AbstractPluginModuleCreator
+public class ComponentImportModuleCreator extends AbstractPluginModuleCreator<ComponentImportProperties>
 {
-
     public static final String MODULE_NAME = "Component Import";
-    private static final String TEMPLATE_PREFIX = "templates/common/component/";
-
-    private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "component-import-plugin.xml.vtl";
 
     @Override
-    public void createModule(PluginModuleLocation location, PluginModuleProperties props) throws Exception
+    public PluginProjectChangeset createModule(ComponentImportProperties props) throws Exception
     {
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
+        ComponentImport componentImport = componentImport(props.getInterfaceId())
+            .key(option(props.getModuleKey()))
+            .filter(option(props.getFilter()));
+        
+        return new PluginProjectChangeset()
+            .withDependencies(MOCKITO_TEST)
+            .withComponentImports(componentImport);
     }
-
 
     @Override
     public String getModuleName()

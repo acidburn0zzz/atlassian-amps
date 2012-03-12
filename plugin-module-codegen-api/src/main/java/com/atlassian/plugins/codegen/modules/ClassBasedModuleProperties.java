@@ -1,5 +1,7 @@
 package com.atlassian.plugins.codegen.modules;
 
+import com.atlassian.plugins.codegen.ClassId;
+
 /**
  * @since 3.6
  */
@@ -12,15 +14,7 @@ public interface ClassBasedModuleProperties extends NameBasedModuleProperties
     String PACKAGE_UNDER_TEST = "PACKAGE_UNDER_TEST";
     String FQ_CLASS_UNDER_TEST = "FQ_CLASS_UNDER_TEST";
 
-    String getFullyQualifiedClassname();
-
-    String getClassname();
-
-    String getPackage();
-
-    String getClassUnderTest();
-
-    String getFullyQualifiedClassUnderTest();
-
-    String getPackageUnderTest();
+    ClassId getClassId();
+    
+    ClassId getClassUnderTest();
 }

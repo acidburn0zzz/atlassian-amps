@@ -16,9 +16,9 @@ public class ServletContextParameterProperties extends BasicNameModuleProperties
         this("MyServletContextParameter");
     }
 
-    public ServletContextParameterProperties(String fqClassName)
+    public ServletContextParameterProperties(String moduleName)
     {
-        super(fqClassName);
+        super(moduleName);
     }
 
     public void setParamName(String name)

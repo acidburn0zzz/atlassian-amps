@@ -1,7 +1,6 @@
 package com.atlassian.maven.plugins.amps;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import com.atlassian.maven.plugins.amps.codegen.ConditionFactory;
@@ -14,23 +13,19 @@ import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompter;
 import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompterFactory;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
-import com.atlassian.plugins.codegen.annotations.DependencyDescriptor;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
+import com.atlassian.plugins.codegen.PluginXmlRewriter;
+import com.atlassian.plugins.codegen.ProjectFilesRewriter;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreatorFactory;
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.XmlStreamWriter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.shade.pom.PomWriter;
 import org.apache.maven.project.MavenProject;
 import org.jfrog.maven.annomojo.annotations.MojoComponent;
 import org.jfrog.maven.annomojo.annotations.MojoGoal;
@@ -120,11 +115,15 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
             PluginModuleProperties moduleProps = modulePrompter.getModulePropertiesFromInput(moduleLocation);
             moduleProps.setProductId(getGadgetCompatibleProductId(productId));
 
-            creator.createModule(moduleLocation, moduleProps);
+            PluginProjectChangeset changeset = creator.createModule(moduleProps);
 
-            //edit pom if needed
-            addRequiredModuleDependenciesToPOM(project, creator);
-
+            // edit pom if needed
+            new MavenProjectRewriter(project, getLog()).applyChanges(changeset);
+            
+            // apply changes to project files
+            new ProjectFilesRewriter(moduleLocation).applyChanges(changeset);
+            new PluginXmlRewriter(moduleLocation).applyChanges(changeset);
+            
             if (pluginModuleSelectionQueryer.addAnotherModule())
             {
                 runGeneration(productId, project, moduleLocation);
@@ -136,54 +135,6 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
             throw new MojoExecutionException("Error creating plugin module", e);
         }
 
-    }
-
-    private void addRequiredModuleDependenciesToPOM(MavenProject project, PluginModuleCreator creator)
-    {
-        List<DependencyDescriptor> descriptors = pluginModuleCreatorFactory.getDependenciesForCreatorClass(creator.getClass());
-        boolean modifyPom = false;
-        if (descriptors != null && !descriptors.isEmpty())
-        {
-            List<Dependency> originalDependencies = project.getModel()
-                    .getDependencies();
-            for (DependencyDescriptor descriptor : descriptors)
-            {
-                Dependency alreadyExisting = (Dependency) CollectionUtils.find(originalDependencies, new DependencyPredicate(descriptor));
-                if (null == alreadyExisting)
-                {
-                    modifyPom = true;
-
-                    Dependency newDependency = new Dependency();
-                    newDependency.setGroupId(descriptor.getGroupId());
-                    newDependency.setArtifactId(descriptor.getArtifactId());
-                    newDependency.setVersion(descriptor.getVersion());
-                    newDependency.setScope(descriptor.getScope());
-
-                    project.getOriginalModel()
-                            .addDependency(newDependency);
-                }
-            }
-        }
-
-        if (modifyPom)
-        {
-            File pom = project.getFile();
-            XmlStreamWriter writer = null;
-            try
-            {
-                writer = new XmlStreamWriter(pom);
-                PomWriter.write(writer, project.getOriginalModel(), true);
-            } catch (IOException e)
-            {
-                getLog().warn("Unable to write plugin-module dependencies to pom.xml", e);
-            } finally
-            {
-                if (writer != null)
-                {
-                    IOUtils.closeQuietly(writer);
-                }
-            }
-        }
     }
 
     private String getGadgetCompatibleProductId(String pid)
@@ -246,26 +197,6 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
             }
         }
         return resourcesRoot;
-    }
-
-    private class DependencyPredicate implements Predicate
-    {
-        private DependencyDescriptor depToCheck;
-
-        private DependencyPredicate(DependencyDescriptor depToCheck)
-        {
-            this.depToCheck = depToCheck;
-        }
-
-        @Override
-        public boolean evaluate(Object o)
-        {
-            Dependency d = (Dependency) o;
-            return (depToCheck.getGroupId()
-                    .equals(d.getGroupId())
-                    && depToCheck.getArtifactId()
-                    .equals(d.getArtifactId()));
-        }
     }
 
     private void initHelperFactories(String productId, MavenProject project) throws MojoExecutionException

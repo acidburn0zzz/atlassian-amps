@@ -1,16 +1,14 @@
 package com.atlassian.plugins.codegen.modules.common.web;
 
-import java.util.List;
-
+import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.AbstractConditionTest;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 
-import org.dom4j.Document;
-import org.dom4j.Node;
 import org.junit.Test;
 
+import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @since 3.6
@@ -18,165 +16,182 @@ import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractWebFragmentTest<T extends AbstractWebFragmentProperties> extends AbstractConditionTest<T>
 {
-
     public static final String JIRA_MODIFIER_KEY_CTX_PROVIDER = "com.atlassian.jira.plugin.webfragment.contextproviders.ModifierKeyContextProvider";
     public static final String XPATH_CTX_PROVIDER = "//context-provider";
-    public static final String XPATH_RESOURCE = "/atlassian-plugin/*//resource";
-    public static final String XPATH_PARAM_RELATIVE = "param";
+    public static final String MODULE_NAME = "My Web Thing";
+    public static final String MODULE_KEY = "my-web-thing";
+    
+    protected AbstractWebFragmentTest(String moduleType, PluginModuleCreator<T> creator)
+    {
+        super(moduleType, creator);
+    }
+        
+    @Test
+    public void moduleHasDefaultKey() throws Exception
+    {
+        assertEquals(MODULE_KEY, getGeneratedModule().attributeValue("key"));
+    }
+    
+    @Test
+    public void moduleHasDefaultI18nNameKey() throws Exception
+    {
+        assertEquals(MODULE_KEY + ".name", getGeneratedModule().attributeValue("i18n-name-key"));
+    }
 
     @Test
     public void contextProviderIsAdded() throws Exception
     {
         props.setContextProvider(JIRA_MODIFIER_KEY_CTX_PROVIDER);
-        creator.createModule(moduleLocation, props);
 
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        List<Node> ctxProviderList = pluginDoc.selectNodes(XPATH_CTX_PROVIDER);
-        assertEquals("wrong number of context providers", 1, ctxProviderList.size());
-
-        Node ctxProviderNode = ctxProviderList.get(0);
-        assertEquals("wrong context provider class", JIRA_MODIFIER_KEY_CTX_PROVIDER, ctxProviderNode.selectSingleNode("@class")
-                .getStringValue());
+        getGeneratedModule();
     }
 
     @Test
-    public void singleResourceAdded() throws Exception
+    public void contextProviderHasClass() throws Exception
     {
-        Resource resource = new Resource();
-        resource.setName("style.css");
-        resource.setLocation("com/example/plugin/style.css");
-        resource.setType("download");
+        props.setContextProvider(JIRA_MODIFIER_KEY_CTX_PROVIDER);
 
-        props.getResources()
-                .add(resource);
-
-        creator.createModule(moduleLocation, props);
-
-        Document pluginDoc = getXmlDocument(pluginXml);
-        List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
-
-        assertEquals("expected single resource", 1, resourceList.size());
-
-        String nodeXpath = "//resource[@name='style.css' and @location='com/example/plugin/style.css' and @type='download']";
-        assertNotNull("single resource not found", pluginDoc.selectSingleNode(nodeXpath));
-
+        assertEquals(JIRA_MODIFIER_KEY_CTX_PROVIDER,
+                     getGeneratedModule().selectSingleNode(XPATH_CTX_PROVIDER + "/@class").getText());
     }
 
     @Test
-    public void singleResourceNamePatternAdded() throws Exception
+    public void resourceIsAdded() throws Exception
     {
-        Resource resource = new Resource();
-        resource.setNamePattern("*.css");
-        resource.setLocation("com/example/plugin/style.css");
-        resource.setType("download");
-
-        props.getResources()
-                .add(resource);
-
-        creator.createModule(moduleLocation, props);
-
-        Document pluginDoc = getXmlDocument(pluginXml);
-        List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
-
-        assertEquals("expected single resource", 1, resourceList.size());
-
-        String nodeXpath = "//resource[@namePattern='*.css' and @location='com/example/plugin/style.css' and @type='download']";
-        assertNotNull("single resource not found", pluginDoc.selectSingleNode(nodeXpath));
-
+        props.getResources().add(cssResource);
+        
+        assertNotNull(getGeneratedModule().selectSingleNode("resource"));
+    }
+    
+    @Test
+    public void resourceHasName() throws Exception
+    {
+        props.getResources().add(cssResource);
+        
+        assertEquals("style.css", getGeneratedModule().selectSingleNode("resource/@name").getText());
     }
 
     @Test
-    public void nameChosenOverPattern() throws Exception
+    public void resourceHasLocation() throws Exception
     {
-        Resource resource = new Resource();
-        resource.setName("style.css");
-        resource.setNamePattern("*.css");
-        resource.setLocation("com/example/plugin/style.css");
-        resource.setType("download");
+        props.getResources().add(cssResource);
 
-        props.getResources()
-                .add(resource);
+        assertEquals("com/example/plugin/style.css", getGeneratedModule().selectSingleNode("resource/@location").getText());
+    }
+    
+    @Test
+    public void resourceHasType() throws Exception
+    {
+        props.getResources().add(cssResource);
 
-        creator.createModule(moduleLocation, props);
-
-        Document pluginDoc = getXmlDocument(pluginXml);
-        List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
-
-        assertEquals("expected single resource", 1, resourceList.size());
-
-        String nodeXpath = "//resource[not(@namePattern) and @name='style.css' and @location='com/example/plugin/style.css' and @type='download']";
-        assertNotNull("single resource not found", pluginDoc.selectSingleNode(nodeXpath));
-
+        assertEquals("download", getGeneratedModule().selectSingleNode("resource/@type").getText());
     }
 
     @Test
-    public void resourceParamsAdded() throws Exception
+    public void namePatternResourceAdded() throws Exception
     {
-        Resource resource = new Resource();
-        resource.setName("style.css");
-        resource.setLocation("com/example/plugin/style.css");
-        resource.setType("download");
-        resource.getParams()
-                .put("content-type", "text/css");
-        resource.getParams()
-                .put("awesome", "me");
+        props.getResources().add(cssNamePatternResource);
 
-        props.getResources()
-                .add(resource);
-
-        creator.createModule(moduleLocation, props);
-
-        Document pluginDoc = getXmlDocument(pluginXml);
-        List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
-
-        assertEquals("expected single resource", 1, resourceList.size());
-
-        String nodeXpath = "//resource[not(@namePattern) and @name='style.css' and @location='com/example/plugin/style.css' and @type='download']";
-        Node resourceNode = pluginDoc.selectSingleNode(nodeXpath);
-
-        List<Node> paramList = resourceNode.selectNodes(XPATH_PARAM_RELATIVE);
-        assertEquals("expected resource params", 2, paramList.size());
-
-        assertNotNull("missing content param", resourceNode.selectSingleNode("param[@name='content-type' and @value='text/css']"));
-        assertNotNull("missing awesome param", resourceNode.selectSingleNode("param[@name='awesome' and @value='me']"));
-
+        assertNotNull(getGeneratedModule().selectSingleNode("resource"));
+    }
+    
+    @Test
+    public void namePatternResourceHasNamePattern() throws Exception
+    {
+        props.getResources().add(cssNamePatternResource);
+        
+        assertEquals("*.css", getGeneratedModule().selectSingleNode("resource/@namePattern").getText());
     }
 
     @Test
-    public void multipleResourcesAdded() throws Exception
+    public void namePatternResourceHasLocation() throws Exception
     {
-        Resource resource = new Resource();
-        resource.setName("style.css");
-        resource.setLocation("com/example/plugin/style.css");
-        resource.setType("download");
-        resource.getParams()
-                .put("content-type", "text/css");
-        resource.getParams()
-                .put("awesome", "me");
+        props.getResources().add(cssNamePatternResource);
+        
+        assertEquals("com/example/plugin", getGeneratedModule().selectSingleNode("resource/@location").getText());
+    }
 
+    @Test
+    public void namePatternResourceHasType() throws Exception
+    {
+        props.getResources().add(cssNamePatternResource);
+
+        assertEquals("download", getGeneratedModule().selectSingleNode("resource/@type").getText());
+    }
+
+    @Test
+    public void resourceNameChosenOverPattern() throws Exception
+    {
+        cssResource.setNamePattern("*.css");
+        props.getResources().add(cssResource);
+
+        assertNull(getGeneratedModule().selectSingleNode("resource/@namePattern"));
+    }
+
+    @Test
+    public void resourceParamHasName() throws Exception
+    {
+        cssResource.getParams().put("content-type", "text/css");
+        props.getResources().add(cssResource);
+
+        assertEquals("content-type", getGeneratedModule().selectSingleNode("resource/param/@name").getText());
+    }
+
+    @Test
+    public void resourceParamHasValue() throws Exception
+    {
+        cssResource.getParams().put("content-type", "text/css");
+        props.getResources().add(cssResource);
+
+        assertEquals("text/css", getGeneratedModule().selectSingleNode("resource/param/@value").getText());
+    }
+    
+    @Test
+    public void secondResourceParamAdded() throws Exception
+    {
+        cssResource.getParams().put("content-type", "text/css");
+        cssResource.getParams().put("awesome", "me");
+        props.getResources().add(cssResource);
+        
+        assertEquals("me", getGeneratedModule().selectSingleNode("resource/param[@name='awesome']/@value").getText());
+    }
+
+    @Test
+    public void allResourceParamsAdded() throws Exception
+    {
+        cssResource.getParams().put("content-type", "text/css");
+        cssResource.getParams().put("awesome", "me");
+        props.getResources().add(cssResource);
+        
+        assertEquals(2, getGeneratedModule().selectNodes("resource/param").size());
+    }
+
+    @Test
+    public void secondResourceAdded() throws Exception
+    {
         Resource resource2 = new Resource();
         resource2.setName("custom.js");
         resource2.setLocation("com/example/plugin/custom.js");
         resource2.setType("download");
 
-        props.getResources()
-                .add(resource);
-        props.getResources()
-                .add(resource2);
+        props.getResources().add(cssResource);
+        props.getResources().add(resource2);
+        
+        assertEquals("com/example/plugin/custom.js",
+                     getGeneratedModule().selectSingleNode("resource[@name='custom.js']/@location").getText());
+    }
 
-        creator.createModule(moduleLocation, props);
+    @Test
+    public void allResourcesAdded() throws Exception
+    {
+        Resource resource2 = new Resource();
+        resource2.setName("custom.js");
+        resource2.setLocation("com/example/plugin/custom.js");
+        resource2.setType("download");
 
-        Document pluginDoc = getXmlDocument(pluginXml);
-        List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
-
-        assertEquals("expected multiple resources", 2, resourceList.size());
-
-        String nodeXpath = "//resource[not(@namePattern) and @name='style.css' and @location='com/example/plugin/style.css' and @type='download']";
-        String node2Xpath = "//resource[not(@namePattern) and @name='custom.js' and @location='com/example/plugin/custom.js' and @type='download']";
-
-        assertNotNull("missing css resource", pluginDoc.selectSingleNode(nodeXpath));
-        assertNotNull("missing js resource", pluginDoc.selectSingleNode(node2Xpath));
-
+        props.getResources().add(cssResource);
+        props.getResources().add(resource2);
+        
+        assertEquals(2, getGeneratedModule().selectNodes("resource").size());
     }
 }

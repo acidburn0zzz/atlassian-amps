@@ -1,8 +1,13 @@
 package com.atlassian.plugins.codegen.modules.common.servlet;
 
-import com.atlassian.plugins.codegen.annotations.*;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
+import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+
+import static com.atlassian.plugins.codegen.modules.Dependencies.SERVLET_API;
 
 /**
  * @since 3.6
@@ -11,24 +16,20 @@ import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 @JiraPluginModuleCreator
 @ConfluencePluginModuleCreator
 @BambooPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "javax.servlet", artifactId = "servlet-api", version = "2.4", scope = "provided")
-})
 public class ServletContextParameterModuleCreator extends AbstractPluginModuleCreator<ServletContextParameterProperties>
 {
-
     public static final String MODULE_NAME = "Servlet Context Parameter";
     private static final String TEMPLATE_PREFIX = "templates/common/servlet/parameter/";
 
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "servlet-context-parameter-plugin.xml.vtl";
 
     @Override
-    public void createModule(PluginModuleLocation location, ServletContextParameterProperties props) throws Exception
+    public PluginProjectChangeset createModule(ServletContextParameterProperties props) throws Exception
     {
-
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
+        return new PluginProjectChangeset()
+            .withDependencies(SERVLET_API)
+            .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
     }
-
 
     @Override
     public String getModuleName()

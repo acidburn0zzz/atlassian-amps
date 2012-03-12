@@ -1,9 +1,7 @@
 package com.atlassian.plugins.codegen;
 
-import java.util.List;
 import java.util.Map;
 
-import com.atlassian.plugins.codegen.annotations.DependencyDescriptor;
 import com.atlassian.plugins.codegen.annotations.asm.ModuleCreatorAnnotationParser;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreatorFactory;
@@ -42,12 +40,6 @@ public class PluginModuleCreatorFactoryImpl implements PluginModuleCreatorFactor
     public Map<Class, PluginModuleCreator> getModuleCreatorsForProduct(String productId)
     {
         return creatorRegistry.getModuleCreatorsForProduct(productId);
-    }
-
-    @Override
-    public List<DependencyDescriptor> getDependenciesForCreatorClass(Class creatorClass)
-    {
-        return creatorRegistry.getDependenciesForCreatorClass(creatorClass);
     }
 
     private void doParse(String packageName) throws Exception

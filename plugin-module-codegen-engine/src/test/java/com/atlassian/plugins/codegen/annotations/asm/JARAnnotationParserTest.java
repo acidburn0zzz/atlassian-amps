@@ -1,10 +1,8 @@
 package com.atlassian.plugins.codegen.annotations.asm;
 
-import java.util.List;
 import java.util.Map;
 
 import com.atlassian.plugins.codegen.PluginModuleCreatorRegistryImpl;
-import com.atlassian.plugins.codegen.annotations.DependencyDescriptor;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreatorRegistry;
 
@@ -15,9 +13,6 @@ import fake.jar.annotation.parser.modules.JARInheritedValidJira;
 import fake.jar.annotation.parser.modules.JARJiraAndConfluenceCreator;
 import fake.jar.annotation.parser.modules.JARJiraAnnotatedWithoutInterface;
 import fake.jar.annotation.parser.modules.JARValidJiraModuleCreator;
-import fake.jar.annotation.parser.modules.dependencies.JARValidJiraWithDependencies;
-import fake.jar.annotation.parser.modules.dependencies.JARValidJiraWithMissingNestedDependency;
-import fake.jar.annotation.parser.modules.dependencies.JARValidJiraWithMissingScopeDependency;
 import fake.jar.annotation.parser.modules.nested.JARNestedValidJira;
 
 import static org.junit.Assert.assertNotNull;
@@ -95,60 +90,5 @@ public class JARAnnotationParserTest
 
         assertTrue("jiraAndConfluence not found for jira", jiraModules.containsKey(JARJiraAndConfluenceCreator.class));
         assertTrue("jiraAndConfluence not found for confluence", confluenceModules.containsKey(JARJiraAndConfluenceCreator.class));
-    }
-
-    @Test
-    public void noDependenciesReturnsEmptyList() throws Exception
-    {
-        parser.parse(MODULES_PACKAGE);
-        List<DependencyDescriptor> dependencies = registry.getDependenciesForCreatorClass(JARValidJiraModuleCreator.class);
-
-        assertTrue("expected empty dependency list", dependencies.isEmpty());
-    }
-
-    @Test
-    public void validDependenciesAreRegistered() throws Exception
-    {
-        parser.parse(MODULES_PACKAGE);
-
-        DependencyDescriptor expectedServlet = new DependencyDescriptor();
-        expectedServlet.setGroupId("javax.servlet");
-        expectedServlet.setArtifactId("servlet-api");
-        expectedServlet.setVersion("2.4");
-        expectedServlet.setScope("provided");
-
-        DependencyDescriptor expectedMockito = new DependencyDescriptor();
-        expectedMockito.setGroupId("org.mockito");
-        expectedMockito.setArtifactId("mockito-all");
-        expectedMockito.setVersion("1.8.5");
-        expectedMockito.setScope("test");
-
-        List<DependencyDescriptor> dependencies = registry.getDependenciesForCreatorClass(JARValidJiraWithDependencies.class);
-        assertTrue("dependency list is empty", !dependencies.isEmpty());
-        assertTrue("servlet-api dependency not found", dependencies.contains(expectedServlet));
-        assertTrue("mockito dependency not found", dependencies.contains(expectedMockito));
-    }
-
-    @Test
-    public void validDependencyWithMissingScopeIsRegistered() throws Exception
-    {
-        parser.parse(MODULES_PACKAGE);
-
-        DependencyDescriptor expectedServlet = new DependencyDescriptor();
-        expectedServlet.setGroupId("javax.servlet");
-        expectedServlet.setArtifactId("servlet-api");
-        expectedServlet.setVersion("2.4");
-
-        List<DependencyDescriptor> dependencies = registry.getDependenciesForCreatorClass(JARValidJiraWithMissingScopeDependency.class);
-        assertTrue("dependency list is empty", !dependencies.isEmpty());
-        assertTrue("servlet-api dependency not found", dependencies.contains(expectedServlet));
-    }
-
-    @Test
-    public void depedenciesWithoutNestedAnnotationIsNotRegistered() throws Exception
-    {
-        parser.parse(MODULES_PACKAGE);
-        List<DependencyDescriptor> dependencies = registry.getDependenciesForCreatorClass(JARValidJiraWithMissingNestedDependency.class);
-        assertTrue("dependency list is empty for missing nested annotation", dependencies.isEmpty());
     }
 }

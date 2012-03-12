@@ -1,9 +1,7 @@
 package com.atlassian.plugins.codegen.annotations.asm;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.atlassian.plugins.codegen.annotations.*;
@@ -135,12 +133,6 @@ public class ModuleCreatorAnnotationParser extends AbstractAnnotationParser
                 return new ProductCreatorAnnotationVisitor(normalizedName);
             }
 
-            if (isModuleCreator && (Dependencies.class.getName()
-                    .equals(normalizedName) || Dependency.class.equals(normalizedName)))
-            {
-                return new DependenciesAnnotationVisitor(normalizedName);
-            }
-
             return null;
         }
 
@@ -188,91 +180,6 @@ public class ModuleCreatorAnnotationParser extends AbstractAnnotationParser
                     }
                 }
             }
-
         }
-
-        private class DependenciesAnnotationVisitor extends EmptyVisitor
-        {
-
-            private String annotationName;
-            private List<DependencyDescriptor> dependencies;
-
-            private DependenciesAnnotationVisitor(String annotationName)
-            {
-                this.annotationName = annotationName;
-                this.dependencies = new ArrayList<DependencyDescriptor>();
-            }
-
-            //Visits nested annotations
-            @Override
-            public AnnotationVisitor visitAnnotation(String name, String annotationName)
-            {
-                String normalizedName = normalize(annotationName);
-                return new DependencyAnnotationVisitor(normalizedName, dependencies);
-            }
-
-            @Override
-            public void visitEnd()
-            {
-
-                super.visitEnd();
-
-                if (!dependencies.isEmpty())
-                {
-                    try
-                    {
-                        Class creatorClass = Class.forName(visitedClassname);
-                        pluginModuleCreatorRegistry.registerModuleCreatorDependencies(creatorClass, dependencies);
-                    } catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        //just don't register
-                    }
-                }
-            }
-
-        }
-
-        private class DependencyAnnotationVisitor extends EmptyVisitor
-        {
-            private String annotationName;
-            private List<DependencyDescriptor> dependencies;
-            private DependencyDescriptor descriptor;
-
-            private DependencyAnnotationVisitor(String annotationName, List<DependencyDescriptor> dependencies)
-            {
-                this.annotationName = annotationName;
-                this.dependencies = dependencies;
-                this.descriptor = new DependencyDescriptor();
-            }
-
-            //visit a name/value pair
-            @Override
-            public void visit(String name, Object value)
-            {
-                if (name.equals("groupId"))
-                {
-                    descriptor.setGroupId((String) value);
-                } else if (name.equals("artifactId"))
-                {
-                    descriptor.setArtifactId((String) value);
-                } else if (name.equals("version"))
-                {
-                    descriptor.setVersion((String) value);
-                } else if (name.equals("scope"))
-                {
-                    descriptor.setScope((String) value);
-                }
-            }
-
-            @Override
-            public void visitEnd()
-            {
-                super.visitEnd();
-                dependencies.add(descriptor);
-            }
-        }
-
     }
-
 }

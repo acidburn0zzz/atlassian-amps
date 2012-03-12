@@ -47,10 +47,9 @@ public class ComponentProperties extends ClassWithInterfaceProperties
         put(SERVICE_PROPS, params);
     }
 
-    @SuppressWarnings(value = "unchecked")
     public void addServiceProp(String name, String value)
     {
-        Map<String, String> params = (Map<String, String>) get(SERVICE_PROPS);
+        Map<String, String> params = getServiceProps();
         if (params == null)
         {
             params = new HashMap<String, String>();
@@ -58,6 +57,12 @@ public class ComponentProperties extends ClassWithInterfaceProperties
         }
 
         params.put(name, value);
+    }
+    
+    @SuppressWarnings(value = "unchecked")
+    public Map<String, String> getServiceProps()
+    {
+        return (Map<String, String>)get(SERVICE_PROPS);
     }
 
     public boolean generateInterface()

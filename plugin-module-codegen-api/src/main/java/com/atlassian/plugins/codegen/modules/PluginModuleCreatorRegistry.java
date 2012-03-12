@@ -1,9 +1,6 @@
 package com.atlassian.plugins.codegen.modules;
 
-import java.util.List;
 import java.util.Map;
-
-import com.atlassian.plugins.codegen.annotations.DependencyDescriptor;
 
 /**
  * @since 3.6
@@ -23,8 +20,4 @@ public interface PluginModuleCreatorRegistry
     <T extends PluginModuleCreator> T getModuleCreator(String productId, Class<T> type);
 
     Map<Class, PluginModuleCreator> getModuleCreatorsForProduct(String productId);
-
-    void registerModuleCreatorDependencies(Class creatorClass, List<DependencyDescriptor> dependencies);
-
-    List<DependencyDescriptor> getDependenciesForCreatorClass(Class creatorClass);
 }

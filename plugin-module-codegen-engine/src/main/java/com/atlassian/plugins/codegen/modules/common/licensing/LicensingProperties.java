@@ -1,4 +1,4 @@
-package com.atlassian.plugins.codegen.modules.common;
+package com.atlassian.plugins.codegen.modules.common.licensing;
 
 import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
 
@@ -7,6 +7,11 @@ import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
  */
 public class LicensingProperties extends BasicClassModuleProperties
 {
+    public LicensingProperties()
+    {
+        super();
+    }
+    
     public LicensingProperties(String fqClass)
     {
         super(fqClass);

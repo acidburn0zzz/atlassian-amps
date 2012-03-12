@@ -1,8 +1,15 @@
 package com.atlassian.plugins.codegen.modules.common.servlet;
 
-import com.atlassian.plugins.codegen.annotations.*;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
+import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+
+import static com.atlassian.plugins.codegen.modules.Dependencies.HTTPCLIENT_TEST;
+import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
+import static com.atlassian.plugins.codegen.modules.Dependencies.SERVLET_API;
 
 /**
  * @since 3.6
@@ -11,11 +18,6 @@ import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 @JiraPluginModuleCreator
 @ConfluencePluginModuleCreator
 @BambooPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "javax.servlet", artifactId = "servlet-api", version = "2.4", scope = "provided")
-        , @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-        , @Dependency(groupId = "org.apache.httpcomponents", artifactId = "httpclient", version = "4.1.1", scope = "test")
-})
 public class ServletContextListenerModuleCreator extends AbstractPluginModuleCreator<ServletContextListenerProperties>
 {
 
@@ -32,32 +34,25 @@ public class ServletContextListenerModuleCreator extends AbstractPluginModuleCre
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "servlet-context-listener-plugin.xml.vtl";
 
     @Override
-    public void createModule(PluginModuleLocation location, ServletContextListenerProperties props) throws Exception
+    public PluginProjectChangeset createModule(ServletContextListenerProperties props) throws Exception
     {
-        String packageName = props.getPackage();
-
-        String classname = props.getClassname();
+        PluginProjectChangeset ret = new PluginProjectChangeset()
+            .withDependencies(SERVLET_API,
+                                      HTTPCLIENT_TEST,
+                                      MOCKITO_TEST)
+            .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 
         if (props.includeExamples())
         {
-            templateHelper.writeJavaClassFromTemplate(EXAMPLE_CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-        } else
-        {
-            //main class
-            templateHelper.writeJavaClassFromTemplate(CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-
-            //unit test
-            templateHelper.writeJavaClassFromTemplate(UNIT_TEST_TEMPLATE, testClassname(classname), location.getTestDirectory(), packageName, props);
-
-            //context listener is too complex to func test without a known servlet
-
+            return ret.with(createClass(props, EXAMPLE_CLASS_TEMPLATE));
         }
-
-
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
+        else
+        {
+            return ret.with(createClassAndTests(props, CLASS_TEMPLATE, UNIT_TEST_TEMPLATE));
+            // context listener is too complex to func test without a known servlet
+        }
     }
-
-
+    
     @Override
     public String getModuleName()
     {

@@ -1,8 +1,15 @@
 package com.atlassian.plugins.codegen.modules.common.web;
 
-import com.atlassian.plugins.codegen.annotations.*;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
+import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+
+import static com.atlassian.plugins.codegen.modules.Dependencies.HTTPCLIENT_TEST;
+import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 
 /**
  * @since 3.6
@@ -12,10 +19,6 @@ import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 @ConfluencePluginModuleCreator
 @BambooPluginModuleCreator
 @FeCruPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-        , @Dependency(groupId = "org.apache.httpcomponents", artifactId = "httpclient", version = "4.1.1", scope = "test")
-})
 public class WebResourceTransformerModuleCreator extends AbstractPluginModuleCreator<WebResourceTransformerProperties>
 {
 
@@ -25,39 +28,29 @@ public class WebResourceTransformerModuleCreator extends AbstractPluginModuleCre
     //stub
     private static final String CLASS_TEMPLATE = TEMPLATE_PREFIX + "WebResourceTransformer.java.vtl";
     private static final String UNIT_TEST_TEMPLATE = TEMPLATE_PREFIX + "WebResourceTransformerTest.java.vtl";
-    private static final String FUNC_TEST_TEMPLATE = TEMPLATE_PREFIX + "WebResourceTransformerFuncTest.java.vtl";
-
+    
     //examples
     private static final String EXAMPLE_CLASS_TEMPLATE = TEMPLATE_PREFIX + "Example" + CLASS_TEMPLATE;
 
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "web-resource-transformer-plugin.xml.vtl";
 
     @Override
-    public void createModule(PluginModuleLocation location, WebResourceTransformerProperties props) throws Exception
+    public PluginProjectChangeset createModule(WebResourceTransformerProperties props) throws Exception
     {
-        String packageName = props.getPackage();
-
-        String classname = props.getClassname();
+        PluginProjectChangeset ret = new PluginProjectChangeset()
+            .withDependencies(HTTPCLIENT_TEST,
+                              MOCKITO_TEST)
+            .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 
         if (props.includeExamples())
         {
-            templateHelper.writeJavaClassFromTemplate(EXAMPLE_CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-        } else
-        {
-            //main class
-            templateHelper.writeJavaClassFromTemplate(CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-
-            //unit test
-            templateHelper.writeJavaClassFromTemplate(UNIT_TEST_TEMPLATE, testClassname(classname), location.getTestDirectory(), packageName, props);
-
-            //func test
-            //templateHelper.writeJavaClassFromTemplate(FUNC_TEST_TEMPLATE, funcTestClassname(classname), location.getTestDirectory(), funcTestPackageName(packageName), props);
+            return ret.with(createClass(props, EXAMPLE_CLASS_TEMPLATE));
         }
-
-
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
+        else
+        {
+            return ret.with(createClassAndTests(props, CLASS_TEMPLATE, UNIT_TEST_TEMPLATE));
+        }
     }
-
 
     @Override
     public String getModuleName()

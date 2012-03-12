@@ -1,17 +1,15 @@
 package fake.jar.annotation.parser.modules.dependencies;
 
-import com.atlassian.plugins.codegen.annotations.Dependencies;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
 
 /**
  * @since 3.5
  */
 @JiraPluginModuleCreator
-@Dependencies({})
-public class JARValidJiraWithMissingNestedDependency implements PluginModuleCreator {
+public class JARValidJiraWithMissingNestedDependency implements PluginModuleCreator<PluginModuleProperties> {
     public static final String MODULE_NAME = "Valid Jira Module With Missing Nested Dependency";
 
     @Override
@@ -20,7 +18,7 @@ public class JARValidJiraWithMissingNestedDependency implements PluginModuleCrea
     }
 
     @Override
-    public void createModule(PluginModuleLocation location, PluginModuleProperties props) throws Exception {
-
+    public PluginProjectChangeset createModule(PluginModuleProperties props) throws Exception {
+        return new PluginProjectChangeset();
     }
 }

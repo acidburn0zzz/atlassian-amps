@@ -1,128 +1,171 @@
 package com.atlassian.plugins.codegen.modules.common.web;
 
-import java.util.Properties;
-
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-import com.atlassian.plugins.codegen.modules.common.Label;
-import com.atlassian.plugins.codegen.modules.common.Tooltip;
-
-import org.dom4j.Document;
-import org.dom4j.Node;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @since 3.6
  */
 public class WebSectionTest extends AbstractWebFragmentTest<WebSectionProperties>
 {
-    public static final String MODULE_NAME = "Awesome Web Section";
     public static final String CUSTOM_LOCATION = "system.admin/mysection";
 
-    @Before
-    public void runGenerator() throws Exception
+    public WebSectionTest()
     {
-        setCreator(new WebSectionModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
-
+        super("web-section", new WebSectionModuleCreator());
+    }
+    
+    @Before
+    public void setupProps() throws Exception
+    {
         setProps(new WebSectionProperties(MODULE_NAME, CUSTOM_LOCATION));
         props.setIncludeExamples(false);
     }
 
     @Test
-    public void moduleIsValid() throws Exception
+    public void moduleHasDefaultKey() throws Exception
     {
-        String xpath = "/atlassian-plugin/web-section[@name='Awesome Web Section' and @key='awesome-web-section' and @i18n-name-key='awesome-web-section.name' and @location='system.admin/mysection' and @weight='1000']";
-
-        creator.createModule(moduleLocation, props);
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("valid web-section not found", pluginDoc.selectSingleNode(xpath));
+        assertEquals(MODULE_KEY, getGeneratedModule().attributeValue("key"));
+    }
+    
+    @Test
+    public void moduleHasLocation() throws Exception
+    {
+        assertEquals(CUSTOM_LOCATION, getGeneratedModule().attributeValue("location"));
     }
 
     @Test
-    public void moduleIsValidWithCustomWeight() throws Exception
+    public void moduleHasDefaultWeight() throws Exception
+    {
+        assertEquals("1000", getGeneratedModule().attributeValue("weight"));
+    }
+    
+    @Test
+    public void moduleHasSpecifiedWeight() throws Exception
     {
         props.setWeight(20);
 
-        String xpath = "/atlassian-plugin/web-section[@name='Awesome Web Section' and @key='awesome-web-section' and @i18n-name-key='awesome-web-section.name' and @location='system.admin/mysection' and @weight='20']";
-
-        creator.createModule(moduleLocation, props);
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("valid web-section with custom weight not found", pluginDoc.selectSingleNode(xpath));
+        assertEquals("20", getGeneratedModule().attributeValue("weight"));
     }
 
     @Test
-    public void labelAdded() throws Exception
+    public void labelIsAdded() throws Exception
     {
-        String paramVal0 = "$helper.project.name";
-        String paramVal1 = "$helper.project.description";
-        Label label = new Label("web.section.mysection", "awesome web section");
-        label.addParam(paramVal0);
-        label.addParam(paramVal1);
-
         props.setLabel(label);
 
-        String labelXpath = "/atlassian-plugin/web-section/label[@key='web.section.mysection']";
-
-        creator.createModule(moduleLocation, props);
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        Node labelNode = pluginDoc.selectSingleNode(labelXpath);
-
-        assertNotNull("label not found", labelNode);
-
-        Node param0 = labelNode.selectSingleNode("param[@name='param0' and @value='" + paramVal0 + "']");
-        Node param1 = labelNode.selectSingleNode("param[@name='param1' and @value='" + paramVal1 + "']");
-
-        assertNotNull("param 0 not found", param0);
-        assertNotNull("param 1 not found", param1);
-
-        Properties i18nprops = loadI18nProperties();
-        assertTrue("label i18n not found", i18nprops.containsKey(label.getKey()));
-        assertEquals("label i18n has wrong value", label.getValue(), i18nprops.getProperty(label.getKey()));
-
+        assertNotNull(getGeneratedModule().selectSingleNode("label"));
+    }
+    
+    @Test
+    public void labelHasI18nKey() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals(label.getKey(), getGeneratedModule().selectSingleNode("label/@key").getText());
     }
 
     @Test
-    public void paramsAdded() throws Exception
+    public void labelHasParams() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals(2, getGeneratedModule().selectNodes("label/param").size());
+    }
+
+    @Test
+    public void labelParam0HasName() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals("param0", getGeneratedModule().selectSingleNode("label/param[1]/@name").getText());
+    }
+
+    @Test
+    public void labelParam0HasValue() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals(label.getParams().get("param0"), getGeneratedModule().selectSingleNode("label/param[1]/@value").getText());
+    }
+
+    @Test
+    public void labelParam1HasName() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals("param1", getGeneratedModule().selectSingleNode("label/param[2]/@name").getText());
+    }
+
+    @Test
+    public void labelParam1HasValue() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals(label.getParams().get("param1"), getGeneratedModule().selectSingleNode("label/param[2]/@value").getText());
+    }
+
+    @Test
+    public void labelStringIsAddedToI18nProperties() throws Exception
+    {
+        props.setLabel(label);
+        
+        assertEquals(label.getValue(), getChangesetForModule().getI18nProperties().get(label.getKey()));
+    }
+
+    @Test
+    public void paramsAreAdded() throws Exception
+    {
+        createParams();
+
+        assertEquals(2, getGeneratedModule().selectNodes("param").size());
+    }
+    
+    @Test
+    public void param0HasValue() throws Exception
+    {
+        createParams();
+
+        assertEquals("true", getGeneratedModule().selectSingleNode("param[@name='isAwesomeSection']/@value").getText());
+    }
+
+    @Test
+    public void param1HasValue() throws Exception
+    {
+        createParams();
+
+        assertEquals("false", getGeneratedModule().selectSingleNode("param[@name='isSuperAwesome']/@value").getText());
+    }
+
+    @Test
+    public void tooltipIsAdded() throws Exception
+    {
+        props.setTooltip(tooltip);
+
+        assertNotNull(getGeneratedModule().selectSingleNode("tooltip"));
+    }
+    
+    @Test
+    public void tooltipHasKey() throws Exception
+    {
+        props.setTooltip(tooltip);
+        
+        assertEquals(tooltip.getKey(), getGeneratedModule().selectSingleNode("tooltip/@key").getText());
+    }
+    
+    @Test
+    public void tooltipStringIsAddedToI18nProperties() throws Exception
+    {
+        props.setTooltip(tooltip);
+        
+        assertEquals(tooltip.getValue(), getChangesetForModule().getI18nProperties().get(tooltip.getKey()));
+    }
+    
+    protected void createParams()
     {
         props.addParam("isAwesomeSection", "true");
         props.addParam("isSuperAwesome", "false");
-
-        String param1Xpath = "/atlassian-plugin/web-section/param[@name='isAwesomeSection' and @value='true']";
-        String param2Xpath = "/atlassian-plugin/web-section/param[@name='isSuperAwesome' and @value='false']";
-
-        creator.createModule(moduleLocation, props);
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("param 1 not found", pluginDoc.selectSingleNode(param1Xpath));
-        assertNotNull("param 2 not found", pluginDoc.selectSingleNode(param2Xpath));
     }
-
-    @Test
-    public void tooltipAdded() throws Exception
-    {
-        Tooltip tooltip = new Tooltip("web.section.mysection.tooltip", "this is an awesome section");
-        props.setTooltip(tooltip);
-
-        String xpath = "/atlassian-plugin/web-section/tooltip[@key='web.section.mysection.tooltip']";
-
-        creator.createModule(moduleLocation, props);
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("tooltip not found", pluginDoc.selectSingleNode(xpath));
-
-        Properties i18nprops = loadI18nProperties();
-        assertTrue("tooltip i18n not found", i18nprops.containsKey(tooltip.getKey()));
-        assertEquals("tooltip i18n has wrong value", tooltip.getValue(), i18nprops.getProperty(tooltip.getKey()));
-    }
-
 }

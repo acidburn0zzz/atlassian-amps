@@ -1,44 +1,45 @@
 package com.atlassian.plugins.codegen.modules.common.servlet;
 
-import java.io.IOException;
+import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
-import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-//TODO: update test to use Dom4J
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @since 3.6
  */
-public class ServletContextParameterTest extends AbstractCodegenTestCase<ServletContextParameterProperties>
+public class ServletContextParameterTest extends AbstractModuleCreatorTestCase<ServletContextParameterProperties>
 {
+    public ServletContextParameterTest()
+    {
+        super("servlet-context-param", new ServletContextParameterModuleCreator());
+    }
 
     @Before
-    public void runGenerator() throws Exception
+    public void setupProps() throws Exception
     {
-        setCreator(new ServletContextParameterModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
-
-        setProps(new ServletContextParameterProperties("MY Param Name"));
-
-        creator.createModule(moduleLocation, props);
+        setProps(new ServletContextParameterProperties("My Parameter"));
+        props.setParamName("color");
+        props.setParamValue("blue");
     }
 
     @Test
-    public void pluginXmlContainsModule() throws IOException
+    public void moduleHasDefaultKey() throws Exception
     {
-        String pluginXmlContent = FileUtils.readFileToString(pluginXml);
-
-        assertTrue("module not found in plugin xml", pluginXmlContent.contains("<servlet-context-param"));
+        assertEquals("my-parameter", getGeneratedModule().attributeValue("key"));
     }
 
+    @Test
+    public void moduleHasParamName() throws Exception
+    {
+        assertEquals("color", getGeneratedModule().selectSingleNode("param-name").getText());
+    }
+
+    @Test
+    public void moduleHasParamValue() throws Exception
+    {
+        assertEquals("blue", getGeneratedModule().selectSingleNode("param-value").getText());
+    }
 }
