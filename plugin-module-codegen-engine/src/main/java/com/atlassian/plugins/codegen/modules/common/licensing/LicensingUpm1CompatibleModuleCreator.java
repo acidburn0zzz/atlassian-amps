@@ -38,7 +38,7 @@ import static com.atlassian.plugins.codegen.ComponentImport.componentImport;
 @CrowdPluginModuleCreator
 public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCreator<LicensingProperties>
 {
-    public static final String MODULE_NAME = "Atlassian License Management (pre-UPM 2 Compatibility)";
+    public static final String MODULE_NAME = "License Management (pre-UPM 2 Compatibility)";
 
     public static final String LICENSE_SERVLET_TEMPLATE = "templates/common/licensing/LicenseServlet.java.vtl";
     public static final String HELLO_WORLD_SERVLET_TEMPLATE = "templates/common/licensing/HelloWorldServlet.java.vtl";
@@ -51,11 +51,14 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
     public static final String LICENSE_SERVLET_URL_PATTERN = "/licenseservlet";
     public static final String HELLO_WORLD_SERVLET_URL_PATTERN = "/helloworldservlet";
     
+    public static final String LICENSE_API_VERSION = "2.1-m5";
+    public static final String LICENSE_API_VERSION_PROPERTY = "upm.license.compatibility.version";
+
     public static final ArtifactDependency[] DEPENDENCIES = {
-        dependency("com.atlassian.upm", "plugin-license-storage-lib", "2.1-m5", "upm.license.compatibility.version", COMPILE),
-        dependency("com.atlassian.upm", "plugin-license-storage-plugin", "2.1-m5", "upm.license.compatibility.version", PROVIDED),
-        dependency("com.atlassian.upm", "licensing-api", "2.1-m5", "upm.license.compatibility.version", PROVIDED),
-        dependency("com.atlassian.upm", "upm-api", "2.1-m5", "upm.license.compatibility.version", PROVIDED),
+        dependency("com.atlassian.upm", "plugin-license-storage-lib", LICENSE_API_VERSION, LICENSE_API_VERSION_PROPERTY, COMPILE),
+        dependency("com.atlassian.upm", "plugin-license-storage-plugin", LICENSE_API_VERSION, LICENSE_API_VERSION_PROPERTY, PROVIDED),
+        dependency("com.atlassian.upm", "licensing-api", LICENSE_API_VERSION, LICENSE_API_VERSION_PROPERTY, PROVIDED),
+        dependency("com.atlassian.upm", "upm-api", LICENSE_API_VERSION, LICENSE_API_VERSION_PROPERTY, PROVIDED),
         dependency("com.atlassian.sal", "sal-api", "2.4.0", PROVIDED),
         dependency("org.springframework.osgi", "spring-osgi-core", "1.1.3", PROVIDED),
         dependency("commons-lang", "commons-lang", "2.4", PROVIDED)

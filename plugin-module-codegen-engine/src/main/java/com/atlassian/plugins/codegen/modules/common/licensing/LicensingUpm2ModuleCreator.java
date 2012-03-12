@@ -29,7 +29,7 @@ import static com.atlassian.plugins.codegen.ComponentImport.componentImport;
 @CrowdPluginModuleCreator
 public class LicensingUpm2ModuleCreator extends AbstractPluginModuleCreator<LicensingProperties>
 {
-    public static final String MODULE_NAME = "Atlassian License Management (UPM 2 API)";
+    public static final String MODULE_NAME = "License Management (UPM 2 API)";
 
     public static final String LICENSE_CHECKER_DESCRIPTION = "Atlassian license management module";
     public static final String LICENSE_CHECKER_CLASS_TEMPLATE = "templates/common/licensing/LicenseChecker.java.vtl";
