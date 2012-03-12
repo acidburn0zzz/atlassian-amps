@@ -1074,7 +1074,7 @@ public class MavenGoals
                     plugin(
                             groupId("org.apache.maven.plugins"),
                             artifactId("maven-javadoc-plugin"),
-                            version("2.4")
+                            version("2.8.1")
                     ),
                     goal("javadoc"),
                     configuration(
@@ -1095,7 +1095,7 @@ public class MavenGoals
                                 )
                             ),
                             element(name("additionalparam"),"-output \"" + resourcedocPath + "\""),
-                            element(name("useStandarDocletOptions"),"false")
+                            element(name("useStandardDocletOptions"),"false")
                     ),
                     executionEnvironment()
             );
