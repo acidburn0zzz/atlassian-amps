@@ -18,48 +18,24 @@ import static com.google.common.collect.Maps.newHashMap;
  */
 public final class PluginProjectChangeset
 {
-    private final ImmutableList<ArtifactDependency> dependencies;
-    private final ImmutableList<BundleInstruction> bundleInstructions;
-    private final ImmutableList<ComponentDeclaration> componentDeclarations;
-    private final ImmutableList<ComponentImport> componentImports;
-    private final ImmutableMap<String, String> i18nProperties;
-    private final ImmutableList<ModuleDescriptor> moduleDescriptors;
-    private final ImmutableMap<String, String> pluginParameters;
-    private final ImmutableList<ResourceFile> resourceFiles;
-    private final ImmutableList<SourceFile> sourceFiles;
+    private final MavenProjectChangeset mavenProject;
+    private final PluginXmlChangeset pluginXml;
+    private final ProjectFilesChangeset projectFiles;
     
     public PluginProjectChangeset()
     {
-        this(ImmutableList.<ArtifactDependency>of(),
-             ImmutableList.<BundleInstruction>of(),
-             ImmutableList.<ComponentDeclaration>of(),
-             ImmutableList.<ComponentImport>of(),
-             ImmutableMap.<String, String>of(),
-             ImmutableList.<ModuleDescriptor>of(),
-             ImmutableMap.<String, String>of(),
-             ImmutableList.<ResourceFile>of(),
-             ImmutableList.<SourceFile>of());
+        this(new MavenProjectChangeset(),
+             new PluginXmlChangeset(),
+             new ProjectFilesChangeset());
     }
     
-    private PluginProjectChangeset(Iterable<ArtifactDependency> dependencies,
-                                   Iterable<BundleInstruction> bundleInstructions,
-                                   Iterable<ComponentDeclaration> componentDeclarations,
-                                   Iterable<ComponentImport> componentImports,
-                                   Map<String, String> i18nProperties,
-                                   Iterable<ModuleDescriptor> moduleDescriptors,
-                                   Map<String, String> pluginParameters,
-                                   Iterable<ResourceFile> resourceFiles,
-                                   Iterable<SourceFile> sourceFiles)
+    private PluginProjectChangeset(MavenProjectChangeset mavenProject,
+                                   PluginXmlChangeset pluginXml,
+                                   ProjectFilesChangeset projectFiles)
     {
-        this.dependencies = ImmutableList.copyOf(dependencies);
-        this.bundleInstructions = ImmutableList.copyOf(bundleInstructions);
-        this.componentDeclarations = ImmutableList.copyOf(componentDeclarations);
-        this.componentImports = ImmutableList.copyOf(componentImports);
-        this.i18nProperties = ImmutableMap.copyOf(i18nProperties);
-        this.moduleDescriptors = ImmutableList.copyOf(moduleDescriptors);
-        this.pluginParameters = ImmutableMap.copyOf(pluginParameters);
-        this.resourceFiles = ImmutableList.copyOf(resourceFiles);
-        this.sourceFiles = ImmutableList.copyOf(sourceFiles);
+        this.mavenProject = mavenProject;
+        this.pluginXml = pluginXml;
+        this.projectFiles = projectFiles;
     }
     
     /**
@@ -67,7 +43,7 @@ public final class PluginProjectChangeset
      */
     public ImmutableList<BundleInstruction> getBundleInstructions()
     {
-        return bundleInstructions;
+        return mavenProject.bundleInstructions;
     }
 
     /**
@@ -75,7 +51,7 @@ public final class PluginProjectChangeset
      */
     public ImmutableList<ComponentDeclaration> getComponentDeclarations()
     {
-        return componentDeclarations;
+        return pluginXml.componentDeclarations;
     }
 
     /**
@@ -83,7 +59,7 @@ public final class PluginProjectChangeset
      */
     public ImmutableList<ComponentImport> getComponentImports()
     {
-        return componentImports;
+        return pluginXml.componentImports;
     }
 
     /**
@@ -91,7 +67,7 @@ public final class PluginProjectChangeset
      */
     public ImmutableList<ArtifactDependency> getDependencies()
     {
-        return dependencies;
+        return mavenProject.dependencies;
     }
     
     /**
@@ -99,7 +75,7 @@ public final class PluginProjectChangeset
      */
     public ImmutableMap<String, String> getI18nProperties()
     {
-        return i18nProperties;
+        return projectFiles.i18nProperties;
     }
 
     /**
@@ -107,7 +83,7 @@ public final class PluginProjectChangeset
      */
     public ImmutableList<ModuleDescriptor> getModuleDescriptors()
     {
-        return moduleDescriptors;
+        return pluginXml.moduleDescriptors;
     }
 
     /**
@@ -116,7 +92,7 @@ public final class PluginProjectChangeset
      */
     public ImmutableMap<String, String> getPluginParameters()
     {
-        return pluginParameters;
+        return pluginXml.pluginParameters;
     }
 
     /**
@@ -124,7 +100,7 @@ public final class PluginProjectChangeset
      */
     public ImmutableList<ResourceFile> getResourceFiles()
     {
-        return resourceFiles;
+        return projectFiles.resourceFiles;
     }
 
     /**
@@ -132,7 +108,7 @@ public final class PluginProjectChangeset
      */
     public ImmutableList<SourceFile> getSourceFiles()
     {
-        return sourceFiles;
+        return projectFiles.sourceFiles;
     }
 
     /**
@@ -140,15 +116,9 @@ public final class PluginProjectChangeset
      */
     public PluginProjectChangeset with(PluginProjectChangeset other)
     {
-        return new PluginProjectChangeset(concat(this.dependencies, other.dependencies),
-                                          concat(this.bundleInstructions, other.bundleInstructions),
-                                          concat(this.componentDeclarations, other.componentDeclarations),
-                                          concat(this.componentImports, other.componentImports),
-                                          addMaps(this.i18nProperties, other.i18nProperties),
-                                          concat(this.moduleDescriptors, other.moduleDescriptors),
-                                          addMaps(this.pluginParameters, other.pluginParameters),
-                                          concat(this.resourceFiles, other.resourceFiles),
-                                          concat(this.sourceFiles, other.sourceFiles));
+        return new PluginProjectChangeset(mavenProject.with(other.mavenProject),
+                                          pluginXml.with(other.pluginXml),
+                                          projectFiles.with(other.projectFiles));
     }
     
     /**
@@ -156,15 +126,9 @@ public final class PluginProjectChangeset
      */
     public PluginProjectChangeset withDependencies(ArtifactDependency... dependencies)
     {
-        return new PluginProjectChangeset(concat(this.dependencies, ImmutableList.copyOf(dependencies)),
-                                          this.bundleInstructions,
-                                          this.componentDeclarations,
-                                          this.componentImports,
-                                          this.i18nProperties,
-                                          this.moduleDescriptors,
-                                          this.pluginParameters,
-                                          this.resourceFiles,
-                                          this.sourceFiles);
+        return new PluginProjectChangeset(mavenProject.withDependencies(dependencies),
+                                          this.pluginXml,
+                                          this.projectFiles);
     }
     
     /**
@@ -172,15 +136,9 @@ public final class PluginProjectChangeset
      */
     public PluginProjectChangeset withBundleInstructions(BundleInstruction... bundleInstructions)
     {
-        return new PluginProjectChangeset(this.dependencies,
-                                          concat(this.bundleInstructions, ImmutableList.copyOf(bundleInstructions)),
-                                          this.componentDeclarations,
-                                          this.componentImports,
-                                          this.i18nProperties,
-                                          this.moduleDescriptors,
-                                          this.pluginParameters,
-                                          this.resourceFiles,
-                                          this.sourceFiles);
+        return new PluginProjectChangeset(mavenProject.withBundleInstructions(bundleInstructions),
+                                          this.pluginXml,
+                                          this.projectFiles);
     }
     
     /**
@@ -188,15 +146,9 @@ public final class PluginProjectChangeset
      */
     public PluginProjectChangeset withComponentDeclarations(ComponentDeclaration... componentDeclarations)
     {
-        return new PluginProjectChangeset(this.dependencies,
-                                          this.bundleInstructions,
-                                          concat(this.componentDeclarations, ImmutableList.copyOf(componentDeclarations)),
-                                          this.componentImports,
-                                          this.i18nProperties,
-                                          this.moduleDescriptors,
-                                          this.pluginParameters,
-                                          this.resourceFiles,
-                                          this.sourceFiles);
+        return new PluginProjectChangeset(this.mavenProject,
+                                          pluginXml.withComponentDeclarations(componentDeclarations),
+                                          this.projectFiles);
     }
 
     /**
@@ -204,15 +156,9 @@ public final class PluginProjectChangeset
      */
     public PluginProjectChangeset withComponentImports(ComponentImport... componentImports)
     {
-        return new PluginProjectChangeset(this.dependencies,
-                                          this.bundleInstructions,
-                                          this.componentDeclarations,
-                                          concat(this.componentImports, ImmutableList.copyOf(componentImports)),
-                                          this.i18nProperties,
-                                          this.moduleDescriptors,
-                                          this.pluginParameters,
-                                          this.resourceFiles,
-                                          this.sourceFiles);
+        return new PluginProjectChangeset(this.mavenProject,
+                                          pluginXml.withComponentImports(componentImports),
+                                          this.projectFiles);
     }
 
     /**
@@ -220,15 +166,9 @@ public final class PluginProjectChangeset
      */
     public PluginProjectChangeset withI18nProperties(Map<String, String> i18nProperties)
     {
-        return new PluginProjectChangeset(this.dependencies,
-                                          this.bundleInstructions,
-                                          this.componentDeclarations,
-                                          this.componentImports,
-                                          addMaps(this.i18nProperties, i18nProperties),
-                                          this.moduleDescriptors,
-                                          this.pluginParameters,
-                                          this.resourceFiles,
-                                          this.sourceFiles);
+        return new PluginProjectChangeset(this.mavenProject,
+                                          this.pluginXml,
+                                          projectFiles.withI18nProperties(i18nProperties));
     }
 
     /**
@@ -236,15 +176,9 @@ public final class PluginProjectChangeset
      */
     public PluginProjectChangeset withModuleDescriptor(ModuleDescriptor moduleDescriptor)
     {
-        return new PluginProjectChangeset(this.dependencies,
-                                          this.bundleInstructions,
-                                          this.componentDeclarations,
-                                          this.componentImports,
-                                          this.i18nProperties,
-                                          concat(this.moduleDescriptors, ImmutableList.of(moduleDescriptor)),
-                                          this.pluginParameters,
-                                          this.resourceFiles,
-                                          this.sourceFiles);
+        return new PluginProjectChangeset(this.mavenProject,
+                                          pluginXml.withModuleDescriptor(moduleDescriptor),
+                                          this.projectFiles);
     }
 
     /**
@@ -253,15 +187,9 @@ public final class PluginProjectChangeset
      */
     public PluginProjectChangeset withPluginParameters(Map<String, String> parameters)
     {
-        return new PluginProjectChangeset(this.dependencies,
-                                          this.bundleInstructions,
-                                          this.componentDeclarations,
-                                          this.componentImports,
-                                          this.i18nProperties,
-                                          this.moduleDescriptors,
-                                          addMaps(this.pluginParameters, parameters),
-                                          this.resourceFiles,
-                                          this.sourceFiles);
+        return new PluginProjectChangeset(this.mavenProject,
+                                          pluginXml.withPluginParameters(parameters),
+                                          this.projectFiles);
     }
     
     /**
@@ -269,15 +197,9 @@ public final class PluginProjectChangeset
      */
     public PluginProjectChangeset withResourceFile(ResourceFile resourceFile)
     {
-        return new PluginProjectChangeset(this.dependencies,
-                                          this.bundleInstructions,
-                                          this.componentDeclarations,
-                                          this.componentImports,
-                                          this.i18nProperties,
-                                          this.moduleDescriptors,
-                                          this.pluginParameters,
-                                          concat(this.resourceFiles, ImmutableList.of(resourceFile)),
-                                          this.sourceFiles);
+        return new PluginProjectChangeset(this.mavenProject,
+                                          this.pluginXml,
+                                          projectFiles.withResourceFile(resourceFile));
     }
 
     /**
@@ -285,21 +207,170 @@ public final class PluginProjectChangeset
      */
     public PluginProjectChangeset withSourceFile(SourceFile sourceFile)
     {
-        return new PluginProjectChangeset(this.dependencies,
-                                          this.bundleInstructions,
-                                          this.componentDeclarations,
-                                          this.componentImports,
-                                          this.i18nProperties,
-                                          this.moduleDescriptors,
-                                          this.pluginParameters,
-                                          this.resourceFiles,
-                                          concat(this.sourceFiles, ImmutableList.of(sourceFile)));
+        return new PluginProjectChangeset(this.mavenProject,
+                                          this.pluginXml,
+                                          projectFiles.withSourceFile(sourceFile));
     }
     
-    private Map<String, String> addMaps(Map<String, String> first, Map<String, String> second)
+    private static Map<String, String> addMaps(Map<String, String> first, Map<String, String> second)
     {
         Map<String, String> ret = newHashMap(first);
         ret.putAll(second);
         return ret;
+    }
+    
+    private static class MavenProjectChangeset
+    {
+        private final ImmutableList<ArtifactDependency> dependencies;
+        private final ImmutableList<BundleInstruction> bundleInstructions;
+
+        MavenProjectChangeset()
+        {
+            this(ImmutableList.<ArtifactDependency>of(),
+                 ImmutableList.<BundleInstruction>of());
+        }
+        
+        MavenProjectChangeset(Iterable<ArtifactDependency> dependencies,
+                              Iterable<BundleInstruction> bundleInstructions)
+        {
+            this.dependencies = ImmutableList.copyOf(dependencies);
+            this.bundleInstructions = ImmutableList.copyOf(bundleInstructions);
+        }
+        
+        MavenProjectChangeset with(MavenProjectChangeset other)
+        {
+            return new MavenProjectChangeset(concat(this.dependencies, other.dependencies),
+                                             concat(this.bundleInstructions, other.bundleInstructions));
+        }
+        
+        MavenProjectChangeset withDependencies(ArtifactDependency... dependencies)
+        {
+            return new MavenProjectChangeset(concat(this.dependencies, ImmutableList.copyOf(dependencies)),
+                                             this.bundleInstructions);
+        }
+
+        MavenProjectChangeset withBundleInstructions(BundleInstruction... bundleInstructions)
+        {
+            return new MavenProjectChangeset(this.dependencies,
+                                             concat(this.bundleInstructions, ImmutableList.copyOf(bundleInstructions)));
+        }
+    }
+    
+    private static class PluginXmlChangeset
+    {
+        final ImmutableList<ComponentDeclaration> componentDeclarations;
+        final ImmutableList<ComponentImport> componentImports;
+        final ImmutableList<ModuleDescriptor> moduleDescriptors;
+        final ImmutableMap<String, String> pluginParameters;
+        
+        PluginXmlChangeset()
+        {
+            this(ImmutableList.<ComponentDeclaration>of(),
+                 ImmutableList.<ComponentImport>of(),
+                 ImmutableList.<ModuleDescriptor>of(),
+                 ImmutableMap.<String, String>of());
+        }
+        
+        PluginXmlChangeset(Iterable<ComponentDeclaration> componentDeclarations,
+                           Iterable<ComponentImport> componentImports,
+                           Iterable<ModuleDescriptor> moduleDescriptors,
+                           Map<String, String> pluginParameters)
+        {
+            this.componentDeclarations = ImmutableList.copyOf(componentDeclarations);
+            this.componentImports = ImmutableList.copyOf(componentImports);
+            this.moduleDescriptors = ImmutableList.copyOf(moduleDescriptors);
+            this.pluginParameters = ImmutableMap.copyOf(pluginParameters);
+        }
+
+        PluginXmlChangeset with(PluginXmlChangeset other)
+        {
+            return new PluginXmlChangeset(concat(this.componentDeclarations, other.componentDeclarations),
+                                          concat(this.componentImports, other.componentImports),
+                                          concat(this.moduleDescriptors, other.moduleDescriptors),
+                                          addMaps(this.pluginParameters, other.pluginParameters));
+        }
+        
+        PluginXmlChangeset withComponentDeclarations(ComponentDeclaration... componentDeclarations)
+        {
+            return new PluginXmlChangeset(concat(this.componentDeclarations, ImmutableList.copyOf(componentDeclarations)),
+                                          this.componentImports,
+                                          this.moduleDescriptors,
+                                          this.pluginParameters);
+        }
+
+        PluginXmlChangeset withComponentImports(ComponentImport... componentImports)
+        {
+            return new PluginXmlChangeset(this.componentDeclarations,
+                                          concat(this.componentImports, ImmutableList.copyOf(componentImports)),
+                                          this.moduleDescriptors,
+                                          this.pluginParameters);
+        }
+        
+        PluginXmlChangeset withModuleDescriptor(ModuleDescriptor moduleDescriptor)
+        {
+            return new PluginXmlChangeset(this.componentDeclarations,
+                                          this.componentImports,
+                                          concat(this.moduleDescriptors, ImmutableList.of(moduleDescriptor)),
+                                          this.pluginParameters);
+        }
+
+        PluginXmlChangeset withPluginParameters(Map<String, String> parameters)
+        {
+            return new PluginXmlChangeset(this.componentDeclarations,
+                                          this.componentImports,
+                                          this.moduleDescriptors,
+                                          addMaps(this.pluginParameters, parameters));
+        }
+    }
+    
+    private static class ProjectFilesChangeset
+    {
+        final ImmutableMap<String, String> i18nProperties;
+        final ImmutableList<ResourceFile> resourceFiles;
+        final ImmutableList<SourceFile> sourceFiles;
+
+        ProjectFilesChangeset()
+        {
+            this(ImmutableMap.<String, String>of(),
+                 ImmutableList.<ResourceFile>of(),
+                 ImmutableList.<SourceFile>of());
+        }
+        
+        ProjectFilesChangeset(Map<String, String> i18nProperties,
+                              Iterable<ResourceFile> resourceFiles,
+                              Iterable<SourceFile> sourceFiles)
+        {
+            this.i18nProperties = ImmutableMap.copyOf(i18nProperties);
+            this.resourceFiles = ImmutableList.copyOf(resourceFiles);
+            this.sourceFiles = ImmutableList.copyOf(sourceFiles);
+        }
+        
+        ProjectFilesChangeset with(ProjectFilesChangeset other)
+        {
+            return new ProjectFilesChangeset(addMaps(this.i18nProperties, other.i18nProperties),
+                                             concat(this.resourceFiles, other.resourceFiles),
+                                             concat(this.sourceFiles, other.sourceFiles));
+        }
+        
+        ProjectFilesChangeset withI18nProperties(Map<String, String> i18nProperties)
+        {
+            return new ProjectFilesChangeset(addMaps(this.i18nProperties, i18nProperties),
+                                             this.resourceFiles,
+                                             this.sourceFiles);
+        }
+        
+        ProjectFilesChangeset withResourceFile(ResourceFile resourceFile)
+        {
+            return new ProjectFilesChangeset(this.i18nProperties,
+                                             concat(this.resourceFiles, ImmutableList.of(resourceFile)),
+                                             this.sourceFiles);
+        }
+        
+        ProjectFilesChangeset withSourceFile(SourceFile sourceFile)
+        {
+            return new ProjectFilesChangeset(this.i18nProperties,
+                                             this.resourceFiles,
+                                             concat(this.sourceFiles, ImmutableList.of(sourceFile)));
+        }
     }
 }
