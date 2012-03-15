@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.atlassian.maven.plugins.amps.XmlMatchers.XmlWrapper;
-import com.atlassian.plugins.codegen.AmpsSystemPropertyVariable;
 import com.atlassian.plugins.codegen.ArtifactDependency;
 import com.atlassian.plugins.codegen.ArtifactDependency.Scope;
 import com.atlassian.plugins.codegen.ArtifactId;
@@ -28,15 +27,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.atlassian.plugins.codegen.AmpsSystemPropertyVariable.ampsSystemPropertyVariable;
-
-import static com.atlassian.fugue.Option.none;
-import static com.atlassian.fugue.Option.some;
 import static com.atlassian.maven.plugins.amps.XmlMatchers.node;
 import static com.atlassian.maven.plugins.amps.XmlMatchers.nodeCount;
 import static com.atlassian.maven.plugins.amps.XmlMatchers.nodeText;
 import static com.atlassian.maven.plugins.amps.XmlMatchers.nodeTextEquals;
 import static com.atlassian.maven.plugins.amps.XmlMatchers.nodes;
+import static com.atlassian.plugins.codegen.AmpsSystemPropertyVariable.ampsSystemPropertyVariable;
 import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
 import static com.atlassian.plugins.codegen.ArtifactId.artifactId;
 import static com.atlassian.plugins.codegen.BundleInstruction.importPackage;
@@ -87,11 +83,11 @@ public class MavenProjectRewriterTest
         "</execution></executions>";
 
     private static final MavenPlugin NEW_MAVEN_PLUGIN_NO_VERSION =
-        mavenPlugin(MAVEN_ARTIFACT, none(String.class), NEW_MAVEN_PLUGIN_CONFIG);
+        mavenPlugin(MAVEN_ARTIFACT, noVersion(), NEW_MAVEN_PLUGIN_CONFIG);
     private static final MavenPlugin NEW_MAVEN_PLUGIN_WITH_VERSION =
-        mavenPlugin(MAVEN_ARTIFACT, some("1.0"), NEW_MAVEN_PLUGIN_CONFIG);
+        mavenPlugin(MAVEN_ARTIFACT, version("1.0"), NEW_MAVEN_PLUGIN_CONFIG);
     private static final MavenPlugin NEW_MAVEN_PLUGIN_WITH_GROUP_ID =
-        mavenPlugin(CUSTOM_ARTIFACT, some("1.0"), NEW_MAVEN_PLUGIN_CONFIG);
+        mavenPlugin(CUSTOM_ARTIFACT, version("1.0"), NEW_MAVEN_PLUGIN_CONFIG);
 
     private static final com.atlassian.plugins.codegen.PluginArtifact NEW_BUNDLED_ARTIFACT =
         pluginArtifact(BUNDLED_ARTIFACT, CUSTOM_ARTIFACT, noVersion());
@@ -276,7 +272,7 @@ public class MavenProjectRewriterTest
     public void mavenPluginWithVersionHasVersion() throws Exception
     {
         assertThat(applyChanges(TEST_POM, changeset.with(NEW_MAVEN_PLUGIN_WITH_VERSION)),
-                   node("//build/plugins/plugin[2]/version", nodeTextEquals(NEW_MAVEN_PLUGIN_WITH_VERSION.getVersion().get())));
+                   node("//build/plugins/plugin[2]/version", nodeTextEquals(NEW_MAVEN_PLUGIN_WITH_VERSION.getVersionId().toString())));
     }
 
     @Test
@@ -290,7 +286,7 @@ public class MavenProjectRewriterTest
     public void mavenPluginExecutionWithDuplicateIdIsNotAdded() throws Exception
     {
         MavenPlugin pluginWithConflictingExecutionConfig =
-            mavenPlugin(MAVEN_ARTIFACT, none(String.class), MAVEN_PLUGIN_CONFIG_WITH_CONFLICTING_EXECUTION);
+            mavenPlugin(MAVEN_ARTIFACT, noVersion(), MAVEN_PLUGIN_CONFIG_WITH_CONFLICTING_EXECUTION);
 
         assertThat(applyChanges(TEST_POM_WITH_MAVEN_PLUGIN, changeset.with(pluginWithConflictingExecutionConfig)),
                    nodes("//build/plugins/plugin[2]/executions/execution", nodeCount(1)));
@@ -300,7 +296,7 @@ public class MavenProjectRewriterTest
     public void mavenPluginExecutionWithDuplicateIdDoesNotOverwriteExistingConfig() throws Exception
     {
         MavenPlugin pluginWithConflictingExecutionConfig =
-            mavenPlugin(MAVEN_ARTIFACT, none(String.class), MAVEN_PLUGIN_CONFIG_WITH_CONFLICTING_EXECUTION);
+            mavenPlugin(MAVEN_ARTIFACT, noVersion(), MAVEN_PLUGIN_CONFIG_WITH_CONFLICTING_EXECUTION);
 
         assertThat(applyChanges(TEST_POM_WITH_MAVEN_PLUGIN, changeset.with(pluginWithConflictingExecutionConfig)),
                    node("//build/plugins/plugin[2]/executions/execution/phase", nodeTextEquals("process-resources")));

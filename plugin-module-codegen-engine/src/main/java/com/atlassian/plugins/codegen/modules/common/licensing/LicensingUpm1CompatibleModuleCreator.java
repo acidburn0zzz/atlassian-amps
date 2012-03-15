@@ -17,7 +17,6 @@ import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletProperties;
 
-import static com.atlassian.fugue.Option.none;
 import static com.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.AmpsSystemPropertyVariable.ampsSystemPropertyVariable;
 import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
@@ -33,6 +32,7 @@ import static com.atlassian.plugins.codegen.MavenPlugin.mavenPlugin;
 import static com.atlassian.plugins.codegen.PluginArtifact.pluginArtifact;
 import static com.atlassian.plugins.codegen.PluginArtifact.ArtifactType.BUNDLED_ARTIFACT;
 import static com.atlassian.plugins.codegen.PluginParameter.pluginParameter;
+import static com.atlassian.plugins.codegen.VersionId.noVersion;
 import static com.atlassian.plugins.codegen.VersionId.version;
 import static com.atlassian.plugins.codegen.VersionId.versionProperty;
 
@@ -123,7 +123,7 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
             .with(DEPENDENCIES)
             .with(BUNDLE_INSTRUCTIONS)
             .with(BUNDLED_ARTIFACTS)
-            .with(mavenPlugin(artifactId(MAVEN_DEPENDENCY_PLUGIN_ID), none(String.class), MAVEN_DEPENDENCY_PLUGIN_CONFIG))
+            .with(mavenPlugin(artifactId(MAVEN_DEPENDENCY_PLUGIN_ID), noVersion(), MAVEN_DEPENDENCY_PLUGIN_CONFIG))
             .with(pluginParameter("atlassian-licensing-enabled", "true"))
             .with(componentImport(fullyQualified("com.atlassian.plugin.PluginAccessor")),
                   componentImport(fullyQualified("com.atlassian.plugin.PluginController")),

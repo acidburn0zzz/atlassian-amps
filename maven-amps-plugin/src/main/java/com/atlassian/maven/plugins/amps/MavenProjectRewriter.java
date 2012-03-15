@@ -184,12 +184,16 @@ public class MavenProjectRewriter implements ProjectRewriter
         return modified;
     }
     
-    private static Plugin toMavenPlugin(MavenPlugin descriptor, Element paramsDesc)
+    private Plugin toMavenPlugin(MavenPlugin descriptor, Element paramsDesc)
     {
         Plugin p = new Plugin();
         p.setGroupId(descriptor.getGroupAndArtifactId().getGroupId().getOrElse((String)null));
         p.setArtifactId(descriptor.getGroupAndArtifactId().getArtifactId());
-        p.setVersion(descriptor.getVersion().getOrElse((String)null));
+        if (descriptor.getVersionId().isDefined())
+        {
+            p.setVersion(descriptor.getVersionId().getVersionOrPropertyPlaceholder().get());
+            createVersionPropertyIfNecessary(descriptor.getVersionId());
+        }
         p.setExtensions("true".equals(paramsDesc.elementText("extensions")));
         for (Object configNode : paramsDesc.selectNodes("configuration"))
         {
