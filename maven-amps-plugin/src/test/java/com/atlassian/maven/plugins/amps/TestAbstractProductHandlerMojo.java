@@ -21,7 +21,6 @@ import com.atlassian.maven.plugins.amps.util.MavenPropertiesUtils;
 import com.google.common.collect.Lists;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -122,7 +121,7 @@ public class TestAbstractProductHandlerMojo
         try
         {
             MavenPropertiesUtils.checkUsingTheRightAmpsPlugin(mojo.getMavenContext());
-            assertTrue("Shouldn't succeed", false);
+            fail("Shouldn't succeed");
         }
         catch (MojoExecutionException mee)
         {

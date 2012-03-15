@@ -93,10 +93,12 @@ public class MavenPropertiesUtils
                 if (!suggestedAmpsArtifact.contains(pluginDescriptor.getGoalPrefix()))
                 {
                     // If there's another Amps plugin, it's fine to blow up, because we're not in a situation where the pom.xml is missing.
-                    throw new MojoExecutionException(String.format("You are using %s:%s but %s is defined in the pom.xml. Please define %s in your pom.xml.",
+                    throw new MojoExecutionException(String.format("You are using %s:%s but %s is defined in the pom.xml. Please use mvn %s:%s, or define %s in your pom.xml.",
                             pluginDescriptor.getGoalPrefix(),
                             mojoDescriptor.getGoal(),
                             suggestedAmpsArtifact,
+                            getGoalPrefix(suggestedAmpsArtifact),
+                            mojoDescriptor.getGoal(),
                             pluginDescriptor.getArtifactId()
                             ));
                 }
@@ -108,6 +110,19 @@ public class MavenPropertiesUtils
                 		"Amps will work successfully, but you could set some parameters using a <configuration> tag in your pom.xml.");
             }
         }
+    }
+    
+    static String getGoalPrefix(String pluginName)
+    {
+        // We need to do this manually because one of the maven versions doesn't return it.
+        List<String> parts = Lists.newArrayList(pluginName.split("-"));
+        parts.remove("maven");
+        parts.remove("plugin");
+        if (parts.size() > 0)
+        {
+            return StringUtils.join(parts, "-");
+        }
+        return pluginName;
     }
 
     /**

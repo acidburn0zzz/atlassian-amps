@@ -1,5 +1,5 @@
 #set( $dollar = '$' )
-        <?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -42,28 +42,50 @@
                 <version>${project.version}</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <!-- To set a default product(s) to run with mvn amps:run, add:
+                    <instanceId>jira1</instanceId>
+                    or
+                    <testGroup>refapp-and-confluence</testGroup> -->
                     <products>
                         <product>
                             <id>jira</id>
+                            <instanceId>jira1</instanceId>
                             <version>\${dollar}{jira.version}</version>
+                            <dataVersion>\${dollar}{jira.data.version}</dataVersion>
                         </product>
                         <product>
                             <id>confluence</id>
+                            <instanceId>confluence1</instanceId>
                             <version>\${dollar}{confluence.version}</version>
+                            <dataVersion>\${dollar}{confluence.data.version}</dataVersion>
                         </product>
                         <product>
                             <id>fecru</id>
+                            <instanceId>fecru1</instanceId>
                             <version>\${dollar}{fecru.version}</version>
+                            <dataVersion>\${dollar}{fecru.data.version}</dataVersion>
                         </product>
                         <product>
                             <id>bamboo</id>
+                            <instanceId>bamboo1</instanceId>
                             <version>\${dollar}{bamboo.version}</version>
+                            <dataVersion>\${dollar}{bamboo.data.version}</dataVersion>
                         </product>
                         <product>
                             <id>refapp</id>
+                            <instanceId>refapp1</instanceId>
                             <version>\${dollar}{refapp.version}</version>
                         </product>
                     </products>
+                    <testGroups>
+                        <testGroup>
+                            <id>refapp-and-confluence</id>
+                            <instanceIds>
+                                <instanceId>refapp1</instanceId>
+                                <instanceId>confluence1</instanceId>
+                            </instanceIds>
+                        </testGroup>
+                    </testGroups>
                 </configuration>
             </plugin>
             <plugin>
@@ -82,6 +104,12 @@
         <fecru.version>${fecru.version}</fecru.version>
         <bamboo.version>${bamboo.version}</bamboo.version>
         <refapp.version>${refapp.version}</refapp.version>
+        
+        <jira.data.version>${jira.data.version}</jira.data.version>
+        <confluence.data.version>${confluence.data.version}</confluence.data.version>
+        <fecru.data.version>${fecru.data.version}</fecru.data.version>
+        <bamboo.data.version>${bamboo.data.version}</bamboo.data.version>
+        
         <amps.version>${project.version}</amps.version>
     </properties>
 
