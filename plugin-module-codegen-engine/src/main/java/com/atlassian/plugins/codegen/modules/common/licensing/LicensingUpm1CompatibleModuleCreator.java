@@ -4,6 +4,7 @@ import com.atlassian.plugins.codegen.ArtifactDependency;
 import com.atlassian.plugins.codegen.BundleInstruction;
 import com.atlassian.plugins.codegen.ClassId;
 import com.atlassian.plugins.codegen.ComponentDeclaration;
+import com.atlassian.plugins.codegen.PluginArtifact;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
@@ -17,15 +18,19 @@ import com.atlassian.plugins.codegen.modules.common.servlet.ServletProperties;
 
 import com.google.common.collect.ImmutableMap;
 
+import static com.atlassian.fugue.Option.none;
 import static com.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
 import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.COMPILE;
 import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.PROVIDED;
+import static com.atlassian.plugins.codegen.ArtifactId.artifactId;
 import static com.atlassian.plugins.codegen.BundleInstruction.dynamicImportPackage;
 import static com.atlassian.plugins.codegen.BundleInstruction.importPackage;
 import static com.atlassian.plugins.codegen.BundleInstruction.privatePackage;
 import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
 import static com.atlassian.plugins.codegen.ComponentImport.componentImport;
+import static com.atlassian.plugins.codegen.MavenPlugin.mavenPlugin;
+import static com.atlassian.plugins.codegen.PluginArtifact.pluginArtifact;
 
 /**
  * @since 3.8
@@ -64,6 +69,11 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
         dependency("commons-lang", "commons-lang", "2.4", PROVIDED)
     };
     
+    public static final PluginArtifact[] BUNDLED_ARTIFACTS = {
+        pluginArtifact(artifactId("com.atlassian.upm", "atlassian-universal-plugin-manager-plugin"), some("1.6.3"), none(String.class)),
+        pluginArtifact(artifactId("com.atlassian.upm", "plugin-license-storage-plugin"), some(LICENSE_API_VERSION), some(LICENSE_API_VERSION_PROPERTY))
+    };
+    
     public static final BundleInstruction[] BUNDLE_INSTRUCTIONS = {
         importPackage("com.atlassian.plugin*", "0.0"),
         importPackage("com.atlassian.sal*", "0.0"),
@@ -83,6 +93,20 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
         dynamicImportPackage("com.atlassian.upm.license.storage.plugin", "2.0.1")
     };
     
+    public static final String MAVEN_DEPENDENCY_PLUGIN_ID = "maven-dependency-plugin";
+    public static final String MAVEN_DEPENDENCY_PLUGIN_CONFIG = "<executions>" +
+            "<execution>" +
+                "<id>copy-storage-plugin</id>" +
+                "<phase>process-resources</phase>" +
+                "<goals><goal>copy-dependencies</goal></goals>" +
+                "<configuration>" +
+                    "<outputDirectory>${project.build.outputDirectory}</outputDirectory>" +
+                    "<includeArtifactIds>plugin-license-storage-plugin</includeArtifactIds>" +
+                    "<stripVersion>true</stripVersion>" +
+                "</configuration>" +
+            "</execution>" +
+        "</executions>";
+    
     @Override
     public PluginProjectChangeset createModule(LicensingProperties props) throws Exception
     {
@@ -92,6 +116,8 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
         PluginProjectChangeset ret = new PluginProjectChangeset()
             .withDependencies(DEPENDENCIES)
             .withBundleInstructions(BUNDLE_INSTRUCTIONS)
+            .withBundledArtifacts(BUNDLED_ARTIFACTS)
+            .withMavenPlugins(mavenPlugin(artifactId(MAVEN_DEPENDENCY_PLUGIN_ID), none(String.class), MAVEN_DEPENDENCY_PLUGIN_CONFIG))
             .withPluginParameters(ImmutableMap.of("atlassian-licensing-enabled", "true"))
             .withComponentImports(componentImport(fullyQualified("com.atlassian.plugin.PluginAccessor")),
                                   componentImport(fullyQualified("com.atlassian.plugin.PluginController")),

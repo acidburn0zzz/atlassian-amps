@@ -1,6 +1,7 @@
 package com.atlassian.plugins.codegen.modules.common.licensing;
 
 import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
+import com.atlassian.plugins.codegen.MavenPlugin;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +46,20 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     {
         // won't verify all the individual bundle instructions, just make sure we have some
         assertFalse(getChangesetForModule().getBundleInstructions().isEmpty());
+    }
+
+    @Test
+    public void bundledArtifactsAreAdded() throws Exception
+    {
+        // won't verify all the individual bundled artifacts, just make sure we have some
+        assertFalse(getChangesetForModule().getBundledArtifacts().isEmpty());
+    }
+    
+    @Test
+    public void mavenDependencyPluginIsAdded() throws Exception
+    {
+        MavenPlugin mp = getChangesetForModule().getMavenPlugins().get(0);
+        assertEquals("maven-dependency-plugin", mp.getGroupAndArtifactId().getCombinedId());
     }
     
     @Test
