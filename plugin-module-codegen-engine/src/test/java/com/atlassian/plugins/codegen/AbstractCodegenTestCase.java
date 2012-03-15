@@ -13,6 +13,7 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
+import static com.atlassian.fugue.Option.some;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
@@ -124,16 +125,17 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
     
     protected ArtifactDependency getDependency(String groupId, String artifactId) throws Exception
     {
+        ArtifactId searchFor = ArtifactId.artifactId(some(groupId), artifactId);
         PluginProjectChangeset changeset = getChangesetForModule();
         assertFalse("did not generate any dependencies", changeset.getDependencies().isEmpty());
         List<String> foundDeps = new LinkedList<String>();
         for (ArtifactDependency dependency : changeset.getDependencies())
         {
-            if (dependency.getGroupId().equals(groupId) && dependency.getArtifactId().equals(artifactId))
+            if (searchFor.equals(dependency.getGroupAndArtifactId()))
             {
                 return dependency;
             }
-            foundDeps.add(dependency.getGroupId() + ":" + dependency.getArtifactId());
+            foundDeps.add(dependency.getGroupAndArtifactId().getCombinedId());
         }
         fail("did not generate any dependency for \"" + groupId + ":" + artifactId + "\"; generated depdendencies were "
              + Joiner.on(", ").join(foundDeps));

@@ -26,12 +26,12 @@
                 <artifactId>maven-amps-plugin</artifactId>
                 <configuration>
                     <contextPath>${contextPath}</contextPath>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <junitArtifactName>junit:junit-dep</junitArtifactName>
+                    <bundledArtifacts>
+                        <bundledArtifact>
+                            <groupId>com.atlassian.dogs</groupId>
+                            <artifactId>cooper</artifactId>
+                        </bundledArtifact>
+                    </bundledArtifacts>
                 </configuration>
             </plugin>
         </plugins>

@@ -2,10 +2,14 @@ package com.atlassian.maven.plugins.amps;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
 
+import com.atlassian.fugue.Option;
 import com.atlassian.plugins.codegen.ArtifactDependency;
+import com.atlassian.plugins.codegen.ArtifactId;
 import com.atlassian.plugins.codegen.BundleInstruction;
+import com.atlassian.plugins.codegen.MavenPlugin;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.ProjectRewriter;
 
@@ -20,13 +24,20 @@ import org.apache.commons.io.output.XmlStreamWriter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.plugins.shade.pom.PomWriter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.Node;
 
 import static com.atlassian.fugue.Option.none;
+import static com.atlassian.fugue.Option.option;
 import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Iterables.any;
@@ -34,7 +45,8 @@ import static com.google.common.collect.Iterables.concat;
 
 /**
  * Applies any changes from a {@link PluginProjectChangeset} that affect the POM of a Maven project.
- * These include dependencies and bundle instructions.
+ * These include dependencies, bundle instructions and bundled artifacts in the AMPS configuration,
+ * and arbitrary build plugin configurations.
  */
 public class MavenProjectRewriter implements ProjectRewriter
 {
@@ -71,7 +83,9 @@ public class MavenProjectRewriter implements ProjectRewriter
         boolean modifyPom = false;
 
         modifyPom |= applyDependencyChanges(changes.getDependencies());
+        modifyPom |= applyMavenPluginChanges(changes.getMavenPlugins());
         modifyPom |= applyBundleInstructionChanges(changes.getBundleInstructions());
+        modifyPom |= applyBundledArtifactChanges(changes.getBundledArtifacts());
 
         if (modifyPom)
         {
@@ -102,24 +116,15 @@ public class MavenProjectRewriter implements ProjectRewriter
         List<Dependency> originalDependencies = model.getDependencies();
         for (ArtifactDependency descriptor : dependencies)
         {
-            boolean alreadyExists = any(originalDependencies, new DependencyPredicate(descriptor));
+            boolean alreadyExists = any(originalDependencies, dependencyArtifactId(descriptor.getGroupAndArtifactId()));
             if (!alreadyExists)
             {
                 modified = true;
 
                 Dependency newDependency = new Dependency();
-                newDependency.setGroupId(descriptor.getGroupId());
-                newDependency.setArtifactId(descriptor.getArtifactId());
-                String version = descriptor.getVersion();
-                for (String propertyName : descriptor.getPropertyName())
-                {
-                    version = "${" + propertyName + "}";
-                    if (!model.getProperties().containsKey(propertyName))
-                    {
-                        model.addProperty(propertyName, descriptor.getVersion());
-                    }
-                }
-                newDependency.setVersion(version);
+                newDependency.setGroupId(descriptor.getGroupAndArtifactId().getGroupId().get());
+                newDependency.setArtifactId(descriptor.getGroupAndArtifactId().getArtifactId());
+                newDependency.setVersion(getVersionWithOptionalProperty(some(descriptor.getVersion()), descriptor.getPropertyName()));
                 newDependency.setScope(descriptor.getScope().name().toLowerCase());
 
                 model.addDependency(newDependency);
@@ -127,35 +132,103 @@ public class MavenProjectRewriter implements ProjectRewriter
         }
         return modified;
     }
+
+    private String getVersionWithOptionalProperty(Option<String> version, Option<String> propertyName)
+    {
+        for (String p : propertyName)
+        {
+            if (!model.getProperties().containsKey(p))
+            {
+                model.addProperty(p, version.getOrElse(""));
+            }
+            return "${" + p + "}";
+        }
+        return version.getOrElse("");
+    }
+    
+    private boolean applyMavenPluginChanges(Iterable<MavenPlugin> mavenPlugins) throws Exception
+    {
+        boolean modified = false;
+        @SuppressWarnings("unchecked")
+        List<Plugin> originalPlugins = model.getBuild().getPlugins();
+        for (MavenPlugin descriptor : mavenPlugins)
+        {
+            Document fragDoc = DocumentHelper.parseText("<root>" + descriptor.getXmlContent() + "</root>");
+            Predicate<Plugin> match = pluginArtifactId(descriptor.getGroupAndArtifactId());
+            if (Iterables.any(originalPlugins, match))
+            {
+                modified |= mergeMavenPluginConfig(Iterables.find(originalPlugins, match), fragDoc.getRootElement());
+            }
+            else
+            {
+                originalPlugins.add(toMavenPlugin(descriptor, fragDoc.getRootElement()));
+                modified = true;
+            }
+        }
+        return modified;
+    }
+    
+    private static boolean mergeMavenPluginConfig(Plugin plugin, Element paramsDesc)
+    {
+        boolean modified = false;
+        for (Object node : paramsDesc.selectNodes("executions/execution"))
+        {
+            Element executionDesc = (Element) node;
+            if (!plugin.getExecutionsAsMap().containsKey(executionDesc.elementTextTrim("id")))
+            {
+                plugin.addExecution(toMavenPluginExecution(executionDesc));
+                modified = true;
+            }
+        }
+        return modified;
+    }
+    
+    private static Plugin toMavenPlugin(MavenPlugin descriptor, Element paramsDesc)
+    {
+        Plugin p = new Plugin();
+        p.setGroupId(descriptor.getGroupAndArtifactId().getGroupId().getOrElse((String)null));
+        p.setArtifactId(descriptor.getGroupAndArtifactId().getArtifactId());
+        p.setVersion(descriptor.getVersion().getOrElse((String)null));
+        p.setExtensions("true".equals(paramsDesc.elementText("extensions")));
+        for (Object configNode : paramsDesc.selectNodes("configuration"))
+        {
+            p.setConfiguration(toXpp3Dom((Element)configNode));
+        }
+        for (Object execNode : paramsDesc.selectNodes("executions/execution"))
+        {
+            p.addExecution(toMavenPluginExecution((Element)execNode));
+        }
+        return p;
+    }
+
+    private static PluginExecution toMavenPluginExecution(Element executionDesc)
+    {
+        PluginExecution pe = new PluginExecution();
+        pe.setId(executionDesc.elementTextTrim("id"));
+        pe.setPhase(executionDesc.elementTextTrim("phase"));
+        for (Object goalNode : executionDesc.selectNodes("goals/goal"))
+        {
+            pe.addGoal(((Node)goalNode).getText());
+        }
+        for (Object configNode : executionDesc.selectNodes("configuration"))
+        {
+            pe.setConfiguration(toXpp3Dom((Element)configNode));
+        }
+        return pe;
+    }
     
     private boolean applyBundleInstructionChanges(Iterable<BundleInstruction> instructions)
     {
-        Plugin ampsPlugin = findAmpsPlugin();
+        Xpp3Dom configRoot = getAmpsPluginConfiguration();
         boolean modified = false;
-        Xpp3Dom configRoot = (Xpp3Dom) ampsPlugin.getConfiguration();
-        if (configRoot == null)
-        {
-            configRoot = new Xpp3Dom("configuration");
-            ampsPlugin.setConfiguration(configRoot);
-        }
-        Xpp3Dom instructionsRoot = configRoot.getChild("instructions");
-        if (instructionsRoot == null)
-        {
-            instructionsRoot = new Xpp3Dom("instructions");
-            configRoot.addChild(instructionsRoot);
-        }
+        Xpp3Dom instructionsRoot = getOrCreateElement(configRoot, "instructions");
         for (BundleInstruction instruction : instructions)
         {
             String categoryName = instruction.getCategory().getElementName();
-            Xpp3Dom categoryElement = instructionsRoot.getChild(categoryName);
-            if (categoryElement == null)
-            {
-                categoryElement = new Xpp3Dom(categoryName);
-                instructionsRoot.addChild(categoryElement);
-            }
+            Xpp3Dom categoryElement = getOrCreateElement(instructionsRoot, categoryName);
             String body = categoryElement.getValue();
             Iterable<BundleInstruction> instructionList = parseInstructions(instruction.getCategory(), (body == null) ? "" : body);
-            if (Iterables.contains(instructionList, new InstructionPackagePredicate(instruction.getPackageName())))
+            if (Iterables.contains(instructionList, bundleInstructionPackageName(instruction.getPackageName())))
             {
                 continue;
             }
@@ -167,7 +240,7 @@ public class MavenProjectRewriter implements ProjectRewriter
         return modified;
     }
     
-    private Iterable<BundleInstruction> parseInstructions(BundleInstruction.Category category, String body)
+    private static Iterable<BundleInstruction> parseInstructions(BundleInstruction.Category category, String body)
     {
         ImmutableList.Builder<BundleInstruction> ret = ImmutableList.builder();
         for (String instructionLine : body.split(","))
@@ -186,7 +259,7 @@ public class MavenProjectRewriter implements ProjectRewriter
         return ret.build();
     }
     
-    private String writeInstructions(Iterable<BundleInstruction> instructions)
+    private static String writeInstructions(Iterable<BundleInstruction> instructions)
     {
         StringBuilder ret = new StringBuilder("\n");
         for (BundleInstruction instruction : instructions)
@@ -204,6 +277,44 @@ public class MavenProjectRewriter implements ProjectRewriter
         return ret.append("\n").toString();
     }
     
+    private boolean applyBundledArtifactChanges(Iterable<com.atlassian.plugins.codegen.PluginArtifact> bundledArtifacts)
+    {
+        Xpp3Dom configRoot = getAmpsPluginConfiguration();
+        boolean modified = false;
+        Xpp3Dom bundledArtifactsRoot = getOrCreateElement(configRoot, "bundledArtifacts");
+        List<Xpp3Dom> existingItems = ImmutableList.copyOf(bundledArtifactsRoot.getChildren("bundledArtifact"));
+        for (com.atlassian.plugins.codegen.PluginArtifact bundledArtifact: bundledArtifacts)
+        {
+            if (!any(existingItems, artifactElement(bundledArtifact.getGroupAndArtifactId())))
+            {
+                bundledArtifactsRoot.addChild(toArtifactElement(bundledArtifact, "bundledArtifact"));
+                modified = true;
+            }
+        }
+        return modified;
+    }
+    
+    private Xpp3Dom toArtifactElement(com.atlassian.plugins.codegen.PluginArtifact pluginArtifact, String type)
+    {
+        Xpp3Dom ret = new Xpp3Dom(type);
+        for (String groupId : pluginArtifact.getGroupAndArtifactId().getGroupId())
+        {
+            Xpp3Dom ge = new Xpp3Dom("groupId");
+            ge.setValue(groupId);
+            ret.addChild(ge);
+        }
+        Xpp3Dom ae = new Xpp3Dom("artifactId");
+        ae.setValue(pluginArtifact.getGroupAndArtifactId().getArtifactId());
+        ret.addChild(ae);
+        if (pluginArtifact.getVersion().isDefined() || pluginArtifact.getPropertyName().isDefined())
+        {
+            Xpp3Dom ve = new Xpp3Dom("version");
+            ve.setValue(getVersionWithOptionalProperty(pluginArtifact.getVersion(), pluginArtifact.getPropertyName()));
+            ret.addChild(ve);
+        }
+        return ret;
+    }
+    
     @SuppressWarnings("unchecked")
     private Plugin findAmpsPlugin()
     {
@@ -217,38 +328,91 @@ public class MavenProjectRewriter implements ProjectRewriter
         }
         throw new IllegalStateException("Could not find AMPS plugin element in POM");
     }
-    
-    private static class DependencyPredicate implements Predicate<Dependency>
+
+    private Xpp3Dom getAmpsPluginConfiguration()
     {
-        private final ArtifactDependency depToCheck;
-    
-        private DependencyPredicate(ArtifactDependency depToCheck)
+        Plugin ampsPlugin = findAmpsPlugin();
+        Xpp3Dom configRoot = (Xpp3Dom) ampsPlugin.getConfiguration();
+        if (configRoot == null)
         {
-            this.depToCheck = depToCheck;
+            configRoot = new Xpp3Dom("configuration");
+            ampsPlugin.setConfiguration(configRoot);
         }
+        return configRoot;
+    }
     
-        @Override
-        public boolean apply(Dependency d)
+    private static Xpp3Dom getOrCreateElement(Xpp3Dom container, String name)
+    {
+        Xpp3Dom ret = container.getChild(name);
+        if (ret == null)
         {
-            return (depToCheck.getGroupId().equals(d.getGroupId())
-                    && depToCheck.getArtifactId().equals(d.getArtifactId()));
+            ret = new Xpp3Dom(name);
+            container.addChild(ret);
+        }
+        return ret;
+    }
+    
+    private static Xpp3Dom toXpp3Dom(Element dom4JElement)
+    {
+        try
+        {
+            return Xpp3DomBuilder.build(new StringReader(dom4JElement.asXML()));
+        }
+        catch (Exception e)
+        {
+            // should never fail to parse XML that was already parsed by dom4J
+            throw new IllegalStateException();
         }
     }
     
-    private static class InstructionPackagePredicate implements Predicate<BundleInstruction>
+    private static Predicate<Dependency> dependencyArtifactId(final ArtifactId artifactId)
     {
-        private final String packageName;
-        
-        private InstructionPackagePredicate(String packageName)
+        return new Predicate<Dependency>()
         {
-            this.packageName = packageName;
-        }
-        
-        @Override
-        public boolean apply(BundleInstruction i)
+            public boolean apply(Dependency d)
+            {
+                return (artifactId.getGroupId().equals(option(d.getGroupId()))
+                        && artifactId.getArtifactId().equals(d.getArtifactId()));
+            }
+        };
+    }
+
+    private static Predicate<Plugin> pluginArtifactId(final ArtifactId artifactId)
+    {
+        return new Predicate<Plugin>()
         {
-            return i.getPackageName().equals(packageName);
-        }
+            public boolean apply(Plugin p)
+            {
+                return artifactId.getArtifactId().equals(p.getArtifactId())
+                    && (artifactId.getGroupId().equals(option(p.getGroupId()))
+                        || (!artifactId.getGroupId().isDefined() && "org.apache.maven.plugins".equals(p.getGroupId())));
+            }
+        };
+    }
+
+    private static Predicate<Xpp3Dom> artifactElement(final ArtifactId artifactId)
+    {
+        return new Predicate<Xpp3Dom>()
+        {
+            public boolean apply(Xpp3Dom e)
+            {
+                return (e.getChild("artifactId") != null)
+                    && e.getChild("artifactId").getValue().equals(artifactId.getArtifactId())
+                    && (((e.getChild("groupId") == null) && !artifactId.getGroupId().isDefined())
+                        || (e.getChild("groupId") != null) && artifactId.getGroupId().equals(some(e.getChild("groupId").getValue())));
+            }
+        };
+    }
+
+    private static Predicate<BundleInstruction> bundleInstructionPackageName(final String packageName)
+    {
+        return new Predicate<BundleInstruction>()
+        {
+            public boolean apply(BundleInstruction i)
+            {
+                return i.getPackageName().equals(packageName);
+            }
+        };
     }
     
     private static class InstructionPackageOrdering extends Ordering<BundleInstruction>

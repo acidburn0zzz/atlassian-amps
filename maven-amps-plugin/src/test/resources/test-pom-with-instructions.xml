@@ -34,12 +34,6 @@
                     </instructions>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <junitArtifactName>junit:junit-dep</junitArtifactName>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 </project>
