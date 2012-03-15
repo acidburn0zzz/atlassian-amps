@@ -71,10 +71,10 @@ public class RPCPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         RPCProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong interface", SOAP_INTERFACE, props.getInterfaceClass());
-        assertEquals("wrong interface package", PACKAGE, props.getInterfacePackage());
-        assertEquals("wrong class", SOAP_CLASSNAME, props.getClassname());
-        assertEquals("wrong class package", PACKAGE, props.getPackage());
+        assertEquals("wrong interface", SOAP_INTERFACE, props.getInterfaceId().getName());
+        assertEquals("wrong interface package", PACKAGE, props.getInterfaceId().getPackage());
+        assertEquals("wrong class", SOAP_CLASSNAME, props.getClassId().getName());
+        assertEquals("wrong class package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong service path", SOAP_PATH, props.getServicePath());
         assertEquals("wrong module name", SOAP_MODULE_NAME, props.getModuleName());
         assertEquals("wrong module key", SOAP_MODULE_KEY, props.getModuleKey());
@@ -107,10 +107,10 @@ public class RPCPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         RPCProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong adv interface", SOAP_INTERFACE, props.getInterfaceClass());
-        assertEquals("wrong adv interface package", PACKAGE, props.getInterfacePackage());
-        assertEquals("wrong adv class", SOAP_CLASSNAME, props.getClassname());
-        assertEquals("wrong adv package", PACKAGE, props.getPackage());
+        assertEquals("wrong adv interface", SOAP_INTERFACE, props.getInterfaceId().getName());
+        assertEquals("wrong adv interface package", PACKAGE, props.getInterfaceId().getPackage());
+        assertEquals("wrong adv class", SOAP_CLASSNAME, props.getClassId().getName());
+        assertEquals("wrong adv package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong adv service path", SOAP_PATH, props.getServicePath());
         assertEquals("wrong adv module name", ADV_MODULE_NAME, props.getModuleName());
         assertEquals("wrong adv module key", ADV_MODULE_KEY, props.getModuleKey());
@@ -136,10 +136,10 @@ public class RPCPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         RPCProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong interface", XML_INTERFACE, props.getInterfaceClass());
-        assertEquals("wrong interface package", PACKAGE, props.getInterfacePackage());
-        assertEquals("wrong class", XML_CLASSNAME, props.getClassname());
-        assertEquals("wrong class package", PACKAGE, props.getPackage());
+        assertEquals("wrong interface", XML_INTERFACE, props.getInterfaceId().getName());
+        assertEquals("wrong interface package", PACKAGE, props.getInterfaceId().getPackage());
+        assertEquals("wrong class", XML_CLASSNAME, props.getClassId().getName());
+        assertEquals("wrong class package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong service path", XML_PATH, props.getServicePath());
         assertEquals("wrong module name", XML_MODULE_NAME, props.getModuleName());
         assertEquals("wrong module key", XML_MODULE_KEY, props.getModuleKey());
@@ -172,10 +172,10 @@ public class RPCPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         RPCProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong adv interface", XML_INTERFACE, props.getInterfaceClass());
-        assertEquals("wrong adv interface package", PACKAGE, props.getInterfacePackage());
-        assertEquals("wrong adv class", XML_CLASSNAME, props.getClassname());
-        assertEquals("wrong adv package", PACKAGE, props.getPackage());
+        assertEquals("wrong adv interface", XML_INTERFACE, props.getInterfaceId().getName());
+        assertEquals("wrong adv interface package", PACKAGE, props.getInterfaceId().getPackage());
+        assertEquals("wrong adv class", XML_CLASSNAME, props.getClassId().getName());
+        assertEquals("wrong adv package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong adv service path", XML_PATH, props.getServicePath());
         assertEquals("wrong adv module name", ADV_MODULE_NAME, props.getModuleName());
         assertEquals("wrong adv module key", ADV_MODULE_KEY, props.getModuleKey());

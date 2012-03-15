@@ -1,17 +1,13 @@
 package com.atlassian.plugins.codegen.modules.common.web;
 
-import com.atlassian.plugins.codegen.annotations.Dependencies;
-import com.atlassian.plugins.codegen.annotations.Dependency;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+import com.atlassian.plugins.codegen.modules.Dependencies;
 
 /**
  * @since 3.6
  */
 
-@Dependencies({
-        @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-})
 public class SimpleWebModuleCreator extends AbstractPluginModuleCreator<SimpleWebProperties>
 {
 
@@ -21,9 +17,11 @@ public class SimpleWebModuleCreator extends AbstractPluginModuleCreator<SimpleWe
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "simple-web-module-plugin.xml.vtl";
 
     @Override
-    public void createModule(PluginModuleLocation location, SimpleWebProperties props) throws Exception
+    public PluginProjectChangeset createModule(SimpleWebProperties props) throws Exception
     {
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
+        return new PluginProjectChangeset()
+            .withDependencies(Dependencies.MOCKITO_TEST)
+            .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
     }
 
 

@@ -27,6 +27,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
+import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
@@ -300,6 +301,32 @@ public class MavenGoals
         return webappWarFile;
     }
 
+    public File copyArtifact(final String targetFileName, final File targetDirectory,
+                             final ProductArtifact artifact, String type) throws MojoExecutionException
+    {
+        final File targetFile = new File(targetDirectory, targetFileName);
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("copy"),
+                configuration(
+                        element(name("artifactItems"),
+                                element(name("artifactItem"),
+                                        element(name("groupId"), artifact.getGroupId()),
+                                        element(name("artifactId"), artifact.getArtifactId()),
+                                        element(name("type"), type),
+                                        element(name("version"), artifact.getVersion()),
+                                        element(name("destFileName"), targetFile.getName()))),
+                        element(name("outputDirectory"), targetDirectory.getPath())
+                ),
+                executionEnvironment()
+        );
+        return targetFile;
+    }
+
     /**
      * Copies {@code artifacts} to the {@code outputDirectory}. Artifacts are looked up in order: <ol> <li>in the maven
      * reactor</li> <li>in the maven repositories</li> </ol> This can't be used in a goal that happens before the
@@ -423,10 +450,6 @@ public class MavenGoals
         final int rmiPort = pickFreePort(0);
         final int actualHttpPort = pickFreePort(webappContext.getHttpPort());
         final List<Element> sysProps = new ArrayList<Element>();
-        if (webappContext.getJvmArgs() == null)
-        {
-            webappContext.setJvmArgs("-Xmx512m -XX:MaxPermSize=256m");
-        }
 
         for (final Map.Entry<String, String> entry : systemProperties.entrySet())
         {
@@ -1021,7 +1044,7 @@ public class MavenGoals
         {
             Set<String> docletPaths = new HashSet<String>();
             StringBuffer docletPath = new StringBuffer(":" + prj.getBuild().getOutputDirectory());
-            String resourcedocPath = prj.getBuild().getOutputDirectory() + File.separator + "resourcedoc.xml";
+            String resourcedocPath = fixWindowsSlashes(prj.getBuild().getOutputDirectory() + File.separator + "resourcedoc.xml");
 
             PluginXmlUtils.PluginInfo pluginInfo = PluginXmlUtils.getPluginInfo(ctx);
 
@@ -1052,7 +1075,7 @@ public class MavenGoals
                     plugin(
                             groupId("org.apache.maven.plugins"),
                             artifactId("maven-javadoc-plugin"),
-                            version("2.4")
+                            version("2.8.1")
                     ),
                     goal("javadoc"),
                     configuration(
@@ -1073,7 +1096,7 @@ public class MavenGoals
                                 )
                             ),
                             element(name("additionalparam"),"-output \"" + resourcedocPath + "\""),
-                            element(name("useStandarDocletOptions"),"false")
+                            element(name("useStandardDocletOptions"),"false")
                     ),
                     executionEnvironment()
             );

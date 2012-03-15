@@ -22,7 +22,7 @@ public class ComponentImportProperties extends ClassWithInterfaceProperties
         if (StringUtils.isNotBlank(fqClassName))
         {
             setFullyQualifiedInterface(fqClassName);
-            setModuleKey(StringUtils.uncapitalize(StringUtils.substringAfterLast(fqClassName, ".")));
+            setModuleKey(StringUtils.uncapitalize(getInterfaceId().getName()));
         }
 
         setFilter("");
@@ -33,4 +33,8 @@ public class ComponentImportProperties extends ClassWithInterfaceProperties
         setProperty(FILTER, filter);
     }
 
+    public String getFilter()
+    {
+        return getProperty(FILTER);
+    }
 }

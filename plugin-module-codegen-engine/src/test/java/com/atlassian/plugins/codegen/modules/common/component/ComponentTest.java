@@ -1,76 +1,120 @@
 package com.atlassian.plugins.codegen.modules.common.component;
 
-import java.io.File;
-import java.util.regex.Matcher;
-
 import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+import com.atlassian.plugins.codegen.ClassId;
 
-import org.dom4j.Document;
-import org.dom4j.Node;
+import com.google.common.collect.ImmutableMap;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static com.atlassian.fugue.Option.some;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @since 3.6
  */
 public class ComponentTest extends AbstractCodegenTestCase<ComponentProperties>
 {
-    public static final String PACKAGE_NAME = "com.atlassian.plugins.component";
-
     @Before
-    public void runGenerator() throws Exception
+    public void setup() throws Exception
     {
         setCreator(new ComponentModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
-
+        
         setProps(new ComponentProperties(PACKAGE_NAME + ".CustomComponent"));
 
+        props.setFullyQualifiedInterface(PACKAGE_NAME + ".CustomInterface");
+        props.setGenerateClass(true);
+        props.setGenerateInterface(true);
         props.setIncludeExamples(false);
-
     }
 
     @Test
-    public void allFilesAreGenerated() throws Exception
+    public void classFileIsGenerated() throws Exception
     {
-        props.setFullyQualifiedInterface(PACKAGE_NAME + ".CustomInterface");
-        props.setGenerateClass(true);
-        props.setGenerateInterface(true);
-        creator.createModule(moduleLocation, props);
-
-        String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
-        String itPackagePath = "it" + File.separator + packagePath;
-        assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "CustomComponent.java").exists());
-        assertTrue("interface not generated", new File(srcDir, packagePath + File.separator + "CustomInterface.java").exists());
-        assertTrue("test class not generated", new File(testDir, packagePath + File.separator + "CustomComponentTest.java").exists());
-        assertTrue("funcTest class not generated", new File(testDir, itPackagePath + File.separator + "CustomComponentFuncTest.java").exists());
-        assertTrue("main class not generated", new File(resourcesDir, "atlassian-plugin.xml").exists());
-
+        getSourceFile(PACKAGE_NAME, "CustomComponent");
     }
 
     @Test
-    public void componentAdded() throws Exception
+    public void interfaceFileIsGenerated() throws Exception
     {
-        props.setFullyQualifiedInterface(PACKAGE_NAME + ".CustomInterface");
-        props.setGenerateClass(true);
-        props.setGenerateInterface(true);
-        creator.createModule(moduleLocation, props);
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        String compXPath = "/atlassian-plugin/component[@name='Custom Component' and @key='custom-component' and @i18n-name-key='custom-component.name' and @class='" + PACKAGE_NAME + ".CustomComponent']";
-        String compIfaceXPath = "interface[text() = '" + PACKAGE_NAME + ".CustomInterface']";
-
-        Node compNode = pluginDoc.selectSingleNode(compXPath);
-        assertNotNull("component not found", compNode);
-        assertNotNull("interface not found", compNode.selectSingleNode(compIfaceXPath));
-
+        getSourceFile(PACKAGE_NAME, "CustomInterface");
     }
 
+    @Test
+    public void unitTestFileIsGenerated() throws Exception
+    {
+        getTestSourceFile(PACKAGE_NAME, "CustomComponentTest");
+    }
+
+    @Test
+    public void functionalTestFileIsGenerated() throws Exception
+    {
+        getTestSourceFile(FUNC_TEST_PACKAGE_NAME, "CustomComponentFuncTest");
+    }
+
+    @Test
+    public void componentDeclarationIsGenerated() throws Exception
+    {
+        assertEquals("expected a component declaration", 1, getChangesetForModule().getComponentDeclarations().size());
+    }
+    
+    @Test
+    public void componentDeclarationHasDefaultKey() throws Exception
+    {
+        assertEquals("custom-component", getChangesetForModule().getComponentDeclarations().get(0).getKey());
+    }
+    
+    @Test
+    public void componentDeclarationHasSpecifiedKey() throws Exception
+    {
+        props.setModuleKey("newkey");
+        assertEquals("newkey", getChangesetForModule().getComponentDeclarations().get(0).getKey());
+    }
+    
+    @Test
+    public void componentDeclarationHasName() throws Exception
+    {
+        assertEquals(some("Custom Component"), getChangesetForModule().getComponentDeclarations().get(0).getName());
+    }
+
+    @Test
+    public void componentDeclarationHasNameI18nKey() throws Exception
+    {
+        props.setNameI18nKey("name-key");
+        assertEquals(some("name-key"), getChangesetForModule().getComponentDeclarations().get(0).getNameI18nKey());
+    }
+
+    @Test
+    public void componentDeclarationHasClass() throws Exception
+    {
+        assertEquals(ClassId.packageAndClass(PACKAGE_NAME, "CustomComponent"), getChangesetForModule().getComponentDeclarations().get(0).getClassId());
+    }
+
+    @Test
+    public void componentDeclarationHasInterface() throws Exception
+    {
+        assertEquals(some(ClassId.packageAndClass(PACKAGE_NAME, "CustomInterface")), getChangesetForModule().getComponentDeclarations().get(0).getInterfaceId());
+    }
+
+    @Test
+    public void componentDeclarationHasDescription() throws Exception
+    {
+        props.setDescription("desc");
+        assertEquals(some("desc"), getChangesetForModule().getComponentDeclarations().get(0).getDescription());
+    }
+
+    @Test
+    public void componentDeclarationHasDescriptionI18nKey() throws Exception
+    {
+        props.setDescriptionI18nKey("desc-key");
+        assertEquals(some("desc-key"), getChangesetForModule().getComponentDeclarations().get(0).getDescriptionI18nKey());
+    }
+    
+    @Test
+    public void componentDeclarationHasServiceProperties() throws Exception
+    {
+        props.setServiceProps(ImmutableMap.of("prop1", "value1"));
+        assertEquals("value1", getChangesetForModule().getComponentDeclarations().get(0).getServiceProperties().get("prop1"));
+    }
 }

@@ -1,8 +1,12 @@
 package com.atlassian.plugins.codegen;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import com.atlassian.plugins.codegen.annotations.DependencyDescriptor;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreatorRegistry;
 
@@ -13,7 +17,6 @@ public class PluginModuleCreatorRegistryImpl implements PluginModuleCreatorRegis
 {
 
     private final Map<String, SortedMap<Class, PluginModuleCreator>> creatorRegistry;
-    private final Map<Class, List<DependencyDescriptor>> creatorDependencyMap;
 
     public PluginModuleCreatorRegistryImpl()
     {
@@ -25,8 +28,6 @@ public class PluginModuleCreatorRegistryImpl implements PluginModuleCreatorRegis
         creatorRegistry.put(PluginModuleCreatorRegistry.CROWD, new TreeMap<Class, PluginModuleCreator>(comparator));
         creatorRegistry.put(PluginModuleCreatorRegistry.FECRU, new TreeMap<Class, PluginModuleCreator>(comparator));
         creatorRegistry.put(PluginModuleCreatorRegistry.REFAPP, new TreeMap<Class, PluginModuleCreator>(comparator));
-
-        this.creatorDependencyMap = new HashMap<Class, List<DependencyDescriptor>>();
     }
 
     @Override
@@ -62,24 +63,6 @@ public class PluginModuleCreatorRegistryImpl implements PluginModuleCreatorRegis
         }
 
         return moduleMap;
-    }
-
-    @Override
-    public void registerModuleCreatorDependencies(Class creatorClass, List<DependencyDescriptor> dependencies)
-    {
-        creatorDependencyMap.put(creatorClass, dependencies);
-    }
-
-    @Override
-    public List<DependencyDescriptor> getDependenciesForCreatorClass(Class creatorClass)
-    {
-        if (!creatorDependencyMap.containsKey(creatorClass) || creatorDependencyMap.get(creatorClass)
-                .isEmpty())
-        {
-            return new ArrayList<DependencyDescriptor>();
-        }
-
-        return creatorDependencyMap.get(creatorClass);
     }
 
     private class ModuleNameComparator implements Comparator<Class>

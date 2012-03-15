@@ -1,14 +1,5 @@
 package com.atlassian.maven.plugins.amps.product.studio;
 
-import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STUDIO_JIRA;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.maven.plugin.MojoExecutionException;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
@@ -16,7 +7,17 @@ import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.product.JiraProductHandler;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import com.google.common.collect.Lists;
+import org.apache.maven.plugin.MojoExecutionException;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STUDIO_JIRA;
 
 /**
  * Handler for Studio-JIRA
@@ -39,7 +40,7 @@ public class StudioJiraProductHandler extends JiraProductHandler implements Stud
     @Override
     public ProductArtifact getArtifact()
     {
-        return new ProductArtifact("com.atlassian.studio", "studio-jira", "RELEASE");
+        return new ProductArtifact("com.atlassian.jira", "jira-ondemand-webapp", "RELEASE");
     }
 
     @Override
@@ -74,16 +75,17 @@ public class StudioJiraProductHandler extends JiraProductHandler implements Stud
         }
 
         StudioProductHandler.addProductHandlerOverrides(log, ctx, homeDir, explodedWarDir);
+    }
 
-        // JIRA needs a bit more PermGen - default is -Xmx512m -XX:MaxPermSize=160m
-        if (ctx.getJvmArgs() == null)
-        {
-            ctx.setJvmArgs("-Xms256m -Xmx768m -XX:MaxPermSize=512m");
-        }
-        else
-        {
-            ctx.setJvmArgs(ctx.getJvmArgs() + " -Xms256m -Xmx768m -XX:MaxPermSize=512m");
-        }
+    // JIRA needs a bit more heap and PermGen - default is -Xmx512m -XX:MaxPermSize=256m (see JvmArgsFix)
+    protected void fixJvmArgs(Product ctx)
+    {
+        final String jvmArgs = JvmArgsFix.empty()
+                .with("-Xms", "256m")
+                .with("-Xmx", "768m")
+                .with("-XX:MaxPermSize=", "512m")
+                .apply(ctx.getJvmArgs());
+        ctx.setJvmArgs(jvmArgs);
     }
 
     @Override

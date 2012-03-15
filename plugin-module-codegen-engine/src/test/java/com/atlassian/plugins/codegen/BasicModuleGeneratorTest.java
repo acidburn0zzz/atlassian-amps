@@ -2,6 +2,7 @@ package com.atlassian.plugins.codegen;
 
 import java.util.Set;
 
+import com.atlassian.plugins.codegen.annotations.asm.ModuleCreatorAnnotationParser;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreatorRegistry;
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletFilterModuleCreator;
 import com.atlassian.plugins.codegen.modules.jira.WorkflowPostFunctionModuleCreator;
@@ -15,10 +16,16 @@ import static org.junit.Assert.assertTrue;
  */
 public class BasicModuleGeneratorTest extends AbstractCodegenTestCase
 {
-
     @Test
     public void hasCommonModules() throws Exception
     {
+        PluginModuleCreatorRegistry pluginModuleCreatorRegistry;
+        ModuleCreatorAnnotationParser parser;
+
+        pluginModuleCreatorRegistry = new PluginModuleCreatorRegistryImpl();
+        parser = new ModuleCreatorAnnotationParser(pluginModuleCreatorRegistry);
+        parser.parse();
+        
         Set<Class> moduleKeys = pluginModuleCreatorRegistry.getModuleCreatorsForProduct(PluginModuleCreatorRegistry.JIRA)
                 .keySet();
         assertTrue(moduleKeys.contains(WorkflowPostFunctionModuleCreator.class));

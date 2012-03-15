@@ -1,68 +1,64 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
-import java.io.File;
+import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
-import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-
-import org.dom4j.Document;
-import org.dom4j.Node;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @since 3.6
  */
-public class WorkflowValidatorTest extends AbstractCodegenTestCase<WorkflowElementProperties>
+public class WorkflowValidatorTest extends AbstractModuleCreatorTestCase<WorkflowElementProperties>
 {
-    public static final String PACKAGE_NAME = "com.atlassian.plugins.jira.workflow";
-    public static final String XPATH = "/atlassian-plugin/workflow-validator[@name='My Workflow Validator' and @key='my-workflow-validator' and @i18n-name-key='my-workflow-validator.name' and @class='" + PACKAGE_NAME + ".MyWorkflowValidatorFactory']";
-
-    protected File templatePath;
-
+    public WorkflowValidatorTest()
+    {
+        super("workflow-validator", new WorkflowValidatorModuleCreator());
+    }
 
     @Before
-    public void runGenerator() throws Exception
+    public void setupProps() throws Exception
     {
-        setCreator(new WorkflowValidatorModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
-
         setProps(new WorkflowElementProperties(PACKAGE_NAME + ".MyWorkflowValidator"));
-
         props.setIncludeExamples(false);
-
-        templatePath = new File(templateDir, "validators");
     }
 
     @Test
-    public void moduleIsValid() throws Exception
+    public void classFileIsGenerated() throws Exception
     {
-
-        creator.createModule(moduleLocation, props);
-        Document pluginDoc = getXmlDocument(pluginXml);
-        Node moduleNode = pluginDoc.selectSingleNode(XPATH);
-
-        assertNotNull("valid workflow-validator not found", moduleNode);
+        getSourceFile(PACKAGE_NAME, "MyWorkflowValidator");
     }
 
     @Test
-    public void moduleHasCondition() throws Exception
+    public void factoryClassFileIsGenerated() throws Exception
     {
-
-        creator.createModule(moduleLocation, props);
-        Document pluginDoc = getXmlDocument(pluginXml);
-        Node moduleNode = pluginDoc.selectSingleNode(XPATH);
-
-        String subXpath = "validator-class[text() = '" + PACKAGE_NAME + ".MyWorkflowValidator']";
-
-        assertNotNull("valid workflow-validator not found", moduleNode);
-        assertNotNull("valid validator-class not found", moduleNode.selectSingleNode(subXpath));
+        getSourceFile(PACKAGE_NAME, "MyWorkflowValidatorFactory");
     }
-
+    
+    @Test
+    public void unitTestFileIsGenerated() throws Exception
+    {
+        getTestSourceFile(PACKAGE_NAME, "MyWorkflowValidatorTest");
+    }
+   
+    @Test
+    public void moduleHasDefaultKey() throws Exception
+    {
+        assertEquals("my-workflow-validator",
+                     getGeneratedModule().attributeValue("key"));
+    }
+    
+    @Test
+    public void moduleHasClass() throws Exception
+    {
+        assertEquals(PACKAGE_NAME + ".MyWorkflowValidatorFactory",
+                     getGeneratedModule().attributeValue("class"));
+    }
+    
+    @Test
+    public void moduleHasValidatorClass() throws Exception
+    {
+        assertEquals(PACKAGE_NAME + ".MyWorkflowValidator", getGeneratedModule().selectSingleNode("validator-class").getText());
+    }
 }

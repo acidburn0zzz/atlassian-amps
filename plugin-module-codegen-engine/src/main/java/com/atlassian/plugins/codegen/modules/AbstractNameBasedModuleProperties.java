@@ -1,8 +1,8 @@
 package com.atlassian.plugins.codegen.modules;
 
-import java.util.Properties;
-
 import com.atlassian.plugins.codegen.util.ClassnameUtil;
+
+import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -91,12 +91,11 @@ public abstract class AbstractNameBasedModuleProperties extends AbstractPluginMo
     }
 
     @Override
-    public Properties getI18nProperties()
+    public ImmutableMap<String, String> getI18nProperties()
     {
-        Properties props = super.getI18nProperties();
-        props.setProperty(getProperty(NAME_I18N_KEY), getProperty(MODULE_NAME));
-        props.setProperty(getProperty(DESCRIPTION_I18N_KEY), getProperty(DESCRIPTION));
-
-        return props;
+        return ImmutableMap.<String, String>builder().putAll(super.getI18nProperties())
+                .put(NAME_I18N_KEY, getProperty(MODULE_NAME))
+                .put(DESCRIPTION_I18N_KEY, getProperty(DESCRIPTION))
+                .build();
     }
 }

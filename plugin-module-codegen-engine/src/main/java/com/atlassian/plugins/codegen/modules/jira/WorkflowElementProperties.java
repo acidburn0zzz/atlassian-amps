@@ -1,8 +1,11 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
+import com.atlassian.plugins.codegen.ClassId;
 import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
 
 import org.apache.commons.lang.StringUtils;
+
+import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
 
 /**
  * @since 3.6
@@ -12,6 +15,8 @@ public class WorkflowElementProperties extends BasicClassModuleProperties
     public static final String FQ_FACTORY_NAME = "FQ_FACTORY_NAME";
     public static final String FACTORY_NAME = "FACTORY_NAME";
 
+    private ClassId factoryClassId;
+    
     public WorkflowElementProperties()
     {
         this("MyWorkflowElement");
@@ -31,27 +36,23 @@ public class WorkflowElementProperties extends BasicClassModuleProperties
 
     public void setFullyQualifiedFactoryName(String fqName)
     {
+        factoryClassId = fullyQualified(fqName);
         setProperty(FQ_FACTORY_NAME, fqName);
-        String classname;
-
-        if (fqName.lastIndexOf(".") > 0)
-        {
-            classname = StringUtils.substringAfterLast(fqName, ".");
-        } else
-        {
-            classname = fqName;
-        }
-
-        setProperty(FACTORY_NAME, classname);
+        setProperty(FACTORY_NAME, factoryClassId.getName());
     }
 
+    public ClassId getFactoryClassId()
+    {
+        return factoryClassId;
+    }
+    
     public String getFullyQualifiedFactoryName()
     {
-        return getProperty(FQ_FACTORY_NAME);
+        return factoryClassId.getFullName();
     }
 
     public String getFactoryName()
     {
-        return getProperty(FACTORY_NAME);
+        return factoryClassId.getName();
     }
 }

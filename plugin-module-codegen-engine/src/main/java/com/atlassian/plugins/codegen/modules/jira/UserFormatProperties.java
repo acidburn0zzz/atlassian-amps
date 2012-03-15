@@ -2,10 +2,11 @@ package com.atlassian.plugins.codegen.modules.jira;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.Resource;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * @since 3.6
@@ -71,15 +72,13 @@ public class UserFormatProperties extends BasicClassModuleProperties
     }
 
     @Override
-    public Properties getI18nProperties()
+    public ImmutableMap<String, String> getI18nProperties()
     {
-        Properties props = super.getI18nProperties();
-
         if (containsKey(TYPE_KEY) && containsKey(TYPE_NAME))
         {
-            props.setProperty(getProperty(TYPE_KEY), getProperty(TYPE_NAME));
+            return ImmutableMap.<String, String>builder().putAll(super.getI18nProperties())
+                .put(getProperty(TYPE_KEY), getProperty(TYPE_NAME)).build();
         }
-
-        return props;
+        return super.getI18nProperties();
     }
 }

@@ -1,61 +1,38 @@
 package com.atlassian.plugins.codegen.modules.common;
 
-import java.io.File;
+import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
-import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-
-import org.apache.commons.io.FilenameUtils;
-import org.dom4j.Document;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @since 3.6
  */
-public class GadgetTest extends AbstractCodegenTestCase<GadgetProperties>
+public class GadgetTest extends AbstractModuleCreatorTestCase<GadgetProperties>
 {
-
+    public GadgetTest()
+    {
+        super("gadget", new GadgetModuleCreator());
+    }
+    
     @Before
-    public void runGenerator() throws Exception
+    public void setupProps() throws Exception
     {
-        setCreator(new GadgetModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
-
         setProps(new GadgetProperties("My Gadget", "gadgets/mygadget/gadget.xml"));
-
         props.setIncludeExamples(false);
-
-        creator.createModule(moduleLocation, props);
     }
 
     @Test
-    public void allFilesAreGenerated() throws Exception
+    public void gadgetFileIsGenerated() throws Exception
     {
-
-        File gadgetFolder = new File(resourcesDir, FilenameUtils.getPath(props.getLocation()));
-
-        assertTrue("main gadget not generated", new File(gadgetFolder, FilenameUtils.getName(props.getLocation())).exists());
-        assertTrue("plugin.xml not generated", new File(resourcesDir, "atlassian-plugin.xml").exists());
-
+        getResourceFile("gadgets/mygadget", "gadget.xml");
     }
 
     @Test
-    public void moduleIsValid() throws Exception
+    public void moduleHasLocation() throws Exception
     {
-        String xpath = "/atlassian-plugin/gadget[@name='My Gadget' and @key='my-gadget' and @i18n-name-key='my-gadget.name' and @location='" + props.getLocation() + "']";
-
-
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("valid gadget not found", pluginDoc.selectSingleNode(xpath));
+        assertEquals("gadgets/mygadget/gadget.xml", getGeneratedModule().attributeValue("location"));
     }
-
 }

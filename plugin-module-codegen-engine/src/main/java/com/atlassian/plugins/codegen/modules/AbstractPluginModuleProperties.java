@@ -1,6 +1,10 @@
 package com.atlassian.plugins.codegen.modules;
 
+import java.util.Map;
 import java.util.Properties;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 /**
  * @since 3.6
@@ -9,12 +13,12 @@ public abstract class AbstractPluginModuleProperties extends Properties implemen
 {
 
     protected boolean includeExamples;
-    protected Properties i18nProperties;
+    protected Map<String, String> i18nProperties;
 
     protected AbstractPluginModuleProperties()
     {
         super();
-        i18nProperties = new Properties();
+        i18nProperties = Maps.newHashMap();
         includeExamples = false;
         setProductId("RefApp");
     }
@@ -46,13 +50,13 @@ public abstract class AbstractPluginModuleProperties extends Properties implemen
     @Override
     public void addI18nProperty(String name, String value)
     {
-        i18nProperties.setProperty(name, value);
+        i18nProperties.put(name, value);
     }
 
     @Override
-    public Properties getI18nProperties()
+    public ImmutableMap<String, String> getI18nProperties()
     {
-        return i18nProperties;
+        return ImmutableMap.copyOf(i18nProperties);
     }
 
 }

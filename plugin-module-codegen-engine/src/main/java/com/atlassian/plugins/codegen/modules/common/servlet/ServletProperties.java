@@ -13,6 +13,8 @@ public class ServletProperties extends BasicClassModuleProperties
     public static final String URL_PATTERN = "URL_PATTERN";
     public static final String INIT_PARAMS = "INIT_PARAMS";
 
+    private boolean createClass = true;
+    
     public ServletProperties()
     {
         this("MyServlet");
@@ -27,6 +29,16 @@ public class ServletProperties extends BasicClassModuleProperties
         setUrlPattern("/" + getProperty(CLASSNAME).toLowerCase());
     }
 
+    public boolean isCreateClass()
+    {
+        return createClass;
+    }
+    
+    public void setCreateClass(boolean createClass)
+    {
+        this.createClass = createClass;
+    }
+    
     public void setUrlPattern(String pattern)
     {
         setProperty(URL_PATTERN, pattern);

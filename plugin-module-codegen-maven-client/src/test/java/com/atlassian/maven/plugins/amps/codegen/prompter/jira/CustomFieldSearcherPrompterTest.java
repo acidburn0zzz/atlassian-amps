@@ -74,8 +74,8 @@ public class CustomFieldSearcherPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         CustomFieldSearcherProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong class", "TextSearcher", props.getClassname());
-        assertEquals("wrong class package", "com.atlassian.jira.issue.customfields.searchers", props.getPackage());
+        assertEquals("wrong class", "TextSearcher", props.getClassId().getName());
+        assertEquals("wrong class package", "com.atlassian.jira.issue.customfields.searchers", props.getClassId().getPackage());
         assertEquals("wrong module name", "Text Searcher", props.getModuleName());
         assertEquals("wrong module key", "text-searcher", props.getModuleKey());
         assertEquals("wrong i18n name key", "text-searcher.name", props.getNameI18nKey());
@@ -110,8 +110,8 @@ public class CustomFieldSearcherPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         CustomFieldSearcherProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong class", "TextSearcher", props.getClassname());
-        assertEquals("wrong class package", "com.atlassian.jira.issue.customfields.searchers", props.getPackage());
+        assertEquals("wrong class", "TextSearcher", props.getClassId().getName());
+        assertEquals("wrong class package", "com.atlassian.jira.issue.customfields.searchers", props.getClassId().getPackage());
         assertEquals("wrong adv module name", ADV_MODULE_NAME, props.getModuleName());
         assertEquals("wrong adv module key", ADV_MODULE_KEY, props.getModuleKey());
         assertEquals("wrong adv description", ADV_DESCRIPTION, props.getDescription());

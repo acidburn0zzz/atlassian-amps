@@ -1,20 +1,15 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
-import java.io.File;
-
-import com.atlassian.plugins.codegen.annotations.Dependencies;
-import com.atlassian.plugins.codegen.annotations.Dependency;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+
+import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 
 /**
  *
  */
 @JiraPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-})
 public class WorkflowPostFunctionModuleCreator extends AbstractPluginModuleCreator<WorkflowPostFunctionProperties>
 {
     public static final String MODULE_NAME = "Workflow Post Function";
@@ -26,29 +21,22 @@ public class WorkflowPostFunctionModuleCreator extends AbstractPluginModuleCreat
     private static final String VIEW_TEMPLATE = TEMPLATE_PREFIX + "post-function.vm.vtl";
     private static final String INPUT_TEMPLATE = TEMPLATE_PREFIX + "post-function-input.vm.vtl";
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "post-function-plugin.xml.vtl";
-
+    private static final String TEMPLATE_PATH = "postfunctions";
+    
     @Override
-    public void createModule(PluginModuleLocation location, WorkflowPostFunctionProperties props) throws Exception
+    public PluginProjectChangeset createModule(WorkflowPostFunctionProperties props) throws Exception
     {
+        PluginProjectChangeset ret = new PluginProjectChangeset()
+            .withDependencies(MOCKITO_TEST)
+            .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
+
         String moduleKey = props.getModuleKey();
         String viewFileName = moduleKey + ".vm";
         String inputFileName = moduleKey + "-input.vm";
-        String packageName = props.getPackage();
-        String functionClass = props.getClassname();
-        String factoryClass = props.getFactoryName();
-
-        File templatesDir = new File(location.getTemplateDirectory(), "postfunctions");
-
-        templateHelper.writeJavaClassFromTemplate(CLASS_TEMPLATE, functionClass, location.getSourceDirectory(), packageName, props);
-        templateHelper.writeJavaClassFromTemplate(FACTORY_TEMPLATE, factoryClass, location.getSourceDirectory(), packageName, props);
-
-        //unit test
-        templateHelper.writeJavaClassFromTemplate(UNIT_TEST_TEMPLATE, testClassname(functionClass), location.getTestDirectory(), packageName, props);
-        templateHelper.writeFileFromTemplate(VIEW_TEMPLATE, viewFileName, templatesDir, props);
-        templateHelper.writeFileFromTemplate(INPUT_TEMPLATE, inputFileName, templatesDir, props);
-
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
-
+        return ret.with(createClassAndTests(props, CLASS_TEMPLATE, UNIT_TEST_TEMPLATE))
+            .with(createClass(props, props.getFactoryClassId(), FACTORY_TEMPLATE))
+            .with(createTemplateResource(props, TEMPLATE_PATH, viewFileName, VIEW_TEMPLATE))
+            .with(createTemplateResource(props, TEMPLATE_PATH, inputFileName, INPUT_TEMPLATE));
     }
 
     @Override

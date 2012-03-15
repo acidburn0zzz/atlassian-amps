@@ -66,8 +66,8 @@ public class ReportPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         ReportProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong class", CLASSNAME, props.getClassname());
-        assertEquals("wrong class package", PACKAGE, props.getPackage());
+        assertEquals("wrong class", CLASSNAME, props.getClassId().getName());
+        assertEquals("wrong class package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
         assertEquals("wrong module key", MODULE_KEY, props.getModuleKey());
         assertEquals("wrong description", DESCRIPTION, props.getDescription());
@@ -107,8 +107,8 @@ public class ReportPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         ReportProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong adv class", CLASSNAME, props.getClassname());
-        assertEquals("wrong adv package", PACKAGE, props.getPackage());
+        assertEquals("wrong adv class", CLASSNAME, props.getClassId().getName());
+        assertEquals("wrong adv package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong adv module name", ADV_MODULE_NAME, props.getModuleName());
         assertEquals("wrong adv module key", ADV_MODULE_KEY, props.getModuleKey());
         assertEquals("wrong adv description", ADV_DESCRIPTION, props.getDescription());

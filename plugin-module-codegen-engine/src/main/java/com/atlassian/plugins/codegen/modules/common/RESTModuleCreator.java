@@ -1,8 +1,20 @@
 package com.atlassian.plugins.codegen.modules.common;
 
-import com.atlassian.plugins.codegen.annotations.*;
+import com.atlassian.plugins.codegen.ClassId;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
+import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+
+import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
+import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.PROVIDED;
+import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.TEST;
+import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
+import static com.atlassian.plugins.codegen.modules.Dependencies.SERVLET_API;
 
 /**
  * @since 3.6
@@ -13,17 +25,8 @@ import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 @BambooPluginModuleCreator
 @FeCruPluginModuleCreator
 @CrowdPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-        , @Dependency(groupId = "javax.ws.rs", artifactId = "jsr311-api", version = "1.0", scope = "provided")
-        , @Dependency(groupId = "javax.xml.bind", artifactId = "jaxb-api", version = "2.1", scope = "provided")
-        , @Dependency(groupId = "com.atlassian.plugins.rest", artifactId = "atlassian-rest-common", version = "1.0.2", scope = "provided")
-        , @Dependency(groupId = "javax.servlet", artifactId = "servlet-api", version = "2.4", scope = "provided")
-        , @Dependency(groupId = "org.apache.wink", artifactId = "wink-client", version = "1.1.3-incubating", scope = "test")
-})
 public class RESTModuleCreator extends AbstractPluginModuleCreator<RESTProperties>
 {
-
     public static final String MODULE_NAME = "REST Plugin Module";
     private static final String TEMPLATE_PREFIX = "templates/common/rest/";
 
@@ -39,35 +42,31 @@ public class RESTModuleCreator extends AbstractPluginModuleCreator<RESTPropertie
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "rest-plugin.xml.vtl";
 
     @Override
-    public void createModule(PluginModuleLocation location, RESTProperties props) throws Exception
+    public PluginProjectChangeset createModule(RESTProperties props) throws Exception
     {
-        String packageName = props.getPackage();
-
-        String classname = props.getClassname();
-        String modelClassname = classname + "Model";
+        PluginProjectChangeset ret = new PluginProjectChangeset()
+            .withDependencies(SERVLET_API,
+                                      dependency("javax.ws.rs", "jsr311-api", "1.0", PROVIDED),
+                                      dependency("javax.xml.bind", "jaxb-api", "2.1", PROVIDED),
+                                      dependency("com.atlassian.plugins.rest", "atlassian-rest-common", "1.0.2", PROVIDED),
+                                      dependency("com.atlassian.sal", "sal-api", "2.6.0", PROVIDED),
+                                      dependency("org.apache.wink", "wink-client", "1.1.3-incubating", TEST),
+                                      MOCKITO_TEST)
+            .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
+        
+        ClassId mainClass = props.getClassId();
 
         if (props.includeExamples())
         {
-            templateHelper.writeJavaClassFromTemplate(EXAMPLE_CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-        } else
-        {
-            //main class
-            templateHelper.writeJavaClassFromTemplate(CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-
-            //model class
-            templateHelper.writeJavaClassFromTemplate(MODEL_TEMPLATE, modelClassname, location.getSourceDirectory(), packageName, props);
-
-            //unit test
-            templateHelper.writeJavaClassFromTemplate(UNIT_TEST_TEMPLATE, testClassname(classname), location.getTestDirectory(), packageName, props);
-
-            //func test
-            templateHelper.writeJavaClassFromTemplate(FUNC_TEST_TEMPLATE, funcTestClassname(classname), location.getTestDirectory(), funcTestPackageName(packageName), props);
+            return ret.with(createClass(props, EXAMPLE_CLASS_TEMPLATE));
         }
-
-
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
+        else
+        {
+            ClassId modelClass = mainClass.classNameSuffix("Model");
+            return ret.with(createClassAndTests(props, CLASS_TEMPLATE, UNIT_TEST_TEMPLATE, FUNC_TEST_TEMPLATE))
+                .with(createClass(props, modelClass, MODEL_TEMPLATE));
+        }
     }
-
 
     @Override
     public String getModuleName()

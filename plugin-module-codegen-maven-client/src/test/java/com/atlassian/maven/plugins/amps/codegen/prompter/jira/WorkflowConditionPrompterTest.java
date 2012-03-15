@@ -57,9 +57,9 @@ public class WorkflowConditionPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         WorkflowElementProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong condition class", CLASSNAME, props.getClassname());
+        assertEquals("wrong condition class", CLASSNAME, props.getClassId().getName());
         assertEquals("wrong factory class", FACTORY_CLASSNAME, props.getFactoryName());
-        assertEquals("wrong class package", PACKAGE, props.getPackage());
+        assertEquals("wrong class package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
         assertEquals("wrong module key", MODULE_KEY, props.getModuleKey());
         assertEquals("wrong description", DESCRIPTION, props.getDescription());
@@ -86,7 +86,7 @@ public class WorkflowConditionPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         WorkflowElementProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong condition class", CLASSNAME, props.getClassname());
+        assertEquals("wrong condition class", CLASSNAME, props.getClassId().getName());
         assertEquals("wrong factory class", FACTORY_CLASSNAME, props.getFactoryName());
         assertEquals("wrong adv module name", ADV_MODULE_NAME, props.getModuleName());
         assertEquals("wrong adv module key", ADV_MODULE_KEY, props.getModuleKey());

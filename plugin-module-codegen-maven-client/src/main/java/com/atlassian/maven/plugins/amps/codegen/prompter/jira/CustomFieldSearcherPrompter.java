@@ -36,7 +36,7 @@ public class CustomFieldSearcherPrompter extends AbstractResourcePrompter<Custom
     {
 
         CustomFieldSearcherProperties props = new CustomFieldSearcherProperties(promptForSearcherClass());
-        if (props.getPackage()
+        if (props.getClassId().getPackage()
                 .equals("com.atlassian.jira.issue.customfields.searchers"))
         {
             props.setGenerateClass(false);

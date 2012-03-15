@@ -18,6 +18,7 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 
+import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
@@ -166,6 +167,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
             {
                 addOverrides(appDir, ctx);
                 customiseInstance(ctx, homeDir, appDir);
+                fixJvmArgs(ctx);
             }
             catch (IOException e)
             {
@@ -203,6 +205,17 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     protected void customiseInstance(Product ctx, File homeDir, File explodedWarDir) throws MojoExecutionException
     {
         // No operation by default
+    }
+
+    /**
+     * Fix jvmArgs, providing necessary defaults.
+     * @param ctx Product to fix jvmArgs for
+     */
+    protected void fixJvmArgs(Product ctx)
+    {
+        final String jvmArgs = JvmArgsFix.defaults()
+                .apply(ctx.getJvmArgs());
+        ctx.setJvmArgs(jvmArgs);
     }
 
     private void addArtifacts(final Product ctx, final File homeDir, final File appDir)

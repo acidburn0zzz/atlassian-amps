@@ -1,136 +1,140 @@
 package com.atlassian.plugins.codegen.modules.common;
 
-import java.util.List;
-
 import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 
-import org.dom4j.Document;
-import org.dom4j.Node;
+import org.dom4j.Element;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @since 3.6
  */
 public class DownloadablePluginResourceTest extends AbstractCodegenTestCase<DownloadablePluginResourceProperties>
 {
-
-    public static final String XPATH_RESOURCE = "/atlassian-plugin/resource";
-    public static final String XPATH_PARAM_RELATIVE = "param";
-
-    /*
-        The base module creator auto-adds an i18n resource, and so all of our tests need to add 1 to their counts
-     */
-
+    protected Resource cssResource;
+    protected Resource cssNamePatternResource;
+    
     @Before
-    public void setupCreator() throws Exception
+    public void setup()
     {
         setCreator(new DownloadablePluginResourceModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
+        
+        cssResource = new Resource();
+        cssResource.setName("style.css");
+        cssResource.setLocation("com/example/plugin/style.css");
+        cssResource.setType("download");
+
+        cssNamePatternResource = new Resource();
+        cssNamePatternResource.setNamePattern("*.css");
+        cssNamePatternResource.setLocation("com/example/plugin");
+        cssNamePatternResource.setType("download");
+        
+        setProps(new DownloadablePluginResourceProperties(cssResource));
+    }
+    
+    @Test
+    public void resourceIsAdded() throws Exception
+    {
+        getGeneratedModule();
+    }
+    
+    @Test
+    public void resourceHasName() throws Exception
+    {
+        assertEquals("style.css", getGeneratedModule().attributeValue("name"));
     }
 
     @Test
-    public void singleResourceAdded() throws Exception
+    public void resourceHasLocation() throws Exception
     {
-        Resource resource = new Resource();
-        resource.setName("style.css");
-        resource.setLocation("com/example/plugin/style.css");
-        resource.setType("download");
-
-        setProps(new DownloadablePluginResourceProperties(resource));
-        creator.createModule(moduleLocation, props);
-
-        Document pluginDoc = getXmlDocument(pluginXml);
-        List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
-
-        assertEquals("expected single resource", 2, resourceList.size());
-
-        String nodeXpath = "//resource[@name='style.css' and @location='com/example/plugin/style.css' and @type='download']";
-        assertNotNull("single resource not found", pluginDoc.selectSingleNode(nodeXpath));
-
+        assertEquals("com/example/plugin/style.css", getGeneratedModule().attributeValue("location"));
+    }
+    
+    @Test
+    public void resourceHasType() throws Exception
+    {
+        assertEquals("download", getGeneratedModule().attributeValue("type"));
     }
 
     @Test
-    public void singleResourceNamePatternAdded() throws Exception
+    public void namePatternResourceAdded() throws Exception
     {
-        Resource resource = new Resource();
-        resource.setNamePattern("*.css");
-        resource.setLocation("com/example/plugin/style.css");
-        resource.setType("download");
+        setProps(new DownloadablePluginResourceProperties(cssNamePatternResource));
 
-        setProps(new DownloadablePluginResourceProperties(resource));
-        creator.createModule(moduleLocation, props);
-
-        Document pluginDoc = getXmlDocument(pluginXml);
-        List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
-
-        assertEquals("expected single resource", 2, resourceList.size());
-
-        String nodeXpath = "//resource[@namePattern='*.css' and @location='com/example/plugin/style.css' and @type='download']";
-        assertNotNull("single resource not found", pluginDoc.selectSingleNode(nodeXpath));
-
+        getGeneratedModule();
+    }
+    
+    @Test
+    public void namePatternResourceHasNamePattern() throws Exception
+    {
+        setProps(new DownloadablePluginResourceProperties(cssNamePatternResource));
+        
+        assertEquals("*.css", getGeneratedModule().attributeValue("namePattern"));
     }
 
     @Test
-    public void nameChosenOverPattern() throws Exception
+    public void namePatternResourceHasLocation() throws Exception
     {
-        Resource resource = new Resource();
-        resource.setName("style.css");
-        resource.setNamePattern("*.css");
-        resource.setLocation("com/example/plugin/style.css");
-        resource.setType("download");
-
-        setProps(new DownloadablePluginResourceProperties(resource));
-        creator.createModule(moduleLocation, props);
-
-        Document pluginDoc = getXmlDocument(pluginXml);
-        List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
-
-        assertEquals("expected single resource", 2, resourceList.size());
-
-        String nodeXpath = "//resource[not(@namePattern) and @name='style.css' and @location='com/example/plugin/style.css' and @type='download']";
-        assertNotNull("single resource not found", pluginDoc.selectSingleNode(nodeXpath));
-
+        setProps(new DownloadablePluginResourceProperties(cssNamePatternResource));
+        
+        assertEquals("com/example/plugin", getGeneratedModule().attributeValue("location"));
     }
 
     @Test
-    public void resourceParamsAdded() throws Exception
+    public void namePatternResourceHasType() throws Exception
     {
-        Resource resource = new Resource();
-        resource.setName("style.css");
-        resource.setLocation("com/example/plugin/style.css");
-        resource.setType("download");
-        resource.getParams()
-                .put("content-type", "text/css");
-        resource.getParams()
-                .put("awesome", "me");
+        setProps(new DownloadablePluginResourceProperties(cssNamePatternResource));
 
-        setProps(new DownloadablePluginResourceProperties(resource));
-        creator.createModule(moduleLocation, props);
-
-        Document pluginDoc = getXmlDocument(pluginXml);
-        List<Node> resourceList = pluginDoc.selectNodes(XPATH_RESOURCE);
-
-        assertEquals("expected single resource", 2, resourceList.size());
-
-        String nodeXpath = "//resource[not(@namePattern) and @name='style.css' and @location='com/example/plugin/style.css' and @type='download']";
-        Node resourceNode = pluginDoc.selectSingleNode(nodeXpath);
-
-        List<Node> paramList = resourceNode.selectNodes(XPATH_PARAM_RELATIVE);
-        assertEquals("expected resource params", 2, paramList.size());
-
-        assertNotNull("missing content param", resourceNode.selectSingleNode("param[@name='content-type' and @value='text/css']"));
-        assertNotNull("missing awesome param", resourceNode.selectSingleNode("param[@name='awesome' and @value='me']"));
-
+        assertEquals("download", getGeneratedModule().attributeValue("type"));
     }
 
+    @Test
+    public void resourceNameChosenOverPattern() throws Exception
+    {
+        cssResource.setNamePattern("*.css");
 
+        assertNull(getGeneratedModule().attributeValue("namePattern"));
+    }
+
+    @Test
+    public void resourceParamHasName() throws Exception
+    {
+        cssResource.getParams().put("content-type", "text/css");
+
+        assertEquals("content-type", getGeneratedModule().selectSingleNode("param/@name").getText());
+    }
+
+    @Test
+    public void resourceParamHasValue() throws Exception
+    {
+        cssResource.getParams().put("content-type", "text/css");
+
+        assertEquals("text/css", getGeneratedModule().selectSingleNode("param/@value").getText());
+    }
+    
+    @Test
+    public void secondResourceParamAdded() throws Exception
+    {
+        cssResource.getParams().put("content-type", "text/css");
+        cssResource.getParams().put("awesome", "me");
+        
+        assertEquals("me", getGeneratedModule().selectSingleNode("param[@name='awesome']/@value").getText());
+    }
+
+    @Test
+    public void allResourceParamsAdded() throws Exception
+    {
+        cssResource.getParams().put("content-type", "text/css");
+        cssResource.getParams().put("awesome", "me");
+        
+        assertEquals(2, getGeneratedModule().selectNodes("param").size());
+    }
+    
+    protected Element getGeneratedModule() throws Exception
+    {
+        return getGeneratedModule("resource");
+    }
 }

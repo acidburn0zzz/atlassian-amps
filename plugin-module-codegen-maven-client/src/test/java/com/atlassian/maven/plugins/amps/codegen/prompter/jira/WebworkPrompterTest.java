@@ -87,8 +87,8 @@ public class WebworkPrompterTest extends AbstractPrompterTest
 
         ActionProperties action = props.getActions()
                 .get(0);
-        assertEquals("wrong action package", DEFAULT_ACTION_PACKAGE, action.getPackage());
-        assertEquals("wrong action classname", DEFAULT_ACTION_NAME, action.getClassname());
+        assertEquals("wrong action package", DEFAULT_ACTION_PACKAGE, action.getClassId().getPackage());
+        assertEquals("wrong action classname", DEFAULT_ACTION_NAME, action.getClassId().getName());
         assertEquals("wrong action alias", DEFAULT_ACTION_ALIAS, action.getAlias());
 
         assertEquals("wrong number of views", 3, action.getViews()
@@ -163,12 +163,12 @@ public class WebworkPrompterTest extends AbstractPrompterTest
         ActionProperties actionTwo = props.getActions()
                 .get(1);
 
-        assertEquals("wrong action package", CUSTOM_ACTION_PACKAGE, actionOne.getPackage());
-        assertEquals("wrong action classname", CUSTOM_ACTION_ONE_NAME, actionOne.getClassname());
+        assertEquals("wrong action package", CUSTOM_ACTION_PACKAGE, actionOne.getClassId().getPackage());
+        assertEquals("wrong action classname", CUSTOM_ACTION_ONE_NAME, actionOne.getClassId().getName());
         assertEquals("wrong action alias", CUSTOM_ACTION_ONE_ALIAS, actionOne.getAlias());
 
-        assertEquals("wrong action package", CUSTOM_ACTION_PACKAGE, actionOne.getPackage());
-        assertEquals("wrong action classname", CUSTOM_ACTION_TWO_NAME, actionTwo.getClassname());
+        assertEquals("wrong action package", CUSTOM_ACTION_PACKAGE, actionTwo.getClassId().getPackage());
+        assertEquals("wrong action classname", CUSTOM_ACTION_TWO_NAME, actionTwo.getClassId().getName());
         assertEquals("wrong action alias", CUSTOM_ACTION_TWO_ALIAS, actionTwo.getAlias());
 
         assertEquals("wrong number of action one views", 2, actionOne.getViews()
