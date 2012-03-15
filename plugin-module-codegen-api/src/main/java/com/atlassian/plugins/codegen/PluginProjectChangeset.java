@@ -19,21 +19,25 @@ import static com.google.common.collect.Maps.newHashMap;
 public final class PluginProjectChangeset
 {
     private final MavenProjectChangeset mavenProject;
+    private final AmpsConfigChangeset ampsConfig;
     private final PluginXmlChangeset pluginXml;
     private final ProjectFilesChangeset projectFiles;
     
     public PluginProjectChangeset()
     {
         this(new MavenProjectChangeset(),
+             new AmpsConfigChangeset(),
              new PluginXmlChangeset(),
              new ProjectFilesChangeset());
     }
     
     private PluginProjectChangeset(MavenProjectChangeset mavenProject,
+                                   AmpsConfigChangeset ampsConfig,
                                    PluginXmlChangeset pluginXml,
                                    ProjectFilesChangeset projectFiles)
     {
         this.mavenProject = mavenProject;
+        this.ampsConfig = ampsConfig;
         this.pluginXml = pluginXml;
         this.projectFiles = projectFiles;
     }
@@ -43,7 +47,16 @@ public final class PluginProjectChangeset
      */
     public ImmutableList<BundleInstruction> getBundleInstructions()
     {
-        return mavenProject.bundleInstructions;
+        return ampsConfig.bundleInstructions;
+    }
+
+    /**
+     * Returns the {@link PluginArtifact} items, if any, that should be added
+     * to the &lt;bundledArtifacts&gt; list in the project's AMPS configuration.
+     */
+    public ImmutableList<PluginArtifact> getBundledArtifacts()
+    {
+        return ampsConfig.bundledArtifacts;
     }
 
     /**
@@ -78,6 +91,14 @@ public final class PluginProjectChangeset
         return projectFiles.i18nProperties;
     }
 
+    /**
+     * Returns the {@link MavenPlugin} objects for this changeset.
+     */
+    public ImmutableList<MavenPlugin> getMavenPlugins()
+    {
+        return mavenProject.mavenPlugins;
+    }
+    
     /**
      * Returns the {@link ModuleDescriptor} objects for this changeset.
      */
@@ -117,6 +138,7 @@ public final class PluginProjectChangeset
     public PluginProjectChangeset with(PluginProjectChangeset other)
     {
         return new PluginProjectChangeset(mavenProject.with(other.mavenProject),
+                                          ampsConfig.with(other.ampsConfig),
                                           pluginXml.with(other.pluginXml),
                                           projectFiles.with(other.projectFiles));
     }
@@ -127,6 +149,7 @@ public final class PluginProjectChangeset
     public PluginProjectChangeset withDependencies(ArtifactDependency... dependencies)
     {
         return new PluginProjectChangeset(mavenProject.withDependencies(dependencies),
+                                          this.ampsConfig,
                                           this.pluginXml,
                                           this.projectFiles);
     }
@@ -136,7 +159,20 @@ public final class PluginProjectChangeset
      */
     public PluginProjectChangeset withBundleInstructions(BundleInstruction... bundleInstructions)
     {
-        return new PluginProjectChangeset(mavenProject.withBundleInstructions(bundleInstructions),
+        return new PluginProjectChangeset(this.mavenProject,
+                                          ampsConfig.withBundleInstructions(bundleInstructions),
+                                          this.pluginXml,
+                                          this.projectFiles);
+    }
+
+    /**
+     * Returns a copy of this changeset with artifacts to add to the &lt;bundledArtifacts&gt; list in
+     * AMPS configuration.
+     */
+    public PluginProjectChangeset withBundledArtifacts(PluginArtifact... artifacts)
+    {
+        return new PluginProjectChangeset(this.mavenProject,
+                                          ampsConfig.withBundledArtifacts(artifacts),
                                           this.pluginXml,
                                           this.projectFiles);
     }
@@ -147,6 +183,7 @@ public final class PluginProjectChangeset
     public PluginProjectChangeset withComponentDeclarations(ComponentDeclaration... componentDeclarations)
     {
         return new PluginProjectChangeset(this.mavenProject,
+                                          this.ampsConfig,
                                           pluginXml.withComponentDeclarations(componentDeclarations),
                                           this.projectFiles);
     }
@@ -157,6 +194,7 @@ public final class PluginProjectChangeset
     public PluginProjectChangeset withComponentImports(ComponentImport... componentImports)
     {
         return new PluginProjectChangeset(this.mavenProject,
+                                          this.ampsConfig,
                                           pluginXml.withComponentImports(componentImports),
                                           this.projectFiles);
     }
@@ -167,16 +205,29 @@ public final class PluginProjectChangeset
     public PluginProjectChangeset withI18nProperties(Map<String, String> i18nProperties)
     {
         return new PluginProjectChangeset(this.mavenProject,
+                                          this.ampsConfig,
                                           this.pluginXml,
                                           projectFiles.withI18nProperties(i18nProperties));
     }
 
+    /**
+     * Returns a copy of this changeset with added {@link MavenPlugin} instances.
+     */
+    public PluginProjectChangeset withMavenPlugins(MavenPlugin... mavenPlugins)
+    {
+        return new PluginProjectChangeset(mavenProject.withMavenPlugins(mavenPlugins),
+                                          this.ampsConfig,
+                                          this.pluginXml,
+                                          this.projectFiles);
+    }
+    
     /**
      * Returns a copy of this changeset with added {@link ModuleDescriptor} instances.
      */
     public PluginProjectChangeset withModuleDescriptor(ModuleDescriptor moduleDescriptor)
     {
         return new PluginProjectChangeset(this.mavenProject,
+                                          this.ampsConfig,
                                           pluginXml.withModuleDescriptor(moduleDescriptor),
                                           this.projectFiles);
     }
@@ -188,6 +239,7 @@ public final class PluginProjectChangeset
     public PluginProjectChangeset withPluginParameters(Map<String, String> parameters)
     {
         return new PluginProjectChangeset(this.mavenProject,
+                                          this.ampsConfig,
                                           pluginXml.withPluginParameters(parameters),
                                           this.projectFiles);
     }
@@ -198,6 +250,7 @@ public final class PluginProjectChangeset
     public PluginProjectChangeset withResourceFile(ResourceFile resourceFile)
     {
         return new PluginProjectChangeset(this.mavenProject,
+                                          this.ampsConfig,
                                           this.pluginXml,
                                           projectFiles.withResourceFile(resourceFile));
     }
@@ -208,6 +261,7 @@ public final class PluginProjectChangeset
     public PluginProjectChangeset withSourceFile(SourceFile sourceFile)
     {
         return new PluginProjectChangeset(this.mavenProject,
+                                          this.ampsConfig,
                                           this.pluginXml,
                                           projectFiles.withSourceFile(sourceFile));
     }
@@ -222,37 +276,74 @@ public final class PluginProjectChangeset
     private static class MavenProjectChangeset
     {
         private final ImmutableList<ArtifactDependency> dependencies;
-        private final ImmutableList<BundleInstruction> bundleInstructions;
-
+        private final ImmutableList<MavenPlugin> mavenPlugins;
+        
         MavenProjectChangeset()
         {
             this(ImmutableList.<ArtifactDependency>of(),
-                 ImmutableList.<BundleInstruction>of());
+                 ImmutableList.<MavenPlugin>of());
         }
         
         MavenProjectChangeset(Iterable<ArtifactDependency> dependencies,
-                              Iterable<BundleInstruction> bundleInstructions)
+                              Iterable<MavenPlugin> mavenPlugins)
         {
             this.dependencies = ImmutableList.copyOf(dependencies);
-            this.bundleInstructions = ImmutableList.copyOf(bundleInstructions);
+            this.mavenPlugins = ImmutableList.copyOf(mavenPlugins);
         }
         
         MavenProjectChangeset with(MavenProjectChangeset other)
         {
             return new MavenProjectChangeset(concat(this.dependencies, other.dependencies),
-                                             concat(this.bundleInstructions, other.bundleInstructions));
+                                             concat(this.mavenPlugins, other.mavenPlugins));
         }
         
         MavenProjectChangeset withDependencies(ArtifactDependency... dependencies)
         {
             return new MavenProjectChangeset(concat(this.dependencies, ImmutableList.copyOf(dependencies)),
-                                             this.bundleInstructions);
+                                             this.mavenPlugins);
         }
-
-        MavenProjectChangeset withBundleInstructions(BundleInstruction... bundleInstructions)
+        
+        MavenProjectChangeset withMavenPlugins(MavenPlugin... mavenPlugins)
         {
             return new MavenProjectChangeset(this.dependencies,
-                                             concat(this.bundleInstructions, ImmutableList.copyOf(bundleInstructions)));
+                                             concat(this.mavenPlugins, ImmutableList.copyOf(mavenPlugins)));
+        }
+    }
+
+    private static class AmpsConfigChangeset
+    {
+        private final ImmutableList<BundleInstruction> bundleInstructions;
+        private final ImmutableList<PluginArtifact> bundledArtifacts;
+        
+        AmpsConfigChangeset()
+        {
+            this(ImmutableList.<BundleInstruction>of(),
+                 ImmutableList.<PluginArtifact>of());
+        }
+        
+        AmpsConfigChangeset(Iterable<BundleInstruction> bundleInstructions,
+                            Iterable<PluginArtifact> bundledArtifacts)
+        {
+            this.bundleInstructions = ImmutableList.copyOf(bundleInstructions);
+            this.bundledArtifacts = ImmutableList.copyOf(bundledArtifacts);
+        }
+        
+        AmpsConfigChangeset with(AmpsConfigChangeset other)
+        {
+            return new AmpsConfigChangeset(concat(this.bundleInstructions, other.bundleInstructions),
+                                           concat(this.bundledArtifacts, other.bundledArtifacts));
+        }
+        
+        AmpsConfigChangeset withBundleInstructions(BundleInstruction... bundleInstructions)
+        {
+            return new AmpsConfigChangeset(concat(this.bundleInstructions, ImmutableList.copyOf(bundleInstructions)),
+                                           this.bundledArtifacts);
+        }
+        
+        AmpsConfigChangeset withBundledArtifacts(PluginArtifact... artifacts)
+        {
+            return new AmpsConfigChangeset(this.bundleInstructions,
+                                           concat(this.bundledArtifacts, ImmutableList.copyOf(artifacts)));
         }
     }
     
