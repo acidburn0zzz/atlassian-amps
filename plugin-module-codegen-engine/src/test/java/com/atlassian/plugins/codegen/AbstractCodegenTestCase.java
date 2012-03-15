@@ -4,6 +4,7 @@ import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
@@ -49,6 +50,15 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
     protected void failWithChangeset(PluginProjectChangeset changeset, String message)
     {
         fail(message + "; generated changeset was " + changeset.toString());
+    }
+    
+    protected void assertChangesetContains(PluginProjectChange change) throws Exception
+    {
+        PluginProjectChangeset changeset = getChangesetForModule();
+        if (!Iterables.contains(changeset.getItems(), change))
+        {
+            failWithChangeset(changeset, "did not generate expected change: " + change);
+        }
     }
     
     protected boolean hasGeneratedModulesOfType(String name) throws Exception

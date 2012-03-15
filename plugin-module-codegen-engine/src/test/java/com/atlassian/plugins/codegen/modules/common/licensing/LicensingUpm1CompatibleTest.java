@@ -1,6 +1,7 @@
 package com.atlassian.plugins.codegen.modules.common.licensing;
 
 import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
+import com.atlassian.plugins.codegen.AmpsSystemPropertyVariable;
 import com.atlassian.plugins.codegen.BundleInstruction;
 import com.atlassian.plugins.codegen.MavenPlugin;
 import com.atlassian.plugins.codegen.PluginArtifact;
@@ -9,6 +10,8 @@ import com.atlassian.plugins.codegen.SourceFile;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static com.atlassian.plugins.codegen.AmpsSystemPropertyVariable.ampsSystemPropertyVariable;
 
 import static com.atlassian.plugins.codegen.PluginParameter.pluginParameter;
 import static org.junit.Assert.assertEquals;
@@ -58,6 +61,12 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     {
         // won't verify all the individual bundled artifacts, just make sure we have some
         assertFalse(getChangesetForModule(PluginArtifact.class).isEmpty());
+    }
+    
+    @Test
+    public void macBaseUrlPropertyIsAdded() throws Exception
+    {
+        assertChangesetContains(ampsSystemPropertyVariable("mac.baseurl", "https://intsys-staging.atlassian.com/my"));
     }
     
     @Test
