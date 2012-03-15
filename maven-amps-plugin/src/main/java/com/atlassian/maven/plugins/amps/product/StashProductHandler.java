@@ -34,7 +34,7 @@ public class StashProductHandler extends AbstractWebappProductHandler
     @Override
     public ProductArtifact getArtifact()
     {
-        return new ProductArtifact("com.atlassian.stash", "stash-standalone-webapp");
+        return new ProductArtifact("com.atlassian.stash", "stash-webapp");
     }
 
     @Override
