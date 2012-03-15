@@ -13,6 +13,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.jfrog.maven.annomojo.annotations.MojoParameter;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -25,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
@@ -145,12 +147,123 @@ public class TestAbstractProductHandlerMojo
         MavenPropertiesUtils.checkUsingTheRightLifecycle(mavenContext);
         Mockito.verify(log).info(Matchers.contains("You are not using <packaging>atlassian-plugin</packaging> in your pom.xml"));
     }
+    
+
+    @Test
+    public void testSystemPropertyIsAssigned() throws MojoExecutionException
+    {
+
+        Properties properties = new Properties();
+        properties.setProperty("amps.httpPort", "7");
+
+        SomeMojo mojo = getSampleMojo(properties);
+
+        Map<String, Product> map = mojo.getProductContexts();
+        assertEquals("There must be 3 products", 3, map.size());
+        assertEquals(7, map.get("foo").getHttpPort());
+        assertEquals(7, map.get("bar").getHttpPort());
+        assertEquals(7, map.get("refapp").getHttpPort());
+    }
+
+    @Test
+    public void testSystemPropertyIsAssignedToIntance() throws MojoExecutionException
+    {
+        Properties properties = new Properties();
+        properties.setProperty("amps.bar.httpPort", "7");
+
+        SomeMojo mojo = getSampleMojo(properties);
+
+        Map<String, Product> map = mojo.getProductContexts();
+        assertEquals(2990, map.get("foo").getHttpPort());
+        assertEquals(7, map.get("bar").getHttpPort());
+        assertEquals(5990, map.get("refapp").getHttpPort());
+    }
+
+    @Test
+    public void testSystemPropertyCanBeIntegerBooleanOrString() throws MojoExecutionException
+    {
+        Properties properties = new Properties();
+        properties.setProperty("amps.stringValue", "my-string");
+        properties.setProperty("amps.intValue", "1");
+        properties.setProperty("amps.boolValue", "true");
+
+        SomeMojo mojo = getSampleMojo(properties);
+        assertEquals("Parameters shoud be assigned with the system property", "my-string", mojo.getStringValue());
+        assertEquals("Parameters shoud be assigned with the system property", 1, mojo.getIntValue());
+        assertEquals("Parameters shoud be assigned with the system property", true, mojo.isBoolValue());
+    }
+
+    @Test
+    public void testSystemPropertyCanBeBean() throws MojoExecutionException
+    {
+        Properties properties = new Properties();
+        properties.setProperty("amps.beanValue", "sentToTheConstructor");
+
+        SomeMojo mojo = getSampleMojo(properties);
+        assertEquals("Parameters shoud be assigned with the system property", "Bean [property1=sentTo, property2=TheConstructor]", mojo.getBeanValue().toString());
+    }
+
+    @Test
+    public void testSystemPropertyCannotAssignReadOnlyAnnotation() throws MojoExecutionException
+    {
+        Properties properties = new Properties();
+        properties.setProperty("amps.valueWithReadOnlyAnnotation", "value");
+
+        try
+        {
+            SomeMojo mojo = getSampleMojo(properties);
+        }
+        catch (MojoExecutionException mee)
+        {
+            assertTrue("Exception should be explicit", mee.getMessage().contains("can't be assigned"));
+            return;
+        }
+        assertTrue("Values without annotation shouldn't be assigned", false);
+    }
+
+    private SomeMojo getSampleMojo(Properties systemProperties) throws MojoExecutionException
+    {
+        Product fooProd = new Product();
+        fooProd.setId("jira");
+        fooProd.setInstanceId("foo");
+        fooProd.setVersion("1.0");
+
+        Product barProd = new Product();
+        barProd.setId("jira");
+        barProd.setInstanceId("bar");
+        barProd.setVersion("2.0");
+
+        SomeMojo mojo = new SomeMojo("refapp", Lists.newArrayList(fooProd, barProd));
+
+        MavenPropertiesUtils.applySystemProperties(mojo, systemProperties);
+        mojo.createProductContexts();
+
+        return mojo;
+    }
 
     public static class SomeMojo extends AbstractProductHandlerMojo
     {
         private final String defaultProductId;
 
         private Xpp3Dom configuration;
+        
+        
+        @MojoParameter
+        private String stringValue;
+
+        @MojoParameter
+        private int intValue;
+
+        @MojoParameter
+        private boolean boolValue;
+
+        @MojoParameter
+        private Bean beanValue;
+
+        private String valueWithNoAnnotation;
+
+        @MojoParameter(readonly = true)
+        private String valueWithReadOnlyAnnotation;
         
         public SomeMojo(String defaultProductId, List<Product> products, Xpp3Dom configuration)
         {
@@ -182,7 +295,7 @@ public class TestAbstractProductHandlerMojo
         @Override
         protected void doExecute() throws MojoExecutionException, MojoFailureException
         {
-
+            // Do nothing
         }
 
         @Override
@@ -231,6 +344,53 @@ public class TestAbstractProductHandlerMojo
         @Override
         protected PluginInformation getPluginInformation() {
             return new PluginInformation("test-product", "Test SDK Version");
+        }
+        
+        public String getStringValue()
+        {
+            return stringValue;
+        }
+
+        public int getIntValue()
+        {
+            return intValue;
+        }
+
+        public boolean isBoolValue()
+        {
+            return boolValue;
+        }
+
+        public Bean getBeanValue()
+        {
+            return beanValue;
+        }
+    }
+    
+    public static class Bean
+    {
+        String property1;
+        String property2;
+
+        public Bean(String description)
+        {
+            super();
+            if ("sentToTheConstructor".equals(description))
+            {
+                this.property1 = "sentTo";
+                this.property2 = "TheConstructor";
+            }
+            else
+            {
+                this.property1 = "none";
+                this.property2 = "none";
+            }
+        }
+
+        @Override
+        public String toString()
+        {
+            return "Bean [property1=" + property1 + ", property2=" + property2 + "]";
         }
     }
 }

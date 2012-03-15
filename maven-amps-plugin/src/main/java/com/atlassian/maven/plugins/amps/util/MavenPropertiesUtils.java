@@ -1,6 +1,8 @@
 package com.atlassian.maven.plugins.amps.util;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -21,9 +24,15 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.jfrog.maven.annomojo.annotations.MojoParameter;
 
+import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
 import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -101,14 +110,24 @@ public class MavenPropertiesUtils
                 // Check it's not the current plugin
                 if (!suggestedAmpsArtifact.contains(pluginDescriptor.getGoalPrefix()))
                 {
+                    String goal = mojoDescriptor.getGoal();
+                    String suggestedPrefix = getGoalPrefix(suggestedAmpsArtifact);
+                    
+                    String advice = "";
+                    if ("run".equals(goal)) 
+                    {
+                        advice = "Did you want to run mvn " + pluginDescriptor.getGoalPrefix() + ":run-standalone ?";
+                    }
+                    
                     // If there's another Amps plugin, it's fine to blow up, because we're not in a situation where the pom.xml is missing.
-                    throw new MojoExecutionException(String.format("You are using %s:%s but %s is defined in the pom.xml. Please use mvn %s:%s, or define %s in your pom.xml.",
+                    throw new MojoExecutionException(String.format("You are using %s:%s but %s is defined in the pom.xml. Please use mvn %s:%s, or define %s in your pom.xml. %s",
                             pluginDescriptor.getGoalPrefix(),
-                            mojoDescriptor.getGoal(),
+                            goal,
                             suggestedAmpsArtifact,
-                            getGoalPrefix(suggestedAmpsArtifact),
-                            mojoDescriptor.getGoal(),
-                            pluginDescriptor.getArtifactId()
+                            suggestedPrefix,
+                            goal,
+                            pluginDescriptor.getArtifactId(),
+                            advice
                             ));
                 }
             }
@@ -345,7 +364,7 @@ public class MavenPropertiesUtils
         for (Xpp3Dom child : configuration.getChildren())
         {
             String name = child.getName();
-            if (child.getChildCount() == 0 && !name.contains("."))
+            if (child.getChildCount() == 0)
             {
                 elementNames.add(name);
             }
@@ -353,4 +372,318 @@ public class MavenPropertiesUtils
         return elementNames;
     }
 
+    /**
+     * Reads the System Properties starting with 'amps.' and applies them to the configuration.
+     * 
+     * @throws MojoExecutionException
+     */
+    public static void applySystemProperties(AbstractProductHandlerMojo mojo, Properties systemProperties) throws MojoExecutionException
+    {
+        Set<Object> keys = systemProperties.keySet();
+        MojoExecutionException lastException = null;
+        List<String> messages = Lists.newArrayList();
+        for (Object key : keys)
+        {
+            if (StringUtils.isNotBlank((String) key) && ((String) key).startsWith("amps."))
+            {
+                try
+                {
+                    applySystemProperty(mojo, ((String) key).substring(5), systemProperties.getProperty((String) key));
+                }
+                catch (MojoExecutionException e)
+                {
+                    messages.add(String.format("-D%s is invalid: %s", key, e.getMessage()));
+                    lastException = e;
+                }
+            }
+        }
+        
+        if (lastException != null)
+        {
+            throw new MojoExecutionException(StringUtils.join(messages, "\n"), lastException);
+        }
+    }
+
+
+    /**
+     * Recursively applies the system property to an object.
+     * 
+     * @param target
+     *            the target object on which the value must be set
+     * @param key
+     *            the name of the field in the format "path.to.field", 'path' being the field of 'target' and 'to' and 'field' the name
+     *            of the fields on the underlying object.
+     * @param value
+     *            the value to set.
+     * 
+     * @throws MojoExecutionException
+     *             if the property couldn't be assigned
+     */
+    private static void applySystemProperty(Object target, String key, String value) throws MojoExecutionException
+    {
+        int firstDotPosition = key.indexOf(".");
+
+        /**
+         * True if 'key' is a path to a field of another object,
+         * false if 'key' is a field of the current object.
+         */
+        boolean keyIsAPath = firstDotPosition != -1;
+        String head = keyIsAPath ? key.substring(0, firstDotPosition) : key;
+        String tail = keyIsAPath ? key.substring(firstDotPosition + 1) : "";
+        Field field = findField(target, head);
+
+        if (field != null)
+        {
+            if (field.isAnnotationPresent(MojoParameter.class) && field.getAnnotation(MojoParameter.class).readonly())
+            {
+                throw new MojoExecutionException(field.getName() + " can't be assigned");
+            }
+            field.setAccessible(true);
+            if (keyIsAPath)
+            {
+                assignValue(target, field, tail, value);
+            }
+            else
+            {
+                assignValue(target, field, value);
+            }
+        }
+        else
+        {
+            // There is no such field. If 'target' is an AbstractProductHandlerMojo,
+            // then search for an instanceId with this name.
+            boolean keyIsAnInstanceName = false;
+            if (target instanceof AbstractProductHandlerMojo)
+            {
+                keyIsAnInstanceName = assignValueToInstance(target, value, head, tail);
+                if (!keyIsAnInstanceName)
+                {
+                    String advice = getAdviceWithClosestNames(head, getAllFieldNames(target.getClass()), ADVICE_COUNT);
+
+                    // The property was neither a name of field neither an instanceId => tell the user
+                    throw new MojoExecutionException(String.format("No property '%s' on %s or product with instanceId='%s'. %s",
+                            head, target.getClass().getSimpleName(), head, advice));
+                }
+            }
+            else
+            {
+                String advice = getAdviceWithClosestNames(head, getAllFieldNames(target.getClass()), ADVICE_COUNT);
+
+                // The property was neither a name of field neither an instanceId => tell the user
+                throw new MojoExecutionException(String.format("No property '%s' on %s. %s",
+                        head, target.getClass().getSimpleName(), advice));
+            }
+        }
+    }
+
+    /**
+     * Reflection - Assigns 'value' to the field 'field' of the instance 'target'
+     * 
+     * @param key
+     *            the full name of the key
+     */
+    private static void assignValue(Object target, Field field, String value) throws MojoExecutionException
+    {
+        Class<?> clazz = field.getType();
+        field.setAccessible(true);
+        if (clazz.isAssignableFrom(String.class))
+        {
+            try
+            {
+                field.set(target, value);
+            }
+            catch (IllegalArgumentException e)
+            {
+                throw new MojoExecutionException("Can't set the value " + value + " to " + target);
+            }
+            catch (IllegalAccessException e)
+            {
+                throw new MojoExecutionException("Can't set the value " + value + " to " + target);
+            }
+        }
+        else if (clazz.isAssignableFrom(Integer.TYPE))
+        {
+            // It's the primitive type, int
+            try
+            {
+                field.set(target, Integer.valueOf(value.toString()));
+            }
+            catch (IllegalArgumentException e)
+            {
+                throw new MojoExecutionException("Can't set the value " + value + " to " + target);
+            }
+            catch (IllegalAccessException e)
+            {
+                throw new MojoExecutionException("Can't set the value " + value + " to " + target);
+            }
+        }
+        else if (clazz.isAssignableFrom(Boolean.TYPE))
+        {
+            // It's the primitive type, boolean
+            try
+            {
+                field.set(target, Boolean.valueOf(value.toString()));
+            }
+            catch (IllegalArgumentException e)
+            {
+                throw new MojoExecutionException("Can't set the value " + value + " to " + target);
+            }
+            catch (IllegalAccessException e)
+            {
+                throw new MojoExecutionException("Can't set the value " + value + " to " + target);
+            }
+        }
+        else
+        {
+            // Use the Constructor(String) if exists.
+            Constructor<?> ctor;
+            try
+            {
+                ctor = clazz.getConstructor(String.class);
+                ctor.setAccessible(true);
+                Object fieldValue = ctor.newInstance(value);
+                field.set(target, fieldValue);
+            }
+            catch (SecurityException e)
+            {
+                throw new MojoExecutionException("Can't construct new " + clazz.getCanonicalName() + "(\"" + value + "\")", e);
+            }
+            catch (NoSuchMethodException e)
+            {
+                throw new MojoExecutionException("Can't construct new " + clazz.getCanonicalName() + "(\"" + value + "\")", e);
+            }
+            catch (InstantiationException e)
+            {
+                throw new MojoExecutionException("Can't instantiate " + clazz.getCanonicalName() + "(" + value + ")", e);
+            }
+            catch (IllegalArgumentException e)
+            {
+                throw new MojoExecutionException("Programming error while assigning the value", e);
+            }
+            catch (IllegalAccessException e)
+            {
+                throw new MojoExecutionException("Can't set the field or access the constructor of the field " + field.getName(), e);
+            }
+            catch (InvocationTargetException e)
+            {
+                throw new MojoExecutionException("The constructor threw an exception while instantiating " + field.getName(), e);
+            }
+        }
+    }
+
+    private static void assignValue(Object target, Field field, String tail, String value) throws MojoExecutionException
+    {
+        try
+        {
+            Object fieldValue = field.get(target);
+            if (fieldValue == null)
+            {
+                fieldValue = field.getType().newInstance();
+                field.set(target, fieldValue);
+            }
+            applySystemProperty(fieldValue, tail, value);
+        }
+        catch (IllegalArgumentException iae)
+        {
+            throw new MojoExecutionException("Error when getting/assigning a value to/from " + field.getName() + " on " + target.toString(), iae);
+        }
+        catch (IllegalAccessException iae)
+        {
+            // Can only be thrown by newInstance()
+            throw new MojoExecutionException("No constructor to instantiate a value for the field " + field.getName() + " on " + target.toString(), iae);
+        }
+        catch (InstantiationException ie)
+        {
+            throw new MojoExecutionException("Error when instantiating a value for the field " + field.getName() + " on " + target.toString(), ie);
+        }
+    }
+
+    private static boolean assignValueToInstance(Object target, String value, String head, String tail) throws MojoExecutionException
+    {
+        Field productsField = findField(target, "products");
+        if (productsField == null)
+        {
+            throw new MojoExecutionException("Error: there should be a field 'products' on the Mojos");
+        }
+        productsField.setAccessible(true);
+        List<Product> products;
+        try
+        {
+            products = (List<Product>) productsField.get(target);
+            Product instance = findProduct(products, head);
+            if (instance != null)
+            {
+                applySystemProperty(instance, tail, value);
+                return true;
+            }
+            return false;
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new MojoExecutionException("Error: the field Mojo.products should be assignable.");
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new MojoExecutionException("Error: the field Mojo.products should be assignable.");
+        }
+    }
+
+    private static Set<String> getAllFieldNames(final Class<?> clazz)
+    {
+        Set<String> allFieldNames = Sets.newHashSet(Iterables.transform(Iterables.filter(
+                Lists.newArrayList(clazz.getDeclaredFields()),
+                new Predicate<Field>()
+                {
+                    @Override
+                    public boolean apply(Field field)
+                    {
+                        MojoParameter annotation = field.getAnnotation(MojoParameter.class);
+                        if (annotation != null)
+                        {
+                            return !annotation.readonly();
+                        }
+                        // @MojoParameter is only required for mojo-level properties
+                        return clazz.isAssignableFrom(AbstractMojo.class) ? false : true;
+                    }
+                }),
+                new Function<Field, String>()
+                {
+                    @Override
+                    public String apply(Field field)
+                    {
+                        return field.getName();
+                    }
+                }));
+        Class<?> superclass = clazz.getSuperclass();
+        if (superclass != null)
+        {
+            allFieldNames.addAll(getAllFieldNames(superclass));
+        }
+        return allFieldNames;
+    }
+
+    /**
+     * Finds the product identified by instanceId in mojo#products.
+     * 
+     * @return the product if defined, otherwise null.
+     */
+    private static Product findProduct(List<Product> products, String instanceId)
+    {
+        Product candidate = null;
+        for (Product product : products)
+        {
+            if (instanceId.equals(product.getInstanceId()))
+            {
+                // Mr. Perfect.
+                return product;
+            }
+            if (candidate == null && product.getId().equals(instanceId))
+            {
+                // instanceId is a product name, so whichever product with this name is candidate
+                candidate = product;
+            }
+        }
+        // Return eponymous product, otherwise null
+        return candidate;
+    }
 }

@@ -593,6 +593,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         MavenPropertiesUtils.checkUsingTheRightAmpsPlugin(getMavenContext());
         MavenPropertiesUtils.checkUnusedConfiguration(this, getMavenContext());
         MavenPropertiesUtils.checkUsingTheRightLifecycle(getMavenContext());
+        MavenPropertiesUtils.applySystemProperties(this, getMavenContext().getSession().getUserProperties());
             
         doExecute();
     }
