@@ -68,6 +68,15 @@ public class MavenPropertiesUtils
         return null;
     }
     
+    public static void checkUsingTheRightLifecycle(MavenContext mavenContext) throws MojoExecutionException
+    {
+        String packaging = mavenContext.getProject().getPackaging();
+        if (!packaging.equals("atlassian-plugin"))
+        {
+            mavenContext.getLog().info("You are not using <packaging>atlassian-plugin</packaging> in your pom.xml, therefore this build will not create an Atlassian Plugin artifact.");
+        }
+    }
+    
     /**
      * Check that plugin is defined in the pom, i.e. avoid mvn amps:run when maven-jira-plugin
      * is defined in the pom.

@@ -128,6 +128,23 @@ public class TestAbstractProductHandlerMojo
             assertThat(mee.getMessage(), containsString("You are using amps:some but maven-jira-plugin is defined in the pom.xml"));
         }
     }
+    
+    @Test
+    public void testNonAtlassianPackagingDisplaysInformation() throws MojoExecutionException
+    {
+        SomeMojo mojo = new SomeMojo("refapp", Collections.<Product>emptyList(), null);
+        PluginDescriptor pluginDescriptors = new PluginDescriptor();
+        pluginDescriptors.setComponents(Lists.newArrayList());
+
+        Log log = Mockito.mock(Log.class);
+        mojo.setLog(log);
+        
+        MavenContext mavenContext = mojo.getMavenContext();
+        when(mavenContext.getProject().getPackaging()).thenReturn("pom");
+        
+        MavenPropertiesUtils.checkUsingTheRightLifecycle(mavenContext);
+        Mockito.verify(log).info(Matchers.contains("You are not using <packaging>atlassian-plugin</packaging> in your pom.xml"));
+    }
 
     public static class SomeMojo extends AbstractProductHandlerMojo
     {
@@ -178,6 +195,7 @@ public class TestAbstractProductHandlerMojo
             when(build.getTestOutputDirectory()).thenReturn(".");
             when(project.getBuild()).thenReturn(build);
             when(project.getBasedir()).thenReturn(new File("."));
+            when(project.getPackaging()).thenReturn("atlassian-plugin");
             
             // Create the mojo descriptor
             PluginDescriptor pluginDescriptor = new PluginDescriptor();
@@ -207,7 +225,7 @@ public class TestAbstractProductHandlerMojo
             plugin.setGroupId("com.atlassian.maven.plugins");
             when(project.getBuildPlugins()).thenReturn(Lists.newArrayList(plugin));
             
-            return new MavenContext(project, null, null, mojoExecution, (PluginManager) null, null);
+            return new MavenContext(project, null, null, mojoExecution, (PluginManager) null, getLog());
         }
 
         @Override
