@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.util.PluginXmlHelper;
@@ -49,27 +48,27 @@ public class PluginXmlRewriter implements ProjectRewriter
         {
             PluginXmlHelper pluginXmlHelper = new PluginXmlHelper(in);
         
-            if (!changes.getI18nProperties().isEmpty())
+            if (changes.hasItems(I18nString.class))
             {
                 pluginXmlHelper.addI18nResource(DEFAULT_I18N_NAME);
             }
             
-            for (Map.Entry<String, String> pluginParam : changes.getPluginParameters().entrySet())
+            for (PluginParameter pluginParam : changes.getItems(PluginParameter.class))
             {
-                pluginXmlHelper.addPluginInfoParam(pluginParam.getKey(), pluginParam.getValue());
+                pluginXmlHelper.addPluginInfoParam(pluginParam.getName(), pluginParam.getValue());
             }
             
-            for (ComponentImport componentImport : changes.getComponentImports())
+            for (ComponentImport componentImport : changes.getItems(ComponentImport.class))
             {
                 pluginXmlHelper.addComponentImport(componentImport);
             }
             
-            for (ComponentDeclaration component : changes.getComponentDeclarations())
+            for (ComponentDeclaration component : changes.getItems(ComponentDeclaration.class))
             {
                 pluginXmlHelper.addComponentDeclaration(component);
             }
             
-            for (ModuleDescriptor moduleDescriptor : changes.getModuleDescriptors())
+            for (ModuleDescriptor moduleDescriptor : changes.getItems(ModuleDescriptor.class))
             {
                 pluginXmlHelper.addModuleAsLastChild(moduleDescriptor.getContent());
             }

@@ -7,14 +7,13 @@ import java.util.UUID;
 
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 
-import com.google.common.collect.ImmutableMap;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
+import static com.atlassian.plugins.codegen.I18nString.i18nString;
 import static com.atlassian.plugins.codegen.SourceFile.sourceFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -64,7 +63,7 @@ public class ProjectFilesRewriterTest
     public void sourceFileIsCreated() throws Exception
     {
         PluginProjectChangeset changes = new PluginProjectChangeset()
-            .withSourceFile(sourceFile(CLASS, SourceFile.SourceGroup.MAIN, CONTENT));
+            .with(sourceFile(CLASS, SourceFile.SourceGroup.MAIN, CONTENT));
         rewriter.applyChanges(changes);
         
         assertTrue(new File(srcDir, "com/atlassian/test/MyClass.java").exists());
@@ -74,7 +73,7 @@ public class ProjectFilesRewriterTest
     public void sourceFileHasContent() throws Exception
     {
         PluginProjectChangeset changes = new PluginProjectChangeset()
-            .withSourceFile(sourceFile(CLASS, SourceFile.SourceGroup.MAIN, CONTENT));
+            .with(sourceFile(CLASS, SourceFile.SourceGroup.MAIN, CONTENT));
         rewriter.applyChanges(changes);
         
         assertEquals(CONTENT, FileUtils.readFileToString(new File(srcDir, "com/atlassian/test/MyClass.java")));
@@ -84,7 +83,7 @@ public class ProjectFilesRewriterTest
     public void testSourceFileIsCreated() throws Exception
     {
         PluginProjectChangeset changes = new PluginProjectChangeset()
-            .withSourceFile(sourceFile(CLASS, SourceFile.SourceGroup.TESTS, CONTENT));
+            .with(sourceFile(CLASS, SourceFile.SourceGroup.TESTS, CONTENT));
         rewriter.applyChanges(changes);
         
         assertTrue(new File(testDir, "com/atlassian/test/MyClass.java").exists());
@@ -94,7 +93,7 @@ public class ProjectFilesRewriterTest
     public void testSourceFileHasContent() throws Exception
     {
         PluginProjectChangeset changes = new PluginProjectChangeset()
-            .withSourceFile(sourceFile(CLASS, SourceFile.SourceGroup.TESTS, CONTENT));
+            .with(sourceFile(CLASS, SourceFile.SourceGroup.TESTS, CONTENT));
         rewriter.applyChanges(changes);
         
         assertEquals(CONTENT, FileUtils.readFileToString(new File(testDir, "com/atlassian/test/MyClass.java")));
@@ -104,7 +103,7 @@ public class ProjectFilesRewriterTest
     public void resourceFileIsCreated() throws Exception
     {
         PluginProjectChangeset changes = new PluginProjectChangeset()
-            .withResourceFile(ResourceFile.resourceFile("templates/test", "template.vm", CONTENT));
+            .with(ResourceFile.resourceFile("templates/test", "template.vm", CONTENT));
         rewriter.applyChanges(changes);
         
         assertTrue(new File(resourcesDir, "templates/test/template.vm").exists());        
@@ -114,7 +113,7 @@ public class ProjectFilesRewriterTest
     public void resourceFileHasContent() throws Exception
     {
         PluginProjectChangeset changes = new PluginProjectChangeset()
-            .withResourceFile(ResourceFile.resourceFile("templates/test", "template.vm", CONTENT));
+            .with(ResourceFile.resourceFile("templates/test", "template.vm", CONTENT));
         rewriter.applyChanges(changes);
         
         assertEquals(CONTENT, FileUtils.readFileToString(new File(resourcesDir, "templates/test/template.vm")));
@@ -124,7 +123,7 @@ public class ProjectFilesRewriterTest
     public void i18nPropertyFileIsCreated() throws Exception
     {
         PluginProjectChangeset changes = new PluginProjectChangeset()
-            .withI18nProperties(ImmutableMap.of("foo", "bar"));
+            .with(i18nString("foo", "bar"));
         rewriter.applyChanges(changes);
         
         assertTrue(new File(resourcesDir, ProjectRewriter.DEFAULT_I18N_NAME + ".properties").exists());        
@@ -134,7 +133,7 @@ public class ProjectFilesRewriterTest
     public void i18nPropertyFileHasPropertyValue() throws Exception
     {
         PluginProjectChangeset changes = new PluginProjectChangeset()
-            .withI18nProperties(ImmutableMap.of("foo", "bar"));
+            .with(i18nString("foo", "bar"));
         rewriter.applyChanges(changes);
         
         Properties props = new Properties();

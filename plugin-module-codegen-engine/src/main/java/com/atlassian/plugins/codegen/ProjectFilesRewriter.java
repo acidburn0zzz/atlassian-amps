@@ -32,7 +32,7 @@ public class ProjectFilesRewriter implements ProjectRewriter
     @Override
     public void applyChanges(PluginProjectChangeset changes) throws Exception
     {
-        for (SourceFile sourceFile : changes.getSourceFiles())
+        for (SourceFile sourceFile : changes.getItems(SourceFile.class))
         {
             File baseDir = sourceFile.getSourceGroup() == SourceFile.SourceGroup.TESTS ?
                 location.getTestDirectory() : location.getSourceDirectory();
@@ -45,7 +45,7 @@ public class ProjectFilesRewriter implements ProjectRewriter
             Files.createParentDirs(newFile);
             FileUtils.writeStringToFile(newFile, sourceFile.getContent());
         }
-        for (ResourceFile resourceFile : changes.getResourceFiles())
+        for (ResourceFile resourceFile : changes.getItems(ResourceFile.class))
         {
             File resourceDir = location.getResourcesDir();
             if (!resourceFile.getRelativePath().equals(""))
@@ -56,7 +56,7 @@ public class ProjectFilesRewriter implements ProjectRewriter
             Files.createParentDirs(newFile);
             FileUtils.writeStringToFile(newFile, resourceFile.getContent());
         }
-        if (!changes.getI18nProperties().isEmpty())
+        if (changes.hasItems(I18nString.class))
         {
             File i18nFile = new File(location.getResourcesDir(), DEFAULT_I18N_NAME + ".properties");
             if (!i18nFile.exists())
@@ -67,7 +67,10 @@ public class ProjectFilesRewriter implements ProjectRewriter
             InputStream is = new FileInputStream(i18nFile);
             props.load(is);
             closeQuietly(is);
-            props.putAll(changes.getI18nProperties());
+            for (I18nString s : changes.getItems(I18nString.class))
+            {
+                props.put(s.getName(), s.getValue());
+            }
             OutputStream os = new FileOutputStream(i18nFile);
             props.store(os, "");
             closeQuietly(os);

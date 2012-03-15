@@ -30,7 +30,7 @@ public class SearchRequestViewModuleCreator extends AbstractPluginModuleCreator<
     public PluginProjectChangeset createModule(SearchRequestViewProperties props) throws Exception
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
+            .with(MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
         
         if (props.includeExamples())

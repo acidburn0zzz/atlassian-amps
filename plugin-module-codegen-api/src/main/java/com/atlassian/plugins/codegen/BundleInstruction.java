@@ -10,7 +10,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Describes a line item in a bundle instruction element, such as &lt;Import-Package&gt;,
  * that should be added to the POM.
  */
-public final class BundleInstruction
+public final class BundleInstruction implements PluginProjectChange
 {
     public enum Category
     {
@@ -70,5 +70,12 @@ public final class BundleInstruction
     public Option<String> getVersion()
     {
         return version;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return "[" + category.getElementName() + ": " + packageName
+            + (version.isDefined() ? (" " + version.get()) : "") + "]";
     }
 }

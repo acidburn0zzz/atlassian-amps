@@ -20,6 +20,10 @@ import org.junit.Test;
 
 import static com.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
+import static com.atlassian.plugins.codegen.I18nString.i18nString;
+import static com.atlassian.plugins.codegen.ModuleDescriptor.moduleDescriptor;
+import static com.atlassian.plugins.codegen.PluginParameter.pluginParameter;
+import static com.atlassian.plugins.codegen.PluginProjectChangeset.changeset;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
@@ -141,7 +145,7 @@ public class PluginXmlRewriterTest
     public void secondPluginParamIsAdded() throws Exception
     {
         applyChanges(addPluginParam());
-        Document xml = applyChanges(new PluginProjectChangeset().withPluginParameters(ImmutableMap.of("second", "thing")));
+        Document xml = applyChanges(new PluginProjectChangeset().with(pluginParameter("second", "thing")));
         
         assertEquals(2, xml.selectNodes("//plugin-info/param").size());
     }
@@ -150,7 +154,7 @@ public class PluginXmlRewriterTest
     public void secondPluginParamHasValue() throws Exception
     {
         applyChanges(addPluginParam());
-        Document xml = applyChanges(new PluginProjectChangeset().withPluginParameters(ImmutableMap.of("second", "thing")));
+        Document xml = applyChanges(new PluginProjectChangeset().with(pluginParameter("second", "thing")));
         
         assertEquals("thing", xml.selectSingleNode("//plugin-info/param[@name='second']").getText());
     }
@@ -159,7 +163,7 @@ public class PluginXmlRewriterTest
     public void pluginParamCannotBeOverwritten() throws Exception
     {
         applyChanges(addPluginParam());
-        Document xml = applyChanges(new PluginProjectChangeset().withPluginParameters(ImmutableMap.of("foo", "baz")));
+        Document xml = applyChanges(new PluginProjectChangeset().with(pluginParameter("foo", "baz")));
         
         assertEquals("bar", xml.selectSingleNode("//plugin-info/param").getText());
     }
@@ -167,7 +171,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentImportIsAdded() throws Exception
     {
-        Document xml = applyChanges(componentImport(IMPORT));
+        Document xml = applyChanges(changeset().with(IMPORT));
         
         assertNotNull(xml.selectSingleNode("//component-import"));
     }
@@ -175,7 +179,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentImportHasInterface() throws Exception
     {
-        Document xml = applyChanges(componentImport(IMPORT));
+        Document xml = applyChanges(changeset().with(IMPORT));
         
         assertEquals(INTERFACE, xml.selectSingleNode("//component-import/@interface").getText());
     }
@@ -183,7 +187,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentImportHasDefaultKey() throws Exception
     {
-        Document xml = applyChanges(componentImport(IMPORT));
+        Document xml = applyChanges(changeset().with(IMPORT));
         
         assertEquals("myInterface", xml.selectSingleNode("//component-import/@key").getText());
     }
@@ -191,7 +195,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentImportHasSpecifiedKey() throws Exception
     {
-        Document xml = applyChanges(componentImport(IMPORT.key(some("new-key"))));
+        Document xml = applyChanges(changeset().with(IMPORT.key(some("new-key"))));
         
         assertEquals("new-key", xml.selectSingleNode("//component-import/@key").getText());
     }
@@ -199,7 +203,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentImportHasNoFilterByDefault() throws Exception
     {
-        Document xml = applyChanges(componentImport(IMPORT));
+        Document xml = applyChanges(changeset().with(IMPORT));
         
         assertNull(xml.selectSingleNode("//component-import/@filter"));
     }
@@ -207,7 +211,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentImportHasSpecifiedFilter() throws Exception
     {
-        Document xml = applyChanges(componentImport(IMPORT.filter(some("my-filter"))));
+        Document xml = applyChanges(changeset().with(IMPORT.filter(some("my-filter"))));
         
         assertEquals("my-filter", xml.selectSingleNode("//component-import/@filter").getText());
     }
@@ -215,7 +219,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentIsAdded() throws Exception
     {
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertNotNull(xml.selectSingleNode("//component"));
     }
@@ -223,7 +227,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentHasKey() throws Exception
     {
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertEquals("my-key", xml.selectSingleNode("//component/@key").getText());
     }
@@ -231,7 +235,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentHasClass() throws Exception
     {
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertEquals(CLASS, xml.selectSingleNode("//component/@class").getText());
     }
@@ -239,7 +243,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentHasNoNameByDefault() throws Exception
     {
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertNull(xml.selectSingleNode("//component/@name"));
     }
@@ -248,7 +252,7 @@ public class PluginXmlRewriterTest
     public void componentHasSpecifiedName() throws Exception
     {
         componentBuilder.name(some("my-name"));
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertEquals("my-name", xml.selectSingleNode("//component/@name").getText());
     }
@@ -256,7 +260,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentHasNoNameI18nKeyByDefault() throws Exception
     {
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertNull(xml.selectSingleNode("//component/@i18n-name-key"));
     }
@@ -265,7 +269,7 @@ public class PluginXmlRewriterTest
     public void componentHasSpecifiedNameI18nKey() throws Exception
     {
         componentBuilder.nameI18nKey(some("name-key"));
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertEquals("name-key", xml.selectSingleNode("//component/@i18n-name-key").getText());
     }
@@ -273,7 +277,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentIsPublicByDefault() throws Exception
     {
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertEquals("true", xml.selectSingleNode("//component/@public").getText());
     }
@@ -282,7 +286,7 @@ public class PluginXmlRewriterTest
     public void componentIsPrivateIfSpecified() throws Exception
     {
         componentBuilder.visibility(Visibility.PRIVATE);
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertNull(xml.selectSingleNode("//component/@public"));
     }
@@ -290,7 +294,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentHasNoAliasByDefault() throws Exception
     {
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertNull(xml.selectSingleNode("//component/@alias"));
     }
@@ -299,7 +303,7 @@ public class PluginXmlRewriterTest
     public void componentHasSpecifiedAlias() throws Exception
     {
         componentBuilder.alias(some("my-alias"));
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertEquals("my-alias", xml.selectSingleNode("//component/@alias").getText());
     }
@@ -307,7 +311,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentHasNoDescriptionByDefault() throws Exception
     {
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertNull(xml.selectSingleNode("//component/description"));
     }
@@ -316,7 +320,7 @@ public class PluginXmlRewriterTest
     public void componentHasSpecifiedDescription() throws Exception
     {
         componentBuilder.description(some("desc"));
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertEquals("desc", xml.selectSingleNode("//component/description").getText());
     }
@@ -325,7 +329,7 @@ public class PluginXmlRewriterTest
     public void componentHasNoDescriptionI18nKeyByDefault() throws Exception
     {
         componentBuilder.description(some("desc"));
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertNull(xml.selectSingleNode("//component/description/@key"));
     }
@@ -334,7 +338,7 @@ public class PluginXmlRewriterTest
     public void componentHasSpecifiedDescriptionI18nKey() throws Exception
     {
         componentBuilder.description(some("desc")).descriptionI18nKey(some("desc-key"));
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertEquals("desc-key", xml.selectSingleNode("//component/description/@key").getText());
     }
@@ -342,7 +346,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentHasNoInterfaceByDefault() throws Exception
     {
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertNull(xml.selectSingleNode("//component/interface"));
     }
@@ -351,7 +355,7 @@ public class PluginXmlRewriterTest
     public void componentHasSpecifiedInterface() throws Exception
     {
         componentBuilder.interfaceId(some(fullyQualified(INTERFACE)));
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertEquals(INTERFACE, xml.selectSingleNode("//component/interface").getText());
     }
@@ -359,7 +363,7 @@ public class PluginXmlRewriterTest
     @Test
     public void componentHasNoServicePropertiesByDefault() throws Exception
     {
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertNull(xml.selectSingleNode("//component/service-properties"));
     }
@@ -368,7 +372,7 @@ public class PluginXmlRewriterTest
     public void componentHasSpecifiedServiceProperties() throws Exception
     {
         componentBuilder.serviceProperties(ImmutableMap.of("foo", "bar"));
-        Document xml = applyChanges(component());
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertEquals("bar", xml.selectSingleNode("//component/service-properties/entry[@key='foo']/@value").getText());
     }
@@ -377,7 +381,7 @@ public class PluginXmlRewriterTest
     public void moduleDescriptorIsAdded() throws Exception
     {
         String module = "<my-module>has some content</my-module>";
-        Document xml = applyChanges(moduleDescriptor(module));
+        Document xml = applyChanges(changeset().with(moduleDescriptor(module)));
         
         assertEquals("has some content", xml.selectSingleNode("//my-module").getText());
     }
@@ -386,7 +390,7 @@ public class PluginXmlRewriterTest
     public void cannotAddMalformedModuleDescriptor() throws Exception
     {
         String module = "<my-module>has some content</boo>";
-        rewriter.applyChanges(moduleDescriptor(module));
+        rewriter.applyChanges(changeset().with(moduleDescriptor(module)));
     }
     
     @Test
@@ -394,37 +398,22 @@ public class PluginXmlRewriterTest
     {
         String module1 = "<foo-module type=\"test\">has some content</foo-module>";
         String module2 = "<bar-module type=\"test\">has some content</bar-module>";
-        applyChanges(moduleDescriptor(module1).with(moduleDescriptor(module2)));
+        applyChanges(changeset().with(moduleDescriptor(module1), moduleDescriptor(module2)));
         
         String module3 = "<foo-module type=\"test\">another one</foo-module>";
-        Document xml = applyChanges(moduleDescriptor(module3));
+        Document xml = applyChanges(changeset().with(moduleDescriptor(module3)));
         
         assertEquals("bar-module", ((Node) xml.selectNodes("//*[@type='test']").get(1)).getName());
     }
     
     protected PluginProjectChangeset addPluginParam()
     {
-        return new PluginProjectChangeset().withPluginParameters(ImmutableMap.of("foo", "bar"));
+        return new PluginProjectChangeset().with(pluginParameter("foo", "bar"));
     }
     
     protected PluginProjectChangeset addI18nProperty()
     {
-        return new PluginProjectChangeset().withI18nProperties(ImmutableMap.of("foo", "bar"));
-    }
-    
-    protected PluginProjectChangeset componentImport(ComponentImport componentImport)
-    {
-        return new PluginProjectChangeset().withComponentImports(componentImport);
-    }
-
-    protected PluginProjectChangeset component()
-    {
-        return new PluginProjectChangeset().withComponentDeclarations(componentBuilder.build());
-    }
-    
-    protected PluginProjectChangeset moduleDescriptor(String content)
-    {
-        return new PluginProjectChangeset().withModuleDescriptor(ModuleDescriptor.moduleDescriptor(content));
+        return new PluginProjectChangeset().with(i18nString("foo", "bar"));
     }
     
     protected Document applyChanges(PluginProjectChangeset changes) throws Exception

@@ -26,6 +26,6 @@ public class ValidJiraWithDependencies implements PluginModuleCreator
     public PluginProjectChangeset createModule(PluginModuleProperties props) throws Exception
     {
         return new PluginProjectChangeset()
-            .withDependencies(SERVLET_API, MOCKITO_TEST);
+            .with(SERVLET_API, MOCKITO_TEST);
     }
 }

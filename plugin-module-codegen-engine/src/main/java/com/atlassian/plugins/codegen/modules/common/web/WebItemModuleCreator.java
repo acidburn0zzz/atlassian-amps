@@ -31,7 +31,7 @@ public class WebItemModuleCreator extends AbstractPluginModuleCreator<WebItemPro
     public PluginProjectChangeset createModule(WebItemProperties props) throws Exception
     {
         return new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
+            .with(MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
     }
 

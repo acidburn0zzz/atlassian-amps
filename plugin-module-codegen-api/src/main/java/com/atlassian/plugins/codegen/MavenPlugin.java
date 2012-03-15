@@ -11,7 +11,7 @@ import com.atlassian.fugue.Option;
  * then only the &lt;executions&gt; element will be modified, adding any &lt;execution&gt;
  * items whose IDs were not already present.
  */
-public class MavenPlugin
+public class MavenPlugin implements PluginProjectChange
 {
     private final ArtifactId artifactId;
     private final Option<String> version;
@@ -42,5 +42,11 @@ public class MavenPlugin
     public String getXmlContent()
     {
         return xmlContent;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return "[plugin: " + artifactId + "]"; 
     }
 }

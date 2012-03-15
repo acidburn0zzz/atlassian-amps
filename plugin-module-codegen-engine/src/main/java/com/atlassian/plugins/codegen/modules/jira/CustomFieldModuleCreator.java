@@ -30,7 +30,7 @@ public class CustomFieldModuleCreator extends AbstractPluginModuleCreator<Custom
     public PluginProjectChangeset createModule(CustomFieldProperties props) throws Exception
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
+            .with(MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
         
         if (props.includeExamples())

@@ -1,11 +1,16 @@
 package com.atlassian.plugins.codegen.modules.common.licensing;
 
 import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
+import com.atlassian.plugins.codegen.BundleInstruction;
 import com.atlassian.plugins.codegen.MavenPlugin;
+import com.atlassian.plugins.codegen.PluginArtifact;
+import com.atlassian.plugins.codegen.PluginParameter;
+import com.atlassian.plugins.codegen.SourceFile;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.atlassian.plugins.codegen.PluginParameter.pluginParameter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -26,7 +31,7 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     @Test
     public void licensingPluginParamIsAdded() throws Exception
     {
-        assertEquals("true", getChangesetForModule().getPluginParameters().get("atlassian-licensing-enabled"));
+        assertEquals(pluginParameter("atlassian-licensing-enabled", "true"), getChangesetForModule(PluginParameter.class).get(0));
     }
     
     @Test
@@ -45,20 +50,20 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     public void bundleInstructionsAreAdded() throws Exception
     {
         // won't verify all the individual bundle instructions, just make sure we have some
-        assertFalse(getChangesetForModule().getBundleInstructions().isEmpty());
+        assertFalse(getChangesetForModule(BundleInstruction.class).isEmpty());
     }
 
     @Test
     public void bundledArtifactsAreAdded() throws Exception
     {
         // won't verify all the individual bundled artifacts, just make sure we have some
-        assertFalse(getChangesetForModule().getBundledArtifacts().isEmpty());
+        assertFalse(getChangesetForModule(PluginArtifact.class).isEmpty());
     }
     
     @Test
     public void mavenDependencyPluginIsAdded() throws Exception
     {
-        MavenPlugin mp = getChangesetForModule().getMavenPlugins().get(0);
+        MavenPlugin mp = getChangesetForModule(MavenPlugin.class).get(0);
         assertEquals("maven-dependency-plugin", mp.getGroupAndArtifactId().getCombinedId());
     }
     
@@ -77,7 +82,7 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     @Test
     public void classFilesAreNotGeneratedByDefault() throws Exception
     {
-        assertTrue(getChangesetForModule().getSourceFiles().isEmpty());
+        assertTrue(getChangesetForModule(SourceFile.class).isEmpty());
     }
     
     @Test

@@ -1,35 +1,53 @@
 package com.atlassian.plugins.codegen;
 
-import com.atlassian.fugue.Option;
-
-import static com.atlassian.fugue.Option.none;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Describes an artifact that should be added to the &lt;bundledArtifacts&gt; or &lt;pluginArtifacts&gt;
  * list in the AMPS configuration.
  */
-public final class PluginArtifact
+public final class PluginArtifact implements PluginProjectChange
 {
-    private ArtifactId artifactId;
-    private Option<String> version;
-    private Option<String> propertyName;
+    /**
+     * Specifies whether to add the artifact to &lt;bundledArtifacts&gt; or &lt;pluginArtifacts&gt;.
+     */
+    public enum ArtifactType
+    {
+        BUNDLED_ARTIFACT("bundledArtifact"),
+        PLUGIN_ARTIFACT("pluginArtifact");
+        
+        private final String elementName;
+        
+        private ArtifactType(String elementName)
+        {
+            this.elementName = elementName;
+        }
+        
+        public String getElementName()
+        {
+            return elementName;
+        }
+    };
+
+    private final ArtifactType type;
+    private final ArtifactId artifactId;
+    private final VersionId versionId;
     
-    public static PluginArtifact pluginArtifact(ArtifactId groupAndArtifactId, Option<String> version, Option<String> propertyName)
+    public static PluginArtifact pluginArtifact(ArtifactType type, ArtifactId groupAndArtifactId, VersionId versionId)
     {
-        return new PluginArtifact(groupAndArtifactId, version, propertyName);
+        return new PluginArtifact(type, groupAndArtifactId, versionId);
     }
 
-    public static PluginArtifact pluginArtifact(ArtifactId groupAndArtifactId, Option<String> version)
+    private PluginArtifact(ArtifactType type, ArtifactId artifactId, VersionId versionId)
     {
-        return new PluginArtifact(groupAndArtifactId, version, none(String.class));
-    }
-
-    private PluginArtifact(ArtifactId artifactId, Option<String> version, Option<String> propertyName)
-    {
+        this.type = checkNotNull(type, "type");
         this.artifactId = checkNotNull(artifactId, "artifactId");
-        this.version = checkNotNull(version, "version");
-        this.propertyName = checkNotNull(propertyName, "propertyName");
+        this.versionId = checkNotNull(versionId, "versionId");
+    }
+    
+    public ArtifactType getType()
+    {
+        return type;
     }
     
     public ArtifactId getGroupAndArtifactId()
@@ -37,31 +55,14 @@ public final class PluginArtifact
         return artifactId;
     }
     
-    public Option<String> getVersion()
+    public VersionId getVersionId()
     {
-        return version;
-    }
-    
-    public Option<String> getPropertyName()
-    {
-        return propertyName;
+        return versionId;
     }
     
     @Override
     public String toString()
     {
-        StringBuilder ret = new StringBuilder();
-        ret.append("(");
-        ret.append(artifactId.getCombinedId());
-        ret.append(",");
-        for (String p : propertyName)
-        {
-            ret.append("${");
-            ret.append(p);
-            ret.append("}=");
-        }
-        ret.append(version.getOrElse(""));
-        ret.append(")");
-        return ret.toString();
+        return "[" + type.getElementName() + ": " + artifactId + (versionId.isDefined() ? (" " + versionId) : "") + "]";
     }
 }

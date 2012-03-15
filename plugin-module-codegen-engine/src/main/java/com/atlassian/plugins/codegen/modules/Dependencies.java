@@ -2,9 +2,8 @@ package com.atlassian.plugins.codegen.modules;
 
 import com.atlassian.plugins.codegen.ArtifactDependency;
 
-import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.PROVIDED;
-
 import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
+import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.PROVIDED;
 import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.TEST;
 
 /**

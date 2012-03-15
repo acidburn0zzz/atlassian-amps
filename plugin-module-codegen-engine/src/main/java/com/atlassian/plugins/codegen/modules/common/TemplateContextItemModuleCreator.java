@@ -32,7 +32,7 @@ public class TemplateContextItemModuleCreator extends AbstractPluginModuleCreato
     public PluginProjectChangeset createModule(TemplateContextItemProperties props) throws Exception
     {
         return new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
+            .with(MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
     }
 

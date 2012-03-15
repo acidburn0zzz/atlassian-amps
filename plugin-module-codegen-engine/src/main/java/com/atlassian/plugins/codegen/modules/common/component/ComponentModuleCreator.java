@@ -53,8 +53,8 @@ public class ComponentModuleCreator extends AbstractPluginModuleCreator<Componen
         }
 
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
-            .withComponentDeclarations(component.build());
+            .with(MOCKITO_TEST)
+            .with(component.build());
         
         if (props.includeExamples())
         {

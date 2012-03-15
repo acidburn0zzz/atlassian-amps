@@ -2,9 +2,12 @@ package com.atlassian.plugins.codegen.modules.common.licensing;
 
 import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
 import com.atlassian.plugins.codegen.ClassId;
+import com.atlassian.plugins.codegen.PluginParameter;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static com.atlassian.plugins.codegen.PluginParameter.pluginParameter;
 
 import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
 import static org.junit.Assert.assertEquals;
@@ -26,7 +29,7 @@ public class LicensingUpm2Test extends AbstractCodegenTestCase<LicensingProperti
     @Test
     public void licensingPluginParamIsAdded() throws Exception
     {
-        assertEquals("true", getChangesetForModule().getPluginParameters().get("atlassian-licensing-enabled"));
+        assertEquals(pluginParameter("atlassian-licensing-enabled", "true"), getChangesetForModule(PluginParameter.class).get(0));
     }
     
     @Test

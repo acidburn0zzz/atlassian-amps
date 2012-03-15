@@ -8,7 +8,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Describes a &lt;component-import&gt; element that should be added to the plugin XML file.
  */
-public final class ComponentImport
+public final class ComponentImport implements PluginProjectChange
 {
     private ClassId interfaceClass;
     private Option<String> key;
@@ -49,5 +49,11 @@ public final class ComponentImport
     public Option<String> getFilter()
     {
         return filter;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return "[component-import: " + interfaceClass + "]";
     }
 }

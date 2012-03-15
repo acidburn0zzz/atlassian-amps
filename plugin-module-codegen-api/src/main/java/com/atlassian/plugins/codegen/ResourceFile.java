@@ -5,7 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Describes a resource file that should be added to the project.
  */
-public class ResourceFile
+public class ResourceFile implements PluginProjectChange
 {
     private final String relativePath;
     private final String name;
@@ -41,5 +41,11 @@ public class ResourceFile
     private String normalizePath(String path)
     {
         return (path.endsWith("/")) ? path.substring(0, path.length() - 1) : path;
+    }
+        
+    @Override
+    public String toString()
+    {
+        return "[resource: " + name + "]";
     }
 }

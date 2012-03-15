@@ -18,7 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Unlike other classes in this package, this class uses a builder pattern due to the
  * large number of optional properties. 
  */
-public final class ComponentDeclaration
+public final class ComponentDeclaration implements PluginProjectChange
 {
     public enum Visibility
     {
@@ -104,6 +104,12 @@ public final class ComponentDeclaration
     public ImmutableMap<String, String> getServiceProperties()
     {
         return serviceProperties;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return "[component: " + classId + "]";
     }
     
     public static class Builder

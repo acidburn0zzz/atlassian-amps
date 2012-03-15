@@ -11,7 +11,9 @@ import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.io.FilenameUtils;
 
+import static com.atlassian.plugins.codegen.I18nString.i18nStrings;
 import static com.atlassian.plugins.codegen.ModuleDescriptor.moduleDescriptor;
+import static com.atlassian.plugins.codegen.PluginProjectChangeset.changeset;
 import static com.atlassian.plugins.codegen.ResourceFile.resourceFile;
 import static com.atlassian.plugins.codegen.SourceFile.sourceFile;
 import static com.atlassian.plugins.codegen.SourceFile.SourceGroup.MAIN;
@@ -67,7 +69,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      */
     protected PluginProjectChangeset createClass(ClassBasedModuleProperties props, ClassId classId, String templateName) throws Exception
     {
-        return new PluginProjectChangeset().withSourceFile(sourceFile(classId, MAIN, fromTemplate(templateName, props)));
+        return changeset().with(sourceFile(classId, MAIN, fromTemplate(templateName, props)));
     }
 
     /**
@@ -79,7 +81,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      */
     protected PluginProjectChangeset createTestClass(ClassBasedModuleProperties props, ClassId classId, String templateName) throws Exception
     {
-        return new PluginProjectChangeset().withSourceFile(sourceFile(classId, TESTS, fromTemplate(templateName, props)));
+        return changeset().with(sourceFile(classId, TESTS, fromTemplate(templateName, props)));
     }
 
     /**
@@ -95,7 +97,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
                                                          String mainTemplate,
                                                          String unitTestTemplate) throws Exception
     {
-        return new PluginProjectChangeset()
+        return changeset()
             .with(createClass(props, mainTemplate))
             .with(createTestClass(props, testClassFor(props.getClassId()), unitTestTemplate));
     }
@@ -131,8 +133,8 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      */
     protected PluginProjectChangeset createModule(PluginModuleProperties props, String templateName) throws Exception
     {
-        return new PluginProjectChangeset().withModuleDescriptor(moduleDescriptor(fromTemplate(templateName, props)))
-            .withI18nProperties(props.getI18nProperties());
+        return changeset().with(moduleDescriptor(fromTemplate(templateName, props)))
+            .with(i18nStrings(props.getI18nProperties()));
     }
     
     /**
@@ -146,7 +148,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      */
     protected PluginProjectChangeset createResource(Map<Object, Object> props, String path, String fileName, String templateName) throws Exception
     {
-        return new PluginProjectChangeset().withResourceFile(resourceFile(path, fileName, fromTemplate(templateName, props)));
+        return changeset().with(resourceFile(path, fileName, fromTemplate(templateName, props)));
     }
 
     /**
@@ -161,7 +163,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
     protected PluginProjectChangeset createTemplateResource(Map<Object, Object> props, String path, String fileName, String templateName) throws Exception
     {
         path = path.equals("") ? TEMPLATES : (path.startsWith(TEMPLATES) ? path : (TEMPLATES + path));
-        return new PluginProjectChangeset().withResourceFile(resourceFile(path, fileName, fromTemplate(templateName, props)));
+        return changeset().with(resourceFile(path, fileName, fromTemplate(templateName, props)));
     }
 
     /**

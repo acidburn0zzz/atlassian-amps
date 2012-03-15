@@ -37,7 +37,7 @@ public class GadgetModuleCreator extends AbstractPluginModuleCreator<GadgetPrope
         String gadgetPath = FilenameUtils.getPath(gadgetLocation);
 
         return new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
+            .with(MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE))
             .with(createResource(props, gadgetPath, gadgetFilename, GADGET_TEMPLATE));
     }

@@ -5,13 +5,14 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
-import com.atlassian.fugue.Option;
+import com.atlassian.plugins.codegen.AmpsSystemPropertyVariable;
 import com.atlassian.plugins.codegen.ArtifactDependency;
 import com.atlassian.plugins.codegen.ArtifactId;
 import com.atlassian.plugins.codegen.BundleInstruction;
 import com.atlassian.plugins.codegen.MavenPlugin;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.ProjectRewriter;
+import com.atlassian.plugins.codegen.VersionId;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
@@ -82,10 +83,11 @@ public class MavenProjectRewriter implements ProjectRewriter
     {
         boolean modifyPom = false;
 
-        modifyPom |= applyDependencyChanges(changes.getDependencies());
-        modifyPom |= applyMavenPluginChanges(changes.getMavenPlugins());
-        modifyPom |= applyBundleInstructionChanges(changes.getBundleInstructions());
-        modifyPom |= applyBundledArtifactChanges(changes.getBundledArtifacts());
+        modifyPom |= applyDependencyChanges(changes.getItems(ArtifactDependency.class));
+        modifyPom |= applyMavenPluginChanges(changes.getItems(MavenPlugin.class));
+        modifyPom |= applyBundleInstructionChanges(changes.getItems(BundleInstruction.class));
+        modifyPom |= applyPluginArtifactChanges(changes.getItems(com.atlassian.plugins.codegen.PluginArtifact.class));
+        modifyPom |= applyAmpsSystemPropertyChanges(changes.getItems(AmpsSystemPropertyVariable.class));
 
         if (modifyPom)
         {
@@ -124,7 +126,8 @@ public class MavenProjectRewriter implements ProjectRewriter
                 Dependency newDependency = new Dependency();
                 newDependency.setGroupId(descriptor.getGroupAndArtifactId().getGroupId().get());
                 newDependency.setArtifactId(descriptor.getGroupAndArtifactId().getArtifactId());
-                newDependency.setVersion(getVersionWithOptionalProperty(some(descriptor.getVersion()), descriptor.getPropertyName()));
+                newDependency.setVersion(descriptor.getVersionId().getVersionOrPropertyPlaceholder().get());
+                createVersionPropertyIfNecessary(descriptor.getVersionId());
                 newDependency.setScope(descriptor.getScope().name().toLowerCase());
 
                 model.addDependency(newDependency);
@@ -133,17 +136,15 @@ public class MavenProjectRewriter implements ProjectRewriter
         return modified;
     }
 
-    private String getVersionWithOptionalProperty(Option<String> version, Option<String> propertyName)
+    private void createVersionPropertyIfNecessary(VersionId versionId)
     {
-        for (String p : propertyName)
+        for (String p : versionId.getPropertyName())
         {
             if (!model.getProperties().containsKey(p))
             {
-                model.addProperty(p, version.getOrElse(""));
+                model.addProperty(p, versionId.getVersion().getOrElse(""));
             }
-            return "${" + p + "}";
         }
-        return version.getOrElse("");
     }
     
     private boolean applyMavenPluginChanges(Iterable<MavenPlugin> mavenPlugins) throws Exception
@@ -277,26 +278,44 @@ public class MavenProjectRewriter implements ProjectRewriter
         return ret.append("\n").toString();
     }
     
-    private boolean applyBundledArtifactChanges(Iterable<com.atlassian.plugins.codegen.PluginArtifact> bundledArtifacts)
+    private boolean applyPluginArtifactChanges(Iterable<com.atlassian.plugins.codegen.PluginArtifact> pluginArtifacts)
     {
         Xpp3Dom configRoot = getAmpsPluginConfiguration();
         boolean modified = false;
-        Xpp3Dom bundledArtifactsRoot = getOrCreateElement(configRoot, "bundledArtifacts");
-        List<Xpp3Dom> existingItems = ImmutableList.copyOf(bundledArtifactsRoot.getChildren("bundledArtifact"));
-        for (com.atlassian.plugins.codegen.PluginArtifact bundledArtifact: bundledArtifacts)
+        for (com.atlassian.plugins.codegen.PluginArtifact p : pluginArtifacts)
         {
-            if (!any(existingItems, artifactElement(bundledArtifact.getGroupAndArtifactId())))
+            Xpp3Dom artifactsRoot = getOrCreateElement(configRoot, p.getType().getElementName() + "s");
+            List<Xpp3Dom> existingItems = ImmutableList.copyOf(artifactsRoot.getChildren(p.getType().getElementName()));
+            if (!any(existingItems, artifactElement(p.getGroupAndArtifactId())))
             {
-                bundledArtifactsRoot.addChild(toArtifactElement(bundledArtifact, "bundledArtifact"));
+                artifactsRoot.addChild(toArtifactElement(p));
+                modified = true;
+            }
+        }
+        return modified;
+    }
+
+    private boolean applyAmpsSystemPropertyChanges(Iterable<AmpsSystemPropertyVariable> propertyVariables)
+    {
+        Xpp3Dom configRoot = getAmpsPluginConfiguration();
+        boolean modified = false;
+        for (AmpsSystemPropertyVariable propertyVariable : propertyVariables)
+        {
+            Xpp3Dom variablesRoot = getOrCreateElement(configRoot, "systemPropertyVariables");
+            if (variablesRoot.getChild(propertyVariable.getName()) == null)
+            {
+                Xpp3Dom variableElement = new Xpp3Dom(propertyVariable.getName());
+                variableElement.setValue(propertyVariable.getValue());
+                variablesRoot.addChild(variableElement);
                 modified = true;
             }
         }
         return modified;
     }
     
-    private Xpp3Dom toArtifactElement(com.atlassian.plugins.codegen.PluginArtifact pluginArtifact, String type)
+    private Xpp3Dom toArtifactElement(com.atlassian.plugins.codegen.PluginArtifact pluginArtifact)
     {
-        Xpp3Dom ret = new Xpp3Dom(type);
+        Xpp3Dom ret = new Xpp3Dom(pluginArtifact.getType().getElementName());
         for (String groupId : pluginArtifact.getGroupAndArtifactId().getGroupId())
         {
             Xpp3Dom ge = new Xpp3Dom("groupId");
@@ -306,10 +325,11 @@ public class MavenProjectRewriter implements ProjectRewriter
         Xpp3Dom ae = new Xpp3Dom("artifactId");
         ae.setValue(pluginArtifact.getGroupAndArtifactId().getArtifactId());
         ret.addChild(ae);
-        if (pluginArtifact.getVersion().isDefined() || pluginArtifact.getPropertyName().isDefined())
+        if (pluginArtifact.getVersionId().isDefined())
         {
             Xpp3Dom ve = new Xpp3Dom("version");
-            ve.setValue(getVersionWithOptionalProperty(pluginArtifact.getVersion(), pluginArtifact.getPropertyName()));
+            ve.setValue(pluginArtifact.getVersionId().getVersionOrPropertyPlaceholder().get());
+            createVersionPropertyIfNecessary(pluginArtifact.getVersionId());
             ret.addChild(ve);
         }
         return ret;

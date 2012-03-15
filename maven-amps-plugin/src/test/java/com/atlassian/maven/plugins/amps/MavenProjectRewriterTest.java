@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.atlassian.maven.plugins.amps.XmlMatchers.XmlWrapper;
+import com.atlassian.plugins.codegen.AmpsSystemPropertyVariable;
 import com.atlassian.plugins.codegen.ArtifactDependency;
 import com.atlassian.plugins.codegen.ArtifactDependency.Scope;
 import com.atlassian.plugins.codegen.ArtifactId;
@@ -27,6 +28,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.atlassian.plugins.codegen.AmpsSystemPropertyVariable.ampsSystemPropertyVariable;
+
 import static com.atlassian.fugue.Option.none;
 import static com.atlassian.fugue.Option.some;
 import static com.atlassian.maven.plugins.amps.XmlMatchers.node;
@@ -39,6 +42,12 @@ import static com.atlassian.plugins.codegen.ArtifactId.artifactId;
 import static com.atlassian.plugins.codegen.BundleInstruction.importPackage;
 import static com.atlassian.plugins.codegen.BundleInstruction.privatePackage;
 import static com.atlassian.plugins.codegen.MavenPlugin.mavenPlugin;
+import static com.atlassian.plugins.codegen.PluginArtifact.pluginArtifact;
+import static com.atlassian.plugins.codegen.PluginArtifact.ArtifactType.BUNDLED_ARTIFACT;
+import static com.atlassian.plugins.codegen.PluginArtifact.ArtifactType.PLUGIN_ARTIFACT;
+import static com.atlassian.plugins.codegen.VersionId.noVersion;
+import static com.atlassian.plugins.codegen.VersionId.version;
+import static com.atlassian.plugins.codegen.VersionId.versionProperty;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.any;
@@ -85,11 +94,13 @@ public class MavenProjectRewriterTest
         mavenPlugin(CUSTOM_ARTIFACT, some("1.0"), NEW_MAVEN_PLUGIN_CONFIG);
 
     private static final com.atlassian.plugins.codegen.PluginArtifact NEW_BUNDLED_ARTIFACT =
-        com.atlassian.plugins.codegen.PluginArtifact.pluginArtifact(CUSTOM_ARTIFACT, none(String.class));
+        pluginArtifact(BUNDLED_ARTIFACT, CUSTOM_ARTIFACT, noVersion());
     private static final com.atlassian.plugins.codegen.PluginArtifact NEW_BUNDLED_ARTIFACT_WITH_VERSION =
-        com.atlassian.plugins.codegen.PluginArtifact.pluginArtifact(CUSTOM_ARTIFACT, some("1.0"));
+        pluginArtifact(BUNDLED_ARTIFACT, CUSTOM_ARTIFACT, version("1.0"));
     private static final com.atlassian.plugins.codegen.PluginArtifact NEW_BUNDLED_ARTIFACT_WITH_VERSION_PROPERTY =
-        com.atlassian.plugins.codegen.PluginArtifact.pluginArtifact(CUSTOM_ARTIFACT, some("1.0"), some("dog.version"));
+        pluginArtifact(BUNDLED_ARTIFACT, CUSTOM_ARTIFACT, versionProperty("dog.version", "1.0"));
+    private static final com.atlassian.plugins.codegen.PluginArtifact NEW_PLUGIN_ARTIFACT =
+        pluginArtifact(PLUGIN_ARTIFACT, CUSTOM_ARTIFACT, noVersion());
     
     private static final BundleInstruction NEW_IMPORT_PACKAGE =
         importPackage("com.atlassian.random", "2.0.1");
@@ -122,35 +133,35 @@ public class MavenProjectRewriterTest
     @Test
     public void dependencyIsAdded() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withDependencies(NEW_DEPENDENCY)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_DEPENDENCY)),
                    nodes("//dependencies/dependency", nodeCount(3)));
     }
 
     @Test
     public void dependencyHasGroupId() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withDependencies(NEW_DEPENDENCY)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_DEPENDENCY)),
                    node("//dependencies/dependency[3]/groupId", nodeTextEquals(CUSTOM_ARTIFACT.getGroupId().get())));
     }
 
     @Test
     public void dependencyHasArtifactId() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withDependencies(NEW_DEPENDENCY)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_DEPENDENCY)),
                    node("//dependencies/dependency[3]/artifactId", nodeTextEquals(CUSTOM_ARTIFACT.getArtifactId())));
     }
 
     @Test
     public void dependencyHasVersion() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withDependencies(NEW_DEPENDENCY)),
-                   node("//dependencies/dependency[3]/version", nodeTextEquals(NEW_DEPENDENCY.getVersion())));
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_DEPENDENCY)),
+                   node("//dependencies/dependency[3]/version", nodeTextEquals(NEW_DEPENDENCY.getVersionId().toString())));
     }
 
     @Test
     public void dependencyHasScope() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withDependencies(NEW_DEPENDENCY)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_DEPENDENCY)),
                    node("//dependencies/dependency[3]/scope", nodeTextEquals("provided")));
     }
     
@@ -159,119 +170,119 @@ public class MavenProjectRewriterTest
     {
         ArtifactDependency existing = dependency("com.atlassian.plugins", "test-artifact-1", "1.0", Scope.PROVIDED);
         
-        assertThat(applyChanges(TEST_POM, changeset.withDependencies(existing)),
+        assertThat(applyChanges(TEST_POM, changeset.with(existing)),
                    nodes("//dependencies/dependency", nodeCount(2)));
     }
     
     @Test
     public void dependencyWithVersionPropertyUsesPropertyNameForVersion() throws Exception
     {
-        ArtifactDependency dependency = dependency(CUSTOM_ARTIFACT, "1.0", "dog.version", Scope.PROVIDED);
+        ArtifactDependency dependency = dependency(CUSTOM_ARTIFACT, versionProperty("dog.version", "1.0"), Scope.PROVIDED);
         
-        assertThat(applyChanges(TEST_POM, changeset.withDependencies(dependency)),
+        assertThat(applyChanges(TEST_POM, changeset.with(dependency)),
                    node("//dependencies/dependency[3]/version", nodeTextEquals("${dog.version}")));
     }
 
     @Test
     public void dependencyWithVersionPropertyAddsPropertyNameAndValueToProperties() throws Exception
     {
-        ArtifactDependency dependency = dependency(CUSTOM_ARTIFACT, "1.0", "dog.version", Scope.PROVIDED);
+        ArtifactDependency dependency = dependency(CUSTOM_ARTIFACT, versionProperty("dog.version", "1.0"), Scope.PROVIDED);
         
-        assertThat(applyChanges(TEST_POM, changeset.withDependencies(dependency)),
+        assertThat(applyChanges(TEST_POM, changeset.with(dependency)),
                    node("//properties/dog.version", nodeTextEquals("1.0")));
     }
 
     @Test
     public void dependencyWithVersionPropertyDoesNotOverwriteExistingProperty() throws Exception
     {
-        ArtifactDependency dependency = dependency(CUSTOM_ARTIFACT, "1.0", "dog.version", Scope.PROVIDED);
-        ArtifactDependency dependency2 = dependency(CUSTOM_ARTIFACT2, "3.5", "dog.version", Scope.PROVIDED);
+        ArtifactDependency dependency = dependency(CUSTOM_ARTIFACT, versionProperty("dog.version", "1.0"), Scope.PROVIDED);
+        ArtifactDependency dependency2 = dependency(CUSTOM_ARTIFACT2, versionProperty("dog.version", "3.5"), Scope.PROVIDED);
         
-        assertThat(applyChanges(TEST_POM, changeset.withDependencies(dependency, dependency2)),
+        assertThat(applyChanges(TEST_POM, changeset.with(dependency, dependency2)),
                    node("//properties/dog.version", nodeTextEquals("1.0")));
     }
     
     @Test
     public void mavenPluginIsAdded() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withMavenPlugins(NEW_MAVEN_PLUGIN_NO_VERSION)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_MAVEN_PLUGIN_NO_VERSION)),
                    nodes("//build/plugins/plugin", nodeCount(INITIAL_MAVEN_PLUGIN_COUNT + 1)));
     }
     
     @Test
     public void mavenPluginHasArtifactId() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withMavenPlugins(NEW_MAVEN_PLUGIN_NO_VERSION)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_MAVEN_PLUGIN_NO_VERSION)),
                    node("//build/plugins/plugin[2]/artifactId", nodeTextEquals(MAVEN_ARTIFACT.getArtifactId())));
     }
     
     @Test
     public void mavenPluginHasExecutionId() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withMavenPlugins(NEW_MAVEN_PLUGIN_NO_VERSION)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_MAVEN_PLUGIN_NO_VERSION)),
                    node("//build/plugins/plugin[2]/executions/execution/id", nodeTextEquals("EXECUTION_ID")));
     }
 
     @Test
     public void mavenPluginHasExecutionPhase() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withMavenPlugins(NEW_MAVEN_PLUGIN_NO_VERSION)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_MAVEN_PLUGIN_NO_VERSION)),
                    node("//build/plugins/plugin[2]/executions/execution/phase", nodeTextEquals("PHASE")));
     }
 
     @Test
     public void mavenPluginHasExecutionGoal1() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withMavenPlugins(NEW_MAVEN_PLUGIN_NO_VERSION)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_MAVEN_PLUGIN_NO_VERSION)),
                    node("//build/plugins/plugin[2]/executions/execution/goals/goal[1]", nodeTextEquals("GOAL1")));
     }
 
     @Test
     public void mavenPluginHasExecutionGoal2() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withMavenPlugins(NEW_MAVEN_PLUGIN_NO_VERSION)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_MAVEN_PLUGIN_NO_VERSION)),
                    node("//build/plugins/plugin[2]/executions/execution/goals/goal[1]", nodeTextEquals("GOAL1")));
     }
 
     @Test
     public void mavenPluginHasExecutionConfig() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withMavenPlugins(NEW_MAVEN_PLUGIN_NO_VERSION)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_MAVEN_PLUGIN_NO_VERSION)),
                    node("//build/plugins/plugin[2]/executions/execution/configuration/param1", nodeTextEquals("value1")));
     }
 
     @Test
     public void mavenPluginWithNoGroupIdHasNoGroupId() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withMavenPlugins(NEW_MAVEN_PLUGIN_NO_VERSION)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_MAVEN_PLUGIN_NO_VERSION)),
                    node("//build/plugins/plugin[2]/groupId", nullValue()));
     }
 
     @Test
     public void mavenPluginWithGroupIdHasGroupId() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withMavenPlugins(NEW_MAVEN_PLUGIN_WITH_GROUP_ID)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_MAVEN_PLUGIN_WITH_GROUP_ID)),
                    node("//build/plugins/plugin[2]/groupId", nodeTextEquals(CUSTOM_ARTIFACT.getGroupId().get())));
     }
 
     @Test
     public void mavenPluginWithNoVersionHasNoVersion() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withMavenPlugins(NEW_MAVEN_PLUGIN_NO_VERSION)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_MAVEN_PLUGIN_NO_VERSION)),
                    node("//build/plugins/plugin[2]/version", nullValue()));
     }
 
     @Test
     public void mavenPluginWithVersionHasVersion() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withMavenPlugins(NEW_MAVEN_PLUGIN_WITH_VERSION)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_MAVEN_PLUGIN_WITH_VERSION)),
                    node("//build/plugins/plugin[2]/version", nodeTextEquals(NEW_MAVEN_PLUGIN_WITH_VERSION.getVersion().get())));
     }
 
     @Test
     public void mavenPluginExecutionIsAddedToExistingPlugin() throws Exception
     {
-        assertThat(applyChanges(TEST_POM_WITH_MAVEN_PLUGIN, changeset.withMavenPlugins(NEW_MAVEN_PLUGIN_NO_VERSION)),
+        assertThat(applyChanges(TEST_POM_WITH_MAVEN_PLUGIN, changeset.with(NEW_MAVEN_PLUGIN_NO_VERSION)),
                    node("//build/plugins/plugin[2]/executions/execution[2]/id", nodeTextEquals("EXECUTION_ID")));
     }
 
@@ -281,7 +292,7 @@ public class MavenProjectRewriterTest
         MavenPlugin pluginWithConflictingExecutionConfig =
             mavenPlugin(MAVEN_ARTIFACT, none(String.class), MAVEN_PLUGIN_CONFIG_WITH_CONFLICTING_EXECUTION);
 
-        assertThat(applyChanges(TEST_POM_WITH_MAVEN_PLUGIN, changeset.withMavenPlugins(pluginWithConflictingExecutionConfig)),
+        assertThat(applyChanges(TEST_POM_WITH_MAVEN_PLUGIN, changeset.with(pluginWithConflictingExecutionConfig)),
                    nodes("//build/plugins/plugin[2]/executions/execution", nodeCount(1)));
     }
 
@@ -291,28 +302,28 @@ public class MavenProjectRewriterTest
         MavenPlugin pluginWithConflictingExecutionConfig =
             mavenPlugin(MAVEN_ARTIFACT, none(String.class), MAVEN_PLUGIN_CONFIG_WITH_CONFLICTING_EXECUTION);
 
-        assertThat(applyChanges(TEST_POM_WITH_MAVEN_PLUGIN, changeset.withMavenPlugins(pluginWithConflictingExecutionConfig)),
+        assertThat(applyChanges(TEST_POM_WITH_MAVEN_PLUGIN, changeset.with(pluginWithConflictingExecutionConfig)),
                    node("//build/plugins/plugin[2]/executions/execution/phase", nodeTextEquals("process-resources")));
     }
 
     @Test
     public void configElementIsCreatedForBundleInstruction() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withBundleInstructions(NEW_IMPORT_PACKAGE)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration", notNullValue()));
     }
 
     @Test
     public void instructionsElementIsCreatedWithinNewlyCreatedConfigElement() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withBundleInstructions(NEW_IMPORT_PACKAGE)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions", notNullValue()));
     }
 
     @Test
     public void bundleInstructionIsAddedToNewInstructionsInNewConfig() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withBundleInstructions(NEW_IMPORT_PACKAGE)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
                         nodeTextEquals("com.atlassian.random;version=\"2.0.1\"")));
     }
@@ -320,14 +331,14 @@ public class MavenProjectRewriterTest
     @Test
     public void instructionsElementIsCreatedWithinExistingConfigElement() throws Exception
     {
-        assertThat(applyChanges(TEST_POM_WITH_CONFIG, changeset.withBundleInstructions(NEW_IMPORT_PACKAGE)),
+        assertThat(applyChanges(TEST_POM_WITH_CONFIG, changeset.with(NEW_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions", notNullValue()));
     }
 
     @Test
     public void bundleInstructionIsAddedToNewInstructionsInExistingConfig() throws Exception
     {
-        assertThat(applyChanges(TEST_POM_WITH_CONFIG, changeset.withBundleInstructions(NEW_IMPORT_PACKAGE)),
+        assertThat(applyChanges(TEST_POM_WITH_CONFIG, changeset.with(NEW_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
                         nodeTextEquals("com.atlassian.random;version=\"2.0.1\"")));
     }
@@ -335,7 +346,7 @@ public class MavenProjectRewriterTest
     @Test
     public void bundleInstructionIsAddedToExistingCategory() throws Exception
     {
-        assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.withBundleInstructions(NEW_IMPORT_PACKAGE)),
+        assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(NEW_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
                         nodeText(delimitedList(",", Matchers.<String>iterableWithSize(4)))));
     }
@@ -344,7 +355,7 @@ public class MavenProjectRewriterTest
     @Test
     public void bundleInstructionIsInsertedInPackageOrderWithinExistingCategory() throws Exception
     {
-        assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.withBundleInstructions(NEW_IMPORT_PACKAGE)),
+        assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(NEW_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
                         nodeText(delimitedList(",",
                                                Matchers.<String>hasItems(any(String.class), 
@@ -356,7 +367,7 @@ public class MavenProjectRewriterTest
     @Test
     public void existingInstructionsArePreservedWhenAddingNewInstructionInCategory() throws Exception
     {
-        assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.withBundleInstructions(NEW_IMPORT_PACKAGE)),
+        assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(NEW_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
                         nodeText(delimitedList(",",
                                                Matchers.<String>hasItems(equalTo("com.atlassian.plugin.*;version=\"${atlassian.plugins.version}\""),
@@ -366,21 +377,21 @@ public class MavenProjectRewriterTest
     @Test
     public void bundleInstructionIsAddedToNewCategoryInExistingInstructions() throws Exception
     {
-        assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.withBundleInstructions(NEW_PRIVATE_PACKAGE)),
+        assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(NEW_PRIVATE_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Private-Package", nodeTextEquals("com.atlassian.random")));
     }
 
     @Test
     public void configElementIsCreatedForBundledArtifact() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withBundledArtifacts(NEW_BUNDLED_ARTIFACT)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_BUNDLED_ARTIFACT)),
                    node("//build/plugins/plugin[1]/configuration", notNullValue()));
     }
 
     @Test
     public void bundledArtifactHasGroupId() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withBundledArtifacts(NEW_BUNDLED_ARTIFACT)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_BUNDLED_ARTIFACT)),
                    node("//build/plugins/plugin[1]/configuration/bundledArtifacts/bundledArtifact/groupId",
                         nodeTextEquals(CUSTOM_ARTIFACT.getGroupId().get())));
     }
@@ -388,15 +399,23 @@ public class MavenProjectRewriterTest
     @Test
     public void bundledArtifactHasArtifactId() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withBundledArtifacts(NEW_BUNDLED_ARTIFACT)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_BUNDLED_ARTIFACT)),
                    node("//build/plugins/plugin[1]/configuration/bundledArtifacts/bundledArtifact/artifactId",
+                        nodeTextEquals(CUSTOM_ARTIFACT.getArtifactId())));
+    }
+
+    @Test
+    public void pluginArtifactHasArtifactId() throws Exception
+    {
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_PLUGIN_ARTIFACT)),
+                   node("//build/plugins/plugin[1]/configuration/pluginArtifacts/pluginArtifact/artifactId",
                         nodeTextEquals(CUSTOM_ARTIFACT.getArtifactId())));
     }
 
     @Test
     public void bundledArtifactWithNoVersionHasNoVersion() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withBundledArtifacts(NEW_BUNDLED_ARTIFACT)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_BUNDLED_ARTIFACT)),
                    node("//build/plugins/plugin[1]/configuration/bundledArtifacts/bundledArtifact/version",
                         nullValue()));
     }
@@ -404,7 +423,7 @@ public class MavenProjectRewriterTest
     @Test
     public void bundledArtifactWithVersionHasVersion() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withBundledArtifacts(NEW_BUNDLED_ARTIFACT_WITH_VERSION)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_BUNDLED_ARTIFACT_WITH_VERSION)),
                    node("//build/plugins/plugin[1]/configuration/bundledArtifacts/bundledArtifact/version",
                         nodeTextEquals("1.0")));
     }
@@ -412,7 +431,7 @@ public class MavenProjectRewriterTest
     @Test
     public void bundledArtifactWithVersionPropertyUsesPropertyName() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withBundledArtifacts(NEW_BUNDLED_ARTIFACT_WITH_VERSION_PROPERTY)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_BUNDLED_ARTIFACT_WITH_VERSION_PROPERTY)),
                    node("//build/plugins/plugin[1]/configuration/bundledArtifacts/bundledArtifact/version",
                         nodeTextEquals("${dog.version}")));
     }
@@ -420,17 +439,59 @@ public class MavenProjectRewriterTest
     @Test
     public void bundledArtifactWithVersionPropertyAddsPropertyNameAndValueToProperties() throws Exception
     {
-        assertThat(applyChanges(TEST_POM, changeset.withBundledArtifacts(NEW_BUNDLED_ARTIFACT_WITH_VERSION_PROPERTY)),
+        assertThat(applyChanges(TEST_POM, changeset.with(NEW_BUNDLED_ARTIFACT_WITH_VERSION_PROPERTY)),
                    node("//properties/dog.version", nodeTextEquals("1.0")));
     }
 
     @Test
     public void existingBundledArtifactIsNotAddedAgain() throws Exception
     {
-        assertThat(applyChanges(TEST_POM_WITH_CONFIG, changeset.withBundledArtifacts(NEW_BUNDLED_ARTIFACT)),
+        assertThat(applyChanges(TEST_POM_WITH_CONFIG, changeset.with(NEW_BUNDLED_ARTIFACT)),
                    nodes("//build/plugins/plugin[1]/configuration/bundledArtifacts/bundledArtifact", nodeCount(1)));
     }
 
+    @Test
+    public void configElementIsCreatedForAmpsSystemProperty() throws Exception
+    {
+        assertThat(applyChanges(TEST_POM, changeset.with(ampsSystemPropertyVariable("newVariable", "bar"))),
+                   node("//build/plugins/plugin[1]/configuration", notNullValue()));
+    }
+    
+    @Test
+    public void variablesElementIsCreatedForAmpsSystemProperty() throws Exception
+    {
+        assertThat(applyChanges(TEST_POM, changeset.with(ampsSystemPropertyVariable("newVariable", "bar"))),
+                   node("//build/plugins/plugin[1]/configuration/systemPropertyVariables", notNullValue()));
+    }
+    
+    @Test
+    public void ampsSystemPropertyHasNameAndValue() throws Exception
+    {
+        assertThat(applyChanges(TEST_POM, changeset.with(ampsSystemPropertyVariable("newVariable", "bar"))),
+                   node("//build/plugins/plugin[1]/configuration/systemPropertyVariables/newVariable", nodeTextEquals("bar")));
+    }
+
+    @Test
+    public void ampsSystemPropertyIsAddedToList() throws Exception
+    {
+        assertThat(applyChanges(TEST_POM_WITH_CONFIG, changeset.with(ampsSystemPropertyVariable("newVariable", "bar"))),
+                   node("//build/plugins/plugin[1]/configuration/systemPropertyVariables/newVariable", nodeTextEquals("bar")));
+    }
+    
+    @Test
+    public void ampsSystemPropertyDoesNotOverwriteVariableWithDifferentName() throws Exception
+    {
+        assertThat(applyChanges(TEST_POM_WITH_CONFIG, changeset.with(ampsSystemPropertyVariable("newVariable", "bar"))),
+                   node("//build/plugins/plugin[1]/configuration/systemPropertyVariables/existingVariable", nodeTextEquals("foo")));
+    }
+    
+    @Test
+    public void ampsSystemPropertyDoesNotOverwriteVariableWithSameName() throws Exception
+    {
+        assertThat(applyChanges(TEST_POM_WITH_CONFIG, changeset.with(ampsSystemPropertyVariable("existingVariable", "bar"))),
+                   node("//build/plugins/plugin[1]/configuration/systemPropertyVariables/existingVariable", nodeTextEquals("foo")));
+    }
+    
     protected XmlWrapper applyChanges(String pomTemplateName, PluginProjectChangeset changes) throws Exception
     {
         InputStream is = getClass().getClassLoader().getResourceAsStream(pomTemplateName);

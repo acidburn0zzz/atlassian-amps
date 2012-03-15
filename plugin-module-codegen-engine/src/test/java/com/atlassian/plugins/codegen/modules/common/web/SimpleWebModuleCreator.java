@@ -20,7 +20,7 @@ public class SimpleWebModuleCreator extends AbstractPluginModuleCreator<SimpleWe
     public PluginProjectChangeset createModule(SimpleWebProperties props) throws Exception
     {
         return new PluginProjectChangeset()
-            .withDependencies(Dependencies.MOCKITO_TEST)
+            .with(Dependencies.MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
     }
 
