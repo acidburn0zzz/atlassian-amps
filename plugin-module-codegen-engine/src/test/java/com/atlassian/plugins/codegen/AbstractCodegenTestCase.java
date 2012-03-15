@@ -8,7 +8,6 @@ import com.google.common.collect.Iterables;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
 import static com.atlassian.fugue.Option.some;
@@ -66,8 +65,7 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
         PluginProjectChangeset changeset = getChangesetForModule();
         for (ModuleDescriptor module : changeset.getItems(ModuleDescriptor.class))
         {
-            Element root = DocumentHelper.parseText(module.getContent()).getRootElement();
-            if (name.equals(root.getName()))
+            if (name.equals(module.getType()))
             {
                 return true;
             }
@@ -83,11 +81,9 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
         ret.addElement("modules");
         for (ModuleDescriptor module : changeset.getItems(ModuleDescriptor.class))
         {
-            Element root = DocumentHelper.parseText(module.getContent()).getRootElement();
-            if (root.getName().equals(name))
+            if (module.getType().equals(name))
             {
-                root.detach();
-                ret.getRootElement().add(root);
+                ret.getRootElement().add(module.getContent());
                 found = true;
             }
         }

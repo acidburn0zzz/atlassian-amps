@@ -1,7 +1,6 @@
 package com.atlassian.plugins.codegen;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
@@ -384,13 +383,6 @@ public class PluginXmlRewriterTest
         Document xml = applyChanges(changeset().with(moduleDescriptor(module)));
         
         assertEquals("has some content", xml.selectSingleNode("//my-module").getText());
-    }
-
-    @Test(expected=IOException.class)
-    public void cannotAddMalformedModuleDescriptor() throws Exception
-    {
-        String module = "<my-module>has some content</boo>";
-        rewriter.applyChanges(changeset().with(moduleDescriptor(module)));
     }
     
     @Test

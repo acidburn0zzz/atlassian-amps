@@ -22,6 +22,12 @@
             <artifactId>guava-osgi</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.4</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     
 </project>

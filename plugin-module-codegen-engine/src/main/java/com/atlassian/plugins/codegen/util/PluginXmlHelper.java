@@ -45,11 +45,10 @@ public class PluginXmlHelper
         this.document = createDocument(input);
     }
     
-    public void addModuleAsLastChild(String fragment) throws DocumentException
+    public void addModuleAsLastChild(Element module)
     {
-        Document fragDoc = DocumentHelper.parseText(fragment);
         Element pluginRoot = document.getRootElement();
-        pluginRoot.add(fragDoc.getRootElement());
+        pluginRoot.add(module);
     }
 
     public void addI18nResource(String name) throws DocumentException, IOException
