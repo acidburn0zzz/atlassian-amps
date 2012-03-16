@@ -376,15 +376,23 @@ public class MavenProjectRewriterTest
                                                    any(String.class), any(String.class), any(String.class))))));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void bundleInstructionIsNotInsertedIfPackageIsAlreadyPresentInCategory() throws Exception
     {
         assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(DUPLICATE_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
                         nodeText(delimitedList(",",
-                                               allOf(hasItem(equalTo("com.atlassian.plugins.rest.common*;version=\"1.0.5\"")),
-                                                     Matchers.<String>iterableWithSize(3))))));
+                                               Matchers.<String>iterableWithSize(3)))));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void bundleInstructionDoesNotOverwriteInstructionForSamePackage() throws Exception
+    {
+        assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(DUPLICATE_IMPORT_PACKAGE)),
+                   node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
+                        nodeText(delimitedList(",",
+                                               Matchers.<String>hasItems(equalTo("com.atlassian.plugins.rest.common*;version=\"1.0.5\""))))));
     }
 
     @Test
