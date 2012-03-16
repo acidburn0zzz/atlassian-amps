@@ -1,140 +1,227 @@
-package com.example.plugins.tutorial.servlet;
- 
+package ${PACKAGE};
+
 import java.io.IOException;
- 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
- 
+
 import com.atlassian.sal.api.ApplicationProperties;
+import com.atlassian.sal.api.auth.LoginUriProvider;
+import com.atlassian.sal.api.message.I18nResolver;
+import com.atlassian.sal.api.user.UserManager;
+import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.upm.api.license.entity.PluginLicense;
 import com.atlassian.upm.api.util.Option;
+import com.atlassian.upm.license.storage.lib.AtlassianMarketplaceUriFactory;
 import com.atlassian.upm.license.storage.lib.PluginLicenseStoragePluginUnresolvedException;
 import com.atlassian.upm.license.storage.lib.ThirdPartyPluginLicenseStorageManager;
- 
+
 import org.apache.commons.lang.StringUtils;
 
 /**
- * A simple license administration servlet that demonstrates how to use
- * {@link ThirdPartyPluginLicenseStorageManager} to:
- * <ul>
- * <li> get the current plugin license,
- * <li> update the plugin license,
- * <li> remove the plugin license,
- * <li> check for a licensing-aware UPM,
- * <li> and properly handle if a licensing-aware UPM is detected.
- * </ul>
- * <p>
+ * A license administration servlet that uses {@link ThirdPartyPluginLicenseStorageManager} to:
+ *  - get the current plugin license,
+ *  - update the plugin license,
+ *  - remove the plugin license,
+ *  - buy, try, upgrade, and renew your license directly from My Atlassian,
+ *  - check for a licensing-aware UPM,
+ *  - and properly handle if a licensing-aware UPM is detected.
+ *
  * This servlet can be reached at http://localhost:2990/jira/plugins/servlet/licenseservlet
- * <p>
- * For more information, see the "UPM Licensing Compatibility" tutorial:
- * https://bitbucket.org/atlassian_tutorial/upm-licensing-compatibility/
  */
-public class LicenseServlet extends HttpServlet
+public class ${CLASSNAME} extends HttpServlet
 {
+    private static final String TEMPLATE = "license-admin.vm";
+
     private final ThirdPartyPluginLicenseStorageManager licenseManager;
+    private final AtlassianMarketplaceUriFactory uriFactory;
     private final ApplicationProperties applicationProperties;
- 
-    public LicenseServlet(ThirdPartyPluginLicenseStorageManager licenseManager, ApplicationProperties applicationProperties)
+    private final TemplateRenderer renderer;
+    private final LoginUriProvider loginUriProvider;
+    private final UserManager userManager;
+    private final I18nResolver i18nResolver;
+
+    public ${CLASSNAME}(ThirdPartyPluginLicenseStorageManager licenseManager,
+                              AtlassianMarketplaceUriFactory uriFactory,
+                              ApplicationProperties applicationProperties,
+                              TemplateRenderer renderer,
+                              LoginUriProvider loginUriProvider,
+                              UserManager userManager,
+                              I18nResolver i18nResolver)
     {
         this.licenseManager = licenseManager;
+        this.uriFactory = uriFactory;
         this.applicationProperties = applicationProperties;
+        this.renderer = renderer;
+        this.loginUriProvider = loginUriProvider;
+        this.userManager = userManager;
+        this.i18nResolver = i18nResolver;
     }
- 
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
-        resp.setContentType("text/html");
-        resp.getWriter().write("<html><body>");
-        outputBody(resp);
-        resp.getWriter().write("</body></html>");
-        resp.getWriter().close();
-    }
- 
-    private void outputBody(HttpServletResponse resp) throws ServletException, IOException
-    {
-        try
+        if (!hasAdminPermission())
         {
-            resp.getWriter().write("<br><br>UPM is licensing-aware: " + licenseManager.isUpmLicensingAware());
-            resp.getWriter().write("<br>Plugin key: " + licenseManager.getPluginKey());
-     
-            if (!licenseManager.isUpmLicensingAware())
-            {
-                resp.getWriter().write("<br><br>Update your license");
-                resp.getWriter().write("<br><form action=\"" + applicationProperties.getBaseUrl() + "/plugins/servlet/licenseservlet\" method=\"POST\">");
-                resp.getWriter().write("<textarea name=\"license\" cols=\"80\" rows=\"10\">");
-                for (String storedRawLicense : licenseManager.getRawLicense())
-                {
-                    //enter the stored license into the textarea, if the license has been stored
-                    resp.getWriter().write(storedRawLicense);
-                }
-                resp.getWriter().write("</textarea>");
-                resp.getWriter().write("<br><input type=\"submit\" value=\"Save\" />");
-                resp.getWriter().write("</form>");
-            }
-            else
-            {
-                resp.getWriter().write("<br>Cannot modify plugin licenses with this API when UPM is licensing-aware. Please use ");
-                resp.getWriter().write("<a href=\"" + licenseManager.getPluginManagementUri() + "\">UPM's licensing UI</a>.");
-            }
+            redirectToLogin(req, resp);
+            return;
         }
-        catch (PluginLicenseStoragePluginUnresolvedException e)
-        {
-            resp.getWriter().write("<br>Sorry, but we cannot find the required licensing support to execute the requested operation. "
-                    + "Please ensure that the Plugin License Storage plugin is installed and enabled. Restarting this plugin " +
-                            "should resolve the problem.");
-        }
+
+        final Map<String, Object> context = initVelocityContext(resp);
+        addEligibleMarketplaceButtons(context);
+        renderer.render(TEMPLATE, context, resp.getWriter());
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
-        resp.setContentType("text/html");
-        resp.getWriter().write("<html><body><b>");
- 
-        try
+        if (!hasAdminPermission())
         {
-            if (!licenseManager.isUpmLicensingAware())
+            redirectToLogin(req, resp);
+            return;
+        }
+
+        final Map<String, Object> context = initVelocityContext(resp);
+
+        if (!context.containsKey("errorMessage"))
+        {
+            try
             {
-                String license = req.getParameter("license");
-                if (!StringUtils.isEmpty(license))
+                if (!licenseManager.isUpmLicensingAware())
                 {
-                    //we have a non-empty license parameter - let's update the license if it is valid.
+                    String license = req.getParameter("license");
                     Option<PluginLicense> validatedLicense = licenseManager.validateLicense(license);
-                    if (validatedLicense.isDefined())
+
+                    //we have an empty/null license parameter - let's remove the stored license.
+                    if (StringUtils.isEmpty(license))
+                    {
+                        licenseManager.removeRawLicense();
+                        context.put("successMessage", i18nResolver.getText("plugin.license.storage.admin.license.remove"));
+                        context.put("license", licenseManager.getLicense());
+                    }
+                    //we have a non-empty license parameter - let's update the license if it is valid.
+                    else if (validatedLicense.isDefined())
                     {
                         licenseManager.setRawLicense(license);
-                        resp.getWriter().write("Valid license. License has been updated.");
+                        if (validatedLicense.get().getError().isDefined())
+                        {
+                            context.put("warningMessage", i18nResolver.getText("plugin.license.storage.admin.license.update.invalid"));
+                        }
+                        else
+                        {
+                            context.put("successMessage", i18nResolver.getText("plugin.license.storage.admin.license.update"));
+                        }
+                        context.put("license", licenseManager.getLicense());
                     }
+                    //we have an invalid license - do nothing.
                     else
                     {
-                        resp.getWriter().write("Invalid license. License has not been updated.");
+                        context.put("errorMessage", i18nResolver.getText("plugin.license.storage.admin.license.invalid"));
                     }
                 }
-                else
-                {
-                    //we have an empty/null license parameter - let's remove the stored license
-                    licenseManager.removeRawLicense();
-                    resp.getWriter().write("License has been removed.");
-                }
             }
-            else
+            catch (PluginLicenseStoragePluginUnresolvedException e)
             {
-                //don't allow POSTs to occur to our license servlet if UPM is licensing-aware
-                resp.getWriter().write("Nice try! You cannot update your plugin license with this API when UPM is licensing-aware.");
+                context.put("errorMessage", i18nResolver.getText("plugin.license.storage.admin.plugin.unavailable"));
+                context.put("storagePluginIsAvailable", false);
+            }
+        }
+
+        addEligibleMarketplaceButtons(context); //must be invoked *after* the license update has occurred.
+        renderer.render(TEMPLATE, context, resp.getWriter());
+    }
+
+    private Map<String, Object> initVelocityContext(HttpServletResponse resp)
+    {
+        resp.setContentType("text/html;charset=utf-8");
+        URI servletUri = URI.create(applicationProperties.getBaseUrl() + "/plugins/servlet/licenseservlet");
+
+        final Map<String, Object> context = new HashMap<String, Object>();
+
+        resp.setContentType("text/html;charset=utf-8");
+        context.put("servletUri", servletUri);
+        context.put("storagePluginIsAvailable", true);
+
+        try
+        {
+            context.put("license", licenseManager.getLicense());
+            context.put("upmLicensingAware", licenseManager.isUpmLicensingAware());
+            context.put("pluginKey", licenseManager.getPluginKey());
+            if (licenseManager.isUpmLicensingAware())
+            {
+                context.put("warningMessage", i18nResolver.getText("plugin.license.storage.admin.upm.licensing.aware",
+                                                                   licenseManager.getPluginManagementUri()));
             }
         }
         catch (PluginLicenseStoragePluginUnresolvedException e)
         {
-            resp.getWriter().write("<br>Sorry, but we cannot find the required licensing support to execute the requested operation. "
-                    + "Please ensure that the Plugin License Storage plugin is installed and enabled. Restarting this plugin " +
-                            "should resolve the problem.");
+            context.put("errorMessage", i18nResolver.getText("plugin.license.storage.admin.plugin.unavailable"));
+            context.put("storagePluginIsAvailable", false);
         }
- 
-        resp.getWriter().write("</b>");
-        outputBody(resp);
-        resp.getWriter().write("</body></html>");
-        resp.getWriter().close();
+
+        return context;
+    }
+
+    private void addEligibleMarketplaceButtons(Map<String, Object> context)
+    {
+        URI servletUri = URI.create(applicationProperties.getBaseUrl() + "/plugins/servlet/licenseservlet");
+
+        try
+        {
+            boolean eligibleButtons = false;
+
+            if (uriFactory.isPluginBuyable())
+            {
+                context.put("buyPluginUri", uriFactory.getBuyPluginUri(servletUri));
+                eligibleButtons = true;
+            }
+            if (uriFactory.isPluginTryable())
+            {
+                context.put("tryPluginUri", uriFactory.getTryPluginUri(servletUri));
+                eligibleButtons = true;
+            }
+            if (uriFactory.isPluginRenewable())
+            {
+                context.put("renewPluginUri", uriFactory.getRenewPluginUri(servletUri));
+                eligibleButtons = true;
+            }
+            if (uriFactory.isPluginUpgradable())
+            {
+                context.put("upgradePluginUri", uriFactory.getUpgradePluginUri(servletUri));
+                eligibleButtons = true;
+            }
+
+            context.put("eligibleButtons", eligibleButtons);
+        }
+        catch (PluginLicenseStoragePluginUnresolvedException e)
+        {
+            context.put("errorMessage", i18nResolver.getText("plugin.license.storage.admin.plugin.unavailable"));
+            context.put("storagePluginIsAvailable", false);
+        }
+    }
+
+    private boolean hasAdminPermission()
+    {
+        String user = userManager.getRemoteUsername();
+        try
+        {
+            return user != null && (userManager.isAdmin(user) || userManager.isSystemAdmin(user));
+        }
+        catch(NoSuchMethodError e)
+        {
+            // userManager.isAdmin(String) was not added until SAL 2.1.
+            // We need this check to ensure backwards compatibility with older product versions.
+            return user != null && userManager.isSystemAdmin(user);
+        }
+    }
+
+    private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
+    {
+        response.sendRedirect(loginUriProvider.getLoginUri(URI.create(request.getRequestURL().toString())).toASCIIString());
     }
 }

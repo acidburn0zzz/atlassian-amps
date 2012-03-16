@@ -1,23 +1,21 @@
 package com.atlassian.plugins.codegen.modules.common.licensing;
 
 import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
-import com.atlassian.plugins.codegen.AmpsSystemPropertyVariable;
 import com.atlassian.plugins.codegen.BundleInstruction;
 import com.atlassian.plugins.codegen.MavenPlugin;
 import com.atlassian.plugins.codegen.PluginArtifact;
 import com.atlassian.plugins.codegen.PluginParameter;
-import com.atlassian.plugins.codegen.SourceFile;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import static com.atlassian.plugins.codegen.AmpsSystemPropertyVariable.ampsSystemPropertyVariable;
-
+import static com.atlassian.plugins.codegen.ClassId.packageAndClass;
+import static com.atlassian.plugins.codegen.I18nString.i18nString;
 import static com.atlassian.plugins.codegen.PluginParameter.pluginParameter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @since 3.8
@@ -28,7 +26,7 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     public void setupProps()
     {
         setCreator(new LicensingUpm1CompatibleModuleCreator());
-        setProps(new LicensingProperties());
+        setProps(new LicensingProperties(PACKAGE_NAME + ".LicenseServlet"));
     }
 
     @Test
@@ -83,66 +81,50 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     }
     
     @Test
-    public void servletModulesAreNotGeneratedByDefault() throws Exception
+    public void licenseServletModuleIsAdded() throws Exception
     {
-        assertFalse(hasGeneratedModulesOfType("servlet"));
-    }
-    
-    @Test
-    public void classFilesAreNotGeneratedByDefault() throws Exception
-    {
-        assertTrue(getChangesetForModule(SourceFile.class).isEmpty());
-    }
-    
-    @Test
-    public void licenseServletModuleIsAddedIfExamplesAreDesired() throws Exception
-    {
-        props.setIncludeExamples(true);
-        
         assertNotNull(getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-servlet']"));
     }
 
     @Test
     public void licenseServletModuleHasClass() throws Exception
     {
-        props.setIncludeExamples(true);
-        
-        assertEquals(LicensingUpm1CompatibleModuleCreator.LICENSE_SERVLET_CLASS.getFullName(),
+        assertEquals(packageAndClass(PACKAGE_NAME, LicensingUpm1CompatibleModuleCreator.LICENSE_SERVLET_CLASS_NAME).getFullName(),
                      getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-servlet']/@class").getText());
     }
 
     @Test
     public void licenseServletModuleHasUrlPattern() throws Exception
     {
-        props.setIncludeExamples(true);
-        
         assertEquals(LicensingUpm1CompatibleModuleCreator.LICENSE_SERVLET_URL_PATTERN,
                      getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-servlet']/url-pattern").getText());
     }
 
     @Test
-    public void helloWorldServletModuleIsAddedIfExamplesAreDesired() throws Exception
+    public void helloWorldServletModuleIsAdded() throws Exception
     {
-        props.setIncludeExamples(true);
-        
-        assertNotNull(getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='hello-world-servlet']"));
+        assertNotNull(getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-hello-world-servlet']"));
     }
     
     @Test
     public void helloWorldServletModuleHasClass() throws Exception
     {
-        props.setIncludeExamples(true);
-        
-        assertEquals(LicensingUpm1CompatibleModuleCreator.HELLO_WORLD_SERVLET_CLASS.getFullName(),
-                     getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='hello-world-servlet']/@class").getText());
+        assertEquals(packageAndClass(PACKAGE_NAME, LicensingUpm1CompatibleModuleCreator.HELLO_WORLD_SERVLET_CLASS_NAME).getFullName(),
+                     getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-hello-world-servlet']/@class").getText());
     }
 
     @Test
     public void helloWorldServletModuleHasUrlPattern() throws Exception
     {
-        props.setIncludeExamples(true);
-        
         assertEquals(LicensingUpm1CompatibleModuleCreator.HELLO_WORLD_SERVLET_URL_PATTERN,
-                     getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='hello-world-servlet']/url-pattern").getText());
+                     getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-hello-world-servlet']/url-pattern").getText());
+    }
+    
+    @Test
+    public void i18nStringsAreAdded() throws Exception
+    {
+        // just check for a couple of the expected strings
+        assertChangesetContains(i18nString("plugin.license.storage.admin.license.details", "License Details"),
+                                i18nString("plugin.license.storage.admin.license.type.DEVELOPER", "developer"));
     }
 }

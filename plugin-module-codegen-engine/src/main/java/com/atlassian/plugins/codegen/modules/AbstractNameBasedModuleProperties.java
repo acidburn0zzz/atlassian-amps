@@ -94,8 +94,8 @@ public abstract class AbstractNameBasedModuleProperties extends AbstractPluginMo
     public ImmutableMap<String, String> getI18nProperties()
     {
         return ImmutableMap.<String, String>builder().putAll(super.getI18nProperties())
-                .put(NAME_I18N_KEY, getProperty(MODULE_NAME))
-                .put(DESCRIPTION_I18N_KEY, getProperty(DESCRIPTION))
+                .put(NAME_I18N_KEY, getProperty(NAME_I18N_KEY))
+                .put(DESCRIPTION_I18N_KEY, getProperty(DESCRIPTION_I18N_KEY))
                 .build();
     }
 }

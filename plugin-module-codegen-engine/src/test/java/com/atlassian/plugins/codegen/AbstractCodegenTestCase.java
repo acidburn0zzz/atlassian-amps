@@ -51,12 +51,15 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
         fail(message + "; generated changeset was " + changeset.toString());
     }
     
-    protected void assertChangesetContains(PluginProjectChange change) throws Exception
+    protected void assertChangesetContains(PluginProjectChange... changes) throws Exception
     {
         PluginProjectChangeset changeset = getChangesetForModule();
-        if (!Iterables.contains(changeset.getItems(), change))
+        for (PluginProjectChange change : changes)
         {
-            failWithChangeset(changeset, "did not generate expected change: " + change);
+            if (!Iterables.contains(changeset.getItems(), change))
+            {
+                failWithChangeset(changeset, "did not generate expected change: " + change);
+            }
         }
     }
     

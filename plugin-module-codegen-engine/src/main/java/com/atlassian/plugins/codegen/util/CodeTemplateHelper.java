@@ -103,8 +103,6 @@ public class CodeTemplateHelper
     {
         public synchronized boolean templateExists(String templatePath)
         {
-            System.out
-                    .println("templatePath = " + templatePath);
             URL resourceUrl = ClasspathResourceLoader.class.getResource(templatePath);
 
             return resourceUrl != null;

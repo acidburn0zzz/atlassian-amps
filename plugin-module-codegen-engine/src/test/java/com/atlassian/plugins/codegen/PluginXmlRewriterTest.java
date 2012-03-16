@@ -274,20 +274,20 @@ public class PluginXmlRewriterTest
     }
 
     @Test
-    public void componentIsPublicByDefault() throws Exception
+    public void componentIsPrivateByDefault() throws Exception
     {
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
-        
-        assertEquals("true", xml.selectSingleNode("//component/@public").getText());
-    }
-
-    @Test
-    public void componentIsPrivateIfSpecified() throws Exception
-    {
-        componentBuilder.visibility(Visibility.PRIVATE);
         Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
         assertNull(xml.selectSingleNode("//component/@public"));
+    }
+
+    @Test
+    public void componentIsPublicIfSpecified() throws Exception
+    {
+        componentBuilder.visibility(Visibility.PUBLIC);
+        Document xml = applyChanges(changeset().with(componentBuilder.build()));
+        
+        assertEquals("true", xml.selectSingleNode("//component/@public").getText());
     }
 
     @Test
