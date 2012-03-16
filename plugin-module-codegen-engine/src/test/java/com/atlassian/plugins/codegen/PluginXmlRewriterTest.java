@@ -159,6 +159,15 @@ public class PluginXmlRewriterTest
     }
 
     @Test
+    public void duplicatePluginParamIsNotAdded() throws Exception
+    {
+        applyChanges(addPluginParam());
+        Document xml = applyChanges(new PluginProjectChangeset().with(pluginParameter("foo", "baz")));
+        
+        assertEquals(1, xml.selectNodes("//plugin-info/param").size());
+    }
+
+    @Test
     public void pluginParamCannotBeOverwritten() throws Exception
     {
         applyChanges(addPluginParam());
@@ -213,6 +222,26 @@ public class PluginXmlRewriterTest
         Document xml = applyChanges(changeset().with(IMPORT.filter(some("my-filter"))));
         
         assertEquals("my-filter", xml.selectSingleNode("//component-import/@filter").getText());
+    }
+    
+    @Test
+    public void duplicateComponentImportKeyCannotBeAdded() throws Exception
+    {
+        ComponentImport secondImportWithSameKey = IMPORT.filter(some("different"));
+        applyChanges(changeset().with(IMPORT));
+        Document xml = applyChanges(changeset().with(secondImportWithSameKey));
+        
+        assertEquals(1, xml.selectNodes("//component-import").size());
+    }
+
+    @Test
+    public void componentImportWithSameKeyIsNotOverwritten() throws Exception
+    {
+        ComponentImport secondImportWithSameKey = IMPORT.filter(some("different"));
+        applyChanges(changeset().with(IMPORT));
+        Document xml = applyChanges(changeset().with(secondImportWithSameKey));
+        
+        assertNull(xml.selectSingleNode("//component-import/@filter"));
     }
     
     @Test
@@ -377,6 +406,28 @@ public class PluginXmlRewriterTest
     }
 
     @Test
+    public void duplicateComponentKeyCannotBeAdded() throws Exception
+    {
+        ComponentDeclaration firstComponent = componentBuilder.name(some("first")).build();
+        ComponentDeclaration secondComponentWithSameKey = componentBuilder.name(some("different")).build();
+        applyChanges(changeset().with(firstComponent));
+        Document xml = applyChanges(changeset().with(secondComponentWithSameKey));
+        
+        assertEquals(1, xml.selectNodes("//component").size());
+    }
+
+    @Test
+    public void componentWithSameKeyIsNotOverwritten() throws Exception
+    {
+        ComponentDeclaration firstComponent = componentBuilder.name(some("first")).build();
+        ComponentDeclaration secondComponentWithSameKey = componentBuilder.name(some("different")).build();
+        applyChanges(changeset().with(firstComponent));
+        Document xml = applyChanges(changeset().with(secondComponentWithSameKey));
+        
+        assertEquals("first", xml.selectSingleNode("//component/@name").getText());
+    }
+    
+    @Test
     public void moduleDescriptorIsAdded() throws Exception
     {
         String module = "<my-module>has some content</my-module>";
@@ -396,6 +447,28 @@ public class PluginXmlRewriterTest
         Document xml = applyChanges(changeset().with(moduleDescriptor(module3)));
         
         assertEquals("bar-module", ((Node) xml.selectNodes("//*[@type='test']").get(1)).getName());
+    }
+    
+    @Test
+    public void moduleDescriptorWithSameTypeAndKeyCannotBeAdded() throws Exception
+    {
+        String module1 = "<my-module key=\"my-key\">good</my-module>";
+        String module2 = "<my-module key=\"my-key\">worse</my-module>";
+        applyChanges(changeset().with(moduleDescriptor(module1)));
+        Document xml = applyChanges(changeset().with(moduleDescriptor(module2)));
+        
+        assertEquals(1, xml.selectNodes("//my-module").size());
+    }
+
+    @Test
+    public void moduleDescriptorWithSameTypeAndKeyIsNotOverwritten() throws Exception
+    {
+        String module1 = "<my-module key=\"my-key\">good</my-module>";
+        String module2 = "<my-module key=\"my-key\">worse</my-module>";
+        applyChanges(changeset().with(moduleDescriptor(module1)));
+        Document xml = applyChanges(changeset().with(moduleDescriptor(module2)));
+        
+        assertEquals("good", xml.selectSingleNode("//my-module").getText());
     }
     
     protected PluginProjectChangeset addPluginParam()

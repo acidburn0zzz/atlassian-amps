@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Map;
 
+import com.atlassian.fugue.Option;
 import com.atlassian.plugins.codegen.ClassId;
 import com.atlassian.plugins.codegen.ComponentDeclaration;
 import com.atlassian.plugins.codegen.ComponentImport;
@@ -24,6 +25,8 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
+import static com.atlassian.fugue.Option.none;
+import static com.atlassian.fugue.Option.some;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
@@ -47,8 +50,12 @@ public class PluginXmlHelper
     
     public void addModuleAsLastChild(Element module)
     {
-        Element pluginRoot = document.getRootElement();
-        pluginRoot.add(module);
+        String key = module.attributeValue("key");
+        if ((key == null) || !findElementByTypeAndAttribute(document.getRootElement(), module.getName(), "key", key).isDefined())
+        {
+            Element pluginRoot = document.getRootElement();
+            pluginRoot.add(module);
+        }
     }
 
     public void addI18nResource(String name) throws DocumentException, IOException
@@ -71,63 +78,72 @@ public class PluginXmlHelper
         {
             pluginInfo = document.addElement("plugin-info");
         }
-        pluginInfo.addElement("param").addAttribute("name", name).setText(value);
+        if (!findElementByTypeAndAttribute(pluginInfo, "param", "name", name).isDefined())
+        {
+            pluginInfo.addElement("param").addAttribute("name", name).setText(value);
+        }
     }
     
     public void addComponentImport(ComponentImport componentImport) throws DocumentException
     {
         String key = componentImport.getKey().getOrElse(createKeyFromClass(componentImport.getInterfaceClass()));
-        Element element = createModule("component-import");
-        element.addAttribute("key", key);
-        element.addAttribute("interface", componentImport.getInterfaceClass().getFullName());
-        for (String filter : componentImport.getFilter())
+        if (!findElementByTypeAndAttribute(document.getRootElement(), "component-import", "key", key).isDefined())
         {
-            element.addAttribute("filter", filter);
+            Element element = createModule("component-import");
+            element.addAttribute("key", key);
+            element.addAttribute("interface", componentImport.getInterfaceClass().getFullName());
+            for (String filter : componentImport.getFilter())
+            {
+                element.addAttribute("filter", filter);
+            }
         }
     }
     
     public void addComponentDeclaration(ComponentDeclaration component) throws DocumentException
     {
-        Element element = createModule("component");
-        element.addAttribute("key", component.getKey());
-        element.addAttribute("class", component.getClassId().getFullName());
-        for (String name : component.getName())
+        if (!findElementByTypeAndAttribute(document.getRootElement(), "component", "key", component.getKey()).isDefined())
         {
-            element.addAttribute("name", name);
-        }
-        for (String nameI18nKey : component.getNameI18nKey())
-        {
-            element.addAttribute("i18n-name-key", nameI18nKey);
-        }
-        if (component.getVisibility() == ComponentDeclaration.Visibility.PUBLIC)
-        {
-            element.addAttribute("public", "true");
-        }
-        for (String alias : component.getAlias())
-        {
-            element.addAttribute("alias", alias);
-        }
-        for (String description : component.getDescription())
-        {
-            Element eDesc = element.addElement("description");
-            eDesc.setText(description);
-            for (String descI18nKey : component.getDescriptionI18nKey())
+            Element element = createModule("component");
+            element.addAttribute("key", component.getKey());
+            element.addAttribute("class", component.getClassId().getFullName());
+            for (String name : component.getName())
             {
-                eDesc.addAttribute("key", descI18nKey);
+                element.addAttribute("name", name);
             }
-        }
-        for (ClassId interfaceId : component.getInterfaceId())
-        {
-            element.addElement("interface").setText(interfaceId.getFullName());
-        }
-        if (!component.getServiceProperties().isEmpty())
-        {
-            Element eProps = element.addElement("service-properties");
-            for (Map.Entry<String, String> entry : component.getServiceProperties().entrySet())
+            for (String nameI18nKey : component.getNameI18nKey())
             {
-                Element eEntry = eProps.addElement("entry");
-                eEntry.addAttribute("key", entry.getKey());
-                eEntry.addAttribute("value", entry.getValue());
+                element.addAttribute("i18n-name-key", nameI18nKey);
+            }
+            if (component.getVisibility() == ComponentDeclaration.Visibility.PUBLIC)
+            {
+                element.addAttribute("public", "true");
+            }
+            for (String alias : component.getAlias())
+            {
+                element.addAttribute("alias", alias);
+            }
+            for (String description : component.getDescription())
+            {
+                Element eDesc = element.addElement("description");
+                eDesc.setText(description);
+                for (String descI18nKey : component.getDescriptionI18nKey())
+                {
+                    eDesc.addAttribute("key", descI18nKey);
+                }
+            }
+            for (ClassId interfaceId : component.getInterfaceId())
+            {
+                element.addElement("interface").setText(interfaceId.getFullName());
+            }
+            if (!component.getServiceProperties().isEmpty())
+            {
+                Element eProps = element.addElement("service-properties");
+                for (Map.Entry<String, String> entry : component.getServiceProperties().entrySet())
+                {
+                    Element eEntry = eProps.addElement("entry");
+                    eEntry.addAttribute("key", entry.getKey());
+                    eEntry.addAttribute("value", entry.getValue());
+                }
             }
         }
     }
@@ -170,6 +186,19 @@ public class PluginXmlHelper
             existingModules.add(newElement);
         }
         return newElement;
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected Option<Element> findElementByTypeAndAttribute(Element parent, String type, String attributeName, String attributeValue)
+    {
+        for (Element e : (List<Element>) parent.elements(type))
+        {
+            if (attributeValue.equals(e.attributeValue(attributeName)))
+            {
+                return some(e);
+            }
+        }
+        return none();
     }
     
     public void savePluginXml(File file) throws IOException
