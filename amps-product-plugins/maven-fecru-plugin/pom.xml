@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-product-plugins</artifactId>
-        <version>3.8-stash-SNAPSHOT</version>
+        <version>3.9-SNAPSHOT</version>
     </parent>
 
     <groupId>com.atlassian.maven.plugins</groupId>
@@ -11,6 +11,15 @@
     <packaging>maven-plugin</packaging>
 
     <name>Maven FishEye/Crucible Plugin</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.atlassian.maven.archetypes</groupId>
+            <artifactId>fecru-plugin-archetype</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <profiles>
         <profile>

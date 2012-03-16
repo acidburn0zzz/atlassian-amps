@@ -63,7 +63,7 @@ public class CodeTemplateHelper
 
     public void writeJavaClassFromTemplate(String templatePath, String className, File sourceDirectory, String packageName, ClassBasedModuleProperties props) throws Exception
     {
-        String originalClass = props.getFullyQualifiedClassname();
+        String originalClass = props.getClassId().getFullName();
         PluginModuleProperties overrideProps = new BasicClassModuleProperties(originalClass);
 
         overrideProps.putAll(props);
@@ -94,7 +94,7 @@ public class CodeTemplateHelper
 
     }
 
-    public String getStringFromTemplate(String templatePath, PluginModuleProperties props) throws Exception
+    public String getStringFromTemplate(String templatePath, Map<Object, Object> props) throws Exception
     {
         return parseTemplate(templatePath, props);
     }

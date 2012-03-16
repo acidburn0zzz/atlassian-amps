@@ -33,7 +33,7 @@ public class RPCProperties extends ClassWithInterfaceProperties
         setNameI18nKey(getProperty(MODULE_KEY) + ".name");
         setDescriptionI18nKey(getProperty(MODULE_KEY) + ".description");
 
-        setServicePath(getInterfaceClass().toLowerCase() + "-v1");
+        setServicePath(getInterfaceId().getName().toLowerCase() + "-v1");
     }
 
     public RPCProperties(String fqClassName, String servicePath)

@@ -120,6 +120,16 @@ public class Product
     private String devToolboxVersion;
 
     /**
+     * Flag to indicate whether or not to enable automatic bundling of PDE.
+     */
+    private Boolean enablePde;
+
+    /**
+     * Version of the PDE plugin
+     */
+    private String pdeVersion;
+    
+    /**
      * Product id - nickname of the product to run
      */
     protected String id;
@@ -245,6 +255,8 @@ public class Product
         prod.setFastdevVersion(fastdevVersion == null ? product.getFastdevVersion() : fastdevVersion);
         prod.setEnableDevToolbox(enableDevToolbox == null ? product.isEnableDevToolbox() : enableDevToolbox);
         prod.setDevToolboxVersion(devToolboxVersion == null ? product.getDevToolboxVersion() : devToolboxVersion);
+        prod.setEnablePde(enablePde == null ? product.isEnablePde() : enablePde);
+        prod.setPdeVersion(pdeVersion == null ? product.getPdeVersion() : pdeVersion);
         prod.setRestVersion(restVersion == null ? product.getRestVersion() : restVersion);
         prod.setPdkVersion(pdkVersion == null ? product.getPdkVersion() : pdkVersion);
         prod.setSalVersion(salVersion == null ? product.getSalVersion() : salVersion);
@@ -553,6 +565,26 @@ public class Product
     public void setDevToolboxVersion(String devToolboxVersion)
     {
         this.devToolboxVersion = devToolboxVersion;
+    }
+
+    public Boolean isEnablePde()
+    {
+        return enablePde;
+    }
+
+    public void setEnablePde(Boolean enablePde)
+    {
+        this.enablePde = enablePde;
+    }
+
+    public String getPdeVersion()
+    {
+        return pdeVersion;
+    }
+
+    public void setPdeVersion(String pdeVersion)
+    {
+        this.pdeVersion = pdeVersion;
     }
 
     public void setWebConsoleVersion(String webConsoleVersion)

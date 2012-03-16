@@ -1,9 +1,9 @@
 package fake.jar.annotation.parser.modules;
 
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
 
 /**
@@ -11,7 +11,7 @@ import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
  */
 @JiraPluginModuleCreator
 @ConfluencePluginModuleCreator
-public class JARJiraAndConfluenceCreator implements PluginModuleCreator {
+public class JARJiraAndConfluenceCreator implements PluginModuleCreator<PluginModuleProperties> {
     public static final String MODULE_NAME = "Jira And Confluence";
 
     @Override
@@ -20,7 +20,7 @@ public class JARJiraAndConfluenceCreator implements PluginModuleCreator {
     }
 
     @Override
-    public void createModule(PluginModuleLocation location, PluginModuleProperties props) throws Exception {
-
+    public PluginProjectChangeset createModule(PluginModuleProperties props) throws Exception {
+        return new PluginProjectChangeset();
     }
 }

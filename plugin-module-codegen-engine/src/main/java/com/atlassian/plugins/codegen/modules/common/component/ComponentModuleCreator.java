@@ -1,8 +1,18 @@
 package com.atlassian.plugins.codegen.modules.common.component;
 
-import com.atlassian.plugins.codegen.annotations.*;
+import com.atlassian.plugins.codegen.ComponentDeclaration;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
+import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+
+import static com.atlassian.fugue.Option.option;
+import static com.atlassian.fugue.Option.some;
+import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 
 /**
  * @since 3.6
@@ -13,12 +23,8 @@ import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 @BambooPluginModuleCreator
 @FeCruPluginModuleCreator
 @CrowdPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-})
 public class ComponentModuleCreator extends AbstractPluginModuleCreator<ComponentProperties>
 {
-
     public static final String MODULE_NAME = "Component";
     private static final String TEMPLATE_PREFIX = "templates/common/component/";
 
@@ -29,47 +35,44 @@ public class ComponentModuleCreator extends AbstractPluginModuleCreator<Componen
     //examples
     private static final String EXAMPLE_CLASS_TEMPLATE = TEMPLATE_PREFIX + "Example" + CLASS_TEMPLATE;
 
-    private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "component-plugin.xml.vtl";
-
     @Override
-    public void createModule(PluginModuleLocation location, ComponentProperties props) throws Exception
+    public PluginProjectChangeset createModule(ComponentProperties props) throws Exception
     {
+        ComponentDeclaration.Builder component = ComponentDeclaration.builder(props.getClassId(), props.getModuleKey())
+            .name(option(props.getModuleName()))
+            .nameI18nKey(option(props.getNameI18nKey()))
+            .description(option(props.getDescription()))
+            .descriptionI18nKey(option(props.getDescriptionI18nKey()));
+        if (props.generateInterface())
+        {
+            component.interfaceId(some(props.getInterfaceId()));
+        }
+        if (props.getServiceProps() != null)
+        {
+            component.serviceProperties(props.getServiceProps());
+        }
 
-        String packageName = props.getPackage();
-
-        String classname = props.getClassname();
-
-        String iClassname = props.getInterfaceClass();
-        String iPackage = props.getInterfacePackage();
-
+        PluginProjectChangeset ret = new PluginProjectChangeset()
+            .withDependencies(MOCKITO_TEST)
+            .withComponentDeclarations(component.build());
+        
         if (props.includeExamples())
         {
-            templateHelper.writeJavaClassFromTemplate(EXAMPLE_CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-        } else
+            return ret.with(createClass(props, EXAMPLE_CLASS_TEMPLATE));
+        }
+        else
         {
             if (props.generateClass())
             {
-                //main class
-                templateHelper.writeJavaClassFromTemplate(CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-
-                //unit test
-                templateHelper.writeJavaClassFromTemplate(GENERIC_TEST_TEMPLATE, testClassname(classname), location.getTestDirectory(), packageName, props);
-
-                //func test
-                templateHelper.writeJavaClassFromTemplate(GENERIC_TEST_TEMPLATE, funcTestClassname(classname), location.getTestDirectory(), funcTestPackageName(packageName), props);
+                ret = ret.with(createClassAndTests(props, CLASS_TEMPLATE, GENERIC_TEST_TEMPLATE, GENERIC_TEST_TEMPLATE));
             }
-
             if (props.generateInterface())
             {
-                templateHelper.writeJavaClassFromTemplate(INTERFACE_TEMPLATE, iClassname, location.getSourceDirectory(), iPackage, props);
+                ret = ret.with(createClass(props, props.getInterfaceId(), INTERFACE_TEMPLATE));
             }
-
+            return ret;
         }
-
-
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
     }
-
 
     @Override
     public String getModuleName()

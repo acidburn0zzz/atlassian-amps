@@ -8,6 +8,9 @@ import com.atlassian.plugins.codegen.modules.common.moduletype.ModuleTypePropert
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.junit.Test;
 
+import static com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter.MODULE_DESCRIP_PROMPT;
+import static com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter.MODULE_KEY_PROMPT;
+import static com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter.MODULE_NAME_PROMPT;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -45,10 +48,10 @@ public class ModuleTypePrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         ModuleTypeProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong interface", INTERFACE_CLASS, props.getInterfaceClass());
-        assertEquals("wrong interface package", PACKAGE, props.getInterfacePackage());
-        assertEquals("wrong class", CLASSNAME, props.getClassname());
-        assertEquals("wrong class package", PACKAGE, props.getPackage());
+        assertEquals("wrong interface", INTERFACE_CLASS, props.getInterfaceId().getName());
+        assertEquals("wrong interface package", PACKAGE, props.getInterfaceId().getPackage());
+        assertEquals("wrong class", CLASSNAME, props.getClassId().getName());
+        assertEquals("wrong class package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
         assertEquals("wrong module key", MODULE_KEY, props.getModuleKey());
         assertEquals("wrong description", DESCRIPTION, props.getDescription());
@@ -65,9 +68,9 @@ public class ModuleTypePrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Enter Package Name", PACKAGE)).thenReturn(PACKAGE);
         when(prompter.prompt("Show Advanced Setup?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
 
-        when(prompter.prompt("Plugin Name", MODULE_NAME)).thenReturn(ADV_MODULE_NAME);
-        when(prompter.prompt("Plugin Key", MODULE_KEY)).thenReturn(ADV_MODULE_KEY);
-        when(prompter.prompt("Plugin Description", DESCRIPTION)).thenReturn(ADV_DESCRIPTION);
+        when(prompter.prompt(MODULE_NAME_PROMPT, MODULE_NAME)).thenReturn(ADV_MODULE_NAME);
+        when(prompter.prompt(MODULE_KEY_PROMPT, MODULE_KEY)).thenReturn(ADV_MODULE_KEY);
+        when(prompter.prompt(MODULE_DESCRIP_PROMPT, DESCRIPTION)).thenReturn(ADV_DESCRIPTION);
         when(prompter.prompt("i18n Name Key", I18N_NAME_KEY)).thenReturn(ADV_I18N_NAME_KEY);
         when(prompter.prompt("i18n Description Key", I18N_DESCRIPTION_KEY)).thenReturn(ADV_I18N_DESCRIPTION_KEY);
 
@@ -77,10 +80,10 @@ public class ModuleTypePrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         ModuleTypeProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong adv interface", INTERFACE_CLASS, props.getInterfaceClass());
-        assertEquals("wrong adv interface package", PACKAGE, props.getInterfacePackage());
-        assertEquals("wrong adv class", CLASSNAME, props.getClassname());
-        assertEquals("wrong adv package", PACKAGE, props.getPackage());
+        assertEquals("wrong adv interface", INTERFACE_CLASS, props.getInterfaceId().getName());
+        assertEquals("wrong adv interface package", PACKAGE, props.getInterfaceId().getPackage());
+        assertEquals("wrong adv class", CLASSNAME, props.getClassId().getName());
+        assertEquals("wrong adv package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong adv module name", ADV_MODULE_NAME, props.getModuleName());
         assertEquals("wrong adv module key", ADV_MODULE_KEY, props.getModuleKey());
         assertEquals("wrong adv description", ADV_DESCRIPTION, props.getDescription());

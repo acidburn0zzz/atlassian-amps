@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static java.lang.String.format;
 
 public class JiraProductHandler extends AbstractWebappProductHandler
@@ -56,7 +57,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         return new HashMap<String, String>()
         {
             {
-                final String dburl = System.getProperty("amps.datasource.url", format("jdbc:hsqldb:%s/database", fixSlashes(getHomeDirectory(ctx).getAbsolutePath())));
+                final String dburl = System.getProperty("amps.datasource.url", format("jdbc:hsqldb:%s/database", fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath())));
                 final String driverClass = System.getProperty("amps.datasource.driver", "org.hsqldb.jdbcDriver");
                 final String username = System.getProperty("amps.datasource.username", "sa");
                 final String password = System.getProperty("amps.datasource.password", "");
@@ -69,15 +70,10 @@ public class JiraProductHandler extends AbstractWebappProductHandler
                 final String datasourceType = "cargo.datasource.type=" + datasourceTypeClass;
                 final String jndi = "cargo.datasource.jndi=jdbc/JiraDS";
 
-                put("jira.home", fixSlashes(getHomeDirectory(ctx).getPath()));
+                put("jira.home", fixWindowsSlashes(getHomeDirectory(ctx).getPath()));
                 put("cargo.datasource.datasource", format("%s|%s|%s|%s|%s|%s", datasource, driver, datasourceUsername, datasourcePassword, datasourceType, jndi));
             }
         };
-    }
-
-    private static String fixSlashes(final String path)
-    {
-        return path.replaceAll("\\\\", "/");
     }
 
     @Override
@@ -148,13 +144,16 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             contextPath = "/" + contextPath;
         }
 
+        String baseUrl = "http://" + ctx.getServer() + ":" + ctx.getHttpPort() + contextPath;
+
         List<Replacement> replacements = super.getReplacements(ctx);
         File homeDir = getHomeDirectory(ctx);
         // We don't rewrap snapshots with these values:
+        replacements.add(0, new Replacement("http://localhost:8080", baseUrl, false));
         replacements.add(new Replacement("@project-dir@", homeDir.getParent(), false));
         replacements.add(new Replacement("/jira-home/", "/home/", false));
         replacements.add(new Replacement("@base-url@",
-                "http://" + ctx.getServer() + ":" + ctx.getHttpPort() + contextPath, false));
+                baseUrl, false));
         return replacements;
     }
 

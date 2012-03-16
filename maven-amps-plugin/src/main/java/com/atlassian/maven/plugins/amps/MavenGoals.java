@@ -4,11 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
@@ -29,6 +27,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
+import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
@@ -66,7 +65,7 @@ public class MavenGoals
             put("cargo-maven2-plugin", "1.0-beta-2-db2");
             // Below is a second definition of 'cargo-maven2-plugin', using CodeHaus instead of TwData.
             put("org.codehaus.cargo:cargo-maven2-plugin", "1.1.3");
-            put("atlassian-pdk", "2.3.0");
+            put("atlassian-pdk", "2.3.1");
             put("maven-archetype-plugin", "2.0-alpha-4");
             put("maven-bundle-plugin", "2.0.0");
             put("yuicompressor-maven-plugin", "0.7.1");
@@ -167,7 +166,7 @@ public class MavenGoals
                 goal("generate"),
                 configuration(
                         element(name("archetypeGroupId"), "com.atlassian.maven.archetypes"),
-                        element(name("archetypeArtifactId"), productId + "-plugin-archetype"),
+                        element(name("archetypeArtifactId"), (productId.equals("all") ? "" : productId + "-" ) + "plugin-archetype"),
                         element(name("archetypeVersion"), VersionUtils.getVersion())
                 ),
                 executionEnvironment());
@@ -303,6 +302,32 @@ public class MavenGoals
         return webappWarFile;
     }
 
+    public File copyArtifact(final String targetFileName, final File targetDirectory,
+                             final ProductArtifact artifact, String type) throws MojoExecutionException
+    {
+        final File targetFile = new File(targetDirectory, targetFileName);
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("copy"),
+                configuration(
+                        element(name("artifactItems"),
+                                element(name("artifactItem"),
+                                        element(name("groupId"), artifact.getGroupId()),
+                                        element(name("artifactId"), artifact.getArtifactId()),
+                                        element(name("type"), type),
+                                        element(name("version"), artifact.getVersion()),
+                                        element(name("destFileName"), targetFile.getName()))),
+                        element(name("outputDirectory"), targetDirectory.getPath())
+                ),
+                executionEnvironment()
+        );
+        return targetFile;
+    }
+
     /**
      * Copies {@code artifacts} to the {@code outputDirectory}. Artifacts are looked up in order: <ol> <li>in the maven
      * reactor</li> <li>in the maven repositories</li> </ol> This can't be used in a goal that happens before the
@@ -427,14 +452,9 @@ public class MavenGoals
         final int rmiPort = pickFreePort(0);
         final int actualHttpPort = pickFreePort(webappContext.getHttpPort());
         final List<Element> sysProps = new ArrayList<Element>();
-        if (webappContext.getJvmArgs() == null)
-        {
-            webappContext.setJvmArgs("-Xmx512m -XX:MaxPermSize=160m");
-        }
 
         for (final Map.Entry<String, String> entry : systemProperties.entrySet())
         {
-            webappContext.setJvmArgs(webappContext.getJvmArgs() + " -D" + entry.getKey() + "=\"" + entry.getValue() + "\"");
             sysProps.add(element(name(entry.getKey()), entry.getValue()));
         }
         log.info("Starting " + productInstanceId + " on the " + container.getId() + " container on ports "
@@ -445,7 +465,6 @@ public class MavenGoals
 
         final List<Element> deps = new ArrayList<Element>();
         for (final ProductArtifact dep : extraContainerDependencies)
-
         {
             deps.add(element(name("dependency"),
                     element(name("location"), webappContext.getArtifactRetriever().resolve(dep))
@@ -1024,29 +1043,9 @@ public class MavenGoals
     public void generateRestDocs() throws MojoExecutionException
     {
         MavenProject prj = ctx.getProject();
-        List<String> docletPaths = new ArrayList<String>();
-        StringBuffer docletPath = new StringBuffer(":" + prj.getBuild().getOutputDirectory());
-        String resourcedocPath = prj.getBuild().getOutputDirectory() + File.separator + "resourcedoc.xml";
         StringBuffer packagesPath = new StringBuffer();
-        PluginXmlUtils.PluginInfo pluginInfo = PluginXmlUtils.getPluginInfo(ctx);
-
-        try
-        {
-            docletPaths.addAll(prj.getCompileClasspathElements());
-            docletPaths.addAll(prj.getRuntimeClasspathElements());
-            docletPaths.addAll(prj.getSystemClasspathElements());
-
-            for(String path : docletPaths) {
-                docletPath.append(File.pathSeparator);
-                docletPath.append(path);
-            }
-
-        } catch (DependencyResolutionRequiredException e)
-        {
-            throw new MojoExecutionException("Dependencies must be resolved", e);
-        }
-
         List<PluginXmlUtils.RESTModuleInfo> restModules = PluginXmlUtils.getRestModules(ctx);
+
         for(PluginXmlUtils.RESTModuleInfo moduleInfo : restModules)
         {
             List<String> packageList = moduleInfo.getPackagesToScan();
@@ -1065,11 +1064,40 @@ public class MavenGoals
 
         if(!restModules.isEmpty() && packagesPath.length() > 0)
         {
+            Set<String> docletPaths = new HashSet<String>();
+            StringBuffer docletPath = new StringBuffer(":" + prj.getBuild().getOutputDirectory());
+            String resourcedocPath = fixWindowsSlashes(prj.getBuild().getOutputDirectory() + File.separator + "resourcedoc.xml");
+
+            PluginXmlUtils.PluginInfo pluginInfo = PluginXmlUtils.getPluginInfo(ctx);
+
+            try
+            {
+                docletPaths.addAll(prj.getCompileClasspathElements());
+                docletPaths.addAll(prj.getRuntimeClasspathElements());
+                docletPaths.addAll(prj.getSystemClasspathElements());
+
+                //AMPS-663: add plugin execution classes to doclet path
+                URL[] pluginUrls = ((URLClassLoader)Thread.currentThread().getContextClassLoader()).getURLs();
+                for(URL pluginUrl : pluginUrls)
+                {
+                    docletPaths.add(pluginUrl.getFile());
+                }
+
+                for(String path : docletPaths) {
+                    docletPath.append(File.pathSeparator);
+                    docletPath.append(path);
+                }
+
+            } catch (DependencyResolutionRequiredException e)
+            {
+                throw new MojoExecutionException("Dependencies must be resolved", e);
+            }
+
             executeMojo(
                     plugin(
                             groupId("org.apache.maven.plugins"),
                             artifactId("maven-javadoc-plugin"),
-                            version("2.4")
+                            version("2.8.1")
                     ),
                     goal("javadoc"),
                     configuration(
@@ -1090,7 +1118,7 @@ public class MavenGoals
                                 )
                             ),
                             element(name("additionalparam"),"-output \"" + resourcedocPath + "\""),
-                            element(name("useStandarDocletOptions"),"false")
+                            element(name("useStandardDocletOptions"),"false")
                     ),
                     executionEnvironment()
             );

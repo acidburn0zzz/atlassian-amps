@@ -10,6 +10,9 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter.MODULE_DESCRIP_PROMPT;
+import static com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter.MODULE_KEY_PROMPT;
+import static com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter.MODULE_NAME_PROMPT;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -68,10 +71,10 @@ public class RPCPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         RPCProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong interface", SOAP_INTERFACE, props.getInterfaceClass());
-        assertEquals("wrong interface package", PACKAGE, props.getInterfacePackage());
-        assertEquals("wrong class", SOAP_CLASSNAME, props.getClassname());
-        assertEquals("wrong class package", PACKAGE, props.getPackage());
+        assertEquals("wrong interface", SOAP_INTERFACE, props.getInterfaceId().getName());
+        assertEquals("wrong interface package", PACKAGE, props.getInterfaceId().getPackage());
+        assertEquals("wrong class", SOAP_CLASSNAME, props.getClassId().getName());
+        assertEquals("wrong class package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong service path", SOAP_PATH, props.getServicePath());
         assertEquals("wrong module name", SOAP_MODULE_NAME, props.getModuleName());
         assertEquals("wrong module key", SOAP_MODULE_KEY, props.getModuleKey());
@@ -92,9 +95,9 @@ public class RPCPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Enter Service Path", "mysoapendpoint-v1")).thenReturn(SOAP_PATH);
         when(prompter.prompt("Show Advanced Setup?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
 
-        when(prompter.prompt("Plugin Name", SOAP_MODULE_NAME)).thenReturn(ADV_MODULE_NAME);
-        when(prompter.prompt("Plugin Key", SOAP_MODULE_KEY)).thenReturn(ADV_MODULE_KEY);
-        when(prompter.prompt("Plugin Description", SOAP_DESCRIPTION)).thenReturn(ADV_DESCRIPTION);
+        when(prompter.prompt(MODULE_NAME_PROMPT, SOAP_MODULE_NAME)).thenReturn(ADV_MODULE_NAME);
+        when(prompter.prompt(MODULE_KEY_PROMPT, SOAP_MODULE_KEY)).thenReturn(ADV_MODULE_KEY);
+        when(prompter.prompt(MODULE_DESCRIP_PROMPT, SOAP_DESCRIPTION)).thenReturn(ADV_DESCRIPTION);
         when(prompter.prompt("i18n Name Key", SOAP_I18N_NAME_KEY)).thenReturn(ADV_I18N_NAME_KEY);
         when(prompter.prompt("i18n Description Key", SOAP_I18N_DESCRIPTION_KEY)).thenReturn(ADV_I18N_DESCRIPTION_KEY);
 
@@ -104,10 +107,10 @@ public class RPCPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         RPCProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong adv interface", SOAP_INTERFACE, props.getInterfaceClass());
-        assertEquals("wrong adv interface package", PACKAGE, props.getInterfacePackage());
-        assertEquals("wrong adv class", SOAP_CLASSNAME, props.getClassname());
-        assertEquals("wrong adv package", PACKAGE, props.getPackage());
+        assertEquals("wrong adv interface", SOAP_INTERFACE, props.getInterfaceId().getName());
+        assertEquals("wrong adv interface package", PACKAGE, props.getInterfaceId().getPackage());
+        assertEquals("wrong adv class", SOAP_CLASSNAME, props.getClassId().getName());
+        assertEquals("wrong adv package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong adv service path", SOAP_PATH, props.getServicePath());
         assertEquals("wrong adv module name", ADV_MODULE_NAME, props.getModuleName());
         assertEquals("wrong adv module key", ADV_MODULE_KEY, props.getModuleKey());
@@ -133,10 +136,10 @@ public class RPCPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         RPCProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong interface", XML_INTERFACE, props.getInterfaceClass());
-        assertEquals("wrong interface package", PACKAGE, props.getInterfacePackage());
-        assertEquals("wrong class", XML_CLASSNAME, props.getClassname());
-        assertEquals("wrong class package", PACKAGE, props.getPackage());
+        assertEquals("wrong interface", XML_INTERFACE, props.getInterfaceId().getName());
+        assertEquals("wrong interface package", PACKAGE, props.getInterfaceId().getPackage());
+        assertEquals("wrong class", XML_CLASSNAME, props.getClassId().getName());
+        assertEquals("wrong class package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong service path", XML_PATH, props.getServicePath());
         assertEquals("wrong module name", XML_MODULE_NAME, props.getModuleName());
         assertEquals("wrong module key", XML_MODULE_KEY, props.getModuleKey());
@@ -157,9 +160,9 @@ public class RPCPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Enter Service Path", "myxmlendpoint-v1")).thenReturn(XML_PATH);
         when(prompter.prompt("Show Advanced Setup?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
 
-        when(prompter.prompt("Plugin Name", XML_MODULE_NAME)).thenReturn(ADV_MODULE_NAME);
-        when(prompter.prompt("Plugin Key", XML_MODULE_KEY)).thenReturn(ADV_MODULE_KEY);
-        when(prompter.prompt("Plugin Description", XML_DESCRIPTION)).thenReturn(ADV_DESCRIPTION);
+        when(prompter.prompt(MODULE_NAME_PROMPT, XML_MODULE_NAME)).thenReturn(ADV_MODULE_NAME);
+        when(prompter.prompt(MODULE_KEY_PROMPT, XML_MODULE_KEY)).thenReturn(ADV_MODULE_KEY);
+        when(prompter.prompt(MODULE_DESCRIP_PROMPT, XML_DESCRIPTION)).thenReturn(ADV_DESCRIPTION);
         when(prompter.prompt("i18n Name Key", XML_I18N_NAME_KEY)).thenReturn(ADV_I18N_NAME_KEY);
         when(prompter.prompt("i18n Description Key", XML_I18N_DESCRIPTION_KEY)).thenReturn(ADV_I18N_DESCRIPTION_KEY);
 
@@ -169,10 +172,10 @@ public class RPCPrompterTest extends AbstractPrompterTest
         modulePrompter.setUseAnsiColor(false);
         RPCProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
-        assertEquals("wrong adv interface", XML_INTERFACE, props.getInterfaceClass());
-        assertEquals("wrong adv interface package", PACKAGE, props.getInterfacePackage());
-        assertEquals("wrong adv class", XML_CLASSNAME, props.getClassname());
-        assertEquals("wrong adv package", PACKAGE, props.getPackage());
+        assertEquals("wrong adv interface", XML_INTERFACE, props.getInterfaceId().getName());
+        assertEquals("wrong adv interface package", PACKAGE, props.getInterfaceId().getPackage());
+        assertEquals("wrong adv class", XML_CLASSNAME, props.getClassId().getName());
+        assertEquals("wrong adv package", PACKAGE, props.getClassId().getPackage());
         assertEquals("wrong adv service path", XML_PATH, props.getServicePath());
         assertEquals("wrong adv module name", ADV_MODULE_NAME, props.getModuleName());
         assertEquals("wrong adv module key", ADV_MODULE_KEY, props.getModuleKey());

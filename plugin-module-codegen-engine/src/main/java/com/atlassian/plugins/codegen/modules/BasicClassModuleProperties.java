@@ -6,8 +6,7 @@ import com.atlassian.plugins.codegen.util.ClassnameUtil;
  *
  */
 public class BasicClassModuleProperties extends AbstractClassBasedModuleProperties
-{
-
+{   
     public BasicClassModuleProperties()
     {
         this("MyPluginModule");

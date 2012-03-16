@@ -1,24 +1,22 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
-import java.io.File;
+import java.util.Map;
 
-import com.atlassian.plugins.codegen.annotations.Dependencies;
-import com.atlassian.plugins.codegen.annotations.Dependency;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+
+import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+
+import static com.atlassian.plugins.codegen.modules.Dependencies.HTTPCLIENT_TEST;
+import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 
 /**
  * @since 3.6
  */
 @JiraPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-        , @Dependency(groupId = "org.apache.httpcomponents", artifactId = "httpclient", version = "4.1.1", scope = "test")
-})
 public class WebworkModuleCreator extends AbstractPluginModuleCreator<WebworkProperties>
 {
 
@@ -29,7 +27,6 @@ public class WebworkModuleCreator extends AbstractPluginModuleCreator<WebworkPro
     private static final String CLASS_TEMPLATE = TEMPLATE_PREFIX + "WebworkAction.java.vtl";
     //private static final String UNIT_TEST_TEMPLATE = TEMPLATE_PREFIX + "WebworkActionTest.java.vtl";
     private static final String UNIT_TEST_TEMPLATE = "templates/generic/GenericTest.java.vtl";
-    private static final String FUNC_TEST_TEMPLATE = TEMPLATE_PREFIX + "WebworkActionFuncTest.java.vtl";
     private static final String VIEW_TEMPLATE = "templates/common/actionview.vm.vtl";
 
     //examples
@@ -38,47 +35,41 @@ public class WebworkModuleCreator extends AbstractPluginModuleCreator<WebworkPro
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "webwork-plugin.xml.vtl";
 
     @Override
-    public void createModule(PluginModuleLocation location, WebworkProperties props) throws Exception
+    public PluginProjectChangeset createModule(WebworkProperties props) throws Exception
     {
+        PluginProjectChangeset ret = new PluginProjectChangeset()
+            .withDependencies(HTTPCLIENT_TEST,
+                              MOCKITO_TEST)
+            .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 
         if (props.includeExamples())
         {
-
-        } else
+        }
+        else
         {
             for (ActionProperties action : props.getActions())
             {
-                //main class
-                templateHelper.writeJavaClassFromTemplate(CLASS_TEMPLATE, action.getClassname(), location.getSourceDirectory(), action.getPackage(), action);
-
-                //unit test
-                templateHelper.writeJavaClassFromTemplate(UNIT_TEST_TEMPLATE, testClassname(action.getClassname()), location.getTestDirectory(), action.getPackage(), action);
-
-                //write view templates
+                ret = ret.with(createClassAndTests(action, CLASS_TEMPLATE, UNIT_TEST_TEMPLATE));
+                
+                // write view templates
                 for (View view : action.getViews())
                 {
-
-                    String viewPath = FilenameUtils.separatorsToSystem(view.getPath());
-
-                    if (viewPath.startsWith("templates" + File.separator) || viewPath.startsWith(File.separator + "templates" + File.separator))
-                    {
-                        viewPath = StringUtils.substringAfter(viewPath, "templates" + File.separator);
-                    }
-
-                    File viewFolder = new File(location.getTemplateDirectory(), FilenameUtils.getPath(viewPath));
-                    String viewFile = FilenameUtils.getName(viewPath);
-
-                    action.setProperty("CURRENT_VIEW", viewFile);
-
-                    templateHelper.writeFileFromTemplate(VIEW_TEMPLATE, FilenameUtils.getName(viewPath), viewFolder, action);
+                    ret = ret.with(createViewResource(action, view, VIEW_TEMPLATE));
                 }
             }
         }
-
-
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
+        
+        return ret;
     }
-
+    
+    protected PluginProjectChangeset createViewResource(Map<Object, Object> props, View view, String templateName) throws Exception
+    {
+        String resourceFullPath = FilenameUtils.separatorsToSystem(view.getPath());
+        String path = FilenameUtils.getPath(resourceFullPath);
+        String fileName = FilenameUtils.getName(resourceFullPath);
+        Map<Object, Object> tempProps = ImmutableMap.builder().putAll(props).put("CURRENT_VIEW", fileName).build();
+        return createTemplateResource(tempProps, path, fileName, templateName);
+    }
 
     @Override
     public String getModuleName()

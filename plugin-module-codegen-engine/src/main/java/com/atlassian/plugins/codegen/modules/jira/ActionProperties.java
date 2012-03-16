@@ -23,7 +23,7 @@ public class ActionProperties extends BasicClassModuleProperties
     {
         super(fqClassName);
         setViews(new ArrayList<View>());
-        setAlias(getClassname());
+        setAlias(getClassId().getName());
     }
 
     public void setViews(List<View> views)

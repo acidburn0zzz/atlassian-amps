@@ -108,7 +108,7 @@ public class TemplateContextItemPrompterTest extends AbstractPrompterTest
         assertEquals("wrong i18n desc key", I18N_DESCRIPTION_KEY, props.getDescriptionI18nKey());
 
         assertEquals("wrong context key", CONTEXT_KEY, props.getContextKey());
-        assertEquals("wrong class", CLASSNAME, props.getFullyQualifiedClassname());
+        assertEquals("wrong class", CLASSNAME, props.getClassId().getFullName());
         assertFalse("wong global access", props.isGlobal());
     }
 
@@ -134,7 +134,7 @@ public class TemplateContextItemPrompterTest extends AbstractPrompterTest
         assertEquals("wrong i18n desc key", I18N_DESCRIPTION_KEY, props.getDescriptionI18nKey());
 
         assertEquals("wrong context key", CONTEXT_KEY, props.getContextKey());
-        assertEquals("wrong class", CLASSNAME, props.getFullyQualifiedClassname());
+        assertEquals("wrong class", CLASSNAME, props.getClassId().getFullName());
         assertTrue("wong global access", props.isGlobal());
     }
 }

@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.jfrog.maven.annomojo.annotations.MojoExecute;
@@ -19,8 +20,6 @@ import java.util.List;
 @MojoRequiresDependencyResolution
 public class DebugMojo extends RunMojo
 {
-    private static final String DEFAULT_JVM_ARGS = "-Xmx512m -XX:MaxPermSize=160m";
-
     /**
      * port for debugging
      */
@@ -42,11 +41,6 @@ public class DebugMojo extends RunMojo
         final List<ProductExecution> productExecutions = getProductExecutions();
         setParallelMode(productExecutions);
 
-        if (jvmArgs == null)
-        {
-            jvmArgs = DEFAULT_JVM_ARGS;
-        }
-
         int counter = 0;
         for (ProductExecution productExecution : productExecutions)
         {
@@ -63,7 +57,7 @@ public class DebugMojo extends RunMojo
 
             if (product.getJvmArgs() == null)
             {
-                product.setJvmArgs(jvmArgs);
+                product.setJvmArgs(StringUtils.defaultString(jvmArgs));
             }
 
             product.setJvmArgs(product.getJvmArgs() + debugArgs);

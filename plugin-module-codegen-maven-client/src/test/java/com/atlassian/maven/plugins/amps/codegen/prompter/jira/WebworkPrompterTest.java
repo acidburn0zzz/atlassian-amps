@@ -12,6 +12,8 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter.MODULE_DESCRIP_PROMPT;
+import static com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter.MODULE_KEY_PROMPT;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -85,8 +87,8 @@ public class WebworkPrompterTest extends AbstractPrompterTest
 
         ActionProperties action = props.getActions()
                 .get(0);
-        assertEquals("wrong action package", DEFAULT_ACTION_PACKAGE, action.getPackage());
-        assertEquals("wrong action classname", DEFAULT_ACTION_NAME, action.getClassname());
+        assertEquals("wrong action package", DEFAULT_ACTION_PACKAGE, action.getClassId().getPackage());
+        assertEquals("wrong action classname", DEFAULT_ACTION_NAME, action.getClassId().getName());
         assertEquals("wrong action alias", DEFAULT_ACTION_ALIAS, action.getAlias());
 
         assertEquals("wrong number of views", 3, action.getViews()
@@ -113,8 +115,8 @@ public class WebworkPrompterTest extends AbstractPrompterTest
     {
         when(prompter.prompt("Enter Plugin Module Name", "My Webwork Module")).thenReturn(MODULE_NAME);
         when(prompter.prompt("Show Advanced Setup?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
-        when(prompter.prompt("Plugin Key", MODULE_KEY)).thenReturn(ADV_MODULE_KEY);
-        when(prompter.prompt("Plugin Description", DESCRIPTION)).thenReturn(ADV_DESCRIPTION);
+        when(prompter.prompt(MODULE_KEY_PROMPT, MODULE_KEY)).thenReturn(ADV_MODULE_KEY);
+        when(prompter.prompt(MODULE_DESCRIP_PROMPT, DESCRIPTION)).thenReturn(ADV_DESCRIPTION);
         when(prompter.prompt("i18n Name Key", I18N_NAME_KEY)).thenReturn(ADV_I18N_NAME_KEY);
         when(prompter.prompt("i18n Description Key", I18N_DESCRIPTION_KEY)).thenReturn(ADV_I18N_DESCRIPTION_KEY);
 
@@ -161,12 +163,12 @@ public class WebworkPrompterTest extends AbstractPrompterTest
         ActionProperties actionTwo = props.getActions()
                 .get(1);
 
-        assertEquals("wrong action package", CUSTOM_ACTION_PACKAGE, actionOne.getPackage());
-        assertEquals("wrong action classname", CUSTOM_ACTION_ONE_NAME, actionOne.getClassname());
+        assertEquals("wrong action package", CUSTOM_ACTION_PACKAGE, actionOne.getClassId().getPackage());
+        assertEquals("wrong action classname", CUSTOM_ACTION_ONE_NAME, actionOne.getClassId().getName());
         assertEquals("wrong action alias", CUSTOM_ACTION_ONE_ALIAS, actionOne.getAlias());
 
-        assertEquals("wrong action package", CUSTOM_ACTION_PACKAGE, actionOne.getPackage());
-        assertEquals("wrong action classname", CUSTOM_ACTION_TWO_NAME, actionTwo.getClassname());
+        assertEquals("wrong action package", CUSTOM_ACTION_PACKAGE, actionTwo.getClassId().getPackage());
+        assertEquals("wrong action classname", CUSTOM_ACTION_TWO_NAME, actionTwo.getClassId().getName());
         assertEquals("wrong action alias", CUSTOM_ACTION_TWO_ALIAS, actionTwo.getAlias());
 
         assertEquals("wrong number of action one views", 2, actionOne.getViews()

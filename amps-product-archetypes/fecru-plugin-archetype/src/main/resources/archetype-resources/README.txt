@@ -2,7 +2,7 @@ You have successfully created a plugin using the Fisheye/Crucible plugin archety
 
 Here are the SDK commands you'll use immediately:
 
-* atlas-run   -- installs this plugin into Fisheye/Crucible and starts it on http://localhost:3990/fecru
+* atlas-run   -- installs this plugin into Fisheye/Crucible and starts it on http://<machinename>:3990/fecru
 * atlas-debug -- same as atlas-run, but allows a debugger to attach at port 5005
 * atlas-cli   -- after atlas-run or atlas-debug, opens a Maven command line window:
                  - 'pi' reinstalls the plugin into the running Fisheye/Crucible instance

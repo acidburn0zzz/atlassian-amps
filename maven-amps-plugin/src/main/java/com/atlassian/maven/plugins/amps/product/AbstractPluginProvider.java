@@ -46,6 +46,11 @@ public abstract class AbstractPluginProvider implements PluginProvider
             artifacts.addAll(getDevToolboxArtifacts(product.getDevToolboxVersion()));
         }
 
+        if (product.isEnablePde() && product.getPdeVersion() != null) 
+        {
+            artifacts.addAll(getPdeArtifacts(product.getPdeVersion()));
+        }
+        
         return artifacts;
     }
 
@@ -75,6 +80,11 @@ public abstract class AbstractPluginProvider implements PluginProvider
         return Collections.singletonList(new ProductArtifact("com.atlassian.devrel", "developer-toolbox-plugin", devToolboxVersion));
     }
 
+    protected Collection<ProductArtifact> getPdeArtifacts(String pdeVersion)
+    {
+        return Collections.singletonList(new ProductArtifact("com.atlassian.plugins", "plugin-data-editor", pdeVersion));
+    }
+    
     protected Collection<ProductArtifact> getRestArtifacts(String restVersion)
     {
         return Collections.singletonList(new ProductArtifact("com.atlassian.plugins.rest", "atlassian-rest-module", restVersion));

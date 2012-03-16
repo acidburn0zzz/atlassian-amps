@@ -1,62 +1,54 @@
 package com.atlassian.plugins.codegen.modules.common.web;
 
-import java.io.File;
-import java.util.regex.Matcher;
+import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
-import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-
-import org.dom4j.Document;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @since 3.6
  */
-public class WebResourceTransformerTest extends AbstractCodegenTestCase<WebResourceTransformerProperties>
+public class WebResourceTransformerTest extends AbstractModuleCreatorTestCase<WebResourceTransformerProperties>
 {
     public static final String PACKAGE_NAME = "com.atlassian.plugin.webresource";
 
+    public WebResourceTransformerTest()
+    {
+        super("web-resource-transformer", new WebResourceTransformerModuleCreator());
+    }
+    
     @Before
-    public void runGenerator() throws Exception
+    public void setupProps() throws Exception
     {
-        setCreator(new WebResourceTransformerModuleCreator());
-        setModuleLocation(new PluginModuleLocation.Builder(srcDir)
-                .resourcesDirectory(resourcesDir)
-                .testDirectory(testDir)
-                .templateDirectory(templateDir)
-                .build());
-
         setProps(new WebResourceTransformerProperties(PACKAGE_NAME + ".MyWebResourceTransformer"));
-
         props.setIncludeExamples(false);
-
-        creator.createModule(moduleLocation, props);
     }
 
     @Test
-    public void allFilesAreGenerated() throws Exception
+    public void classFileIsGenerated() throws Exception
     {
-        String packagePath = PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
-        String itPackagePath = "it" + File.separator + packagePath;
-        assertTrue("main class not generated", new File(srcDir, packagePath + File.separator + "MyWebResourceTransformer.java").exists());
-        assertTrue("test class not generated", new File(testDir, packagePath + File.separator + "MyWebResourceTransformerTest.java").exists());
-        assertTrue("plugin.xml not generated", new File(resourcesDir, "atlassian-plugin.xml").exists());
-
+        getSourceFile(PACKAGE_NAME, "MyWebResourceTransformer");
     }
 
     @Test
-    public void moduleIsValid() throws Exception
+    public void unitTestFileIsGenerated() throws Exception
     {
-        String xpath = "/atlassian-plugin/web-resource-transformer[@name='My Web Resource Transformer' and @key='my-web-resource-transformer' and @i18n-name-key='my-web-resource-transformer.name' and @class='" + PACKAGE_NAME + ".MyWebResourceTransformer']";
-
-        creator.createModule(moduleLocation, props);
-        Document pluginDoc = getXmlDocument(pluginXml);
-
-        assertNotNull("valid web-resource-transformer not found", pluginDoc.selectSingleNode(xpath));
+        getTestSourceFile(PACKAGE_NAME, "MyWebResourceTransformerTest");
     }
 
+    @Test
+    public void moduleHasDefaultKey() throws Exception
+    {
+        assertEquals("my-web-resource-transformer",
+                     getGeneratedModule().attributeValue("key"));
+    }
+    
+    @Test
+    public void moduleHasClass() throws Exception
+    {
+        assertEquals(PACKAGE_NAME + ".MyWebResourceTransformer",
+                     getGeneratedModule().attributeValue("class"));
+    }
 }

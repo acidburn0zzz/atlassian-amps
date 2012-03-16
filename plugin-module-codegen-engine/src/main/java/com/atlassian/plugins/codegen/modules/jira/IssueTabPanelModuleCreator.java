@@ -1,20 +1,15 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
-import java.io.File;
-
-import com.atlassian.plugins.codegen.annotations.Dependencies;
-import com.atlassian.plugins.codegen.annotations.Dependency;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+
+import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 
 /**
  * @since 3.6
  */
 @JiraPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-})
 public class IssueTabPanelModuleCreator extends AbstractPluginModuleCreator<TabPanelProperties>
 {
 
@@ -24,7 +19,6 @@ public class IssueTabPanelModuleCreator extends AbstractPluginModuleCreator<TabP
     //stub
     private static final String CLASS_TEMPLATE = TEMPLATE_PREFIX + "IssueTabPanel.java.vtl";
     private static final String UNIT_TEST_TEMPLATE = "templates/generic/GenericTest.java.vtl";
-    private static final String FUNC_TEST_TEMPLATE = TEMPLATE_PREFIX + "IssueTabPanelFuncTest.java.vtl";
     private static final String VIEW_TEMPLATE = TEMPLATE_PREFIX + "issue-tab-panel.vm.vtl";
 
     //examples
@@ -33,32 +27,25 @@ public class IssueTabPanelModuleCreator extends AbstractPluginModuleCreator<TabP
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "issue-tab-panel-plugin.xml.vtl";
 
     @Override
-    public void createModule(PluginModuleLocation location, TabPanelProperties props) throws Exception
+    public PluginProjectChangeset createModule(TabPanelProperties props) throws Exception
     {
-        String moduleKey = props.getModuleKey();
-        String packageName = props.getPackage();
-        String classname = props.getClassname();
-        String viewFileName = moduleKey + ".vm";
-        File templatesDir = new File(location.getTemplateDirectory(), "tabpanels");
+        PluginProjectChangeset ret = new PluginProjectChangeset()
+            .withDependencies(MOCKITO_TEST)
+            .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 
         if (props.includeExamples())
         {
-            templateHelper.writeJavaClassFromTemplate(EXAMPLE_CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-        } else
-        {
-            //main class
-            templateHelper.writeJavaClassFromTemplate(CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-
-            //unit test
-            templateHelper.writeJavaClassFromTemplate(UNIT_TEST_TEMPLATE, testClassname(classname), location.getTestDirectory(), packageName, props);
-
-            templateHelper.writeFileFromTemplate(VIEW_TEMPLATE, viewFileName, templatesDir, props);
+            return ret.with(createClass(props, EXAMPLE_CLASS_TEMPLATE));
         }
-
-
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
+        else
+        {
+            if (props.isUseCustomClass())
+            {
+                ret = ret.with(createClassAndTests(props, CLASS_TEMPLATE, UNIT_TEST_TEMPLATE));
+            }
+            return ret.with(createTemplateResource(props, "tabpanels", props.getModuleKey() + ".vm", VIEW_TEMPLATE));
+        }
     }
-
 
     @Override
     public String getModuleName()

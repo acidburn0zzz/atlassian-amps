@@ -1,7 +1,11 @@
 package com.atlassian.maven.plugins.amps.product.studio;
 
-import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STUDIO_CONFLUENCE;
-import static java.lang.String.format;
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.product.ConfluenceProductHandler;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.util.Arrays;
@@ -9,12 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.product.ConfluenceProductHandler;
+import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STUDIO_CONFLUENCE;
+import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
+import static java.lang.String.format;
 
 /**
  * Handler for Studio-Confluence
@@ -37,7 +38,7 @@ public class StudioConfluenceProductHandler extends ConfluenceProductHandler imp
     @Override
     public ProductArtifact getArtifact()
     {
-        return new ProductArtifact("com.atlassian.studio", "studio-confluence", "RELEASE");
+        return new ProductArtifact("com.atlassian.confluence", "confluence-studio-webapp", "RELEASE");
     }
 
     @Override
@@ -47,7 +48,7 @@ public class StudioConfluenceProductHandler extends ConfluenceProductHandler imp
 
         // This datasource is only used by the Studio version of Confluence:
         final String dburl = System.getProperty("amps.datasource.url",
-                format("jdbc:hsqldb:%s/database/confluencedb;hsqldb.tx=MVCC", StudioProductHandler.fixWindowsSlashes(getHomeDirectory(product).getAbsolutePath())));
+                format("jdbc:hsqldb:%s/database/confluencedb;hsqldb.tx=MVCC", fixWindowsSlashes(getHomeDirectory(product).getAbsolutePath())));
         final String driverClass = System.getProperty("amps.datasource.driver", "org.hsqldb.jdbcDriver");
         final String username = System.getProperty("amps.datasource.username", "sa");
         final String password = System.getProperty("amps.datasource.password", "");

@@ -1,24 +1,19 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
-import java.io.File;
-
-import com.atlassian.plugins.codegen.annotations.Dependencies;
-import com.atlassian.plugins.codegen.annotations.Dependency;
+import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.codehaus.plexus.util.FileUtils;
+
+import static com.atlassian.plugins.codegen.ResourceFile.resourceFile;
+import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 
 /**
  * @since 3.6
  */
 @JiraPluginModuleCreator
-@Dependencies({
-        @Dependency(groupId = "org.mockito", artifactId = "mockito-all", version = "1.8.5", scope = "test")
-})
 public class ReportModuleCreator extends AbstractPluginModuleCreator<ReportProperties>
 {
 
@@ -28,7 +23,6 @@ public class ReportModuleCreator extends AbstractPluginModuleCreator<ReportPrope
     //stub
     private static final String CLASS_TEMPLATE = TEMPLATE_PREFIX + "Report.java.vtl";
     private static final String UNIT_TEST_TEMPLATE = "templates/generic/GenericTest.java.vtl";
-    private static final String FUNC_TEST_TEMPLATE = TEMPLATE_PREFIX + "ReportFuncTest.java.vtl";
     private static final String VIEW_TEMPLATE = "templates/common/actionview.vm.vtl";
 
     //examples
@@ -37,57 +31,37 @@ public class ReportModuleCreator extends AbstractPluginModuleCreator<ReportPrope
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "report-plugin.xml.vtl";
 
     @Override
-    public void createModule(PluginModuleLocation location, ReportProperties props) throws Exception
+    public PluginProjectChangeset createModule(ReportProperties props) throws Exception
     {
-        String packageName = props.getPackage();
-
-        String classname = props.getClassname();
-
+        PluginProjectChangeset ret = new PluginProjectChangeset()
+            .withDependencies(MOCKITO_TEST)
+            .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
+        
         if (props.includeExamples())
         {
-            templateHelper.writeJavaClassFromTemplate(EXAMPLE_CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-        } else
-        {
-            //main class
-            templateHelper.writeJavaClassFromTemplate(CLASS_TEMPLATE, classname, location.getSourceDirectory(), packageName, props);
-
-            //unit test
-            templateHelper.writeJavaClassFromTemplate(UNIT_TEST_TEMPLATE, testClassname(classname), location.getTestDirectory(), packageName, props);
-
-            //func test
-            //templateHelper.writeJavaClassFromTemplate(FUNC_TEST_TEMPLATE, funcTestClassname(classname), location.getTestDirectory(), funcTestPackageName(packageName), props);
+            return ret.with(createClass(props, EXAMPLE_CLASS_TEMPLATE));
         }
-
-        //since we know resources are velocity templates, let's create them
-        for (Resource resource : props.getResources())
+        else
         {
-            if (resource.getType()
-                    .equals("i18n"))
+            ret = ret.with(createClassAndTests(props, CLASS_TEMPLATE, UNIT_TEST_TEMPLATE));
+            
+            //since we know resources are velocity templates, let's create them
+            for (Resource resource : props.getResources())
             {
-                File resourceFile = new File(location.getResourcesDir(), resource.getLocation() + ".properties");
-                if (!resourceFile.exists())
+                if (resource.getType().equals("i18n"))
                 {
-                    resourceFile.createNewFile();
+                    String path = FileUtils.getPath(resource.getLocation());
+                    String name = FileUtils.filename(resource.getLocation());
+                    ret = ret.withResourceFile(resourceFile(path, name + ".properties", ""));
                 }
-            } else
-            {
-                String resourcePath = FilenameUtils.separatorsToSystem(resource.getLocation());
-
-                if (resourcePath.startsWith("templates" + File.separator) || resourcePath.startsWith(File.separator + "templates" + File.separator))
+                else
                 {
-                    resourcePath = StringUtils.substringAfter(resourcePath, "templates" + File.separator);
+                    ret = ret.with(createTemplateResource(props, resource, VIEW_TEMPLATE));
                 }
-
-                File resourceFolder = new File(location.getTemplateDirectory(), FilenameUtils.getPath(resourcePath));
-                String resourceFile = FilenameUtils.getName(resourcePath);
-
-                props.setProperty("CURRENT_VIEW", resourceFile);
-
-                templateHelper.writeFileFromTemplate(VIEW_TEMPLATE, FilenameUtils.getName(resourcePath), resourceFolder, props);
             }
+            
+            return ret;
         }
-
-        addModuleToPluginXml(PLUGIN_MODULE_TEMPLATE, location, props);
     }
 
 

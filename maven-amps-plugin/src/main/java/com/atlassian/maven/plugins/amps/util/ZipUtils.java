@@ -99,8 +99,27 @@ public class ZipUtils
      */
     public static int countNestingLevel(File zip) throws ZipException, IOException
     {
-        List<String> filenames = toList(new ZipFile(zip).entries());
-        return countNestingLevel(filenames);
+        ZipFile zipFile = null;
+        try
+        {
+            zipFile = new ZipFile(zip);
+            List<String> filenames = toList(zipFile.entries());
+            return countNestingLevel(filenames);
+        }
+        finally
+        {
+            if (zipFile != null)
+            {
+                try
+                {
+                    zipFile.close();
+                }
+                catch (IOException e)
+                {
+                    // ignore
+                }
+            }
+        }
     }
 
     /**

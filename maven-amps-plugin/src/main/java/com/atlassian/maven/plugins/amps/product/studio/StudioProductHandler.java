@@ -1,5 +1,43 @@
 package com.atlassian.maven.plugins.amps.product.studio;
 
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.product.AmpsProductHandler;
+import com.atlassian.maven.plugins.amps.product.ProductHandler;
+import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.atlassian.maven.plugins.amps.util.ProjectUtils;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.surefire.shade.org.apache.commons.lang.StringUtils;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+
 import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STUDIO;
 import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STUDIO_BAMBOO;
 import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STUDIO_CONFLUENCE;
@@ -9,42 +47,12 @@ import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STU
 import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.surefire.shade.org.apache.commons.lang.StringUtils;
-
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.ProductExecution;
-import com.atlassian.maven.plugins.amps.product.AmpsProductHandler;
-import com.atlassian.maven.plugins.amps.product.ProductHandler;
-import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
-import com.atlassian.maven.plugins.amps.util.ProjectUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 /**
  * This product handler is a 'ghost'. It doesn't start a real product, but it prepares the environment
  * for all studio-based products.
  * @since 3.6
  */
-final public class StudioProductHandler extends AmpsProductHandler
+public class StudioProductHandler extends AmpsProductHandler
 {
     private static final String STUDIO_PROPERTIES = "home/studio.properties";
     private static final String STUDIO_TEST_PROPERTIES = "studiotest.properties";
@@ -53,7 +61,12 @@ final public class StudioProductHandler extends AmpsProductHandler
     private static final String STUDIO_INITIAL_DATA_XML = "home/studio-initial-data.xml";
 
     /** This token is used in product's <version> when they want to reuse the Studio product's version */
-    private static final String STUDIO_VERSION_TOKEN = "STUDIO-VERSION";
+    private static final String ONDEMAND_VERSION_TOKEN = "STUDIO-VERSION";
+    private static final String ONDEMAND_GROUP_ID = "com.atlassian.studio";
+
+
+    private static final String JIRA_VERSION_KEY = "jira.version";
+    private static final String CONFLUENCE_VERSION_KEY = "confluence.version";
 
     private static final Map<String, String> defaultContextPaths = new HashMap<String, String>()
     {
@@ -102,13 +115,17 @@ final public class StudioProductHandler extends AmpsProductHandler
      * Returns the list of products that are configured in this studio instance, as defined in 'instanceIds'
      *
      * @param studioContext
-     *            the Studio product
+     *            the Studio product. If not a studio product, returns an empty list.
      * @return a list of instance ids. Never null.
      * @throws MojoExecutionException
      *             if the Studio product is misconfigured
      */
-    public List<String> getDependantInstances(Product studioContext) throws MojoExecutionException
+    public static List<String> getDependantInstances(Product studioContext) throws MojoExecutionException
     {
+        if (!STUDIO.equals(studioContext.getId()))
+        {
+            return Collections.emptyList();
+        }
         StudioProperties studioProperties = getStudioProperties(studioContext);
         studioProperties.setStudioProduct(studioContext);
         List<String> instanceIds = studioContext.getInstanceIds();
@@ -232,7 +249,7 @@ final public class StudioProductHandler extends AmpsProductHandler
             {
                 // This value will be replaced with the version given by the studio product.
                 // We can't leave it empty because the value will be defaulted to RELEASE.
-                product.setVersion(STUDIO_VERSION_TOKEN);
+                product.setVersion(ONDEMAND_VERSION_TOKEN);
             }
 
             // Set the default debug port
@@ -252,110 +269,112 @@ final public class StudioProductHandler extends AmpsProductHandler
     /**
      * Requests the Studio instance to configure its fellow products (home directory, ...)
      *
-     * Not thread safe.
+     * Not thread safe. The client should guarantee it calls this method once and only once for a productMap.
      *
-     * @param studioContext
-     *            the studio instance. There may be several Studio instances, so the products should be configured
-     *            with this instance in mind.
-     *
-     * @param dependantProducts
-     *            the list of products running 'in' this instance of studio (same home & applinked).
-     *            The client should guarantee it calls this method once and only once for all the product on one
-     *            Studio instance.
+     * @param productMap
+     *            The product map of { instanceId -> product }. 
      * @throws MojoExecutionException
      */
-    public void configure(Product studioContext, List<ProductExecution> dependantProducts) throws MojoExecutionException
+    public void configureStudioProducts(Map<String, Product> productMap) throws MojoExecutionException
     {
-        StudioProperties studioProperties = getStudioProperties(studioContext);
-
-        boolean confluenceStandalone = true;
-
-        // Sets properties for each product
-        for (ProductExecution execution : dependantProducts)
+        // Find the Studio product, if any
+        for (Product studioContext : productMap.values())
         {
-            // Each product provides some configuration info
-
-            // JIRA, Confluence and Bamboo support the parallel startup;
-            // Crowd must be started synchronously because there's a race condition
-            // and Fisheye doesn't support parallel startup.
-
-            Product product = execution.getProduct();
-            if (STUDIO_CROWD.equals(product.getId()))
+            if (STUDIO.equals(studioContext.getId()))
             {
-                studioProperties.setCrowd(product);
-                if (product.getSynchronousStartup() == null)
+                StudioProperties studioProperties = getStudioProperties(studioContext);
+
+                boolean confluenceStandalone = true;
+                final OnDemandProductVersions versions = new OnDemandProductVersions(studioContext, studioProperties);
+
+                // Sets properties for each product
+                for (String instanceId : getDependantInstances(studioContext))
                 {
-                    product.setSynchronousStartup(Boolean.TRUE);
-                }
-            }
-            else if (STUDIO_CONFLUENCE.equals(product.getId()))
-            {
-                studioProperties.setConfluence(product);
-                if (product.getSynchronousStartup() == null)
-                {
-                    product.setSynchronousStartup(studioContext.getSynchronousStartup());
-                }
-            }
-            else if (STUDIO_JIRA.equals(product.getId()))
-            {
-                studioProperties.setJira(product);
-                confluenceStandalone = false;
-                if (product.getSynchronousStartup() == null)
-                {
-                    product.setSynchronousStartup(studioContext.getSynchronousStartup());
-                }
-            }
-            else if (STUDIO_FECRU.equals(product.getId()))
-            {
-                studioProperties.setFisheye(product);
-                confluenceStandalone = false;
-            }
-            else if (STUDIO_BAMBOO.equals(product.getId()))
-            {
-                studioProperties.setBamboo(product);
-                confluenceStandalone = false;
-                if (product.getSynchronousStartup() == null)
-                {
-                    product.setSynchronousStartup(studioContext.getSynchronousStartup());
-                }
-            }
-            else
-            {
-                throw new MojoExecutionException("A non-studio product was listed in a Studio instance: " + product.getInstanceId());
-            }
+                    Product product = productMap.get(instanceId);
 
-            studioProperties.setModeConfluenceStandalone(confluenceStandalone);
+                    // Each product provides some configuration info
 
-            // And share the bean between all products
-            product.setStudioProperties(studioProperties);
+                    // JIRA, Confluence and Bamboo support the parallel startup;
+                    // Crowd must be started synchronously because there's a race condition
+                    // and Fisheye doesn't support parallel startup.
 
-            // Set the common Studio version
-            if (STUDIO_VERSION_TOKEN.equals(product.getVersion()))
-            {
-                product.setVersion(studioProperties.getVersion());
+                    if (STUDIO_CROWD.equals(product.getId()))
+                    {
+                        studioProperties.setCrowd(product);
+                        if (product.getSynchronousStartup() == null)
+                        {
+                            product.setSynchronousStartup(Boolean.TRUE);
+                        }
+                    }
+                    else if (STUDIO_CONFLUENCE.equals(product.getId()))
+                    {
+                        studioProperties.setConfluence(product);
+                        if (product.getSynchronousStartup() == null)
+                        {
+                            product.setSynchronousStartup(studioContext.getSynchronousStartup());
+                        }
+                    }
+                    else if (STUDIO_JIRA.equals(product.getId()))
+                    {
+                        studioProperties.setJira(product);
+                        confluenceStandalone = false;
+                        if (product.getSynchronousStartup() == null)
+                        {
+                            product.setSynchronousStartup(studioContext.getSynchronousStartup());
+                        }
+                    }
+                    else if (STUDIO_FECRU.equals(product.getId()))
+                    {
+                        studioProperties.setFisheye(product);
+                        confluenceStandalone = false;
+                    }
+                    else if (STUDIO_BAMBOO.equals(product.getId()))
+                    {
+                        studioProperties.setBamboo(product);
+                        confluenceStandalone = false;
+                        if (product.getSynchronousStartup() == null)
+                        {
+                            product.setSynchronousStartup(studioContext.getSynchronousStartup());
+                        }
+                    }
+                    else
+                    {
+                        throw new MojoExecutionException("A non-studio product was listed in a Studio instance: " + product.getInstanceId());
+                    }
+
+                    studioProperties.setModeConfluenceStandalone(confluenceStandalone);
+
+                    // And share the bean between all products
+                    product.setStudioProperties(studioProperties);
+
+                    if (ONDEMAND_VERSION_TOKEN.equals(product.getVersion()))
+                    {
+                        product.setVersion(versions.getVersion(product));
+                    }
+                }
+
+                // Sets the paths for non-products
+                File studioHomeDir = getHomeDirectory(studioContext);
+                File studioCommonsDir = studioHomeDir.getParentFile();
+                File svnHomeDir = new File(studioCommonsDir, "svn-home");
+                File webDavDir = new File(studioCommonsDir, "webdav-home");
+                String svnPublicUrl;
+                if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows"))
+                {
+                    svnPublicUrl = "file:///" + svnHomeDir.getAbsolutePath();
+                    log.warn("Studio is only designed to run on Linux systems.");
+                }
+                else
+                {
+                    svnPublicUrl = "file://" + svnHomeDir.getAbsolutePath();
+                }
+
+                studioProperties.setStudioHome(studioHomeDir.getAbsolutePath());
+                studioProperties.setSvnRoot(svnHomeDir.getAbsolutePath());
+                studioProperties.setSvnPublicUrl(svnPublicUrl);
+                studioProperties.setWebDavHome(webDavDir.getAbsolutePath());
             }
         }
-
-        // Sets the paths for non-products
-        File studioHomeDir = getHomeDirectory(studioContext);
-        File studioCommonsDir = studioHomeDir.getParentFile();
-        File svnHomeDir = new File(studioCommonsDir, "svn-home");
-        File webDavDir = new File(studioCommonsDir, "webdav-home");
-        String svnPublicUrl;
-        if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows"))
-        {
-            svnPublicUrl = "file:///" + svnHomeDir.getAbsolutePath();
-            log.warn("Studio is only designed to run on Linux systems.");
-        }
-        else
-        {
-            svnPublicUrl = "file://" + svnHomeDir.getAbsolutePath();
-        }
-
-        studioProperties.setStudioHome(studioHomeDir.getAbsolutePath());
-        studioProperties.setSvnRoot(svnHomeDir.getAbsolutePath());
-        studioProperties.setSvnPublicUrl(svnPublicUrl);
-        studioProperties.setWebDavHome(webDavDir.getAbsolutePath());
     }
 
     /**
@@ -843,11 +862,6 @@ final public class StudioProductHandler extends AmpsProductHandler
         }
     }
 
-    static String fixWindowsSlashes(final String path)
-    {
-        return path.replaceAll("\\\\", "/");
-    }
-
     static boolean checkFileExists(File file, Log log)
     {
         if (!file.exists())
@@ -861,7 +875,7 @@ final public class StudioProductHandler extends AmpsProductHandler
     /**
      * Returns the first value which is not null. Useful to set default values
      *
-     * @param t
+     * @param <T>
      * @return the first non-null value, or null if all values are null
      */
     public static <T> T firstNotNull(T... values)
@@ -875,4 +889,158 @@ final public class StudioProductHandler extends AmpsProductHandler
         }
         return null;
     }
+
+    @VisibleForTesting
+    protected Model getOnDemandPomModel(Product ondemand, StudioProperties properties) throws MojoExecutionException
+    {
+        File pomFile = getOnDemandPom(ondemand, properties);
+        return readModel(pomFile);
+    }
+
+    private Model readModel(File pomFile) throws MojoExecutionException
+    {
+        Reader filePomReader = null;
+        try
+        {
+            filePomReader = new BufferedReader(new FileReader(pomFile));
+            MavenXpp3Reader pomReader = new MavenXpp3Reader();
+            return pomReader.read(filePomReader);
+        }
+        catch (Exception e)
+        {
+            throw new MojoExecutionException("Failed to read ondemand-fireball pom", e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(filePomReader);
+        }
+    }
+
+    private File getOnDemandPom(Product ondemand, StudioProperties properties) throws MojoExecutionException
+    {
+        final File baseDir = getBaseDirectory(ondemand);
+        File ondemandPom = new File(baseDir, "ondemand.pom");
+        if (!ondemandPom.exists())
+        {
+            ondemandPom = goals.copyArtifact("ondemand.pom", baseDir, getPomArtifact(properties), "pom");
+        }
+        return ondemandPom;
+    }
+
+    private ProductArtifact getPomArtifact(StudioProperties properties)
+    {
+        final String version = properties.getVersion();
+        if (isPostOnDemandSplit(version))
+        {
+            return new ProductArtifact(ONDEMAND_GROUP_ID, "ondemand-fireball", version);
+        }
+        else
+        {
+            return new ProductArtifact(ONDEMAND_GROUP_ID, "studio-parent", version);
+        }
+
+    }
+
+    private boolean isPostOnDemandSplit(String version)
+    {
+        // first post-split version was 133, but 133-partial-1 is before! :)
+        return getVersionNumber(version) >= 133 && !version.equals("133-partial-1");
+    }
+
+    private int getVersionNumber(String version)
+    {
+        final int digitsCount = getDigitsCount(version);
+        if (digitsCount == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            return Integer.parseInt(version.substring(0, digitsCount));
+        }
+    }
+
+    private int getDigitsCount(String version)
+    {
+        for (int i=0; i<version.length(); i++)
+        {
+            if (!Character.isDigit(version.charAt(i)))
+            {
+                return i;
+            }
+        }
+        return version.length();
+    }
+
+    /**
+     * Retrieves default product versions from ondemand parent pom.
+     *
+     */
+    private class OnDemandProductVersions
+    {
+        private final Map<String,String> productVersionMappings;
+        private final StudioProperties properties;
+
+        OnDemandProductVersions(Product ondemand, StudioProperties properties) throws MojoExecutionException
+        {
+            this.properties = properties;
+            this.productVersionMappings = initMappings(ondemand);
+        }
+
+        String getVersion(Product product)
+        {
+            if (productVersionMappings.containsKey(product.getId()))
+            {
+                return productVersionMappings.get(product.getId());
+            }
+            else
+            {
+                // default version is OnDemand version
+                return properties.getVersion();
+            }
+        }
+
+        private Map<String, String> initMappings(Product ondemand) throws MojoExecutionException
+        {
+            Model model = getOnDemandPomModel(ondemand, properties);
+            validate(model);
+            ImmutableMap.Builder<String,String> builder = ImmutableMap.builder();
+            builder.put(STUDIO_JIRA, getVersionProperty(JIRA_VERSION_KEY, model.getProperties()));
+            builder.put(STUDIO_CONFLUENCE, getVersionProperty(CONFLUENCE_VERSION_KEY, model.getProperties()));
+            return builder.build();
+        }
+
+
+
+        private void validate(Model model) throws MojoExecutionException
+        {
+            Properties props = model.getProperties();
+            validatePropertyExists(JIRA_VERSION_KEY, props);
+            validatePropertyExists(CONFLUENCE_VERSION_KEY, props);
+        }
+
+        private String getVersionProperty(String key, Properties props)
+        {
+            if (props.containsKey(key))
+            {
+                return props.getProperty(key);
+            }
+            else
+            {
+                return properties.getVersion();
+            }
+        }
+
+        private void validatePropertyExists(String key, Properties props)
+        {
+            if (!props.containsKey(key))
+            {
+                context.getLog().warn("Expected property '" + key + "' in the OnDemand fireball POM (version "
+                        + properties.getVersion() + ") not found. OnDemand version will be used instead");
+            }
+        }
+
+
+    }
+
 }
