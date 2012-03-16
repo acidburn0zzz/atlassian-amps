@@ -8,7 +8,7 @@ import com.google.common.collect.Iterables;
 /**
  * Describes an key-value pair that should be added to the plugin project's I18n strings file.
  */
-public class I18nString extends AbstractPropertyValue implements PluginProjectChange
+public class I18nString extends AbstractPropertyValue implements PluginProjectChange, SummarizeAsGroup
 {
     public static I18nString i18nString(String name, String value)
     {
@@ -29,6 +29,12 @@ public class I18nString extends AbstractPropertyValue implements PluginProjectCh
     private I18nString(String name, String value)
     {
         super(name, value);
+    }
+
+    @Override
+    public String getGroupName()
+    {
+        return "i18n strings";
     }
     
     @Override

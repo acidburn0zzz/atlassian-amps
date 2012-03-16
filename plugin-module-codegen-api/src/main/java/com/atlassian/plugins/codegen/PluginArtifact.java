@@ -63,6 +63,6 @@ public final class PluginArtifact implements PluginProjectChange
     @Override
     public String toString()
     {
-        return "[" + type.getElementName() + ": " + artifactId + (versionId.isDefined() ? (" " + versionId) : "") + "]";
+        return "[" + type.getElementName() + ": " + artifactId + "]";
     }
 }

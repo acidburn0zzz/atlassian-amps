@@ -15,4 +15,10 @@ public class AmpsSystemPropertyVariable extends AbstractPropertyValue implements
     {
         super(name, value);
     }
+    
+    @Override
+    public String toString()
+    {
+        return "[systemPropertyVariable: " + super.toString() + "]";
+    }
 }

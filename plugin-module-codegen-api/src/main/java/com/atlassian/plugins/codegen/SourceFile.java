@@ -50,6 +50,6 @@ public class SourceFile implements PluginProjectChange
     @Override
     public String toString()
     {
-        return "[source: " + classId + "]";
+        return "[class: " + classId + "]";
     }
 }

@@ -116,7 +116,13 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
             moduleProps.setProductId(getGadgetCompatibleProductId(productId));
 
             PluginProjectChangeset changeset = creator.createModule(moduleProps);
-
+            
+            getLog().info("Adding the following items to the project:");
+            for (String desc : changeset.getChangeDescriptionsOrSummaries())
+            {
+                getLog().info("  " + desc);
+            }
+            
             // edit pom if needed
             new MavenProjectRewriter(project, getLog()).applyChanges(changeset);
             

@@ -45,6 +45,6 @@ public class MavenPlugin implements PluginProjectChange
     @Override
     public String toString()
     {
-        return "[plugin: " + artifactId + "]"; 
+        return "[Maven plugin: " + artifactId + "]"; 
     }
 }

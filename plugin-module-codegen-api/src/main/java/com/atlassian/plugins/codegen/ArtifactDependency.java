@@ -101,6 +101,6 @@ public final class ArtifactDependency implements PluginProjectChange
     @Override
     public String toString()
     {
-        return "[dependency " + artifactId + " " + versionId + " (" + scope.name().toLowerCase() + ")]";
+        return "[dependency: " + artifactId + "]";
     }
 }
