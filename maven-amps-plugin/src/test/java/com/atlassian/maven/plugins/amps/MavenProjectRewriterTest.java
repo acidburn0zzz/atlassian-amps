@@ -27,6 +27,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.Matchers.hasItem;
+
+import static org.hamcrest.Matchers.allOf;
+
 import static com.atlassian.maven.plugins.amps.XmlMatchers.node;
 import static com.atlassian.maven.plugins.amps.XmlMatchers.nodeCount;
 import static com.atlassian.maven.plugins.amps.XmlMatchers.nodeText;
@@ -100,6 +104,8 @@ public class MavenProjectRewriterTest
     
     private static final BundleInstruction NEW_IMPORT_PACKAGE =
         importPackage("com.atlassian.random", "2.0.1");
+    private static final BundleInstruction DUPLICATE_IMPORT_PACKAGE =
+        importPackage("com.atlassian.plugins.rest.common*", "1.0.5");
     private static final BundleInstruction NEW_PRIVATE_PACKAGE =
         privatePackage("com.atlassian.random");
     
@@ -368,6 +374,17 @@ public class MavenProjectRewriterTest
                         nodeText(delimitedList(",",
                                                Matchers.<String>hasItems(equalTo("com.atlassian.plugin.*;version=\"${atlassian.plugins.version}\""),
                                                    any(String.class), any(String.class), any(String.class))))));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void bundleInstructionIsNotInsertedIfPackageIsAlreadyPresentInCategory() throws Exception
+    {
+        assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(DUPLICATE_IMPORT_PACKAGE)),
+                   node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
+                        nodeText(delimitedList(",",
+                                               allOf(hasItem(equalTo("com.atlassian.plugins.rest.common*;version=\"1.0.5\"")),
+                                                     Matchers.<String>iterableWithSize(3))))));
     }
 
     @Test

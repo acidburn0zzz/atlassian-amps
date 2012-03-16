@@ -233,7 +233,7 @@ public class MavenProjectRewriter implements ProjectRewriter
             Xpp3Dom categoryElement = getOrCreateElement(instructionsRoot, categoryName);
             String body = categoryElement.getValue();
             Iterable<BundleInstruction> instructionList = parseInstructions(instruction.getCategory(), (body == null) ? "" : body);
-            if (Iterables.contains(instructionList, bundleInstructionPackageName(instruction.getPackageName())))
+            if (any(instructionList, bundleInstructionPackageName(instruction.getPackageName())))
             {
                 continue;
             }
