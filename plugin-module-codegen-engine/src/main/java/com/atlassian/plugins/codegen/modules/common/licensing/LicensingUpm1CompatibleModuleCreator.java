@@ -157,13 +157,6 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
         PluginProjectChangeset licenseServlet = new ServletModuleCreator().createModule(licenseServletProps)
             .with(createClass(licenseServletProps, LICENSE_SERVLET_TEMPLATE));
         
-        ClassId helloWorldServletClass = props.getClassId().className(HELLO_WORLD_SERVLET_CLASS_NAME);
-        ServletProperties helloWorldServletProps = new ServletProperties(helloWorldServletClass.getFullName());
-        helloWorldServletProps.setUrlPattern(HELLO_WORLD_SERVLET_URL_PATTERN);
-        helloWorldServletProps.setCreateClass(false);
-        PluginProjectChangeset helloWorldServlet = new ServletModuleCreator().createModule(helloWorldServletProps)
-            .with(createClass(helloWorldServletProps, HELLO_WORLD_SERVLET_TEMPLATE));
-        
         PluginProjectChangeset ret = new PluginProjectChangeset()
             .with(DEPENDENCIES)
             .with(BUNDLE_INSTRUCTIONS)
@@ -173,10 +166,21 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
             .with(COMPONENT_IMPORTS)
             .with(COMPONENTS)
             .with(licenseServlet)
-            .with(helloWorldServlet)
             .with(ampsSystemPropertyVariable("mac.baseurl", "https://intsys-staging.atlassian.com/my"))
             .with(resourceFile("", "license-admin.vm", fromFile(LICENSE_SERVLET_VELOCITY_TEMPLATE)))
             .with(createI18nStrings(props, PROPERTIES_TEMPLATE));
+        
+        if (props.includeExamples())
+        {
+            ClassId helloWorldServletClass = props.getClassId().className(HELLO_WORLD_SERVLET_CLASS_NAME);
+            ServletProperties helloWorldServletProps = new ServletProperties(helloWorldServletClass.getFullName());
+            helloWorldServletProps.setUrlPattern(HELLO_WORLD_SERVLET_URL_PATTERN);
+            helloWorldServletProps.setCreateClass(false);
+            PluginProjectChangeset helloWorldServlet = new ServletModuleCreator().createModule(helloWorldServletProps)
+                .with(createClass(helloWorldServletProps, HELLO_WORLD_SERVLET_TEMPLATE));
+
+            ret = ret.with(helloWorldServlet);
+        }
         
         return ret;
     }

@@ -24,6 +24,7 @@ public class LicensingUpm1CompatiblePrompter extends AbstractModulePrompter<Lice
     @Override
     public LicensingProperties promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException
     {
+        showExamplesPrompt = true;
         String packageName = promptJavaPackagename("Enter Servlet Package Name", getDefaultBasePackage() + ".servlet");
         return new LicensingProperties(packageName + ".LicenseServlet");
     }

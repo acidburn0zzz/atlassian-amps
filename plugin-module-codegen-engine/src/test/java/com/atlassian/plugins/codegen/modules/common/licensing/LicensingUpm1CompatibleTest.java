@@ -16,6 +16,7 @@ import static com.atlassian.plugins.codegen.PluginParameter.pluginParameter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @since 3.8
@@ -101,14 +102,22 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     }
 
     @Test
-    public void helloWorldServletModuleIsAdded() throws Exception
+    public void helloWorldServletModuleIsNotAddedByDefault() throws Exception
     {
+        assertNull(getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-hello-world-servlet']"));
+    }
+    
+    @Test
+    public void helloWorldServletModuleIsAddedIfExamplesAreSelected() throws Exception
+    {
+        props.setIncludeExamples(true);
         assertNotNull(getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-hello-world-servlet']"));
     }
     
     @Test
     public void helloWorldServletModuleHasClass() throws Exception
     {
+        props.setIncludeExamples(true);
         assertEquals(packageAndClass(PACKAGE_NAME, LicensingUpm1CompatibleModuleCreator.HELLO_WORLD_SERVLET_CLASS_NAME).getFullName(),
                      getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-hello-world-servlet']/@class").getText());
     }
@@ -116,6 +125,7 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     @Test
     public void helloWorldServletModuleHasUrlPattern() throws Exception
     {
+        props.setIncludeExamples(true);
         assertEquals(LicensingUpm1CompatibleModuleCreator.HELLO_WORLD_SERVLET_URL_PATTERN,
                      getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-hello-world-servlet']/url-pattern").getText());
     }

@@ -100,7 +100,7 @@
                         <tr>
                             <td>$i18n.getText("plugin.license.storage.admin.license.attribute.sen.title")</td>
                             #if ($license.get().supportEntitlementNumber.isDefined())
-                            <td>$license.get().supportEntitlementNumber</td>
+                            <td>$license.get().supportEntitlementNumber.get()</td>
                             #end
                         </tr>
                     #end
