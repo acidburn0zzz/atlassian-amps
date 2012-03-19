@@ -40,7 +40,7 @@ import static com.atlassian.plugins.codegen.VersionId.version;
 import static com.atlassian.plugins.codegen.VersionId.versionProperty;
 
 /**
- * @since 3.8
+ * @since 3.9
  */
 @RefAppPluginModuleCreator
 @JiraPluginModuleCreator
@@ -50,7 +50,7 @@ import static com.atlassian.plugins.codegen.VersionId.versionProperty;
 @CrowdPluginModuleCreator
 public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCreator<LicensingProperties>
 {
-    public static final String MODULE_NAME = "License Management (pre-UPM 2 Compatibility)";
+    public static final String MODULE_NAME = "Licensing API Support";
 
     public static final String LICENSE_SERVLET_TEMPLATE = "templates/common/licensing/LicenseServlet.java.vtl";
     public static final String HELLO_WORLD_SERVLET_TEMPLATE = "templates/common/licensing/HelloWorldServlet.java.vtl";
@@ -74,6 +74,8 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
     public static final String LICENSE_API_VERSION = "2.1-m8";
     public static final VersionId LICENSE_API_VERSION_PROPERTY = versionProperty("upm.license.compatibility.version", LICENSE_API_VERSION);
 
+    public static final String LICENSE_API_IMPORT_VERSION = "2.0.1";
+    
     public static final ArtifactDependency[] DEPENDENCIES = {
         dependency("com.atlassian.upm", "plugin-license-storage-lib", LICENSE_API_VERSION_PROPERTY, COMPILE),
         dependency("com.atlassian.upm", "plugin-license-storage-plugin", LICENSE_API_VERSION_PROPERTY, PROVIDED),
@@ -105,10 +107,10 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
         importPackage("org.springframework.context*", "0.0"),
         importPackage("org.springframework.osgi*", "0.0"),
         privatePackage("com.atlassian.upm.license.storage.lib*"),
-        dynamicImportPackage("com.atlassian.upm.api.license", "2.0.1"),
-        dynamicImportPackage("com.atlassian.upm.api.license.entity", "2.0.1"),
-        dynamicImportPackage("com.atlassian.upm.api.util", "2.0.1"),
-        dynamicImportPackage("com.atlassian.upm.license.storage.plugin", "2.0.1")
+        dynamicImportPackage("com.atlassian.upm.api.license", LICENSE_API_IMPORT_VERSION),
+        dynamicImportPackage("com.atlassian.upm.api.license.entity", LICENSE_API_IMPORT_VERSION),
+        dynamicImportPackage("com.atlassian.upm.api.util", LICENSE_API_IMPORT_VERSION),
+        dynamicImportPackage("com.atlassian.upm.license.storage.plugin", LICENSE_API_IMPORT_VERSION)
     };
     
     public static final ComponentImport[] COMPONENT_IMPORTS = {
