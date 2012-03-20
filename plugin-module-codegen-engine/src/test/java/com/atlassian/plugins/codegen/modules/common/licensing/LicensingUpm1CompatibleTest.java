@@ -27,7 +27,7 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     public void setupProps()
     {
         setCreator(new LicensingUpm1CompatibleModuleCreator());
-        setProps(new LicensingProperties(PACKAGE_NAME + ".LicenseServlet"));
+        setProps(new LicensingProperties(PACKAGE_NAME + ".MyServlet"));
     }
 
     @Test
@@ -84,21 +84,21 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     @Test
     public void licenseServletModuleIsAdded() throws Exception
     {
-        assertNotNull(getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-servlet']"));
+        assertNotNull(getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='my-servlet']"));
     }
 
     @Test
     public void licenseServletModuleHasClass() throws Exception
     {
-        assertEquals(packageAndClass(PACKAGE_NAME, LicensingUpm1CompatibleModuleCreator.LICENSE_SERVLET_CLASS_NAME).getFullName(),
-                     getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-servlet']/@class").getText());
+        assertEquals(packageAndClass(PACKAGE_NAME, "MyServlet").getFullName(),
+                     getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='my-servlet']/@class").getText());
     }
 
     @Test
     public void licenseServletModuleHasUrlPattern() throws Exception
     {
         assertEquals(LicensingUpm1CompatibleModuleCreator.LICENSE_SERVLET_URL_PATTERN,
-                     getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-servlet']/url-pattern").getText());
+                     getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='my-servlet']/url-pattern").getText());
     }
 
     @Test

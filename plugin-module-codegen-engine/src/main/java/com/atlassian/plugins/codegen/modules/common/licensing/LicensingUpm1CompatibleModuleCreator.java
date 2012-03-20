@@ -61,7 +61,6 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
     public static final ClassId PLUGIN_INSTALLER_CLASS = fullyQualified("com.atlassian.upm.license.storage.lib.PluginLicenseStoragePluginInstaller");
     public static final ClassId MARKETPLACE_URI_FACTORY_CLASS = fullyQualified("com.atlassian.upm.license.storage.lib.AtlassianMarketplaceUriFactoryImpl");
     
-    public static final String LICENSE_SERVLET_CLASS_NAME = "LicenseServlet";
     public static final String LICENSE_SERVLET_NAME_I18N_KEY = "license-servlet.name";
     public static final String LICENSE_SERVLET_DESCRIPTION_I18N_KEY = "license-servlet.description";
     public static final String LICENSE_SERVLET_URL_PATTERN = "/licenseservlet";
@@ -148,7 +147,7 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
     @Override
     public PluginProjectChangeset createModule(LicensingProperties props) throws Exception
     {
-        ClassId licenseServletClass = props.getClassId().className(LICENSE_SERVLET_CLASS_NAME);
+        ClassId licenseServletClass = props.getClassId();
         ServletProperties licenseServletProps = new ServletProperties(licenseServletClass.getFullName());
         licenseServletProps.setUrlPattern(LICENSE_SERVLET_URL_PATTERN);
         licenseServletProps.setNameI18nKey(LICENSE_SERVLET_NAME_I18N_KEY);
