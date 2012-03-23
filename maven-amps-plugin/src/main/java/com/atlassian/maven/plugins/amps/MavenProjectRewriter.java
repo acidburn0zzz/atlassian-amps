@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.atlassian.plugins.codegen.AmpsSystemPropertyVariable;
 import com.atlassian.plugins.codegen.ArtifactDependency;
@@ -18,7 +20,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.XmlStreamWriter;
@@ -37,12 +38,10 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
 
-import static com.atlassian.fugue.Option.none;
 import static com.atlassian.fugue.Option.option;
 import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Iterables.any;
-import static com.google.common.collect.Iterables.concat;
 
 /**
  * Applies any changes from a {@link PluginProjectChangeset} that affect the POM of a Maven project.
@@ -232,54 +231,58 @@ public class MavenProjectRewriter implements ProjectRewriter
             String categoryName = instruction.getCategory().getElementName();
             Xpp3Dom categoryElement = getOrCreateElement(instructionsRoot, categoryName);
             String body = categoryElement.getValue();
-            Iterable<BundleInstruction> instructionList = parseInstructions(instruction.getCategory(), (body == null) ? "" : body);
-            if (any(instructionList, bundleInstructionPackageName(instruction.getPackageName())))
+            String[] instructionLines = (body == null) ? new String[0] : body.split(",");
+            if (any(ImmutableList.copyOf(instructionLines), bundleInstructionLineWithPackageName(instruction.getPackageName())))
             {
                 continue;
             }
-            Iterable<BundleInstruction> newList = new InstructionPackageOrdering().sortedCopy(
-                concat(instructionList, ImmutableList.of(instruction)));
-            categoryElement.setValue(writeInstructions(newList));
+            categoryElement.setValue(addInstructionLine(instructionLines, instruction));
             modified = true;
         }
         return modified;
     }
     
-    private static Iterable<BundleInstruction> parseInstructions(BundleInstruction.Category category, String body)
+    private static String addInstructionLine(String[] instructionLines, BundleInstruction instruction)
     {
-        ImmutableList.Builder<BundleInstruction> ret = ImmutableList.builder();
-        for (String instructionLine : body.split(","))
+        String newLine = instruction.getPackageName();
+        for (String version : instruction.getVersion())
         {
-            String[] instructionParts = instructionLine.trim().split(";");
-            if (instructionParts.length == 1)
-            {
-                ret.add(new BundleInstruction(category, instructionParts[0], none(String.class)));
-            }
-            else if (instructionParts.length == 2 && instructionParts[1].startsWith("version=\"") && instructionParts[1].endsWith("\""))
-            {
-                String version = instructionParts[1].substring(9, instructionParts[1].length() - 1);
-                ret.add(new BundleInstruction(category, instructionParts[0], some(version)));
-            }
+            newLine = newLine + ";version=\"" + version + "\"";
         }
-        return ret.build();
-    }
-    
-    private static String writeInstructions(Iterable<BundleInstruction> instructions)
-    {
-        StringBuilder ret = new StringBuilder("\n");
-        for (BundleInstruction instruction : instructions)
+        if ((instructionLines.length == 0) || instructionLines[0].trim().equals(""))
         {
-            if (ret.length() > 1)
-            {
-                ret.append(",\n");
-            }
-            ret.append(instruction.getPackageName());
-            for (String version : instruction.getVersion())
-            {
-                ret.append(";version=\"").append(version).append("\"");
-            }
+            return newLine;
         }
-        return ret.append("\n").toString();
+        StringBuilder buf = new StringBuilder();
+        boolean inserted = false;
+        String indent = "";
+        Pattern indentRegex = Pattern.compile("^\\n*([ \\t]*).*");
+        for (String oldLine : instructionLines)
+        {
+            if (buf.length() > 0)
+            {
+                buf.append(",");
+            }
+            if (!inserted && (oldLine.trim().compareTo(newLine) > 0))
+            {
+                buf.append("\n").append(indent).append(newLine).append(",\n");
+                inserted = true;
+            }
+            if (indent.equals(""))
+            {
+                Matcher m = indentRegex.matcher(oldLine);
+                if (m.matches())
+                {
+                    indent = m.group(1);
+                }
+            }
+            buf.append(oldLine);
+        }
+        if (!inserted)
+        {
+            buf.append(",\n").append(newLine);
+        }
+        return buf.toString();
     }
     
     private boolean applyPluginArtifactChanges(Iterable<com.atlassian.plugins.codegen.PluginArtifact> pluginArtifacts)
@@ -428,23 +431,15 @@ public class MavenProjectRewriter implements ProjectRewriter
         };
     }
 
-    private static Predicate<BundleInstruction> bundleInstructionPackageName(final String packageName)
+    private static Predicate<String> bundleInstructionLineWithPackageName(final String packageName)
     {
-        return new Predicate<BundleInstruction>()
+        return new Predicate<String>()
         {
-            public boolean apply(BundleInstruction i)
+            public boolean apply(String input)
             {
-                return i.getPackageName().equals(packageName);
+                String s = input.trim();
+                return s.equals(packageName) || s.startsWith(packageName + ";");
             }
         };
-    }
-    
-    private static class InstructionPackageOrdering extends Ordering<BundleInstruction>
-    {
-        @Override
-        public int compare(BundleInstruction first, BundleInstruction second)
-        {
-            return first.getPackageName().compareTo(second.getPackageName());
-        }
     }
 }
