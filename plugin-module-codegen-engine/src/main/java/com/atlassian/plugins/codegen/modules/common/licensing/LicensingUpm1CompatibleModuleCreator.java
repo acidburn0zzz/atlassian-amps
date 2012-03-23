@@ -165,7 +165,6 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
             .with(COMPONENT_IMPORTS)
             .with(COMPONENTS)
             .with(licenseServlet)
-            .with(ampsSystemPropertyVariable("mac.baseurl", "https://intsys-staging.atlassian.com/my"))
             .with(resourceFile("", "license-admin.vm", fromFile(LICENSE_SERVLET_VELOCITY_TEMPLATE)))
             .with(createI18nStrings(props, PROPERTIES_TEMPLATE));
         
