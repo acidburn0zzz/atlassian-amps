@@ -111,6 +111,8 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
             }
 
             modulePrompter.setDefaultBasePackage(project.getGroupId());
+            modulePrompter.setPluginKey(project.getGroupId() + "." + project.getArtifactId());
+            
             PluginModuleProperties moduleProps = modulePrompter.getModulePropertiesFromInput(moduleLocation);
             moduleProps.setProductId(getGadgetCompatibleProductId(productId));
 

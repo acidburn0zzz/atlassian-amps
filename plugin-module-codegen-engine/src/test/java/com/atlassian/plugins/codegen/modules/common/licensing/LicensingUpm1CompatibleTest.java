@@ -23,11 +23,16 @@ import static org.junit.Assert.assertNull;
  */
 public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<LicensingProperties>
 {
+    private static final String LICENSE_SERVLET_PATH = "my/license";
+    private static final String HELLO_SERVLET_PATH = "good/morning/sunshine";
+    
     @Before
     public void setupProps()
     {
         setCreator(new LicensingUpm1CompatibleModuleCreator());
         setProps(new LicensingProperties(PACKAGE_NAME + ".MyServlet"));
+        props.setLicenseServletPath(LICENSE_SERVLET_PATH);
+        props.setHelloWorldServletPath(HELLO_SERVLET_PATH);
     }
 
     @Test
@@ -91,7 +96,7 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     @Test
     public void licenseServletModuleHasUrlPattern() throws Exception
     {
-        assertEquals(LicensingUpm1CompatibleModuleCreator.LICENSE_SERVLET_URL_PATTERN,
+        assertEquals("/" + LICENSE_SERVLET_PATH,
                      getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='my-servlet']/url-pattern").getText());
     }
 
@@ -120,7 +125,7 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     public void helloWorldServletModuleHasUrlPattern() throws Exception
     {
         props.setIncludeExamples(true);
-        assertEquals(LicensingUpm1CompatibleModuleCreator.HELLO_WORLD_SERVLET_URL_PATTERN,
+        assertEquals("/" + HELLO_SERVLET_PATH,
                      getAllGeneratedModulesOfType("servlet").selectSingleNode("//servlet[@key='license-hello-world-servlet']/url-pattern").getText());
     }
     
