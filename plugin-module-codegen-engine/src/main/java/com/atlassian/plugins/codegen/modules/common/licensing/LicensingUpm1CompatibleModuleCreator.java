@@ -162,6 +162,7 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
             helloWorldServletProps.setCreateClass(false);
             BasicClassModuleProperties helloWorldServletClassProps = new BasicClassModuleProperties(helloWorldServletClass.getFullName());
             helloWorldServletClassProps.putAll(props);
+            helloWorldServletClassProps.setFullyQualifiedClassname(helloWorldServletClass.getFullName());
             PluginProjectChangeset helloWorldServlet = new ServletModuleCreator().createModule(helloWorldServletProps)
                 .with(createClass(helloWorldServletClassProps, HELLO_WORLD_SERVLET_TEMPLATE));
 

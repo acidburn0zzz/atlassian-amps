@@ -42,20 +42,18 @@ public class ${CLASSNAME} extends HttpServlet
             //This accessor method can be used whether or not a licensing-aware UPM is present.
             if (licenseManager.getLicense().isDefined())
             {
-                for (PluginLicense pluginLicense : licenseManager.getLicense())
+                PluginLicense pluginLicense = licenseManager.getLicense().get();
+                //Check and see if the stored license has an error. If not, it is currently valid.
+                if (pluginLicense.getError().isDefined())
                 {
-                    //Check and see if the stored license has an error. If not, it is currently valid.
-                    if (pluginLicense.getError().isDefined())
-                    {
-                        //A license is currently stored, however, it is invalid (e.g. expired or user count mismatch)
-                        resp.getWriter().write("I'd love to say hello, but cannot do so because your license has an error: " 
-                                + pluginLicense.getError().get().name());
-                    }
-                    else
-                    {
-                        //A license is currently stored and it is valid.
-                        resp.getWriter().write("Hello, world! You are licensed!");
-                    }
+                    //A license is currently stored, however, it is invalid (e.g. expired or user count mismatch)
+                    resp.getWriter().write("I'd love to say hello, but cannot do so because your license has an error: " 
+                            + pluginLicense.getError().get().name());
+                }
+                else
+                {
+                    //A license is currently stored and it is valid.
+                    resp.getWriter().write("Hello, world! You are licensed!");
                 }
             }
             else
