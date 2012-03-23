@@ -63,12 +63,6 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     }
     
     @Test
-    public void macBaseUrlPropertyIsAdded() throws Exception
-    {
-        assertChangesetContains(ampsSystemPropertyVariable("mac.baseurl", "https://intsys-staging.atlassian.com/my"));
-    }
-    
-    @Test
     public void mavenDependencyPluginIsAdded() throws Exception
     {
         MavenPlugin mp = getChangesetForModule(MavenPlugin.class).get(0);
