@@ -92,19 +92,6 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
     };
     
     public static final BundleInstruction[] BUNDLE_INSTRUCTIONS = {
-        importPackage("com.atlassian.plugin*", "0.0"),
-        importPackage("com.atlassian.sal*", "0.0"),
-        importPackage("com.atlassian.templaterenderer*", "0.0"),
-        importPackage("com.google.common*", "1.0"),
-        importPackage("javax.servlet*", "0.0"),
-        importPackage("org.apache.commons*", "0.0"),
-        importPackage("org.joda.time*", "0.0"),
-        importPackage("org.osgi.framework*", "0.0"),
-        importPackage("org.osgi.util*", "0.0"),
-        importPackage("org.slf4j*", "1.5"),
-        importPackage("org.springframework.beans*", "0.0"),
-        importPackage("org.springframework.context*", "0.0"),
-        importPackage("org.springframework.osgi*", "0.0"),
         privatePackage("com.atlassian.upm.license.storage.lib*"),
         dynamicImportPackage("com.atlassian.upm.api.license", LICENSE_API_IMPORT_VERSION),
         dynamicImportPackage("com.atlassian.upm.api.license.entity", LICENSE_API_IMPORT_VERSION),
