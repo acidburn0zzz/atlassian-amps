@@ -392,7 +392,7 @@ public class MavenProjectRewriterTest
         assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(DUPLICATE_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
                         nodeText(delimitedList(",",
-                                               Matchers.<String>hasItems(equalTo("com.atlassian.plugins.rest.common*;version=\"1.0.5\""))))));
+                                               Matchers.<String>hasItems(equalTo("com.atlassian.plugins.rest.common*;version=\"1.0.5\";resolution:=optional"))))));
     }
 
     @Test

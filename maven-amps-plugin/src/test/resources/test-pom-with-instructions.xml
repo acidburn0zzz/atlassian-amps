@@ -28,7 +28,7 @@
                     <instructions>
                         <Import-Package>
                             com.atlassian.plugin.*;version="${atlassian.plugins.version}",
-                            com.atlassian.plugins.rest.common*;version="1.0.5",
+                            com.atlassian.plugins.rest.common*;version="1.0.5";resolution:=optional,
                             com.atlassian.sal.api*;version="${sal.api.version}"
                         </Import-Package>
                     </instructions>
