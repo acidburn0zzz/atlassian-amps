@@ -32,7 +32,7 @@ import org.apache.commons.lang.StringUtils;
  *  - check for a licensing-aware UPM,
  *  - and properly handle if a licensing-aware UPM is detected.
  *
- * This servlet can be reached at http://localhost:2990/jira/plugins/servlet/licenseservlet
+ * This servlet can be reached at http://localhost:2990/jira/plugins/servlet/${LICENSE_SERVLET_PATH}
  */
 public class ${CLASSNAME} extends HttpServlet
 {
@@ -139,7 +139,7 @@ public class ${CLASSNAME} extends HttpServlet
     private Map<String, Object> initVelocityContext(HttpServletResponse resp)
     {
         resp.setContentType("text/html;charset=utf-8");
-        URI servletUri = URI.create(applicationProperties.getBaseUrl() + "/plugins/servlet/licenseservlet");
+        URI servletUri = URI.create(applicationProperties.getBaseUrl() + "/plugins/servlet/${LICENSE_SERVLET_PATH}");
 
         final Map<String, Object> context = new HashMap<String, Object>();
 
@@ -169,7 +169,7 @@ public class ${CLASSNAME} extends HttpServlet
 
     private void addEligibleMarketplaceButtons(Map<String, Object> context)
     {
-        URI servletUri = URI.create(applicationProperties.getBaseUrl() + "/plugins/servlet/licenseservlet");
+        URI servletUri = URI.create(applicationProperties.getBaseUrl() + "/plugins/servlet/${LICENSE_SERVLET_PATH}");
 
         try
         {

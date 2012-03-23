@@ -15,6 +15,7 @@ import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
+import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletProperties;
 
@@ -136,8 +137,10 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
         licenseServletProps.setNameI18nKey(LICENSE_SERVLET_NAME_I18N_KEY);
         licenseServletProps.setDescriptionI18nKey(LICENSE_SERVLET_DESCRIPTION_I18N_KEY);
         licenseServletProps.setCreateClass(false);
+        BasicClassModuleProperties licenseServletClassProps = new BasicClassModuleProperties(licenseServletClass.getFullName());
+        licenseServletClassProps.putAll(props);
         PluginProjectChangeset licenseServlet = new ServletModuleCreator().createModule(licenseServletProps)
-            .with(createClass(licenseServletProps, LICENSE_SERVLET_TEMPLATE));
+            .with(createClass(licenseServletClassProps, LICENSE_SERVLET_TEMPLATE));
         
         PluginProjectChangeset ret = new PluginProjectChangeset()
             .with(DEPENDENCIES)
@@ -157,8 +160,10 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
             ServletProperties helloWorldServletProps = new ServletProperties(helloWorldServletClass.getFullName());
             helloWorldServletProps.setUrlPattern("/" + props.getHelloWorldServletPath());
             helloWorldServletProps.setCreateClass(false);
+            BasicClassModuleProperties helloWorldServletClassProps = new BasicClassModuleProperties(helloWorldServletClass.getFullName());
+            helloWorldServletClassProps.putAll(props);
             PluginProjectChangeset helloWorldServlet = new ServletModuleCreator().createModule(helloWorldServletProps)
-                .with(createClass(helloWorldServletProps, HELLO_WORLD_SERVLET_TEMPLATE));
+                .with(createClass(helloWorldServletClassProps, HELLO_WORLD_SERVLET_TEMPLATE));
 
             ret = ret.with(helloWorldServlet);
         }

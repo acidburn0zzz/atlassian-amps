@@ -25,9 +25,10 @@ public class LicensingProperties extends BasicClassModuleProperties
         return licenseServletPath;
     }
 
-    public void setLicenseServletPath(String licensingServletPath)
+    public void setLicenseServletPath(String licenseServletPath)
     {
-        this.licenseServletPath = licensingServletPath;
+        this.licenseServletPath = licenseServletPath;
+        setProperty("LICENSE_SERVLET_PATH", licenseServletPath);
     }
 
     public String getHelloWorldServletPath()
@@ -38,5 +39,6 @@ public class LicensingProperties extends BasicClassModuleProperties
     public void setHelloWorldServletPath(String helloWorldServletPath)
     {
         this.helloWorldServletPath = helloWorldServletPath;
+        setProperty("HELLO_WORLD_SERVLET_PATH", helloWorldServletPath);
     }
 }
