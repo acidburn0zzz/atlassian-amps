@@ -57,7 +57,7 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-confluence-plugin</artifactId>
-                <version>${project.version}</version>
+                <version>\${dollar}{amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <productVersion>\${dollar}{confluence.version}</productVersion>
