@@ -1,4 +1,4 @@
-package com.atlassian.maven.plugins.amps;
+package com.atlassian.plugins.codegen;
 
 import java.util.List;
 
