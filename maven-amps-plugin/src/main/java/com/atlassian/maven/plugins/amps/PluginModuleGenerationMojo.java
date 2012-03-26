@@ -77,6 +77,7 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
                 .resourcesDirectory(resourcesDir)
                 .testDirectory(testDir)
                 .templateDirectory(new File(resourcesDir, "templates"))
+                .groupAndArtifactId(project.getGroupId(), project.getArtifactId())
                 .build();
 
         if (!moduleLocation.getPluginXml()

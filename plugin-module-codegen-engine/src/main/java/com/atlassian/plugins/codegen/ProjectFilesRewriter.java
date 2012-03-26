@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+import com.atlassian.plugins.codegen.util.FileUtil;
 
 import com.google.common.io.Files;
 
@@ -32,16 +33,14 @@ public class ProjectFilesRewriter implements ProjectRewriter
     @Override
     public void applyChanges(PluginProjectChangeset changes) throws Exception
     {
+        // We use a PluginXmlHelper to read some information from atlassian-plugin.xml if needed
+        PluginXmlHelper xmlHelper = new PluginXmlHelper(location);
+        
         for (SourceFile sourceFile : changes.getItems(SourceFile.class))
         {
             File baseDir = sourceFile.getSourceGroup() == SourceFile.SourceGroup.TESTS ?
                 location.getTestDirectory() : location.getSourceDirectory();
-            File packageDir = baseDir;
-            for (String packagePart : sourceFile.getClassId().getPackage().split("\\."))
-            {
-                packageDir = new File(packageDir, packagePart);
-            }
-            File newFile = new File(packageDir, sourceFile.getClassId().getName() + ".java");
+            File newFile = FileUtil.dotDelimitedFilePath(baseDir, sourceFile.getClassId().getFullName(), ".java");
             Files.createParentDirs(newFile);
             FileUtils.writeStringToFile(newFile, sourceFile.getContent());
         }
@@ -58,7 +57,8 @@ public class ProjectFilesRewriter implements ProjectRewriter
         }
         if (changes.hasItems(I18nString.class))
         {
-            File i18nFile = new File(location.getResourcesDir(), DEFAULT_I18N_NAME + ".properties");
+            File i18nFile = FileUtil.dotDelimitedFilePath(location.getResourcesDir(), xmlHelper.getDefaultI18nLocation(), ".properties");
+            Files.createParentDirs(i18nFile);
             if (!i18nFile.exists())
             {
                 i18nFile.createNewFile();

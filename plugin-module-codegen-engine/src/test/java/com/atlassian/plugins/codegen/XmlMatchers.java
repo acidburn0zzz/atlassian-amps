@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 public class XmlMatchers
 {
-    private static final String DUMMY_NAMESPACE_PREFIX = "x";
+    private static final String DUMMY_NAMESPACE_PREFIX = "xmlMatchersDummyNamespace";
     
     public static class XmlWrapper
     {
@@ -42,15 +42,14 @@ public class XmlMatchers
         {
             for (String ns : defaultNamespacePrefix)
             {
-                return path.replaceAll("/(?!/)", "/" + ns + ":");
+                return path.replaceAll("/(?![/@])", "/" + ns + ":");
             }
             return path;
         }
         
-        private void dump()
+        private String dump()
         {
-            System.err.println("Document being matched:");
-            System.err.println(root.asXML());
+            return "\nDocument being matched:\n" + root.asXML();
         }
     }
     
@@ -68,7 +67,7 @@ public class XmlMatchers
     {
         Document doc = DocumentHelper.parseText(content);
         String defaultNamespace = doc.getRootElement().getNamespace().getURI();
-        if (defaultNamespace != null)
+        if ((defaultNamespace != null) && !defaultNamespace.equals(""))
         {
             // this is a workaround for the fact that default namespaces don't really work in dom4j
             doc.getRootElement().addNamespace(DUMMY_NAMESPACE_PREFIX, defaultNamespace);
@@ -97,8 +96,7 @@ public class XmlMatchers
                 if (!nodeMatcher.matches(node))
                 {
                     nodeMatcher.describeMismatch(node, mismatchDescription);
-                    System.err.println("Document being matched:");
-                    System.err.println(xml.root.asXML());
+                    mismatchDescription.appendText(xml.dump());
                     return false;
                 }
                 return true;
@@ -123,7 +121,7 @@ public class XmlMatchers
                 if (!nodesMatcher.matches(nodes))
                 {
                     nodesMatcher.describeMismatch(nodes, mismatchDescription);
-                    xml.dump();
+                    mismatchDescription.appendText(xml.dump());
                     return false;
                 }
                 return true;
@@ -160,6 +158,33 @@ public class XmlMatchers
             {
                 description.appendText("with text ");
                 textMatcher.describeTo(description);
+            }
+        };
+    }
+
+    public static Matcher<Node> nodeName(final Matcher<? super String> nameMatcher)
+    {
+        return new TypeSafeDiagnosingMatcher<Node>()
+        {
+            protected boolean matchesSafely(Node node, Description mismatchDescription)
+            {
+                if (node == null)
+                {
+                    mismatchDescription.appendText("node did not exist");
+                    return false;
+                }
+                else if (!nameMatcher.matches(node.getName()))
+                {
+                    nameMatcher.describeMismatch(node.getText().trim(), mismatchDescription);
+                    return false;
+                }
+                return true;
+            }
+
+            public void describeTo(Description description)
+            {
+                description.appendText("with name ");
+                nameMatcher.describeTo(description);
             }
         };
     }

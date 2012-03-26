@@ -1,4 +1,4 @@
-package com.atlassian.plugins.codegen.util;
+package com.atlassian.plugins.codegen;
 
 import java.io.File;
 import java.io.FileInputStream;
