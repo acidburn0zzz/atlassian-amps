@@ -9,6 +9,7 @@ import java.util.Properties;
 
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.util.FileUtil;
+import com.atlassian.plugins.codegen.util.PluginXmlHelper;
 
 import com.google.common.io.Files;
 

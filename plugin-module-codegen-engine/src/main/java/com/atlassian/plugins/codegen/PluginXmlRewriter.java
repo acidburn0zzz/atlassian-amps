@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+import com.atlassian.plugins.codegen.util.PluginXmlHelper;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
