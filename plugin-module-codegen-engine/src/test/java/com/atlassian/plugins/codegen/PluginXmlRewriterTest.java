@@ -1,19 +1,11 @@
 package com.atlassian.plugins.codegen;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.UUID;
-
 import com.atlassian.plugins.codegen.ComponentDeclaration.Visibility;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+import com.atlassian.plugins.codegen.XmlMatchers.XmlWrapper;
 
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Node;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,205 +15,201 @@ import static com.atlassian.plugins.codegen.I18nString.i18nString;
 import static com.atlassian.plugins.codegen.ModuleDescriptor.moduleDescriptor;
 import static com.atlassian.plugins.codegen.PluginParameter.pluginParameter;
 import static com.atlassian.plugins.codegen.PluginProjectChangeset.changeset;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
+import static com.atlassian.plugins.codegen.XmlMatchers.node;
+import static com.atlassian.plugins.codegen.XmlMatchers.nodeCount;
+import static com.atlassian.plugins.codegen.XmlMatchers.nodeName;
+import static com.atlassian.plugins.codegen.XmlMatchers.nodeTextEquals;
+import static com.atlassian.plugins.codegen.XmlMatchers.nodes;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 public class PluginXmlRewriterTest
 {
     protected static final String CLASS = "com.atlassian.test.MyClass";
     protected static final String INTERFACE = "com.atlassian.test.MyInterface";
     protected static final ComponentImport IMPORT = ComponentImport.componentImport(fullyQualified(INTERFACE));
-     
-    protected File tempDir;
-    protected File resourcesDir;
-    protected File pluginXml;
+    
     protected ComponentDeclaration.Builder componentBuilder = ComponentDeclaration.builder(fullyQualified(CLASS), "my-key");
 
+    protected ProjectHelper helper;
     protected PluginXmlRewriter rewriter;
     
     @Before
     public void setup() throws Exception
     {
-        final File sysTempDir = new File("target");
-        String dirName = UUID.randomUUID().toString();
-        tempDir = new File(sysTempDir, dirName);
-        resourcesDir = new File(tempDir, "resources");
-        pluginXml = new File(resourcesDir, "atlassian-plugin.xml");
-
-        tempDir.mkdirs();
-        resourcesDir.mkdirs();
-
-        InputStream is = this.getClass().getResourceAsStream("/empty-plugin.xml");
-        IOUtils.copy(is, FileUtils.openOutputStream(pluginXml));
-        
-        rewriter = new PluginXmlRewriter(pluginXml);
+        helper = new ProjectHelper();
+        usePluginXml("empty-plugin.xml");
     }
     
-    @Test
-    public void canConstructXmlRewriterFromLocation() throws Exception
+    private void usePluginXml(String path) throws Exception
     {
-        PluginModuleLocation location = new PluginModuleLocation.Builder(new File(tempDir, "src"))
-            .resourcesDirectory(resourcesDir)
-            .testDirectory(new File(tempDir, "test-src"))
-            .build();
-        rewriter = new PluginXmlRewriter(location);
-        
-        // make an arbitrary change
-        long oldFileSize = FileUtils.sizeOf(pluginXml);
-        rewriter.applyChanges(addPluginParam());
-        
-        // verify that it found the XML file in its expected location and modified it
-        assertTrue(FileUtils.sizeOf(pluginXml) != oldFileSize);
+        helper.usePluginXml(path);
+        rewriter = new PluginXmlRewriter(helper.location);
     }
     
     @Test
     public void i18nResourceIsNotAddedByDefault() throws Exception
     {
-        Document xml = applyChanges(addPluginParam());
-        
-        assertEquals(0, xml.selectNodes("//resource").size());
+        assertThat(applyChanges(addPluginParam()),
+                   nodes("//resource[@type='i18n']", nodeCount(0)));
     }
 
     @Test
     public void i18nResourceIsAddedIfI18nPropertiesArePresent() throws Exception
     {
-        Document xml = applyChanges(addI18nProperty());
-        
-        assertNotNull(xml.selectSingleNode("//resource"));
+        assertThat(applyChanges(addI18nProperty()),
+                   nodes("//resource[@type='i18n']", nodeCount(1)));
     }
 
     @Test
-    public void i18nResourceHasType() throws Exception
+    public void i18nResourceHasDefaultName() throws Exception
     {
-        Document xml = applyChanges(addI18nProperty());
-        
-        assertEquals("i18n", xml.selectSingleNode("//resource/@type").getText());
+        assertThat(applyChanges(addI18nProperty()),
+                   node("//resource[@type='i18n']/@name", nodeTextEquals("i18n")));
     }
 
     @Test
-    public void i18nResourceHasName() throws Exception
+    public void i18nResourceHasDefaultLocation() throws Exception
     {
-        Document xml = applyChanges(addI18nProperty());
-        
-        assertEquals("i18n", xml.selectSingleNode("//resource/@name").getText());
+        assertThat(applyChanges(addI18nProperty()),
+                   node("//resource[@type='i18n']/@location", nodeTextEquals(ProjectHelper.PLUGIN_KEY)));
     }
 
     @Test
-    public void i18nResourceHasLocation() throws Exception
+    public void i18nResourceWithSameNameIsNotAdded() throws Exception
     {
-        Document xml = applyChanges(addI18nProperty());
+        usePluginXml("plugin-with-same-i18n-name.xml");
         
-        assertEquals(ProjectRewriter.DEFAULT_I18N_NAME, xml.selectSingleNode("//resource/@location").getText());
+        assertThat(applyChanges(addI18nProperty()),
+                   nodes("//resource[@type='i18n']", nodeCount(1)));
+    }
+    
+    @Test
+    public void i18nResourceWithSameNameIsNotOverwritten() throws Exception
+    {
+        usePluginXml("plugin-with-same-i18n-name.xml");
+
+        assertThat(applyChanges(addI18nProperty()),
+                   node("//resource[@type='i18n']/@location", nodeTextEquals("nonstandard-location")));
     }
 
+    @Test
+    public void i18nResourceWithSameLocationIsNotAdded() throws Exception
+    {
+        usePluginXml("plugin-with-same-i18n-location.xml");
+        
+        assertThat(applyChanges(addI18nProperty()),
+                   nodes("//resource[@type='i18n']", nodeCount(1)));
+    }
+    
+    @Test
+    public void i18nResourceWithSameLocationIsNotOverwritten() throws Exception
+    {
+        usePluginXml("plugin-with-same-i18n-location.xml");
+
+        assertThat(applyChanges(addI18nProperty()),
+                   node("//resource[@type='i18n']/@name", nodeTextEquals("nonstandard-name")));
+    }
+    
     @Test
     public void pluginParamIsAdded() throws Exception
     {
-        Document xml = applyChanges(addPluginParam());
-        
-        assertNotNull(xml.selectSingleNode("//plugin-info/param"));
+        assertThat(applyChanges(addPluginParam()),
+                   nodes("//plugin-info/param", nodeCount(1)));
     }
     
     @Test
     public void pluginParamHasName() throws Exception
     {
-        Document xml = applyChanges(addPluginParam());
-        
-        assertEquals("foo", xml.selectSingleNode("//plugin-info/param/@name").getText());
+        assertThat(applyChanges(addPluginParam()),
+                   node("//plugin-info/param/@name", nodeTextEquals("foo")));
     }
 
     @Test
     public void pluginParamHasValue() throws Exception
     {
-        Document xml = applyChanges(addPluginParam());
-        
-        assertEquals("bar", xml.selectSingleNode("//plugin-info/param").getText());
+        assertThat(applyChanges(addPluginParam()),
+                   node("//plugin-info/param", nodeTextEquals("bar")));
     }
 
     @Test
     public void secondPluginParamIsAdded() throws Exception
     {
         applyChanges(addPluginParam());
-        Document xml = applyChanges(new PluginProjectChangeset().with(pluginParameter("second", "thing")));
-        
-        assertEquals(2, xml.selectNodes("//plugin-info/param").size());
+
+        assertThat(applyChanges(changeset().with(pluginParameter("second", "thing"))),
+                   nodes("//plugin-info/param", nodeCount(2)));
     }
 
     @Test
     public void secondPluginParamHasValue() throws Exception
     {
         applyChanges(addPluginParam());
-        Document xml = applyChanges(new PluginProjectChangeset().with(pluginParameter("second", "thing")));
-        
-        assertEquals("thing", xml.selectSingleNode("//plugin-info/param[@name='second']").getText());
+
+        assertThat(applyChanges(changeset().with(pluginParameter("second", "thing"))),
+                   node("//plugin-info/param[@name='second']", nodeTextEquals("thing")));
     }
 
     @Test
     public void duplicatePluginParamIsNotAdded() throws Exception
     {
         applyChanges(addPluginParam());
-        Document xml = applyChanges(new PluginProjectChangeset().with(pluginParameter("foo", "baz")));
-        
-        assertEquals(1, xml.selectNodes("//plugin-info/param").size());
+
+        assertThat(applyChanges(changeset().with(pluginParameter("foo", "baz"))),
+                   nodes("//plugin-info/param", nodeCount(1)));
     }
 
     @Test
     public void pluginParamCannotBeOverwritten() throws Exception
     {
         applyChanges(addPluginParam());
-        Document xml = applyChanges(new PluginProjectChangeset().with(pluginParameter("foo", "baz")));
-        
-        assertEquals("bar", xml.selectSingleNode("//plugin-info/param").getText());
+
+        assertThat(applyChanges(changeset().with(pluginParameter("second", "thing"))),
+                   node("//plugin-info/param", nodeTextEquals("bar")));
     }
     
     @Test
     public void componentImportIsAdded() throws Exception
     {
-        Document xml = applyChanges(changeset().with(IMPORT));
-        
-        assertNotNull(xml.selectSingleNode("//component-import"));
+        assertThat(applyChanges(changeset().with(IMPORT)),
+                   node("//component-import", notNullValue()));
     }
 
     @Test
     public void componentImportHasInterface() throws Exception
     {
-        Document xml = applyChanges(changeset().with(IMPORT));
-        
-        assertEquals(INTERFACE, xml.selectSingleNode("//component-import/@interface").getText());
+        assertThat(applyChanges(changeset().with(IMPORT)),
+                   node("//component-import/@interface", nodeTextEquals(INTERFACE)));
     }
 
     @Test
     public void componentImportHasDefaultKey() throws Exception
     {
-        Document xml = applyChanges(changeset().with(IMPORT));
-        
-        assertEquals("myInterface", xml.selectSingleNode("//component-import/@key").getText());
+        assertThat(applyChanges(changeset().with(IMPORT)),
+                   node("//component-import/@key", nodeTextEquals("myInterface")));
     }
     
     @Test
     public void componentImportHasSpecifiedKey() throws Exception
     {
-        Document xml = applyChanges(changeset().with(IMPORT.key(some("new-key"))));
-        
-        assertEquals("new-key", xml.selectSingleNode("//component-import/@key").getText());
+        assertThat(applyChanges(changeset().with(IMPORT.key(some("new-key")))),
+                   node("//component-import/@key", nodeTextEquals("new-key")));
     }
     
     @Test
     public void componentImportHasNoFilterByDefault() throws Exception
     {
-        Document xml = applyChanges(changeset().with(IMPORT));
-        
-        assertNull(xml.selectSingleNode("//component-import/@filter"));
+        assertThat(applyChanges(changeset().with(IMPORT)),
+                   node("//component-import/@filter", nullValue()));
     }
     
     @Test
     public void componentImportHasSpecifiedFilter() throws Exception
     {
-        Document xml = applyChanges(changeset().with(IMPORT.filter(some("my-filter"))));
-        
-        assertEquals("my-filter", xml.selectSingleNode("//component-import/@filter").getText());
+        assertThat(applyChanges(changeset().with(IMPORT.filter(some("my-filter")))),
+                   node("//component-import/@filter", nodeTextEquals("my-filter")));
     }
     
     @Test
@@ -229,9 +217,9 @@ public class PluginXmlRewriterTest
     {
         ComponentImport secondImportWithSameKey = IMPORT.filter(some("different"));
         applyChanges(changeset().with(IMPORT));
-        Document xml = applyChanges(changeset().with(secondImportWithSameKey));
-        
-        assertEquals(1, xml.selectNodes("//component-import").size());
+
+        assertThat(applyChanges(changeset().with(secondImportWithSameKey)),
+                   nodes("//component-import", nodeCount(1)));
     }
 
     @Test
@@ -239,170 +227,160 @@ public class PluginXmlRewriterTest
     {
         ComponentImport secondImportWithSameKey = IMPORT.filter(some("different"));
         applyChanges(changeset().with(IMPORT));
-        Document xml = applyChanges(changeset().with(secondImportWithSameKey));
-        
-        assertNull(xml.selectSingleNode("//component-import/@filter"));
+
+        assertThat(applyChanges(changeset().with(secondImportWithSameKey)),
+                   node("//component-import/@filter", nullValue()));
     }
     
     @Test
     public void componentIsAdded() throws Exception
     {
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
-        
-        assertNotNull(xml.selectSingleNode("//component"));
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component", notNullValue()));
     }
 
     @Test
     public void componentHasKey() throws Exception
     {
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
-        
-        assertEquals("my-key", xml.selectSingleNode("//component/@key").getText());
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/@key", nodeTextEquals("my-key")));
     }
 
     @Test
     public void componentHasClass() throws Exception
     {
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
-        
-        assertEquals(CLASS, xml.selectSingleNode("//component/@class").getText());
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/@class", nodeTextEquals(CLASS)));
     }
 
     @Test
     public void componentHasNoNameByDefault() throws Exception
     {
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
-        
-        assertNull(xml.selectSingleNode("//component/@name"));
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/@name", nullValue()));
     }
 
     @Test
     public void componentHasSpecifiedName() throws Exception
     {
         componentBuilder.name(some("my-name"));
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
-        assertEquals("my-name", xml.selectSingleNode("//component/@name").getText());
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/@name", nodeTextEquals("my-name")));
     }
 
     @Test
     public void componentHasNoNameI18nKeyByDefault() throws Exception
     {
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
-        
-        assertNull(xml.selectSingleNode("//component/@i18n-name-key"));
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/@i18n-name-key", nullValue()));
     }
 
     @Test
     public void componentHasSpecifiedNameI18nKey() throws Exception
     {
         componentBuilder.nameI18nKey(some("name-key"));
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
-        assertEquals("name-key", xml.selectSingleNode("//component/@i18n-name-key").getText());
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/@i18n-name-key", nodeTextEquals("name-key")));
     }
 
     @Test
     public void componentIsPrivateByDefault() throws Exception
     {
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
-        
-        assertNull(xml.selectSingleNode("//component/@public"));
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/@public", nullValue()));
     }
 
     @Test
     public void componentIsPublicIfSpecified() throws Exception
     {
         componentBuilder.visibility(Visibility.PUBLIC);
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
-        assertEquals("true", xml.selectSingleNode("//component/@public").getText());
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/@public", nodeTextEquals("true")));
     }
 
     @Test
     public void componentHasNoAliasByDefault() throws Exception
     {
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
-        
-        assertNull(xml.selectSingleNode("//component/@alias"));
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/@alias", nullValue()));
     }
 
     @Test
     public void componentHasSpecifiedAlias() throws Exception
     {
         componentBuilder.alias(some("my-alias"));
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
-        assertEquals("my-alias", xml.selectSingleNode("//component/@alias").getText());
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/@alias", nodeTextEquals("my-alias")));
     }
 
     @Test
     public void componentHasNoDescriptionByDefault() throws Exception
     {
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
-        
-        assertNull(xml.selectSingleNode("//component/description"));
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/description", nullValue()));
     }
 
     @Test
     public void componentHasSpecifiedDescription() throws Exception
     {
         componentBuilder.description(some("desc"));
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
-        assertEquals("desc", xml.selectSingleNode("//component/description").getText());
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/description", nodeTextEquals("desc")));
     }
 
     @Test
     public void componentHasNoDescriptionI18nKeyByDefault() throws Exception
     {
         componentBuilder.description(some("desc"));
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
-        assertNull(xml.selectSingleNode("//component/description/@key"));
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/description/@key", nullValue()));
     }
 
     @Test
     public void componentHasSpecifiedDescriptionI18nKey() throws Exception
     {
         componentBuilder.description(some("desc")).descriptionI18nKey(some("desc-key"));
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
-        assertEquals("desc-key", xml.selectSingleNode("//component/description/@key").getText());
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/description/@key", nodeTextEquals("desc-key")));
     }
 
     @Test
     public void componentHasNoInterfaceByDefault() throws Exception
     {
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
-        
-        assertNull(xml.selectSingleNode("//component/interface"));
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/interface", nullValue()));
     }
 
     @Test
     public void componentHasSpecifiedInterface() throws Exception
     {
         componentBuilder.interfaceId(some(fullyQualified(INTERFACE)));
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
-        assertEquals(INTERFACE, xml.selectSingleNode("//component/interface").getText());
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/interface", nodeTextEquals(INTERFACE)));
     }
 
     @Test
     public void componentHasNoServicePropertiesByDefault() throws Exception
     {
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
-        
-        assertNull(xml.selectSingleNode("//component/service-properties"));
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/service-properties", nullValue()));
     }
 
     @Test
     public void componentHasSpecifiedServiceProperties() throws Exception
     {
         componentBuilder.serviceProperties(ImmutableMap.of("foo", "bar"));
-        Document xml = applyChanges(changeset().with(componentBuilder.build()));
         
-        assertEquals("bar", xml.selectSingleNode("//component/service-properties/entry[@key='foo']/@value").getText());
+        assertThat(applyChanges(changeset().with(componentBuilder.build())),
+                   node("//component/service-properties/entry[@key='foo']/@value", nodeTextEquals("bar")));
     }
 
     @Test
@@ -411,9 +389,9 @@ public class PluginXmlRewriterTest
         ComponentDeclaration firstComponent = componentBuilder.name(some("first")).build();
         ComponentDeclaration secondComponentWithSameKey = componentBuilder.name(some("different")).build();
         applyChanges(changeset().with(firstComponent));
-        Document xml = applyChanges(changeset().with(secondComponentWithSameKey));
         
-        assertEquals(1, xml.selectNodes("//component").size());
+        assertThat(applyChanges(changeset().with(secondComponentWithSameKey)),
+                   nodes("//component", nodeCount(1)));
     }
 
     @Test
@@ -422,18 +400,17 @@ public class PluginXmlRewriterTest
         ComponentDeclaration firstComponent = componentBuilder.name(some("first")).build();
         ComponentDeclaration secondComponentWithSameKey = componentBuilder.name(some("different")).build();
         applyChanges(changeset().with(firstComponent));
-        Document xml = applyChanges(changeset().with(secondComponentWithSameKey));
         
-        assertEquals("first", xml.selectSingleNode("//component/@name").getText());
+        assertThat(applyChanges(changeset().with(secondComponentWithSameKey)),
+                   node("//component/@name", nodeTextEquals("first")));
     }
     
     @Test
     public void moduleDescriptorIsAdded() throws Exception
     {
         String module = "<my-module>has some content</my-module>";
-        Document xml = applyChanges(changeset().with(moduleDescriptor(module)));
-        
-        assertEquals("has some content", xml.selectSingleNode("//my-module").getText());
+        assertThat(applyChanges(changeset().with(moduleDescriptor(module))),
+                   node("//my-module", nodeTextEquals("has some content")));
     }
     
     @Test
@@ -444,9 +421,8 @@ public class PluginXmlRewriterTest
         applyChanges(changeset().with(moduleDescriptor(module1), moduleDescriptor(module2)));
         
         String module3 = "<foo-module type=\"test\">another one</foo-module>";
-        Document xml = applyChanges(changeset().with(moduleDescriptor(module3)));
-        
-        assertEquals("bar-module", ((Node) xml.selectNodes("//*[@type='test']").get(1)).getName());
+        assertThat(applyChanges(changeset().with(moduleDescriptor(module3))),
+                   node("//*[@type='test'][2]", nodeName(equalTo("bar-module"))));
     }
     
     @Test
@@ -455,9 +431,9 @@ public class PluginXmlRewriterTest
         String module1 = "<my-module key=\"my-key\">good</my-module>";
         String module2 = "<my-module key=\"my-key\">worse</my-module>";
         applyChanges(changeset().with(moduleDescriptor(module1)));
-        Document xml = applyChanges(changeset().with(moduleDescriptor(module2)));
         
-        assertEquals(1, xml.selectNodes("//my-module").size());
+        assertThat(applyChanges(changeset().with(moduleDescriptor(module2))),
+                   nodes("//my-module", nodeCount(1)));
     }
 
     @Test
@@ -466,9 +442,9 @@ public class PluginXmlRewriterTest
         String module1 = "<my-module key=\"my-key\">good</my-module>";
         String module2 = "<my-module key=\"my-key\">worse</my-module>";
         applyChanges(changeset().with(moduleDescriptor(module1)));
-        Document xml = applyChanges(changeset().with(moduleDescriptor(module2)));
         
-        assertEquals("good", xml.selectSingleNode("//my-module").getText());
+        assertThat(applyChanges(changeset().with(moduleDescriptor(module2))),
+                   node("//my-module", nodeTextEquals("good")));
     }
     
     protected PluginProjectChangeset addPluginParam()
@@ -481,9 +457,9 @@ public class PluginXmlRewriterTest
         return new PluginProjectChangeset().with(i18nString("foo", "bar"));
     }
     
-    protected Document applyChanges(PluginProjectChangeset changes) throws Exception
+    protected XmlWrapper applyChanges(PluginProjectChangeset changes) throws Exception
     {
         rewriter.applyChanges(changes);
-        return DocumentHelper.parseText(FileUtils.readFileToString(pluginXml));
+        return XmlMatchers.xml(FileUtils.readFileToString(helper.pluginXml));
     }
 }

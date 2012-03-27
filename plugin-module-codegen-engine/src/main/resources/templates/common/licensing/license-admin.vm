@@ -99,9 +99,11 @@
                         </tr>
                         <tr>
                             <td>$i18n.getText("plugin.license.storage.admin.license.attribute.sen.title")</td>
+                            <td>
                             #if ($license.get().supportEntitlementNumber.isDefined())
-                            <td>$license.get().supportEntitlementNumber.get()</td>
+                                $license.get().supportEntitlementNumber.get()
                             #end
+                            </td>
                         </tr>
                     #end
                 </tbody>

@@ -1,24 +1,15 @@
-package com.atlassian.maven.plugins.amps;
+package com.atlassian.plugins.codegen;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.InputStream;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.atlassian.maven.plugins.amps.XmlMatchers.XmlWrapper;
-import com.atlassian.plugins.codegen.ArtifactDependency;
 import com.atlassian.plugins.codegen.ArtifactDependency.Scope;
-import com.atlassian.plugins.codegen.ArtifactId;
-import com.atlassian.plugins.codegen.BundleInstruction;
-import com.atlassian.plugins.codegen.MavenPlugin;
-import com.atlassian.plugins.codegen.PluginProjectChangeset;
+import com.atlassian.plugins.codegen.XmlMatchers.XmlWrapper;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -27,15 +18,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.hasItem;
-
-import static org.hamcrest.Matchers.allOf;
-
-import static com.atlassian.maven.plugins.amps.XmlMatchers.node;
-import static com.atlassian.maven.plugins.amps.XmlMatchers.nodeCount;
-import static com.atlassian.maven.plugins.amps.XmlMatchers.nodeText;
-import static com.atlassian.maven.plugins.amps.XmlMatchers.nodeTextEquals;
-import static com.atlassian.maven.plugins.amps.XmlMatchers.nodes;
 import static com.atlassian.plugins.codegen.AmpsSystemPropertyVariable.ampsSystemPropertyVariable;
 import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
 import static com.atlassian.plugins.codegen.ArtifactId.artifactId;
@@ -48,6 +30,11 @@ import static com.atlassian.plugins.codegen.PluginArtifact.ArtifactType.PLUGIN_A
 import static com.atlassian.plugins.codegen.VersionId.noVersion;
 import static com.atlassian.plugins.codegen.VersionId.version;
 import static com.atlassian.plugins.codegen.VersionId.versionProperty;
+import static com.atlassian.plugins.codegen.XmlMatchers.node;
+import static com.atlassian.plugins.codegen.XmlMatchers.nodeCount;
+import static com.atlassian.plugins.codegen.XmlMatchers.nodeText;
+import static com.atlassian.plugins.codegen.XmlMatchers.nodeTextEquals;
+import static com.atlassian.plugins.codegen.XmlMatchers.nodes;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.any;
@@ -392,7 +379,7 @@ public class MavenProjectRewriterTest
         assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(DUPLICATE_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
                         nodeText(delimitedList(",",
-                                               Matchers.<String>hasItems(equalTo("com.atlassian.plugins.rest.common*;version=\"1.0.5\""))))));
+                                               Matchers.<String>hasItems(equalTo("com.atlassian.plugins.rest.common*;version=\"1.0.5\";resolution:=optional"))))));
     }
 
     @Test
@@ -518,19 +505,8 @@ public class MavenProjectRewriterTest
         InputStream is = getClass().getClassLoader().getResourceAsStream(pomTemplateName);
         FileUtils.copyInputStreamToFile(is, pom);
         closeQuietly(is);
-        
-        Reader reader = new FileReader(pom);
-        try
-        {
-            MavenXpp3Reader xpp3Reader = new MavenXpp3Reader();
-            Model model = xpp3Reader.read(reader);
-            rewriter = new MavenProjectRewriter(model, pom);
-        }
-        finally
-        {
-            closeQuietly(reader);
-        }
 
+        rewriter = new MavenProjectRewriter(pom);
         rewriter.applyChanges(changes);
         
         return XmlMatchers.xml(FileUtils.readFileToString(pom), "project");

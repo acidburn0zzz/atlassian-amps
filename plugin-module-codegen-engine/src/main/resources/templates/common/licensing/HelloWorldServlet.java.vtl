@@ -16,7 +16,7 @@ import com.atlassian.upm.license.storage.lib.ThirdPartyPluginLicenseStorageManag
  * {@link ThirdPartyPluginLicenseStorageManager} to ensure plugin license
  * existence/validity at a plugin entry point.
  *
- * This servlet can be reached at http://localhost:2990/jira/plugins/servlet/licensehelloworld
+ * This servlet can be reached at http://localhost:2990/jira/plugins/servlet/${HELLO_WORLD_SERVLET_PATH}
  *
  * Note that Atlassian does not recommend writing servlets in this manner. You should really look
  * into using a templating library such as Velocity. This servlet is written this way solely for simplicity purposes.
@@ -42,20 +42,18 @@ public class ${CLASSNAME} extends HttpServlet
             //This accessor method can be used whether or not a licensing-aware UPM is present.
             if (licenseManager.getLicense().isDefined())
             {
-                for (PluginLicense pluginLicense : licenseManager.getLicense())
+                PluginLicense pluginLicense = licenseManager.getLicense().get();
+                //Check and see if the stored license has an error. If not, it is currently valid.
+                if (pluginLicense.getError().isDefined())
                 {
-                    //Check and see if the stored license has an error. If not, it is currently valid.
-                    if (pluginLicense.getError().isDefined())
-                    {
-                        //A license is currently stored, however, it is invalid (e.g. expired or user count mismatch)
-                        resp.getWriter().write("I'd love to say hello, but cannot do so because your license has an error: " 
-                                + pluginLicense.getError().get().name());
-                    }
-                    else
-                    {
-                        //A license is currently stored and it is valid.
-                        resp.getWriter().write("Hello, world! You are licensed!");
-                    }
+                    //A license is currently stored, however, it is invalid (e.g. expired or user count mismatch)
+                    resp.getWriter().write("I'd love to say hello, but cannot do so because your license has an error: " 
+                            + pluginLicense.getError().get().name());
+                }
+                else
+                {
+                    //A license is currently stored and it is valid.
+                    resp.getWriter().write("Hello, world! You are licensed!");
                 }
             }
             else

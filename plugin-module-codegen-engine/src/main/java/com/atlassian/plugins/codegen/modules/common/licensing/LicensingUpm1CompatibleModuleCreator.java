@@ -15,17 +15,16 @@ import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
+import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletProperties;
 
 import static com.atlassian.fugue.Option.some;
-import static com.atlassian.plugins.codegen.AmpsSystemPropertyVariable.ampsSystemPropertyVariable;
 import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
 import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.COMPILE;
 import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.PROVIDED;
 import static com.atlassian.plugins.codegen.ArtifactId.artifactId;
 import static com.atlassian.plugins.codegen.BundleInstruction.dynamicImportPackage;
-import static com.atlassian.plugins.codegen.BundleInstruction.importPackage;
 import static com.atlassian.plugins.codegen.BundleInstruction.privatePackage;
 import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
 import static com.atlassian.plugins.codegen.ComponentDeclaration.componentDeclaration;
@@ -63,12 +62,10 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
     
     public static final String LICENSE_SERVLET_NAME_I18N_KEY = "license-servlet.name";
     public static final String LICENSE_SERVLET_DESCRIPTION_I18N_KEY = "license-servlet.description";
-    public static final String LICENSE_SERVLET_URL_PATTERN = "/licenseservlet";
     
     public static final String HELLO_WORLD_SERVLET_CLASS_NAME = "LicenseHelloWorldServlet";
     public static final String HELLO_WORLD_SERVLET_NAME_I18N_KEY = "license-hello-world-servlet.name";
     public static final String HELLO_WORLD_SERVLET_DESCRIPTION_I18N_KEY = "license-hello-world-servlet.description";
-    public static final String HELLO_WORLD_SERVLET_URL_PATTERN = "/licensehelloworld";
     
     public static final String LICENSE_API_VERSION = "2.1";
     public static final VersionId LICENSE_API_VERSION_PROPERTY = versionProperty("upm.license.compatibility.version", LICENSE_API_VERSION);
@@ -92,19 +89,6 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
     };
     
     public static final BundleInstruction[] BUNDLE_INSTRUCTIONS = {
-        importPackage("com.atlassian.plugin*", "0.0"),
-        importPackage("com.atlassian.sal*", "0.0"),
-        importPackage("com.atlassian.templaterenderer*", "0.0"),
-        importPackage("com.google.common*", "1.0"),
-        importPackage("javax.servlet*", "0.0"),
-        importPackage("org.apache.commons*", "0.0"),
-        importPackage("org.joda.time*", "0.0"),
-        importPackage("org.osgi.framework*", "0.0"),
-        importPackage("org.osgi.util*", "0.0"),
-        importPackage("org.slf4j*", "1.5"),
-        importPackage("org.springframework.beans*", "0.0"),
-        importPackage("org.springframework.context*", "0.0"),
-        importPackage("org.springframework.osgi*", "0.0"),
         privatePackage("com.atlassian.upm.license.storage.lib*"),
         dynamicImportPackage("com.atlassian.upm.api.license", LICENSE_API_IMPORT_VERSION),
         dynamicImportPackage("com.atlassian.upm.api.license.entity", LICENSE_API_IMPORT_VERSION),
@@ -149,12 +133,14 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
     {
         ClassId licenseServletClass = props.getClassId();
         ServletProperties licenseServletProps = new ServletProperties(licenseServletClass.getFullName());
-        licenseServletProps.setUrlPattern(LICENSE_SERVLET_URL_PATTERN);
+        licenseServletProps.setUrlPattern("/" + props.getLicenseServletPath());
         licenseServletProps.setNameI18nKey(LICENSE_SERVLET_NAME_I18N_KEY);
         licenseServletProps.setDescriptionI18nKey(LICENSE_SERVLET_DESCRIPTION_I18N_KEY);
         licenseServletProps.setCreateClass(false);
+        BasicClassModuleProperties licenseServletClassProps = new BasicClassModuleProperties(licenseServletClass.getFullName());
+        licenseServletClassProps.putAll(props);
         PluginProjectChangeset licenseServlet = new ServletModuleCreator().createModule(licenseServletProps)
-            .with(createClass(licenseServletProps, LICENSE_SERVLET_TEMPLATE));
+            .with(createClass(licenseServletClassProps, LICENSE_SERVLET_TEMPLATE));
         
         PluginProjectChangeset ret = new PluginProjectChangeset()
             .with(DEPENDENCIES)
@@ -172,10 +158,13 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
         {
             ClassId helloWorldServletClass = props.getClassId().className(HELLO_WORLD_SERVLET_CLASS_NAME);
             ServletProperties helloWorldServletProps = new ServletProperties(helloWorldServletClass.getFullName());
-            helloWorldServletProps.setUrlPattern(HELLO_WORLD_SERVLET_URL_PATTERN);
+            helloWorldServletProps.setUrlPattern("/" + props.getHelloWorldServletPath());
             helloWorldServletProps.setCreateClass(false);
+            BasicClassModuleProperties helloWorldServletClassProps = new BasicClassModuleProperties(helloWorldServletClass.getFullName());
+            helloWorldServletClassProps.putAll(props);
+            helloWorldServletClassProps.setFullyQualifiedClassname(helloWorldServletClass.getFullName());
             PluginProjectChangeset helloWorldServlet = new ServletModuleCreator().createModule(helloWorldServletProps)
-                .with(createClass(helloWorldServletProps, HELLO_WORLD_SERVLET_TEMPLATE));
+                .with(createClass(helloWorldServletClassProps, HELLO_WORLD_SERVLET_TEMPLATE));
 
             ret = ret.with(helloWorldServlet);
         }
