@@ -37,6 +37,12 @@ import static com.atlassian.plugins.codegen.ResourceFile.resourceFile;
 import static com.atlassian.plugins.codegen.VersionId.noVersion;
 import static com.atlassian.plugins.codegen.VersionId.version;
 import static com.atlassian.plugins.codegen.VersionId.versionProperty;
+import static com.atlassian.plugins.codegen.modules.Dependencies.APPLICATION_PROPERTIES_IMPORT;
+import static com.atlassian.plugins.codegen.modules.Dependencies.COMMONS_LANG;
+import static com.atlassian.plugins.codegen.modules.Dependencies.I18N_RESOLVER_IMPORT;
+import static com.atlassian.plugins.codegen.modules.Dependencies.SAL_API;
+import static com.atlassian.plugins.codegen.modules.Dependencies.TEMPLATE_RENDERER_API;
+import static com.atlassian.plugins.codegen.modules.Dependencies.TEMPLATE_RENDERER_IMPORT;
 
 /**
  * @since 3.9
@@ -77,10 +83,10 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
         dependency("com.atlassian.upm", "plugin-license-storage-plugin", LICENSE_API_VERSION_PROPERTY, PROVIDED),
         dependency("com.atlassian.upm", "licensing-api", LICENSE_API_VERSION_PROPERTY, PROVIDED),
         dependency("com.atlassian.upm", "upm-api", LICENSE_API_VERSION_PROPERTY, PROVIDED),
-        dependency("com.atlassian.sal", "sal-api", "2.4.0", PROVIDED),
-        dependency("com.atlassian.templaterenderer", "atlassian-template-renderer-api", versionProperty("atlassian.templaterenderer.version", "1.0.5"), PROVIDED),
-        dependency("org.springframework.osgi", "spring-osgi-core", "1.1.3", PROVIDED),
-        dependency("commons-lang", "commons-lang", "2.4", PROVIDED)
+        SAL_API,
+        TEMPLATE_RENDERER_API,
+        COMMONS_LANG,
+        dependency("org.springframework.osgi", "spring-osgi-core", "1.1.3", PROVIDED)
     };
     
     public static final PluginArtifact[] BUNDLED_ARTIFACTS = {
@@ -100,12 +106,12 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
         componentImport(fullyQualified("com.atlassian.plugin.PluginAccessor")),
         componentImport(fullyQualified("com.atlassian.plugin.PluginController")),
         componentImport(fullyQualified("com.atlassian.sal.api.transaction.TransactionTemplate")).key(some("txTemplate")),
-        componentImport(fullyQualified("com.atlassian.sal.api.ApplicationProperties")),
-        componentImport(fullyQualified("com.atlassian.templaterenderer.TemplateRenderer")),
+        APPLICATION_PROPERTIES_IMPORT,
+        TEMPLATE_RENDERER_IMPORT,
         componentImport(fullyQualified("com.atlassian.sal.api.pluginsettings.PluginSettingsFactory")),
         componentImport(fullyQualified("com.atlassian.sal.api.auth.LoginUriProvider")),
         componentImport(fullyQualified("com.atlassian.sal.api.user.UserManager")),
-        componentImport(fullyQualified("com.atlassian.sal.api.message.I18nResolver"))
+        I18N_RESOLVER_IMPORT
     };
     
     public static final ComponentDeclaration[] COMPONENTS = {

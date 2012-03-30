@@ -147,19 +147,25 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
         return (Element) results.selectSingleNode("//modules/" + name);
     }
 
-    protected I18nString getI18nString(String name, String value) throws Exception
+    protected I18nString getI18nString(String name) throws Exception
     {
-        I18nString searchFor = I18nString.i18nString(name, value);
         PluginProjectChangeset changeset = getChangesetForModule();
         for (I18nString i : changeset.getItems(I18nString.class))
         {
-            if (searchFor.equals(i))
+            if (i.getName().equals(name))
             {
                 return i;
             }
         }
-        failWithChangeset(changeset, "did not generate i18n string " + searchFor);
+        failWithChangeset(changeset, "did not generate i18n string '" + name + "'");
         return null;
+    }
+
+    protected I18nString getI18nString(String name, String value) throws Exception
+    {
+        I18nString i = getI18nString(name);
+        assertEquals("i18n string '" + name + "' had wrong value", value, i.getValue());
+        return i;
     }
     
     protected SourceFile getSourceFile(String packageName, String className) throws Exception

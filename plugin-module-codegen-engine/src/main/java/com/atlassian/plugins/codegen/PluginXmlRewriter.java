@@ -9,6 +9,8 @@ import java.util.Map;
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.util.PluginXmlHelper;
 
+import com.google.common.collect.ImmutableList;
+
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -16,6 +18,8 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+
+import static com.google.common.collect.Iterables.concat;
 
 /**
  * Applies the subset of changes from a {@link PluginProjectChangeset} that affect the
@@ -148,18 +152,27 @@ public class PluginXmlRewriter implements ProjectRewriter
     private boolean addComponentImport(ComponentImport componentImport) throws DocumentException
     {
         String key = componentImport.getKey().getOrElse(createKeyFromClass(componentImport.getInterfaceClass()));
-        if (!PluginXmlHelper.findElementByTypeAndAttribute(document.getRootElement(), "component-import", "key", key).isDefined())
+        for (ClassId interfaceId : concat(ImmutableList.of(componentImport.getInterfaceClass()), componentImport.getAlternateInterfaces()))
         {
-            Element element = createModule("component-import");
-            element.addAttribute("key", key);
-            element.addAttribute("interface", componentImport.getInterfaceClass().getFullName());
-            for (String filter : componentImport.getFilter())
+            if ((document.getRootElement().selectNodes("//component-import[@interface='" + interfaceId.getFullName() + "']").size() > 0)
+                || (document.getRootElement().selectNodes("//component-import/interface[text()='" + interfaceId.getFullName() + "']").size() > 0))
             {
-                element.addAttribute("filter", filter);
+                return false;
             }
-            return true;
         }
-        return false;
+        if (PluginXmlHelper.findElementByTypeAndAttribute(document.getRootElement(), "component-import", "key", key).isDefined())
+        {
+            return false;
+        }
+        
+        Element element = createModule("component-import");
+        element.addAttribute("key", key);
+        element.addAttribute("interface", componentImport.getInterfaceClass().getFullName());
+        for (String filter : componentImport.getFilter())
+        {
+            element.addAttribute("filter", filter);
+        }
+        return true;
     }
     
     private boolean addComponentDeclaration(ComponentDeclaration component) throws DocumentException

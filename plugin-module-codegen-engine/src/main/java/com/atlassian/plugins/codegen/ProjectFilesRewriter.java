@@ -1,10 +1,8 @@
 package com.atlassian.plugins.codegen;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Properties;
 
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
@@ -58,23 +56,35 @@ public class ProjectFilesRewriter implements ProjectRewriter
         }
         if (changes.hasItems(I18nString.class))
         {
-            File i18nFile = FileUtil.dotDelimitedFilePath(location.getResourcesDir(), xmlHelper.getDefaultI18nLocation(), ".properties");
-            Files.createParentDirs(i18nFile);
-            if (!i18nFile.exists())
+            addI18nStrings(FileUtil.dotDelimitedFilePath(location.getResourcesDir(), xmlHelper.getDefaultI18nLocation(), ".properties"),
+                changes.getItems(I18nString.class));
+        }
+    }
+
+    private void addI18nStrings(File file, Iterable<I18nString> items) throws IOException
+    {
+        Files.createParentDirs(file);
+        String oldContent = file.exists() ? FileUtils.readFileToString(file) : "";
+        Properties oldProps = new Properties();
+        oldProps.load(new StringReader(oldContent));
+        StringBuilder newContent = new StringBuilder(oldContent);
+        boolean modified = false;
+        for (I18nString item : items)
+        {
+            if (!oldProps.containsKey(item.getName()))
             {
-                i18nFile.createNewFile();
+                if (!modified)
+                {
+                    newContent.append("\n");
+                }
+                modified = true;
+                newContent.append(item.getName()).append("=").append(item.getValue()).append("\n");
+                oldProps.put(item.getName(), item.getValue());
             }
-            Properties props = new Properties();
-            InputStream is = new FileInputStream(i18nFile);
-            props.load(is);
-            closeQuietly(is);
-            for (I18nString s : changes.getItems(I18nString.class))
-            {
-                props.put(s.getName(), s.getValue());
-            }
-            OutputStream os = new FileOutputStream(i18nFile);
-            props.store(os, "");
-            closeQuietly(os);
+        }
+        if (modified)
+        {
+            FileUtils.writeStringToFile(file, newContent.toString());
         }
     }
 }
