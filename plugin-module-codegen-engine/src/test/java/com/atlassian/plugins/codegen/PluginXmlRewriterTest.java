@@ -29,7 +29,9 @@ public class PluginXmlRewriterTest
 {
     protected static final String CLASS = "com.atlassian.test.MyClass";
     protected static final String INTERFACE = "com.atlassian.test.MyInterface";
+    protected static final String INTERFACE2 = "com.atlassian.test.MyInterface2";
     protected static final ComponentImport IMPORT = ComponentImport.componentImport(fullyQualified(INTERFACE));
+    protected static final ComponentImport IMPORT2 = ComponentImport.componentImport(fullyQualified(INTERFACE2));
     
     protected ComponentDeclaration.Builder componentBuilder = ComponentDeclaration.builder(fullyQualified(CLASS), "my-key");
 
@@ -215,21 +217,46 @@ public class PluginXmlRewriterTest
     @Test
     public void duplicateComponentImportKeyCannotBeAdded() throws Exception
     {
-        ComponentImport secondImportWithSameKey = IMPORT.filter(some("different"));
-        applyChanges(changeset().with(IMPORT));
+        applyChanges(changeset().with(IMPORT.key(some("my-key"))));
 
-        assertThat(applyChanges(changeset().with(secondImportWithSameKey)),
+        assertThat(applyChanges(changeset().with(IMPORT2.key(some("my-key")))),
                    nodes("//component-import", nodeCount(1)));
     }
 
     @Test
     public void componentImportWithSameKeyIsNotOverwritten() throws Exception
     {
-        ComponentImport secondImportWithSameKey = IMPORT.filter(some("different"));
-        applyChanges(changeset().with(IMPORT));
+        applyChanges(changeset().with(IMPORT.key(some("my-key"))));
 
-        assertThat(applyChanges(changeset().with(secondImportWithSameKey)),
-                   node("//component-import/@filter", nullValue()));
+        assertThat(applyChanges(changeset().with(IMPORT2.key(some("my-key")))),
+                   node("//component-import/@interface", nodeTextEquals(INTERFACE)));
+    }
+    
+    @Test
+    public void componentWithSameInterfaceCannotBeAdded() throws Exception
+    {
+        applyChanges(changeset().with(IMPORT.key(some("key1"))));
+
+        assertThat(applyChanges(changeset().with(IMPORT.key(some("key2")))),
+                   nodes("//component-import", nodeCount(1)));
+    }
+
+    @Test
+    public void componentWithSameInterfaceInSubElementCannotBeAdded() throws Exception
+    {
+        usePluginXml("plugin-with-import-interface-element.xml");
+
+        assertThat(applyChanges(changeset().with(IMPORT.key(some("key2")))),
+                   nodes("//component-import", nodeCount(1)));
+    }
+    
+    @Test
+    public void componentCannotBeAddedIfAlternateInterfaceIsAlreadyUsed() throws Exception
+    {
+        applyChanges(changeset().with(IMPORT.key(some("key1"))));
+
+        assertThat(applyChanges(changeset().with(IMPORT2.alternateInterfaces(fullyQualified(INTERFACE)).key(some("key2")))),
+                   nodes("//component-import", nodeCount(1)));
     }
     
     @Test
