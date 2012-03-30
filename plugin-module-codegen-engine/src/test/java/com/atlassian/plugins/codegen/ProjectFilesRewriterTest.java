@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
 import static com.atlassian.plugins.codegen.I18nString.i18nString;
+import static com.atlassian.plugins.codegen.PluginProjectChangeset.changeset;
 import static com.atlassian.plugins.codegen.SourceFile.sourceFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -19,10 +20,12 @@ public class ProjectFilesRewriterTest
 {
     protected static final ClassId CLASS = fullyQualified("com.atlassian.test.MyClass");
     protected static final String CONTENT = "this is some amazing content";
-    
+    protected static final String I18N_FILE_NAME = ProjectHelper.GROUP_ID + File.separator + ProjectHelper.ARTIFACT_ID + ".properties";
+
     protected ProjectHelper helper;
     protected ProjectFilesRewriter rewriter;
-    
+    protected File i18nFile;
+
     @Before
     public void setup() throws Exception
     {
@@ -34,6 +37,7 @@ public class ProjectFilesRewriterTest
     {
         helper.usePluginXml(path);
         rewriter = new ProjectFilesRewriter(helper.location);
+        i18nFile = new File(helper.location.getResourcesDir(), I18N_FILE_NAME);
     }
 
     @After
@@ -105,35 +109,45 @@ public class ProjectFilesRewriterTest
     @Test
     public void i18nPropertyFileIsCreatedWithDefaultLocation() throws Exception
     {
-        PluginProjectChangeset changes = new PluginProjectChangeset()
-            .with(i18nString("foo", "bar"));
-        rewriter.applyChanges(changes);
+        rewriter.applyChanges(changeset().with(i18nString("foo", "bar")));
         
-        assertTrue(new File(helper.resourcesDir, ProjectHelper.GROUP_ID + File.separator
-                            + ProjectHelper.ARTIFACT_ID + ".properties").exists());        
+        assertTrue(i18nFile.exists());        
     }
     
     @Test
     public void i18nPropertyFileHasPropertyValue() throws Exception
     {
-        PluginProjectChangeset changes = new PluginProjectChangeset()
-            .with(i18nString("foo", "bar"));
-        rewriter.applyChanges(changes);
+        rewriter.applyChanges(changeset().with(i18nString("foo", "bar")));
         
         Properties props = new Properties();
-        props.load(new FileInputStream(new File(helper.resourcesDir, ProjectHelper.GROUP_ID + File.separator
-                                                + ProjectHelper.ARTIFACT_ID + ".properties")));
+        props.load(new FileInputStream(i18nFile));
         assertEquals("bar", props.getProperty("foo"));
     }
     
+    @Test
+    public void duplicateI18nPropertyNameIsNotAdded() throws Exception
+    {
+        FileUtils.writeStringToFile(i18nFile, "foo=goo\n");
+        rewriter.applyChanges(changeset().with(i18nString("foo", "bar")));
+        
+        assertEquals("foo=goo\n", FileUtils.readFileToString(i18nFile));
+    }
+
+    @Test
+    public void propertiesAreNotReordered() throws Exception
+    {
+        FileUtils.writeStringToFile(i18nFile, "foo=goo\nall=lol");
+        rewriter.applyChanges(changeset().with(i18nString("gal", "pal"), i18nString("bar", "car")));
+        
+        assertEquals("foo=goo\nall=lol\ngal=pal\nbar=car\n", FileUtils.readFileToString(i18nFile));
+    }
+
     @Test
     public void i18nPropertyFileIsCreatedWithCustomLocation() throws Exception
     {
         usePluginXml("plugin-with-same-i18n-name.xml");
 
-        PluginProjectChangeset changes = new PluginProjectChangeset()
-        .with(i18nString("foo", "bar"));
-        rewriter.applyChanges(changes);
+        rewriter.applyChanges(changeset().with(i18nString("foo", "bar")));
     
         assertTrue(new File(helper.resourcesDir, "nonstandard-location.properties").exists());
     }
