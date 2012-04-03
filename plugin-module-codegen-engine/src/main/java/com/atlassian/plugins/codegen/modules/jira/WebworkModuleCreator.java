@@ -38,7 +38,7 @@ public class WebworkModuleCreator extends AbstractPluginModuleCreator<WebworkPro
     public PluginProjectChangeset createModule(WebworkProperties props) throws Exception
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .withDependencies(HTTPCLIENT_TEST,
+            .with(HTTPCLIENT_TEST,
                               MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 

@@ -1,6 +1,7 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
+import com.atlassian.plugins.codegen.SourceFile;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 
 import org.junit.Before;
@@ -50,7 +51,7 @@ public class CustomFieldSearcherTest extends AbstractModuleCreatorTestCase<Custo
     {
         props.setGenerateClass(false);
         
-        assertTrue(getChangesetForModule().getSourceFiles().isEmpty());
+        assertTrue(getChangesetForModule(SourceFile.class).isEmpty());
     }
     
     @Test

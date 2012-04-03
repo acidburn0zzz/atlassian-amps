@@ -30,7 +30,7 @@ public class DownloadablePluginResourceModuleCreator extends AbstractPluginModul
     public PluginProjectChangeset createModule(DownloadablePluginResourceProperties props) throws Exception
     {
         return new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
+            .with(MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
     }
 

@@ -12,13 +12,17 @@ public class PluginModuleLocation
     private final File testDirectory;
     private final File templateDirectory;
     private final File pluginXml;
+    private final String groupId;
+    private final String artifactId;
 
-    private PluginModuleLocation(File sourceDirectory, File resourcesDirectory, File testDirectory, File templateDirectory)
+    private PluginModuleLocation(Builder builder)
     {
-        this.sourceDirectory = sourceDirectory;
-        this.templateDirectory = templateDirectory;
-        this.resourcesDir = resourcesDirectory;
-        this.testDirectory = testDirectory;
+        this.sourceDirectory = builder.sourceDirectory;
+        this.templateDirectory = builder.templateDirectory;
+        this.resourcesDir = builder.resourcesDirectory;
+        this.testDirectory = builder.testDirectory;
+        this.groupId = builder.groupId;
+        this.artifactId = builder.artifactId;
         this.pluginXml = new File(resourcesDir, "atlassian-plugin.xml");
     }
 
@@ -47,12 +51,24 @@ public class PluginModuleLocation
         return pluginXml;
     }
 
+    public String getGroupId()
+    {
+        return groupId;
+    }
+    
+    public String getArtifactId()
+    {
+        return artifactId;
+    }
+    
     public static class Builder
     {
         private File sourceDirectory;
-        private File resourcesDir;
+        private File resourcesDirectory;
         private File testDirectory;
         private File templateDirectory;
+        private String groupId;
+        private String artifactId;
 
         public Builder(File sourceDirectory)
         {
@@ -65,9 +81,9 @@ public class PluginModuleLocation
             return this;
         }
 
-        public Builder resourcesDirectory(File resourcesDir)
+        public Builder resourcesDirectory(File resourcesDirectory)
         {
-            this.resourcesDir = resourcesDir;
+            this.resourcesDirectory = resourcesDirectory;
             return this;
         }
 
@@ -77,9 +93,16 @@ public class PluginModuleLocation
             return this;
         }
 
+        public Builder groupAndArtifactId(String groupId, String artifactId)
+        {
+            this.groupId = groupId;
+            this.artifactId = artifactId;
+            return this;
+        }
+
         public PluginModuleLocation build()
         {
-            return new PluginModuleLocation(sourceDirectory, resourcesDir, testDirectory, templateDirectory);
+            return new PluginModuleLocation(this);
         }
     }
 }

@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.jar.Manifest;
 
 @MojoGoal ("validate-manifest")
@@ -23,6 +25,13 @@ public class ValidateManifestMojo extends AbstractAmpsMojo
      */
     @MojoParameter (expression = "${manifest.validation.skip}")
     protected boolean skipManifestValidation = false;
+
+    /**
+     * The BND instructions for the bundle.  We'll only validate the import versions if there was an
+     * explicit Import-Package list, not if we auto-generated the imports.
+     */
+    @MojoParameter
+    private Map<String, String> instructions = new HashMap<String, String>();
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -39,9 +48,12 @@ public class ValidateManifestMojo extends AbstractAmpsMojo
 
                 mfin = new FileInputStream(mfile);
                 Manifest mf = new Manifest(mfin);
-                PackageImportVersionValidator validator = new PackageImportVersionValidator(getMavenContext().getProject(),
-                        getMavenContext().getLog(), getPluginInformation().getId());
-                validator.validate(mf.getMainAttributes().getValue(Constants.IMPORT_PACKAGE));
+                if (instructions.containsKey(Constants.IMPORT_PACKAGE))
+                {
+                    PackageImportVersionValidator validator = new PackageImportVersionValidator(getMavenContext().getProject(),
+                            getMavenContext().getLog(), getPluginInformation().getId());
+                    validator.validate(mf.getMainAttributes().getValue(Constants.IMPORT_PACKAGE));
+                }
             }
             catch (IOException e)
             {

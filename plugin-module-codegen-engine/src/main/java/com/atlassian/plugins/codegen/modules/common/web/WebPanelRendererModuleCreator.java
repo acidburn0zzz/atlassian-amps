@@ -34,7 +34,7 @@ public class WebPanelRendererModuleCreator extends AbstractPluginModuleCreator<W
     public PluginProjectChangeset createModule(WebPanelRendererProperties props) throws Exception
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
+            .with(MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 
         if (props.includeExamples())

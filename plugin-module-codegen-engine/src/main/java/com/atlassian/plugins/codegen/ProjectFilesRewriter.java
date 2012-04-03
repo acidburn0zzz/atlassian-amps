@@ -1,13 +1,13 @@
 package com.atlassian.plugins.codegen;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Properties;
 
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+import com.atlassian.plugins.codegen.util.FileUtil;
+import com.atlassian.plugins.codegen.util.PluginXmlHelper;
 
 import com.google.common.io.Files;
 
@@ -32,20 +32,18 @@ public class ProjectFilesRewriter implements ProjectRewriter
     @Override
     public void applyChanges(PluginProjectChangeset changes) throws Exception
     {
-        for (SourceFile sourceFile : changes.getSourceFiles())
+        // We use a PluginXmlHelper to read some information from atlassian-plugin.xml if needed
+        PluginXmlHelper xmlHelper = new PluginXmlHelper(location);
+        
+        for (SourceFile sourceFile : changes.getItems(SourceFile.class))
         {
             File baseDir = sourceFile.getSourceGroup() == SourceFile.SourceGroup.TESTS ?
                 location.getTestDirectory() : location.getSourceDirectory();
-            File packageDir = baseDir;
-            for (String packagePart : sourceFile.getClassId().getPackage().split("\\."))
-            {
-                packageDir = new File(packageDir, packagePart);
-            }
-            File newFile = new File(packageDir, sourceFile.getClassId().getName() + ".java");
+            File newFile = FileUtil.dotDelimitedFilePath(baseDir, sourceFile.getClassId().getFullName(), ".java");
             Files.createParentDirs(newFile);
             FileUtils.writeStringToFile(newFile, sourceFile.getContent());
         }
-        for (ResourceFile resourceFile : changes.getResourceFiles())
+        for (ResourceFile resourceFile : changes.getItems(ResourceFile.class))
         {
             File resourceDir = location.getResourcesDir();
             if (!resourceFile.getRelativePath().equals(""))
@@ -56,21 +54,37 @@ public class ProjectFilesRewriter implements ProjectRewriter
             Files.createParentDirs(newFile);
             FileUtils.writeStringToFile(newFile, resourceFile.getContent());
         }
-        if (!changes.getI18nProperties().isEmpty())
+        if (changes.hasItems(I18nString.class))
         {
-            File i18nFile = new File(location.getResourcesDir(), DEFAULT_I18N_NAME + ".properties");
-            if (!i18nFile.exists())
+            addI18nStrings(FileUtil.dotDelimitedFilePath(location.getResourcesDir(), xmlHelper.getDefaultI18nLocation(), ".properties"),
+                changes.getItems(I18nString.class));
+        }
+    }
+
+    private void addI18nStrings(File file, Iterable<I18nString> items) throws IOException
+    {
+        Files.createParentDirs(file);
+        String oldContent = file.exists() ? FileUtils.readFileToString(file) : "";
+        Properties oldProps = new Properties();
+        oldProps.load(new StringReader(oldContent));
+        StringBuilder newContent = new StringBuilder(oldContent);
+        boolean modified = false;
+        for (I18nString item : items)
+        {
+            if (!oldProps.containsKey(item.getName()))
             {
-                i18nFile.createNewFile();
+                if (!modified)
+                {
+                    newContent.append("\n");
+                }
+                modified = true;
+                newContent.append(item.getName()).append("=").append(item.getValue()).append("\n");
+                oldProps.put(item.getName(), item.getValue());
             }
-            Properties props = new Properties();
-            InputStream is = new FileInputStream(i18nFile);
-            props.load(is);
-            closeQuietly(is);
-            props.putAll(changes.getI18nProperties());
-            OutputStream os = new FileOutputStream(i18nFile);
-            props.store(os, "");
-            closeQuietly(os);
+        }
+        if (modified)
+        {
+            FileUtils.writeStringToFile(file, newContent.toString());
         }
     }
 }

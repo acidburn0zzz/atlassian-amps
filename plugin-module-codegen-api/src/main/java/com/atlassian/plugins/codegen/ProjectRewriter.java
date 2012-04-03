@@ -6,7 +6,5 @@ package com.atlassian.plugins.codegen;
  */
 public interface ProjectRewriter
 {
-    static final String DEFAULT_I18N_NAME = "atlassian-plugin";
-
     void applyChanges(PluginProjectChangeset changes) throws Exception;
 }

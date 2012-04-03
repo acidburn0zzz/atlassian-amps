@@ -29,7 +29,7 @@ public class WebSectionModuleCreator extends AbstractPluginModuleCreator<WebSect
     public PluginProjectChangeset createModule(WebSectionProperties props) throws Exception
     {
         return new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
+            .with(MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
     }
     

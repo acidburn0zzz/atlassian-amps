@@ -23,7 +23,7 @@ public class JARValidJiraWithDependencies implements PluginModuleCreator<PluginM
     @Override
     public PluginProjectChangeset createModule(PluginModuleProperties props) throws Exception {
         return new PluginProjectChangeset()
-            .withDependencies(dependency("javax.servlet", "servlet-api", "2.4", Scope.PROVIDED),
-                              dependency("org.mockito", "mockito-all", "1.8.5", Scope.TEST));
+            .with(dependency("javax.servlet", "servlet-api", "2.4", Scope.PROVIDED),
+                  dependency("org.mockito", "mockito-all", "1.8.5", Scope.TEST));
     }
 }

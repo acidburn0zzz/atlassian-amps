@@ -46,4 +46,15 @@ public class NoSuperPrompter implements PluginModulePrompter<BasicClassModulePro
     {
         return AbstractModulePrompter.DEFAULT_BASE_PACKAGE;
     }
+    
+    @Override
+    public void setPluginKey(String pluginKey)
+    {
+    }
+    
+    @Override
+    public String getPluginKey()
+    {
+        return "example";
+    }
 }

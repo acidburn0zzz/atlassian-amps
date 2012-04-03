@@ -45,13 +45,13 @@ public class RESTModuleCreator extends AbstractPluginModuleCreator<RESTPropertie
     public PluginProjectChangeset createModule(RESTProperties props) throws Exception
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .withDependencies(SERVLET_API,
-                                      dependency("javax.ws.rs", "jsr311-api", "1.0", PROVIDED),
-                                      dependency("javax.xml.bind", "jaxb-api", "2.1", PROVIDED),
-                                      dependency("com.atlassian.plugins.rest", "atlassian-rest-common", "1.0.2", PROVIDED),
-                                      dependency("com.atlassian.sal", "sal-api", "2.6.0", PROVIDED),
-                                      dependency("org.apache.wink", "wink-client", "1.1.3-incubating", TEST),
-                                      MOCKITO_TEST)
+            .with(SERVLET_API,
+                              dependency("javax.ws.rs", "jsr311-api", "1.0", PROVIDED),
+                              dependency("javax.xml.bind", "jaxb-api", "2.1", PROVIDED),
+                              dependency("com.atlassian.plugins.rest", "atlassian-rest-common", "1.0.2", PROVIDED),
+                              dependency("com.atlassian.sal", "sal-api", "2.6.0", PROVIDED),
+                              dependency("org.apache.wink", "wink-client", "1.1.3-incubating", TEST),
+                              MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
         
         ClassId mainClass = props.getClassId();

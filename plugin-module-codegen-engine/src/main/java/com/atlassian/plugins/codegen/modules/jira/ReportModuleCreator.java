@@ -34,7 +34,7 @@ public class ReportModuleCreator extends AbstractPluginModuleCreator<ReportPrope
     public PluginProjectChangeset createModule(ReportProperties props) throws Exception
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
+            .with(MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
         
         if (props.includeExamples())
@@ -52,7 +52,7 @@ public class ReportModuleCreator extends AbstractPluginModuleCreator<ReportPrope
                 {
                     String path = FileUtils.getPath(resource.getLocation());
                     String name = FileUtils.filename(resource.getLocation());
-                    ret = ret.withResourceFile(resourceFile(path, name + ".properties", ""));
+                    ret = ret.with(resourceFile(path, name + ".properties", ""));
                 }
                 else
                 {

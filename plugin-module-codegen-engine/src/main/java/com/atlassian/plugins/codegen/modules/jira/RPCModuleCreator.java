@@ -39,8 +39,8 @@ public class RPCModuleCreator extends AbstractPluginModuleCreator<RPCProperties>
         String nameI18nKey = props.getNameI18nKey() + ".component";
         
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .withDependencies(HTTPCLIENT_TEST,
-                              MOCKITO_TEST)
+            .with(HTTPCLIENT_TEST,
+                  MOCKITO_TEST)
             .with(createModule(props, props.isSoap() ? SOAP_PLUGIN_MODULE_TEMPLATE : XML_PLUGIN_MODULE_TEMPLATE));
 
         if (props.includeExamples())
@@ -59,7 +59,7 @@ public class RPCModuleCreator extends AbstractPluginModuleCreator<RPCProperties>
             .name(some(name))
             .nameI18nKey(some(nameI18nKey))
             .build();
-        return ret.withComponentDeclarations(component);
+        return ret.with(component);
     }
 
     @Override
