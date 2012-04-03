@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps.product.studio;
 
+import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
@@ -46,23 +47,13 @@ public class StudioConfluenceProductHandler extends ConfluenceProductHandler imp
     {
         Map<String, String> systemProperties = new HashMap<String, String>(super.getSystemProperties(product));
 
-        // This datasource is only used by the Studio version of Confluence:
-        final String dburl = System.getProperty("amps.datasource.url",
-                format("jdbc:hsqldb:%s/database/confluencedb;hsqldb.tx=MVCC", fixWindowsSlashes(getHomeDirectory(product).getAbsolutePath())));
-        final String driverClass = System.getProperty("amps.datasource.driver", "org.hsqldb.jdbcDriver");
-        final String username = System.getProperty("amps.datasource.username", "sa");
-        final String password = System.getProperty("amps.datasource.password", "");
-        final String datasourceTypeClass = "javax.sql.DataSource";
+        DataSource ds = product.getDataSource();
+        ds.setDefaultValues("jdbc/DefaultDS",
+             // This datasource is only used by the Studio version of Confluence:
+                format("jdbc:hsqldb:%s/database/confluencedb;hsqldb.tx=MVCC", fixWindowsSlashes(getHomeDirectory(product).getAbsolutePath())),
+                "org.hsqldb.jdbcDriver", "sa", "", "javax.sql.DataSource", null, null);
 
-        final String datasource = format("cargo.datasource.url=%s", dburl);
-        final String driver = format("cargo.datasource.driver=%s", driverClass);
-        final String datasourceUsername = format("cargo.datasource.username=%s", username);
-        final String datasourcePassword = format("cargo.datasource.password=%s", password);
-        final String datasourceType = "cargo.datasource.type=" + datasourceTypeClass;
-        final String jndi = "cargo.datasource.jndi=jdbc/DefaultDS";
-
-        systemProperties.put("cargo.datasource.datasource",
-                format("%s|%s|%s|%s|%s|%s", datasource, driver, datasourceUsername, datasourcePassword, datasourceType, jndi));
+        systemProperties.put("cargo.datasource.datasource", ds.getCargoString());
 
         // We also add common studio system properties
         systemProperties.putAll(product.getStudioProperties().getSystemProperties());
