@@ -557,6 +557,11 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         {
             product.setContextPath("/" + handler.getId());
         }
+        
+        if (product.getDataSource() == null)
+        {
+            product.setDataSource(new DataSource());
+        }
     }
 
     private List<ProductArtifact> stringToArtifactList(String val, List<ProductArtifact> artifacts)

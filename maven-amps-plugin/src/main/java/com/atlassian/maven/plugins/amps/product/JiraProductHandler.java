@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
@@ -57,21 +58,12 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         return new HashMap<String, String>()
         {
             {
-                final String dburl = System.getProperty("amps.datasource.url", format("jdbc:hsqldb:%s/database", fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath())));
-                final String driverClass = System.getProperty("amps.datasource.driver", "org.hsqldb.jdbcDriver");
-                final String username = System.getProperty("amps.datasource.username", "sa");
-                final String password = System.getProperty("amps.datasource.password", "");
-                final String datasourceTypeClass = "javax.sql.DataSource";
-
-                final String datasource = format("cargo.datasource.url=%s", dburl);
-                final String driver = format("cargo.datasource.driver=%s", driverClass);
-                final String datasourceUsername = format("cargo.datasource.username=%s", username);
-                final String datasourcePassword = format("cargo.datasource.password=%s", password);
-                final String datasourceType = "cargo.datasource.type=" + datasourceTypeClass;
-                final String jndi = "cargo.datasource.jndi=jdbc/JiraDS";
+                DataSource dataSource = ctx.getDataSource();
+                dataSource.setDefaultValues("jdbc/JiraDS", format("jdbc:hsqldb:%s/database", fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath())),
+                        "org.hsqldb.jdbcDriver", "sa", "", "javax.sql.DataSource", null, null);
 
                 put("jira.home", fixWindowsSlashes(getHomeDirectory(ctx).getPath()));
-                put("cargo.datasource.datasource", format("%s|%s|%s|%s|%s|%s", datasource, driver, datasourceUsername, datasourcePassword, datasourceType, jndi));
+                put("cargo.datasource.datasource", dataSource.getCargoString());
             }
         };
     }

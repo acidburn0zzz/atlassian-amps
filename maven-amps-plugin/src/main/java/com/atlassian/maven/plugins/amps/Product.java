@@ -227,6 +227,19 @@ public class Product
      * Tells whether shutdown is enabled for Fisheye. This property is passed on in the properties files.
      */
     protected Boolean shutdownEnabled;
+    
+    /**
+     * Registers a JNDI datasource using cargo.datasource.datasource.
+     * <ul>
+     * <li>Default values depend on the product.</li>
+     * <li>Only Jira, Studio-Jira, Studio-Bamboo, Studio-Confluence and Studio-Crowd have one by default, and they use hsqldb.</li>
+     * <li>They use the jndi datasource only if it is configured so. For example, confluence-plugin-test-resource is setup
+     * with a direct access to hsqldb.</li>
+     * </ul>
+     * 
+     */
+    protected DataSource dataSource;
+    
 
 
 
@@ -270,6 +283,7 @@ public class Product
         prod.setDataHome(dataHome == null ? product.getDataHome() : dataHome);
         prod.setLog4jProperties(log4jProperties == null ? product.getLog4jProperties() : log4jProperties);
         prod.setJvmArgs(jvmArgs == null ? product.getJvmArgs() : jvmArgs);
+        prod.setDataSource(dataSource == null ? product.getDataSource() : dataSource);
         prod.setGroupId(groupId == null ? product.getGroupId() : groupId);
         prod.setArtifactId(artifactId == null ? product.getArtifactId() : artifactId);
         prod.setVersion(version == null ? product.getVersion() : version);
@@ -758,6 +772,23 @@ public class Product
     public void setDataHome(String dataHome)
     {
         this.dataHome = dataHome;
+    }
+    
+
+    /**
+     * @return the dataSource. Not null, because initialized in {@link AbstractProductHandlerMojo#setDefaultValues(Product, com.atlassian.maven.plugins.amps.product.ProductHandler)}
+     */
+    public DataSource getDataSource()
+    {
+        return dataSource;
+    }
+
+    /**
+     * @param dataSource the dataSource to set
+     */
+    public void setDataSource(DataSource dataSource)
+    {
+        this.dataSource = dataSource;
     }
 
     @Override
