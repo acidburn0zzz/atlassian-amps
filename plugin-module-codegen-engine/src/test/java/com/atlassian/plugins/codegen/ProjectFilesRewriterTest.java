@@ -118,9 +118,17 @@ public class ProjectFilesRewriterTest
     public void i18nPropertyFileHasPropertyValue() throws Exception
     {
         rewriter.applyChanges(changeset().with(i18nString("foo", "bar")));
-        
+
         Properties props = new Properties();
-        props.load(new FileInputStream(i18nFile));
+        FileInputStream in = new FileInputStream(i18nFile);
+        try
+        {
+            props.load(in);
+        }
+        finally
+        {
+            in.close();
+        }
         assertEquals("bar", props.getProperty("foo"));
     }
     
