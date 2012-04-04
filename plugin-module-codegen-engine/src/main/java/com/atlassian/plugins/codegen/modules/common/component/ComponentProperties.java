@@ -84,4 +84,9 @@ public class ComponentProperties extends ClassWithInterfaceProperties
     {
         this.generateClass = generateClass;
     }
+    
+    public boolean isPublic()
+    {
+        return Boolean.valueOf(getProperty(PUBLIC));
+    }
 }

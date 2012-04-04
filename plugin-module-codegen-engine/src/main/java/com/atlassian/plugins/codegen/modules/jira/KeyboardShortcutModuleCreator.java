@@ -21,7 +21,7 @@ public class KeyboardShortcutModuleCreator extends AbstractPluginModuleCreator<K
     public PluginProjectChangeset createModule(KeyboardShortcutProperties props) throws Exception
     {
         return new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
+            .with(MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
     }
 

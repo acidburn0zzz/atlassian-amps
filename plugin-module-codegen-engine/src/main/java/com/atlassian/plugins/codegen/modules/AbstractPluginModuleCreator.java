@@ -1,8 +1,12 @@
 package com.atlassian.plugins.codegen.modules;
 
+import java.io.StringReader;
 import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
 
 import com.atlassian.plugins.codegen.ClassId;
+import com.atlassian.plugins.codegen.I18nString;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.util.CodeTemplateHelper;
@@ -10,8 +14,11 @@ import com.atlassian.plugins.codegen.util.CodeTemplateHelper;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 
+import static com.atlassian.plugins.codegen.I18nString.i18nStrings;
 import static com.atlassian.plugins.codegen.ModuleDescriptor.moduleDescriptor;
+import static com.atlassian.plugins.codegen.PluginProjectChangeset.changeset;
 import static com.atlassian.plugins.codegen.ResourceFile.resourceFile;
 import static com.atlassian.plugins.codegen.SourceFile.sourceFile;
 import static com.atlassian.plugins.codegen.SourceFile.SourceGroup.MAIN;
@@ -67,7 +74,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      */
     protected PluginProjectChangeset createClass(ClassBasedModuleProperties props, ClassId classId, String templateName) throws Exception
     {
-        return new PluginProjectChangeset().withSourceFile(sourceFile(classId, MAIN, fromTemplate(templateName, props)));
+        return changeset().with(sourceFile(classId, MAIN, fromTemplate(templateName, props)));
     }
 
     /**
@@ -79,7 +86,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      */
     protected PluginProjectChangeset createTestClass(ClassBasedModuleProperties props, ClassId classId, String templateName) throws Exception
     {
-        return new PluginProjectChangeset().withSourceFile(sourceFile(classId, TESTS, fromTemplate(templateName, props)));
+        return changeset().with(sourceFile(classId, TESTS, fromTemplate(templateName, props)));
     }
 
     /**
@@ -95,7 +102,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
                                                          String mainTemplate,
                                                          String unitTestTemplate) throws Exception
     {
-        return new PluginProjectChangeset()
+        return changeset()
             .with(createClass(props, mainTemplate))
             .with(createTestClass(props, testClassFor(props.getClassId()), unitTestTemplate));
     }
@@ -131,8 +138,8 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      */
     protected PluginProjectChangeset createModule(PluginModuleProperties props, String templateName) throws Exception
     {
-        return new PluginProjectChangeset().withModuleDescriptor(moduleDescriptor(fromTemplate(templateName, props)))
-            .withI18nProperties(props.getI18nProperties());
+        return changeset().with(moduleDescriptor(fromTemplate(templateName, props)))
+            .with(i18nStrings(props.getI18nProperties()));
     }
     
     /**
@@ -146,7 +153,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      */
     protected PluginProjectChangeset createResource(Map<Object, Object> props, String path, String fileName, String templateName) throws Exception
     {
-        return new PluginProjectChangeset().withResourceFile(resourceFile(path, fileName, fromTemplate(templateName, props)));
+        return changeset().with(resourceFile(path, fileName, fromTemplate(templateName, props)));
     }
 
     /**
@@ -161,7 +168,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
     protected PluginProjectChangeset createTemplateResource(Map<Object, Object> props, String path, String fileName, String templateName) throws Exception
     {
         path = path.equals("") ? TEMPLATES : (path.startsWith(TEMPLATES) ? path : (TEMPLATES + path));
-        return new PluginProjectChangeset().withResourceFile(resourceFile(path, fileName, fromTemplate(templateName, props)));
+        return changeset().with(resourceFile(path, fileName, fromTemplate(templateName, props)));
     }
 
     /**
@@ -183,15 +190,42 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
     }
     
     /**
+     * Returns a changeset that will add a set of I18n strings to the project, based on a properties file
+     * that can contain template variables.
+     * @param props  property set whose properties may be used in the template
+     * @param templateName  path to the template file for the property list
+     * @return  a {@link PluginProjectChangeset} that describes the new I18n strings
+     */
+    @SuppressWarnings("unchecked")
+    protected PluginProjectChangeset createI18nStrings(Map<Object, Object> props, String templateName) throws Exception
+    {
+        String propListString = fromTemplate(templateName, props);
+        Properties propList = new Properties();
+        propList.load(new StringReader(propListString));
+        return changeset().with(I18nString.i18nStrings(new TreeMap<String, String>((Map) propList)));
+    }
+    
+    /**
      * Generates content using a template file.
      * @param templatePath  path to the template file
      * @param props  properties that may be used in the template
-     * @return
+     * @return  the generated content
      * @throws Exception
      */
     protected String fromTemplate(String templatePath, Map<Object, Object> props) throws Exception
     {
         return templateHelper.getStringFromTemplate(templatePath, props);
+    }
+
+    /**
+     * Reads a file as-is from the classpath, with no template substitution.
+     * @param filePath  path to the template file
+     * @return  the file content
+     * @throws Exception
+     */
+    protected String fromFile(String filePath) throws Exception
+    {
+        return IOUtils.toString(getClass().getClassLoader().getResourceAsStream(filePath));
     }
     
     /**

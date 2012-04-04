@@ -1,6 +1,8 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
+import com.atlassian.plugins.codegen.ResourceFile;
+import com.atlassian.plugins.codegen.SourceFile;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
 
 import org.dom4j.Document;
@@ -60,7 +62,7 @@ public abstract class AbstractTabPanelTest extends AbstractModuleCreatorTestCase
     {
         props.setUseCustomClass(false);
 
-        assertTrue(getChangesetForModule().getSourceFiles().isEmpty());
+        assertTrue(getChangesetForModule(SourceFile.class).isEmpty());
     }
 
     @Test
@@ -149,7 +151,7 @@ public abstract class AbstractTabPanelTest extends AbstractModuleCreatorTestCase
     {
         props.setLabel(label);
         
-        assertEquals(label.getValue(), getChangesetForModule().getI18nProperties().get(label.getKey()));
+        getI18nString(label.getKey(), label.getValue());
     }
 
     @Test
@@ -158,7 +160,7 @@ public abstract class AbstractTabPanelTest extends AbstractModuleCreatorTestCase
         props.setLabel(label);
         props.setUseCustomClass(true);
         
-        Document viewDoc = DocumentHelper.parseText(getChangesetForModule().getResourceFiles().get(0).getContent());
+        Document viewDoc = DocumentHelper.parseText(getChangesetForModule(ResourceFile.class).get(0).getContent());
         assertNotNull(viewDoc.selectSingleNode("/div/h3[text() = \"$i18n.getText('" + label.getKey() + "')\"]"));
     }
 }

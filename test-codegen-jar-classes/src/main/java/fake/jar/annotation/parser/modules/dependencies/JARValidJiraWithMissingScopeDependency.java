@@ -23,6 +23,6 @@ public class JARValidJiraWithMissingScopeDependency implements PluginModuleCreat
     @Override
     public PluginProjectChangeset createModule(PluginModuleProperties props) throws Exception {
         return new PluginProjectChangeset()
-            .withDependencies(dependency("javax.servlet", "servlet-api", "2.4", Scope.DEFAULT));
+            .with(dependency("javax.servlet", "servlet-api", "2.4", Scope.DEFAULT));
     }
 }

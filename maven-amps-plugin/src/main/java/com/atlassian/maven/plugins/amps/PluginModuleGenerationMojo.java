@@ -13,6 +13,7 @@ import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompter;
 import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompterFactory;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
+import com.atlassian.plugins.codegen.MavenProjectRewriter;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.PluginXmlRewriter;
 import com.atlassian.plugins.codegen.ProjectFilesRewriter;
@@ -51,7 +52,6 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-
         //can't figure out how to get plexus to fire a method after injection, so doing it here
         pluginModulePrompterFactory.setLog(getLog());
         try
@@ -77,6 +77,7 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
                 .resourcesDirectory(resourcesDir)
                 .testDirectory(testDir)
                 .templateDirectory(new File(resourcesDir, "templates"))
+                .groupAndArtifactId(project.getGroupId(), project.getArtifactId())
                 .build();
 
         if (!moduleLocation.getPluginXml()
@@ -112,13 +113,28 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
             }
 
             modulePrompter.setDefaultBasePackage(project.getGroupId());
+            modulePrompter.setPluginKey(project.getGroupId() + "." + project.getArtifactId());
+            
             PluginModuleProperties moduleProps = modulePrompter.getModulePropertiesFromInput(moduleLocation);
             moduleProps.setProductId(getGadgetCompatibleProductId(productId));
 
             PluginProjectChangeset changeset = creator.createModule(moduleProps);
-
+            
+            getLog().info("Adding the following items to the project:");
+            for (String desc : changeset.getChangeDescriptionsOrSummaries())
+            {
+                getLog().info("  " + desc);
+            }
+            
             // edit pom if needed
-            new MavenProjectRewriter(project, getLog()).applyChanges(changeset);
+            try
+            {
+                new MavenProjectRewriter(project.getFile()).applyChanges(changeset);
+            }
+            catch (Exception e)
+            {
+                getLog().error("Unable to apply changes to POM: " + e);
+            }
             
             // apply changes to project files
             new ProjectFilesRewriter(moduleLocation).applyChanges(changeset);

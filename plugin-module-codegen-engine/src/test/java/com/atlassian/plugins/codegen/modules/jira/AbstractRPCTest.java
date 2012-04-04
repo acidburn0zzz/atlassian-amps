@@ -1,6 +1,7 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
+import com.atlassian.plugins.codegen.ComponentDeclaration;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -63,18 +64,18 @@ public abstract class AbstractRPCTest extends AbstractModuleCreatorTestCase<RPCP
     @Test
     public void componentAdded() throws Exception
     {
-        assertFalse(getChangesetForModule().getComponentDeclarations().isEmpty());
+        assertFalse(getChangesetForModule(ComponentDeclaration.class).isEmpty());
     }
     
     @Test
     public void componentHasClass() throws Exception
     {
-        assertEquals(fullyQualified(PACKAGE_NAME + ".MyEndpointImpl"), getChangesetForModule().getComponentDeclarations().get(0).getClassId());
+        assertEquals(fullyQualified(PACKAGE_NAME + ".MyEndpointImpl"), getChangesetForModule(ComponentDeclaration.class).get(0).getClassId());
     }
 
     @Test
     public void componentHasInterface() throws Exception
     {
-        assertEquals(some(fullyQualified(PACKAGE_NAME + ".MyEndpoint")), getChangesetForModule().getComponentDeclarations().get(0).getInterfaceId());
+        assertEquals(some(fullyQualified(PACKAGE_NAME + ".MyEndpoint")), getChangesetForModule(ComponentDeclaration.class).get(0).getInterfaceId());
     }
 }

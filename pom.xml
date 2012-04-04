@@ -2,14 +2,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.atlassian.pom</groupId>
-        <!-- TODO: When we merge back to trunk, we must come back to atlassian-public-pon -->
-        <artifactId>atlassian-private-pom</artifactId>
-        <version>25</version>
+        <artifactId>atlassian-public-pom</artifactId>
+        <version>27</version>
     </parent>
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>3.9-SNAPSHOT</version>
+    <version>3.10-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
@@ -340,7 +339,7 @@
         <jira.data.version>5.0</jira.data.version>
         <fugue.version>1.0</fugue.version>
         <guava.osgi.version>6.0.0</guava.osgi.version>
-        <bamboo.version>3.3</bamboo.version>
+        <bamboo.version>4.0</bamboo.version>
         <bamboo.data.version>3.2.2</bamboo.data.version>
         <fecru.version>2.5.4-20110408064401</fecru.version>
         <fecru.data.version>2.5.2-20110307050326</fecru.data.version>
@@ -349,8 +348,8 @@
         <clover.version>3.1.0</clover.version>
         <studio.version>108.2</studio.version>
         <studio.data.version>108.2-m0</studio.data.version>
-        <stash.version>1.0-m16</stash.version>
-        <stash.data.version>1.0-m16</stash.data.version>
+        <stash.version>1.0.0-m19</stash.version>
+        <stash.data.version>1.0.0-m19</stash.data.version>
         <skipCodegenTests>false</skipCodegenTests>
     </properties>
 </project>

@@ -12,6 +12,8 @@ import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 
 import static com.atlassian.fugue.Option.option;
 import static com.atlassian.fugue.Option.some;
+import static com.atlassian.plugins.codegen.ComponentDeclaration.Visibility.PRIVATE;
+import static com.atlassian.plugins.codegen.ComponentDeclaration.Visibility.PUBLIC;
 import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 
 /**
@@ -42,7 +44,8 @@ public class ComponentModuleCreator extends AbstractPluginModuleCreator<Componen
             .name(option(props.getModuleName()))
             .nameI18nKey(option(props.getNameI18nKey()))
             .description(option(props.getDescription()))
-            .descriptionI18nKey(option(props.getDescriptionI18nKey()));
+            .descriptionI18nKey(option(props.getDescriptionI18nKey()))
+            .visibility(props.isPublic() ? PUBLIC : PRIVATE);
         if (props.generateInterface())
         {
             component.interfaceId(some(props.getInterfaceId()));
@@ -53,8 +56,8 @@ public class ComponentModuleCreator extends AbstractPluginModuleCreator<Componen
         }
 
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
-            .withComponentDeclarations(component.build());
+            .with(MOCKITO_TEST)
+            .with(component.build());
         
         if (props.includeExamples())
         {

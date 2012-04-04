@@ -33,8 +33,8 @@ public class WorkflowValidatorModuleCreator extends AbstractPluginModuleCreator<
     public PluginProjectChangeset createModule(WorkflowElementProperties props) throws Exception
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .withDependencies(HTTPCLIENT_TEST,
-                                      MOCKITO_TEST)
+            .with(HTTPCLIENT_TEST,
+                  MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 
         if (props.includeExamples())

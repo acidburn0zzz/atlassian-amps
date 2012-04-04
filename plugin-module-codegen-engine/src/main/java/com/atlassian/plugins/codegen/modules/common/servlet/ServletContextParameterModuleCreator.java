@@ -27,7 +27,7 @@ public class ServletContextParameterModuleCreator extends AbstractPluginModuleCr
     public PluginProjectChangeset createModule(ServletContextParameterProperties props) throws Exception
     {
         return new PluginProjectChangeset()
-            .withDependencies(SERVLET_API)
+            .with(SERVLET_API)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
     }
 

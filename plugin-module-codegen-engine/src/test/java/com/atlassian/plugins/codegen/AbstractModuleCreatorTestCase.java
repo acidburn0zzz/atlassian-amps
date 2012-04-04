@@ -99,6 +99,22 @@ public abstract class AbstractModuleCreatorTestCase<T extends NameBasedModulePro
         assertEquals("desc-key", getGeneratedModule().selectSingleNode("description/@key").getText());
     }
     
+    @Test
+    public void i18nStringsContainNameKey() throws Exception
+    {
+        props.setModuleName("my-name");
+        props.setNameI18nKey("name-key");
+        assertEquals("my-name", getI18nString("name-key").getValue());
+    }
+
+    @Test
+    public void i18nStringsContainDescriptionKey() throws Exception
+    {
+        props.setDescription("desc");
+        props.setDescriptionI18nKey("desc-key");
+        assertEquals("desc", getI18nString("desc-key").getValue());
+    }
+
     protected Element getGeneratedModule() throws Exception
     {
         return getGeneratedModule(moduleType);

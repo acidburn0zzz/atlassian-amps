@@ -38,9 +38,9 @@ public class ServletFilterModuleCreator extends AbstractPluginModuleCreator<Serv
     public PluginProjectChangeset createModule(ServletFilterProperties props) throws Exception
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .withDependencies(SERVLET_API,
-                                      HTTPCLIENT_TEST,
-                                      MOCKITO_TEST)
+            .with(SERVLET_API,
+                  HTTPCLIENT_TEST,
+                  MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 
         if (props.includeExamples())

@@ -39,7 +39,7 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-crowd-plugin</artifactId>
-                <version>${project.version}</version>
+                <version>\${dollar}{amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <productVersion>\${dollar}{crowd.version}</productVersion>

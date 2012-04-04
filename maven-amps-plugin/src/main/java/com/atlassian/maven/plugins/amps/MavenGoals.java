@@ -6,7 +6,13 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
@@ -27,8 +33,10 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
-import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
+import aQute.lib.osgi.Constants;
+
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
+import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -854,6 +862,12 @@ public class MavenGoals
         for (final Map.Entry<String, String> entry : instructions.entrySet())
         {
             instlist.add(element(entry.getKey(), entry.getValue()));
+        }
+        if (!instructions.containsKey(Constants.IMPORT_PACKAGE))
+        {
+            instlist.add(element(Constants.IMPORT_PACKAGE, "*;resolution:=optional"));
+            // BND will expand the wildcard to a list of actually-used packages, but this tells it to mark
+            // them all as optional
         }
         for (final Map.Entry<String, String> entry : basicAttributes.entrySet())
         {

@@ -81,7 +81,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     /**
      * Container to run in
      */
-    @MojoParameter(expression = "${container}")
+    @MojoParameter(expression = "${container}", defaultValue = DEFAULT_CONTAINER)
     protected String containerId;
 
     /**
@@ -161,7 +161,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     /**
      * The test resources version
      */
-    @MojoParameter(expression = "${product.data.version}")
+    @MojoParameter(expression = "${product.data.version}", defaultValue = DEFAULT_PRODUCT_DATA_VERSION)
     private String productDataVersion;
 
     /**
@@ -489,14 +489,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         if (product.getDataVersion() == null)
         {
-            if (ProductHandlerFactory.STASH.equals(product.getId()))
-            {
-                product.setDataVersion("1.0-SNAPSHOT");
-            }
-            else
-            {
-                product.setDataVersion(DEFAULT_PRODUCT_DATA_VERSION);
-            }
+            product.setDataVersion(DEFAULT_PRODUCT_DATA_VERSION);
         }
 
         if (product.getPdkVersion() == null)
@@ -556,14 +549,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         if (product.getVersion() == null)
         {
-            if (ProductHandlerFactory.STASH.equals(product.getId()))
-            {
-                product.setVersion("1.0-SNAPSHOT");
-            }
-            else
-            {
-                product.setVersion("RELEASE");
-            }
+            product.setVersion("RELEASE");
         }
 
         if (product.getContextPath() == null)

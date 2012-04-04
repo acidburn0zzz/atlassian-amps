@@ -17,6 +17,5 @@
       -->
       <configuration class="${package}.ExampleTaskConfigurator"/>
       <resource type="freemarker" name="edit" location="editExampleTask.ftl"/>
-      <resource type="freemarker" name="view" location="viewExampleTask.ftl"/>
     </taskType>
 </atlassian-plugin>

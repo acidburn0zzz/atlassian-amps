@@ -144,7 +144,7 @@ public class WebItemTest extends AbstractWebFragmentTest<WebItemProperties>
     {
         props.setLabel(label);
         
-        assertEquals(label.getValue(), getChangesetForModule().getI18nProperties().get(label.getKey()));
+        getI18nString(label.getKey(), label.getValue());
     }
     
     @Test
@@ -216,7 +216,7 @@ public class WebItemTest extends AbstractWebFragmentTest<WebItemProperties>
     {
         props.setTooltip(tooltip);
         
-        assertEquals(tooltip.getValue(), getChangesetForModule().getI18nProperties().get(tooltip.getKey()));
+        getI18nString(tooltip.getKey(), tooltip.getValue());
     }
     
     protected void createParams()
