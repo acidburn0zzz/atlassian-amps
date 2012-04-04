@@ -6,7 +6,7 @@ import com.atlassian.maven.plugins.amps.StopMojo;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 
 /**
- * @since 3.8
+ * @since 3.10
  */
 public class StashStopMojo extends StopMojo
 {

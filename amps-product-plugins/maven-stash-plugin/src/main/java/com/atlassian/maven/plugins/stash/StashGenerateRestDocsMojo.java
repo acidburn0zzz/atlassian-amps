@@ -6,7 +6,7 @@ import org.jfrog.maven.annomojo.annotations.MojoGoal;
 import org.jfrog.maven.annomojo.annotations.MojoRequiresDependencyResolution;
 
 /**
- * @since 3.8
+ * @since 3.10
  */
 @MojoGoal("generate-rest-docs")
 @MojoRequiresDependencyResolution("test")
