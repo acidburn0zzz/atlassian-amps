@@ -30,7 +30,7 @@ public class IssueTabPanelModuleCreator extends AbstractPluginModuleCreator<TabP
     public PluginProjectChangeset createModule(TabPanelProperties props) throws Exception
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
+            .with(MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 
         if (props.includeExamples())

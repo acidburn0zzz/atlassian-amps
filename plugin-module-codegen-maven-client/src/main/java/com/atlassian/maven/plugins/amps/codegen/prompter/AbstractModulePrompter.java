@@ -25,12 +25,14 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
     public static final String MODULE_NAME_PROMPT = "Module Name";
     public static final String MODULE_KEY_PROMPT = "Module Key";
     public static final String MODULE_DESCRIP_PROMPT = "Module Description";
-
+    public static final String DEFAULT_PLUGIN_KEY = "example";
+    
     protected final Prompter prompter;
     protected boolean showExamplesPrompt;
     protected boolean showAdvancedPrompt;
     protected boolean showAdvancedNamePrompt;
     protected String defaultBasePackage;
+    protected String pluginKey;
     protected boolean useAnsiColor;
 
     public AbstractModulePrompter(Prompter prompter)
@@ -429,5 +431,17 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
         {
             return DEFAULT_BASE_PACKAGE;
         }
+    }
+    
+    @Override
+    public void setPluginKey(String pluginKey)
+    {
+        this.pluginKey = pluginKey;
+    }
+    
+    @Override
+    public String getPluginKey()
+    {
+        return (pluginKey == null) ? DEFAULT_PLUGIN_KEY : pluginKey;
     }
 }

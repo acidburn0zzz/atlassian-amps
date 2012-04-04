@@ -72,6 +72,8 @@ public class JiraProductHandler extends AbstractWebappProductHandler
 
                 put("jira.home", fixWindowsSlashes(getHomeDirectory(ctx).getPath()));
                 put("cargo.datasource.datasource", format("%s|%s|%s|%s|%s|%s", datasource, driver, datasourceUsername, datasourcePassword, datasourceType, jndi));
+                
+                put("catalina.servlet.uriencoding", "UTF-8");
             }
         };
     }

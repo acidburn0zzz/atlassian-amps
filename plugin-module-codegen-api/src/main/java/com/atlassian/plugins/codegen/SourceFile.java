@@ -5,7 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Describes a source file that should be added to the project.
  */
-public class SourceFile
+public class SourceFile implements PluginProjectChange
 {
     /**
      * Specifies whether to add the file to {@code src/main} or {@code src/test}.
@@ -45,5 +45,11 @@ public class SourceFile
     public String getContent()
     {
         return content;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return "[class: " + classId + "]";
     }
 }

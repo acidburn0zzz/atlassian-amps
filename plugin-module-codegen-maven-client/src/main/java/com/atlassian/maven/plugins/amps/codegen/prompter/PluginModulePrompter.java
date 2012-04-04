@@ -28,4 +28,7 @@ public interface PluginModulePrompter<T extends PluginModuleProperties>
 
     String getDefaultBasePackage();
 
+    void setPluginKey(String pluginKey);
+    
+    String getPluginKey();
 }

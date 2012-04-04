@@ -8,7 +8,6 @@
     <resources>
         <resource filtered="true">src/main/resources/atlassian-plugin.xml</resource>
         <resource filtered="true">src/main/resources/editExampleTask.ftl</resource>
-        <resource filtered="true">src/main/resources/viewExampleTask.ftl</resource>
         <resource filtered="true">src/main/resources/english.properties</resource>
         <resource filtered="false">src/test/java/it/IntegrationTestMyPlugin.java</resource>
         <resource filtered="false">src/test/resources/TEST_RESOURCES_README.TXT</resource>

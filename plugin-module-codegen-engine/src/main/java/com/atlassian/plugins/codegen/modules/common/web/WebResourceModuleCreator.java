@@ -28,7 +28,7 @@ public class WebResourceModuleCreator extends AbstractPluginModuleCreator<WebRes
     public PluginProjectChangeset createModule(WebResourceProperties props) throws Exception
     {
         return new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
+            .with(MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
     }
     

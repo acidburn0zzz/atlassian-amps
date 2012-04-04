@@ -127,7 +127,7 @@ public class ReportTest extends AbstractModuleCreatorTestCase<ReportProperties>
     {
         props.setLabel(label);
         
-        assertEquals(label.getValue(), getChangesetForModule().getI18nProperties().get(label.getKey()));
+        getI18nString(label.getKey(), label.getValue());
     }
 
     @Test

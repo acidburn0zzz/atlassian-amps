@@ -32,6 +32,9 @@
                             <artifactId>cooper</artifactId>
                         </bundledArtifact>
                     </bundledArtifacts>
+                    <systemPropertyVariables>
+                        <existingVariable>foo</existingVariable>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>

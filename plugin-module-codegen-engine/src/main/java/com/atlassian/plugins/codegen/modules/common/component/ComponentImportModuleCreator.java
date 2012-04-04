@@ -35,8 +35,8 @@ public class ComponentImportModuleCreator extends AbstractPluginModuleCreator<Co
             .filter(option(props.getFilter()));
         
         return new PluginProjectChangeset()
-            .withDependencies(MOCKITO_TEST)
-            .withComponentImports(componentImport);
+            .with(MOCKITO_TEST)
+            .with(componentImport);
     }
 
     @Override

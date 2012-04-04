@@ -2,8 +2,6 @@ package com.atlassian.plugins.codegen;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.atlassian.fugue.Option;
-
 /**
  * Describes a Maven plugin configuration element that should be added to the POM, specified
  * as a group/artifact/version and an XML fragment that provides all other elements within the
@@ -11,21 +9,21 @@ import com.atlassian.fugue.Option;
  * then only the &lt;executions&gt; element will be modified, adding any &lt;execution&gt;
  * items whose IDs were not already present.
  */
-public class MavenPlugin
+public class MavenPlugin implements PluginProjectChange
 {
     private final ArtifactId artifactId;
-    private final Option<String> version;
+    private final VersionId versionId;
     private final String xmlContent;
     
-    public static MavenPlugin mavenPlugin(ArtifactId artifactId, Option<String> version, String xmlContent)
+    public static MavenPlugin mavenPlugin(ArtifactId artifactId, VersionId versionId, String xmlContent)
     {
-        return new MavenPlugin(artifactId, version, xmlContent);
+        return new MavenPlugin(artifactId, versionId, xmlContent);
     }
     
-    private MavenPlugin(ArtifactId artifactId, Option<String> version, String xmlContent)
+    private MavenPlugin(ArtifactId artifactId, VersionId versionId, String xmlContent)
     {
         this.artifactId = checkNotNull(artifactId, "artifactId");
-        this.version = checkNotNull(version, "version");
+        this.versionId = checkNotNull(versionId, "versionId");
         this.xmlContent = checkNotNull(xmlContent, "xmlContent");
     }
 
@@ -34,13 +32,19 @@ public class MavenPlugin
         return artifactId;
     }
 
-    public Option<String> getVersion()
+    public VersionId getVersionId()
     {
-        return version;
+        return versionId;
     }
     
     public String getXmlContent()
     {
         return xmlContent;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return "[Maven plugin: " + artifactId + "]"; 
     }
 }
