@@ -4,8 +4,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-
-import com.google.inject.internal.util.Lists;
+import com.google.common.collect.Lists;
 
 /**
  * For more information about the properties, see http://cargo.codehaus.org/DataSource+and+Resource+Support

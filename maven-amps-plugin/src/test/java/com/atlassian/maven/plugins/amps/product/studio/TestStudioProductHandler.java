@@ -3,8 +3,9 @@ package com.atlassian.maven.plugins.amps.product.studio;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
-import com.google.inject.internal.util.ImmutableMap;
-import com.google.inject.internal.util.Maps;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
