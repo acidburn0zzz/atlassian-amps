@@ -61,6 +61,7 @@ public class MavenGoals
     {{
             put("tomcat5x", new Container("tomcat5x", "org.apache.tomcat", "apache-tomcat", "5.5.26"));
             put("tomcat6x", new Container("tomcat6x", "org.apache.tomcat", "apache-tomcat", "6.0.20"));
+            put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.22", "windows-x64"));
             put("resin3x", new Container("resin3x", "com.caucho", "resin", "3.0.26"));
             put("jboss42x", new Container("jboss42x", "org.jboss.jbossas", "jbossas", "4.2.3.GA"));
             put("jetty6x", new Container("jetty6x"));
@@ -424,6 +425,7 @@ public class MavenGoals
                                         element(name("groupId"), container.getGroupId()),
                                         element(name("artifactId"), container.getArtifactId()),
                                         element(name("version"), container.getVersion()),
+                                        element(name("classifier"), container.getClassifier()),
                                         element(name("type"), "zip"))),
                         element(name("outputDirectory"), container.getRootDirectory(getBuildDirectory()))
                 ),
@@ -466,7 +468,7 @@ public class MavenGoals
         log.info("Starting " + productInstanceId + " on the " + container.getId() + " container on ports "
                 + actualHttpPort + " (http) and " + rmiPort + " (rmi)");
 
-        final String baseUrl = getBaseUrl(webappContext.getServer(), actualHttpPort, webappContext.getContextPath());
+        final String baseUrl = getBaseUrl(webappContext, actualHttpPort);
         sysProps.add(element(name("baseurl"), baseUrl));
 
         final List<Element> deps = new ArrayList<Element>();
@@ -492,11 +494,12 @@ public class MavenGoals
             startupTimeout = 0;
         }
 
+        Plugin cargo = cargo(webappContext);
         executeMojo(
-                cargo(webappContext),
+                cargo,
                 goal("start"),
                 configuration(
-                        element(name("wait"), "false"),
+                        waitElement(cargo),
                         element(name("container"),
                                 element(name("containerId"), container.getId()),
                                 element(name("type"), container.getType()),
@@ -527,13 +530,13 @@ public class MavenGoals
         );
         return actualHttpPort;
     }
-    
+
     public void stopWebapp(final String productId, final String containerId, final Product webappContext) throws MojoExecutionException
     {
         final Container container = findContainer(containerId);
 
         String actualShutdownTimeout = webappContext.getSynchronousStartup() ? "0" : String.valueOf(webappContext.getShutdownTimeout());
-        
+
         executeMojo(
         cargo(webappContext),
         goal("stop"),
@@ -555,20 +558,20 @@ public class MavenGoals
         executionEnvironment()
         );
     }
-    
+
     /**
-     * Cargo waits (org.codehaus.cargo.container.tomcat.internal.AbstractCatalinaInstalledLocalContainer#waitForCompletion(boolean waitForStarting)) for 3 ports, but the AJP and RMI ports may 
+     * Cargo waits (org.codehaus.cargo.container.tomcat.internal.AbstractCatalinaInstalledLocalContainer#waitForCompletion(boolean waitForStarting)) for 3 ports, but the AJP and RMI ports may
      * not be correct (see below), so we configure it to wait on the HTTP port only.
-     * 
+     *
      * Since we're not configuring the AJP port it defaults to 8009. All the Studio applications are currently using 8009 (by default, since not configured in startWebapp)
-     * which means that this port might have been taken by a different application (the container will still come up though, see 
-     * "INFO: Port busy 8009 java.net.BindException: Address already in use" in the log). Thus we don't want to wait for it because it might be still open also the container 
-     * is shut down. 
-     * 
+     * which means that this port might have been taken by a different application (the container will still come up though, see
+     * "INFO: Port busy 8009 java.net.BindException: Address already in use" in the log). Thus we don't want to wait for it because it might be still open also the container
+     * is shut down.
+     *
      * The RMI port is randomly chosen (see startWebapp), thus we don't have any information close at hand. As a future optimisation, e.g. when we move away from cargo to let's say
      * Apache's Tomcat Maven Plugin we could retrieve the actualy configuration from the server.xml on shutdown and thus know exactly for what which port to wait until it gets closed.
      * We could do that already in cargo (e.g. container/tomcat6x/<productHome>/conf/server.xml) but that means that we have to support all the containers we are supporting with cargo.
-     * 
+     *
      * Since the HTTP port is the only one that interests us, we set all three ports to this one when calling stop. But since that may be randomly chosen as well we might be waiting
      * for the wrong port to get closed. Since this is the minor use case, one has to either accept the timeout if the default port is open, or configure product.stop.timeout to 0 in
      * order to skip the wait.
@@ -589,13 +592,15 @@ public class MavenGoals
      * The org.twdata.maven plugin is a fork of the org.codehaus.cargo plugin that has been used in AMPS so far. The
      * org.codehaus.cargo plugin in the more recent version has the advantage of setting the timeout to 0. This skips
      * waiting for start/stop of the container in order to perform these operations in parallel.
-     * 
+     *
      * @param if {@link Product#getSynchronousStartup()} is true, org.twdata.maven.cargo-maven2-plugin is chosen, if it
      *        is false, org.codehaus.cargo.cargo-maven2-plugin is chosen
      */
-    private Plugin cargo(Product webappContext)
+    private Plugin cargo(Product context)
     {
-        if (Boolean.TRUE.equals(webappContext.getSynchronousStartup()))
+        if (Boolean.TRUE.equals(context.getSynchronousStartup())
+                // TWData's Cargo doesn't support Tomcat 7
+                && !"tomcat7x".equals(context.getContainerId()))
         {
             return plugin(
                 groupId("org.twdata.maven"),
@@ -611,14 +616,31 @@ public class MavenGoals
         }
     }
 
-    public static String getBaseUrl(final String server, final int actualHttpPort, final String contextPath)
+    private Element waitElement(Plugin cargo)
+    {
+        if (cargo.getGroupId().equals("org.twdata.maven"))
+        {
+            return element(name("wait"), "false");
+        }
+        // If not using twdata's cargo, we avoid passing wait=false, because it's the default and it generates
+        // a deprecation warning
+        return element(name(""), "");
+    }
+
+    public static String getBaseUrl(Product product, int actualHttpPort)
+    {
+        return getBaseUrl(product.getServer(), product.getHttpPort(), product.getContextPath());
+    }
+
+    private static String getBaseUrl(String server, int actualHttpPort, String contextPath)
     {
         String port = actualHttpPort != 80 ? ":" + actualHttpPort : "";
-        if (server.startsWith("http")) {
-            return server + port + contextPath;
-        } else {
-            return "http://" + server + port + contextPath;
+        server = server.startsWith("http") ? server : "http://" + server;
+        if (!contextPath.startsWith("/") && StringUtils.isNotBlank(contextPath))
+        {
+            contextPath = "/" + contextPath;
         }
+        return server + port + contextPath;
     }
 
     public void runTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties, final File targetDirectory)
@@ -1151,6 +1173,7 @@ public class MavenGoals
     {
         private final String id;
         private final String type;
+        private final String classifier;
 
         /**
          * Installable container that can be downloaded by Maven.
@@ -1165,6 +1188,24 @@ public class MavenGoals
             super(groupId, artifactId, version);
             this.id = id;
             this.type = "installed";
+            this.classifier = "";
+        }
+
+        /**
+         * Installable container that can be downloaded by Maven.
+         *
+         * @param id         identifier of container, eg. "tomcat5x".
+         * @param groupId    groupId of container.
+         * @param artifactId artifactId of container.
+         * @param version    version number of container.
+         * @param classifier classifier of the container.
+         */
+        public Container(final String id, final String groupId, final String artifactId, final String version, final String classifier)
+        {
+            super(groupId, artifactId, version);
+            this.id = id;
+            this.type = "installed";
+            this.classifier = classifier;
         }
 
         /**
@@ -1176,6 +1217,7 @@ public class MavenGoals
         {
             this.id = id;
             this.type = "embedded";
+            this.classifier = "";
         }
 
         /**
@@ -1192,6 +1234,14 @@ public class MavenGoals
         public String getType()
         {
             return type;
+        }
+
+        /**
+         * @return classifier the classifier of the ProductArtifact
+         */
+        public String getClassifier()
+        {
+            return classifier;
         }
 
         /**

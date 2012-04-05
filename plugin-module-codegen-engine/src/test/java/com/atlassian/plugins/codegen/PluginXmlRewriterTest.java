@@ -6,6 +6,7 @@ import com.atlassian.plugins.codegen.XmlMatchers.XmlWrapper;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,6 +50,12 @@ public class PluginXmlRewriterTest
     {
         helper.usePluginXml(path);
         rewriter = new PluginXmlRewriter(helper.location);
+    }
+    
+    @After
+    public void deleteTempDir() throws Exception
+    {
+        helper.destroy();
     }
     
     @Test

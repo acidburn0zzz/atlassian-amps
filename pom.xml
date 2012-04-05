@@ -23,14 +23,6 @@
         </license>
     </licenses>
 
-    <contributors>
-        <contributor>
-            <name>Jonathan Doklovic</name>
-            <organization>Sysbliss</organization>
-            <organizationUrl>http://www.sysbliss.com/</organizationUrl>
-        </contributor>
-    </contributors>
-
     <scm>
         <connection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</connection>
         <developerConnection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</developerConnection>
@@ -184,6 +176,7 @@
                             <artifact>com.atlassian.maven.plugins:maven-bamboo-plugin:${project.version}</artifact>
                             <artifact>com.atlassian.maven.plugins:maven-fecru-plugin:${project.version}</artifact>
                             <artifact>com.atlassian.maven.plugins:maven-crowd-plugin:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.plugins:maven-stash-plugin:${project.version}</artifact>
 
                             <!-- the archetypes -->
                             <artifact>com.atlassian.maven.archetypes:refapp-plugin-archetype:${project.version}</artifact>
@@ -192,6 +185,7 @@
                             <artifact>com.atlassian.maven.archetypes:bamboo-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:fecru-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:crowd-plugin-archetype:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.archetypes:stash-plugin-archetype:${project.version}</artifact>
 
                             <!-- restricted artifacts -->
                             <artifact>javax.servlet:servlet-api:2.3</artifact>
@@ -203,6 +197,8 @@
                             <artifact>jta:jta:1.0.1B</artifact>
                             <artifact>jta:jta:1.0.1</artifact>
                             <artifact>javax.jms:jms:1.1</artifact>
+                            <artifact>com.atlassian.stash:stash-webapp:${stash.version}:war</artifact>
+                            <artifact>com.atlassian.stash:stash-plugin-test-resources:${stash.data.version}:zip</artifact>
                         </artifacts>
                     </configuration>
                 </plugin>
@@ -349,9 +345,11 @@
         <fecru.data.version>2.5.2-20110307050326</fecru.data.version>
         <crowd.version>2.3.4</crowd.version>
         <crowd.data.version>2.2.2</crowd.data.version>
-        <clover.version>3.0.2</clover.version>
+        <clover.version>3.1.0</clover.version>
         <studio.version>108.2</studio.version>
         <studio.data.version>108.2-m0</studio.data.version>
+        <stash.version>1.0.0-m19</stash.version>
+        <stash.data.version>1.0.0-m19</stash.data.version>
         <skipCodegenTests>false</skipCodegenTests>
     </properties>
 </project>

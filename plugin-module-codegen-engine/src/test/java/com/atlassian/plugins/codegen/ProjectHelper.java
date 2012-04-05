@@ -27,9 +27,9 @@ public class ProjectHelper
     
     public ProjectHelper() throws Exception
     {
-        final File sysTempDir = new File("target");
+        final File buildRoot = new File("target");
         String dirName = UUID.randomUUID().toString();
-        tempDir = new File(sysTempDir, dirName);
+        tempDir = new File(buildRoot, dirName);
         srcDir = new File(tempDir, "src");
         testDir = new File(tempDir, "test");
         resourcesDir = new File(tempDir, "resources");

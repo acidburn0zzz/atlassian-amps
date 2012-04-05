@@ -17,6 +17,11 @@ public class TestCreateAndVerifyPlugin extends SdkTestBase
         createAndVerify("refapp");
     }
 
+    public void testStash() throws IOException, InterruptedException
+    {
+        createAndVerify("stash");
+    }
+
     public void testConfluence() throws IOException, InterruptedException
     {
         createAndVerify("confluence");
