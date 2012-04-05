@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 
 /**
  * For more information about the properties, see http://cargo.codehaus.org/DataSource+and+Resource+Support
+ *
  * @since 3.10
  */
 public class DataSource
@@ -60,11 +61,29 @@ public class DataSource
      * Cargo-style string to pass to Cargo in the "cargo.datasource.datasource" property.
      * If set, the other properties will not be read.
      * 
-     * <p>Example:
-     * cargo.datasource.username=sa|cargo.datasource.password...|...
+     * <p>
+     * Example: cargo.datasource.username=sa|cargo.datasource.password...|...
      * </p>
      */
     private String cargoString;
+
+    /**
+     * Additional libraries required in the container (e.g. Tomcat) to support the driver.
+     * Example with a random library:
+     *
+     * <pre>
+     * {@code
+     * <libArtifacts>
+     *   <libArtifact>
+     *      <groupId>postgres</groupId>
+     *      <artifactId>postgres</artifactId>
+     *      <version>9.1-901-1.jdbc4</artifactId>
+     *   </libArtifact>
+     * </libArtifacts>
+     * }
+     * </pre>
+     */
+    private List<LibArtifact> libArtifacts = Lists.newArrayList();
 
     public DataSource()
     {
@@ -194,6 +213,15 @@ public class DataSource
         this.properties = properties;
     }
 
+    public List<LibArtifact> getLibArtifacts()
+    {
+        return libArtifacts;
+    }
+
+    public void setLibArtifacts(List<LibArtifact> libArtifacts)
+    {
+        this.libArtifacts = libArtifacts;
+    }
 
     public void setCargoString(String cargoString)
     {

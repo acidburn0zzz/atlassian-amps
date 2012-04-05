@@ -478,6 +478,12 @@ public class MavenGoals
                     element(name("location"), webappContext.getArtifactRetriever().resolve(dep))
             ));
         }
+        for (ProductArtifact containerDependency : webappContext.getDataSource().getLibArtifacts())
+        {
+            deps.add(element(name("dependency"),
+                    element(name("location"), webappContext.getArtifactRetriever().resolve(containerDependency))
+            ));
+        }
 
         final List<Element> props = new ArrayList<Element>();
         for (final Map.Entry<String, String> entry : systemProperties.entrySet())
