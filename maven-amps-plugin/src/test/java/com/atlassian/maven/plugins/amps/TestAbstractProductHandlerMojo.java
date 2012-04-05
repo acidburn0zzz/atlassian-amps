@@ -248,7 +248,7 @@ public class TestAbstractProductHandlerMojo
 
         SomeMojo mojo = new SomeMojo("refapp", Lists.newArrayList(fooProd, barProd));
 
-        MavenPropertiesUtils.applySystemProperties(mojo, systemProperties);
+        MavenPropertiesUtils.applySystemProperties(mojo, systemProperties, "amps.");
         mojo.createProductContexts();
 
         return mojo;

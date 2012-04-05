@@ -375,15 +375,16 @@ public class MavenPropertiesUtils
     /**
      * Reads the System Properties starting with 'amps.' and applies them to the configuration.
      * 
+     * @param checkedPropertiesPrefix the prefix of the checked system properties, including the dot. Not null.
      * @throws MojoExecutionException
      */
-    public static void applySystemProperties(AbstractProductHandlerMojo mojo, Properties systemProperties) throws MojoExecutionException
+    public static void applySystemProperties(AbstractProductHandlerMojo mojo, Properties systemProperties, String checkedPropertiesPrefix) throws MojoExecutionException
     {
         MojoExecutionException lastException = null;
         List<String> messages = Lists.newArrayList();
         for (Object key : systemProperties.stringPropertyNames())
         {
-            if (StringUtils.isNotBlank((String) key) && ((String) key).startsWith("amps."))
+            if (StringUtils.isNotBlank((String) key) && ((String) key).startsWith(checkedPropertiesPrefix))
             {
                 try
                 {

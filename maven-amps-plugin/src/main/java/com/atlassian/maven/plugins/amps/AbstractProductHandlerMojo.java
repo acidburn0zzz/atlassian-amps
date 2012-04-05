@@ -350,6 +350,20 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      */
     @MojoParameter (expression = "${parallel}", defaultValue = "false")
     protected boolean parallel;
+    
+    /**
+     * Prefix of the system properties which are checked before being injected.
+     * <p>
+     * Examples:<ul>
+     * <li>-Dchecked.httpPort=1990 will set the port</li>
+     * <li>-Dchecked.myInstance.version=4.0 will set the version for the product with instance id = "myInstance"</li>
+     * <li>-Dchecked.invalid=value will fail.
+     * </ul>
+     * </p>
+     * To deactivate the checking system, set to empty string. Properties will not be injected.
+     */
+    @MojoParameter (expression = "${checked.system.properties.prefix}", defaultValue = "checked.")
+    protected String checkedSystemPropertiesPrefix;
 
 
     protected Product createDefaultProductContext() throws MojoExecutionException
@@ -595,10 +609,13 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         systemPropertyVariables.putAll((Map) systemProperties);
 
         detectDeprecatedVersionOverrides();
-        MavenPropertiesUtils.checkUsingTheRightAmpsPlugin(getMavenContext());
-        MavenPropertiesUtils.checkUnusedConfiguration(this, getMavenContext());
-        MavenPropertiesUtils.checkUsingTheRightLifecycle(getMavenContext());
-        MavenPropertiesUtils.applySystemProperties(this, getMavenContext().getSession().getUserProperties());
+        if (StringUtils.isNotBlank(checkedSystemPropertiesPrefix))
+        {
+            MavenPropertiesUtils.checkUsingTheRightAmpsPlugin(getMavenContext());
+            MavenPropertiesUtils.checkUnusedConfiguration(this, getMavenContext());
+            MavenPropertiesUtils.checkUsingTheRightLifecycle(getMavenContext());
+            MavenPropertiesUtils.applySystemProperties(this, getMavenContext().getSession().getUserProperties(), checkedSystemPropertiesPrefix);
+        }
             
         doExecute();
     }
