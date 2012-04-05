@@ -233,9 +233,33 @@ public class Product
      * <ul>
      * <li>Default values depend on the product.</li>
      * <li>Only Jira, Studio-Jira, Studio-Bamboo, Studio-Confluence and Studio-Crowd have one by default, and they use hsqldb.</li>
-     * <li>They use the jndi datasource only if it is configured so. For example, confluence-plugin-test-resource is setup
-     * with a direct access to hsqldb.</li>
+     * <li>They only use the jndi datasource if the user configured this way. For example, the snapshot confluence-plugin-test-resource.zip
+     * is setup with a direct access to hsqldb.</li>
      * </ul>
+     * Example:
+     * <pre>{@code
+     * <products>
+     *   <product>
+     *     <id>jira</id>
+     *     <instanceId>jira50</instanceId>
+     *     <version>5.0</version>
+     *     <dataVersion>5.0</dataVersion>
+     *     <dataSource>
+     *         <url>jdbc:postgresql://localhost:5432/jira</url>
+     *         <username>jira</username>
+     *         <password>jira</password>
+     *         <libArtifacts>
+     *           <libArtifact>
+     *             <groupId>postgresql</groupId>
+     *             <artifactId>postgresql</artifactId>
+     *             <version>9.1-901-1.jdbc4</version>
+     *           </libArtifact>
+     *         </libArtifacts>
+     *     </dataSource>
+     *   </product>
+     * </products>
+     * }
+     * </pre>
      * 
      */
     protected DataSource dataSource;
