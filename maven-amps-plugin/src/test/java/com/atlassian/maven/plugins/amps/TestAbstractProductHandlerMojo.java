@@ -152,7 +152,6 @@ public class TestAbstractProductHandlerMojo
     @Test
     public void testSystemPropertyIsAssigned() throws MojoExecutionException
     {
-
         Properties properties = new Properties();
         properties.setProperty("amps.httpPort", "7");
 
@@ -170,6 +169,20 @@ public class TestAbstractProductHandlerMojo
     {
         Properties properties = new Properties();
         properties.setProperty("amps.bar.httpPort", "7");
+
+        SomeMojo mojo = getSampleMojo(properties);
+
+        Map<String, Product> map = mojo.getProductContexts();
+        assertEquals(2990, map.get("foo").getHttpPort());
+        assertEquals(7, map.get("bar").getHttpPort());
+        assertEquals(5990, map.get("refapp").getHttpPort());
+    }
+
+    @Test
+    public void testSystemPropertyIsCaseInsensitive() throws MojoExecutionException
+    {
+        Properties properties = new Properties();
+        properties.setProperty("amps.bAr.HTTPPORT", "7");
 
         SomeMojo mojo = getSampleMojo(properties);
 

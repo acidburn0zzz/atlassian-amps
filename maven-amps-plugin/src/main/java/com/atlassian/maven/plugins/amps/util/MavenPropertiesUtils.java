@@ -58,7 +58,7 @@ public class MavenPropertiesUtils
         {
             for (Field declaredField : clazz.getDeclaredFields())
             {
-                if (propertyName.equals(declaredField.getName()))
+                if (propertyName.equalsIgnoreCase(declaredField.getName()))
                 {
                     return declaredField;
                 }
@@ -328,7 +328,7 @@ public class MavenPropertiesUtils
      */
     public static int distance(String left, String right)
     {
-        if (left.equals(right))
+        if (left.equalsIgnoreCase(right))
         {
             return 0;
         }
@@ -379,10 +379,9 @@ public class MavenPropertiesUtils
      */
     public static void applySystemProperties(AbstractProductHandlerMojo mojo, Properties systemProperties) throws MojoExecutionException
     {
-        Set<Object> keys = systemProperties.keySet();
         MojoExecutionException lastException = null;
         List<String> messages = Lists.newArrayList();
-        for (Object key : keys)
+        for (Object key : systemProperties.stringPropertyNames())
         {
             if (StringUtils.isNotBlank((String) key) && ((String) key).startsWith("amps."))
             {
@@ -421,15 +420,16 @@ public class MavenPropertiesUtils
      */
     private static void applySystemProperty(Object target, String key, String value) throws MojoExecutionException
     {
-        int firstDotPosition = key.indexOf(".");
+        String caseInsensitiveKey = key.toLowerCase(Locale.ENGLISH);
+        int firstDotPosition = caseInsensitiveKey.indexOf(".");
 
         /**
          * True if 'key' is a path to a field of another object,
          * false if 'key' is a field of the current object.
          */
         boolean keyIsAPath = firstDotPosition != -1;
-        String head = keyIsAPath ? key.substring(0, firstDotPosition) : key;
-        String tail = keyIsAPath ? key.substring(firstDotPosition + 1) : "";
+        String head = keyIsAPath ? caseInsensitiveKey.substring(0, firstDotPosition) : caseInsensitiveKey;
+        String tail = keyIsAPath ? caseInsensitiveKey.substring(firstDotPosition + 1) : "";
         Field field = findField(target, head);
 
         if (field != null)
@@ -672,12 +672,12 @@ public class MavenPropertiesUtils
         Product candidate = null;
         for (Product product : products)
         {
-            if (instanceId.equals(product.getInstanceId()))
+            if (instanceId.equalsIgnoreCase(product.getInstanceId()))
             {
                 // Mr. Perfect.
                 return product;
             }
-            if (candidate == null && product.getId().equals(instanceId))
+            if (candidate == null && product.getId().equalsIgnoreCase(instanceId))
             {
                 // instanceId is a product name, so whichever product with this name is candidate
                 candidate = product;

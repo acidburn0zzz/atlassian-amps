@@ -2,10 +2,21 @@ package com.atlassian.maven.plugins.amps;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Map;
+
+import org.apache.maven.model.Build;
+import org.apache.maven.project.MavenProject;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
-public class DataSourceTest
+import com.atlassian.maven.plugins.amps.product.JiraProductHandler;
+
+@RunWith(MockitoJUnitRunner.class)
+public class TestDataSource
 {
     DataSource ds;
     
@@ -73,5 +84,34 @@ public class DataSourceTest
         		"|cargo.datasource.type=f" +
         		"|cargo.datasource.transactionsupport=g" +
         		"|cargo.datasource.properties=h", ds.getCargoString());
+    }
+
+    @Mock MavenContext context;
+    @Mock MavenProject project;
+    @Mock Build build;
+    
+    @Mock JiraProductHandler jph;
+    
+    @Test
+    public void jiraDefaultString()
+    {
+        Mockito.when(context.getProject()).thenReturn(project);
+        Mockito.when(project.getBuild()).thenReturn(build);
+        Mockito.when(build.getDirectory()).thenReturn("");
+        
+        Product jiraProduct = new Product();
+        jiraProduct.setDataSource(new DataSource());
+        jiraProduct.setInstanceId("");
+        Map<String, String> systemProperties = new JiraProductHandler(context, null).getSystemProperties(jiraProduct);
+        //Map<String, String> systemProperties = jph.getSystemProperties(jiraProduct);
+        String cargoString = systemProperties.get("cargo.datasource.datasource");
+        assertEquals("cargo.datasource.url=jdbc:hsqldb:/home/database" +
+        		"|cargo.datasource.driver=org.hsqldb.jdbcDriver" +
+        		"|cargo.datasource.username=sa" +
+        		"|cargo.datasource.password=" +
+        		"|cargo.datasource.jndi=jdbc/JiraDS" +
+        		"|cargo.datasource.type=javax.sql.DataSource",
+                cargoString);
+
     }
 }
