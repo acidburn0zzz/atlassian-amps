@@ -228,8 +228,9 @@ public class StudioProductHandler extends AmpsProductHandler
      * @param product
      *            a product. All products are accepted but not all of the will be
      *            modified. The product must have an instanceId.
+     * @return true if this was a Studio product (or Studio itself), false otherwise
      */
-    public static void setDefaultValues(MavenContext context, Product product)
+    public static boolean setDefaultValues(MavenContext context, Product product)
     {
         // Set the default context path
         // Amps requires '/' before and not after
@@ -263,7 +264,10 @@ public class StudioProductHandler extends AmpsProductHandler
             {
                 product.setShutdownEnabled(Boolean.TRUE);
             }
+
+            return true;
         }
+        return false;
     }
 
     /**
