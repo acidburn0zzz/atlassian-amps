@@ -38,6 +38,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STUDIO;
+
 /**
  * Base class for webapp mojos
  */
@@ -464,17 +466,25 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     {
         product.setInstanceId(getProductInstanceId(product));
 
-        // If it's a Studio product, some defaults are different (ex: context path for Confluence is /wiki)
-        StudioProductHandler.setDefaultValues(getMavenContext(), product);
-
         //Apply the common default values
         String dversion = System.getProperty("product.data.version", product.getDataVersion());
         String pversion = System.getProperty("product.version", product.getVersion());
         String dpath = System.getProperty("product.data.path", product.getDataPath());
 
-        product.setDataPath(dpath);
-        product.setDataVersion(dversion);
-        product.setVersion(pversion);
+        // If it's a Studio product, some defaults are different (ex: context path for Confluence is /wiki)
+        if (!StudioProductHandler.setDefaultValues(getMavenContext(), product))
+        {
+            // hacky workaround for AMPS-738:  avoid applying the regular product defaults to a Studio sub-product;
+            // however, do apply them to the main Studio product if and only if we're explicitly running Studio (so
+            // we'll get the right result for command-line options like "-Dproduct=studio -Dproduct.version=108.3").
+            if (!STUDIO.equals(product.getId()) || STUDIO.equals(System.getProperty("product")))
+            {
+                product.setVersion(pversion);
+	            product.setDataVersion(dversion);
+                product.setDataPath(dpath);
+            }
+        }
+
         product.setArtifactRetriever(new ArtifactRetriever(artifactResolver, artifactFactory, localRepository, repositories));
 
         if (product.getContainerId() == null)
