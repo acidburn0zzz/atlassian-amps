@@ -437,6 +437,20 @@ public class MavenGoals
         return ctx.getProject().getBuild().getDirectory();
     }
 
+    private static Xpp3Dom configurationWithoutNullElements(Element... elements)
+    {
+        List<Element> nonNullElements = new ArrayList<Element>();
+        for (Element e : elements)
+        {
+            if (e != null)
+            {
+                nonNullElements.add(e);
+            }
+        }
+
+        return configuration(nonNullElements.toArray(new Element[nonNullElements.size()]));
+    }
+
     public int startWebapp(final String productInstanceId, final File war, final Map<String, String> systemProperties, final List<ProductArtifact> extraContainerDependencies,
                            final Product webappContext) throws MojoExecutionException
     {
@@ -495,11 +509,12 @@ public class MavenGoals
         }
 
         Plugin cargo = cargo(webappContext);
+
         executeMojo(
                 cargo,
                 goal("start"),
-                configuration(
-                        waitElement(cargo),
+                configurationWithoutNullElements(
+                        waitElement(cargo), // This may be null
                         element(name("container"),
                                 element(name("containerId"), container.getId()),
                                 element(name("type"), container.getType()),
@@ -624,7 +639,7 @@ public class MavenGoals
         }
         // If not using twdata's cargo, we avoid passing wait=false, because it's the default and it generates
         // a deprecation warning
-        return element(name(""), "");
+        return null;
     }
 
     public static String getBaseUrl(Product product, int actualHttpPort)
