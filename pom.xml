@@ -348,8 +348,8 @@
         <clover.version>3.1.0</clover.version>
         <studio.version>108.2</studio.version>
         <studio.data.version>108.2-m0</studio.data.version>
-        <stash.version>1.0.0-m19</stash.version>
-        <stash.data.version>1.0.0-m19</stash.data.version>
+        <stash.version>1.0.0</stash.version>
+        <stash.data.version>1.0.0</stash.data.version>
         <skipCodegenTests>false</skipCodegenTests>
     </properties>
 </project>
