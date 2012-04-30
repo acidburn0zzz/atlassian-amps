@@ -2,6 +2,8 @@ package com.atlassian.maven.plugins.amps.product;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -83,6 +85,16 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
     {
         String baseUrl = MavenGoals.getBaseUrl(ctx, ctx.getHttpPort());
 
+        /* Crowd connects back to itself; use 'localhost' rather than the hostname an external client would see */
+        try
+        {
+            baseUrl = withLocalhostAsHostname(baseUrl);
+        }
+        catch (URISyntaxException e)
+        {
+            throw new MojoExecutionException("Unable to process Crowd service URL", e);
+        }
+
         try
         {
             ConfigFileUtils.replaceAll(new File(homeDir, "crowd.cfg.xml"),
@@ -99,6 +111,22 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
         {
             throw new MojoExecutionException(e.getMessage());
         }
+    }
+
+    static String withLocalhostAsHostname(String uri) throws URISyntaxException
+    {
+        URI base = new URI(uri);
+
+        URI baseWithLocalhost = new URI(
+                base.getScheme(),
+                base.getUserInfo(),
+                "localhost",
+                base.getPort(),
+                base.getPath(),
+                base.getQuery(),
+                base.getFragment());
+
+        return baseWithLocalhost.toString();
     }
 
     @Override
@@ -152,5 +180,4 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
         configFiles.add(new File(snapshotDir, "crowd.properties"));
         return configFiles;
     }
-
 }
