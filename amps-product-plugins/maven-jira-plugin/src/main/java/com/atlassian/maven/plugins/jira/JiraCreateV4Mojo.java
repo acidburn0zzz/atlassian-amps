@@ -1,12 +1,11 @@
 package com.atlassian.maven.plugins.jira;
 
 import com.atlassian.maven.plugins.amps.PluginInformation;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoRequiresProject;
 
-@MojoGoal ("create_v4")
-@MojoRequiresProject (false)
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+
+@Mojo(name = "create_v4", requiresProject = false)
 public class JiraCreateV4Mojo extends JiraCreateMojo
 {
     private static final String JIRA4 = "jira4";

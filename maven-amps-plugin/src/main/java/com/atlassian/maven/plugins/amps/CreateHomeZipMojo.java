@@ -1,17 +1,19 @@
 package com.atlassian.maven.plugins.amps;
 
-import com.atlassian.maven.plugins.amps.product.ProductHandler;
-import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
-import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
-import com.google.common.collect.Lists;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
-
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+
+import com.atlassian.maven.plugins.amps.product.ProductHandler;
+import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
+import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
+
+import com.google.common.collect.Lists;
+
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Creates a zip file containing the previous run's home directory
@@ -19,13 +21,13 @@ import java.util.Map;
  *
  * @since 3.1-m3
  */
-@MojoGoal("create-home-zip")
+@Mojo(name = "create-home-zip")
 public class CreateHomeZipMojo extends AbstractProductHandlerMojo {
 
     /**
      * Generated home directory zip file.
      */
-    @MojoParameter(expression = "${homeZip}", required = false)
+    @Parameter(property = "homeZip", required = false)
     protected File homeZip;
 
     public void doExecute() throws MojoExecutionException, MojoFailureException

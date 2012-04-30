@@ -2,7 +2,8 @@ package com.atlassian.maven.plugins.amps.pdk;
 
 import com.atlassian.maven.plugins.amps.AbstractProductHandlerAwareMojo;
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
+
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  *
@@ -12,49 +13,49 @@ public abstract class AbstractPdkMojo extends AbstractProductHandlerAwareMojo
     /**
      *
      */
-    @MojoParameter(expression = "${atlassian.plugin.key}")
+    @Parameter(property = "atlassian.plugin.key")
     protected String pluginKey;
 
     /**
      *
      */
-    @MojoParameter(expression = "${project.groupId}")
+    @Parameter(property = "project.groupId")
     protected String groupId;
 
     /**
      *
      */
-    @MojoParameter(expression = "${project.artifactId}")
+    @Parameter(property = "project.artifactId")
     protected String artifactId;
 
     /**
      * HTTP port for the servlet containers
      */
-    @MojoParameter(expression = "${http.port}")
+    @Parameter(property = "http.port")
     protected int httpPort;
 
     /**
      * Application context path
      */
-    @MojoParameter(expression = "${context.path}")
+    @Parameter(property = "context.path")
     protected String contextPath;
 
     /**
      * Username of user that will install the plugin
      */
-    @MojoParameter(expression = "${username}", defaultValue = "admin")
+    @Parameter(property = "username", defaultValue = "admin")
     protected String username;
 
     /**
      * Password of user that will install the plugin
      */
-    @MojoParameter(expression = "${password}", defaultValue = "admin")
+    @Parameter(property = "password", defaultValue = "admin")
     protected String password;
 
     /**
      * Application server
      */
-    @MojoParameter(expression = "${server}", defaultValue = "localhost")
+    @Parameter(property = "server", defaultValue = "localhost")
     protected String server;
 
     protected void ensurePluginKeyExists()

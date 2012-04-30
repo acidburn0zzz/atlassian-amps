@@ -16,6 +16,8 @@ import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.locator.DefaultModelLocator;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuilder;
@@ -25,24 +27,20 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
-import org.jfrog.maven.annomojo.annotations.MojoRequiresProject;
 
 import static java.util.Collections.singletonList;
 
 /**
  * Run the webapp without a plugin project
  */
-@MojoGoal ("run-standalone")
-@MojoRequiresProject (false)
+@Mojo(name = "run-standalone", requiresProject = false)
 public class RunStandaloneMojo extends AbstractProductHandlerMojo
 {
     private final String
         GROUP_ID = "com.atlassian.amps",
         ARTIFACT_ID = "standalone";
 
-    @MojoParameter (expression = "${component.org.apache.maven.project.MavenProjectBuilder}", required = true, readonly = true)
+    @Parameter (property = "component.org.apache.maven.project.MavenProjectBuilder", required = true, readonly = true)
     private MavenProjectBuilder projectBuilder;
 
     private Artifact getStandaloneArtifact()

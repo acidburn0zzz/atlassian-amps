@@ -1,8 +1,8 @@
 package com.atlassian.maven.plugins.ampsdispatcher;
 
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
+import org.apache.maven.plugins.annotations.Mojo;
 
-@MojoGoal("cli")
+@Mojo(name = "cli")
 public class AmpsDispatcherCliMojo extends AbstractAmpsDispatcherMojo
 {
 }

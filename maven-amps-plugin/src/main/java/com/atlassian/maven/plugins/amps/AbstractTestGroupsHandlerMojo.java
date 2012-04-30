@@ -1,16 +1,17 @@
 package com.atlassian.maven.plugins.amps;
 
-import com.atlassian.maven.plugins.amps.product.ProductHandler;
-import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.atlassian.maven.plugins.amps.product.ProductHandler;
+import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
+
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 
 public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandlerMojo
 {
@@ -19,7 +20,7 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
     /**
      * The list of configured test groups
      */
-    @MojoParameter
+    @Parameter
     private List<TestGroup> testGroups = new ArrayList<TestGroup>();
 
     protected final List<TestGroup> getTestGroups()

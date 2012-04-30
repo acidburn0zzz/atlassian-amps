@@ -1,14 +1,15 @@
 package com.atlassian.maven.plugins.amps;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
-
-import java.io.File;
-import java.io.IOException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 
@@ -22,7 +23,7 @@ import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
  *
  * @since 3.3
  */
-@MojoGoal("test-jar")
+@Mojo(name = "test-jar")
 public class TestJarMojo extends AbstractAmpsMojo
 {
 
@@ -30,13 +31,13 @@ public class TestJarMojo extends AbstractAmpsMojo
      * Whether the test plugin should be built or not.  If not specified, it detects an atlassian-plugin.xml in the
      * test classes directory and builds if exists.
      */
-    @MojoParameter
+    @Parameter
     private Boolean buildTestPlugin;
 
     /**
      * The final name for the test plugin, without the "-tests" suffix.
      */
-    @MojoParameter(expression = "${project.build.finalName}")
+    @Parameter(property = "project.build.finalName")
     private String finalName;
 
     public void execute() throws MojoExecutionException, MojoFailureException

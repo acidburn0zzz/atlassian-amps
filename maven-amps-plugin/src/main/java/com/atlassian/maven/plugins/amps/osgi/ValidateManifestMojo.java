@@ -1,14 +1,5 @@
 package com.atlassian.maven.plugins.amps.osgi;
 
-import aQute.lib.osgi.Constants;
-import com.atlassian.maven.plugins.amps.AbstractAmpsMojo;
-import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
-import org.apache.commons.io.IOUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,20 +8,32 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.Manifest;
 
-@MojoGoal ("validate-manifest")
+import com.atlassian.maven.plugins.amps.AbstractAmpsMojo;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
+import aQute.lib.osgi.Constants;
+
+import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
+
+@Mojo (name = "validate-manifest")
 public class ValidateManifestMojo extends AbstractAmpsMojo
 {
     /**
      * Whether to skip validation or not
      */
-    @MojoParameter (expression = "${manifest.validation.skip}")
+    @Parameter (property = "manifest.validation.skip")
     protected boolean skipManifestValidation = false;
 
     /**
      * The BND instructions for the bundle.  We'll only validate the import versions if there was an
      * explicit Import-Package list, not if we auto-generated the imports.
      */
-    @MojoParameter
+    @Parameter
     private Map<String, String> instructions = new HashMap<String, String>();
 
     public void execute() throws MojoExecutionException, MojoFailureException

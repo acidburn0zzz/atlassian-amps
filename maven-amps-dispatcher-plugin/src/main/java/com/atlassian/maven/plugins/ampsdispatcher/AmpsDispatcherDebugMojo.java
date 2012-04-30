@@ -1,15 +1,15 @@
 package com.atlassian.maven.plugins.ampsdispatcher;
 
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoExecute;
-import org.jfrog.maven.annomojo.annotations.MojoRequiresDependencyResolution;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
  * Debug the webapp
  */
-@MojoGoal("debug")
-@MojoExecute(phase = "package")
-@MojoRequiresDependencyResolution
+@Mojo(name = "debug", requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Execute(phase = LifecyclePhase.PACKAGE)
 public class AmpsDispatcherDebugMojo extends AbstractAmpsDispatcherMojo
 {
 }

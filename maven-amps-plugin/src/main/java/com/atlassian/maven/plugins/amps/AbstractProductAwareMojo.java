@@ -1,27 +1,24 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
+import org.apache.maven.plugins.annotations.Parameter;
 
 public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
 {
     /**
      * Product id
      */
-    @MojoParameter(expression = "${product}")
+    @Parameter(property = "product")
     private String product;
 
     /**
      * Instance to run. If provided, used to determine the product to use, instead of
      * using the product ID.
      */
-    @MojoParameter(expression = "${instanceId}")
+    @Parameter(property = "instanceId")
     protected String instanceId;
 
 
@@ -37,7 +34,7 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
      * <li>or pass <code>-Dallow.google.tracking=false</code> on the command line.
      * </ol>
      */
-    @MojoParameter(expression = "${allow.google.tracking}", defaultValue = "true")
+    @Parameter(property = "allow.google.tracking", defaultValue = "true")
     protected boolean allowGoogleTracking;
 
     private GoogleAmpsTracker googleTracker;

@@ -1,20 +1,5 @@
 package com.atlassian.maven.plugins.amps;
 
-import com.atlassian.maven.plugins.amps.product.ProductHandler;
-import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import org.apache.commons.io.IOUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.surefire.shade.org.apache.commons.lang.StringUtils;
-import org.apache.maven.artifact.Artifact;
-import org.jfrog.maven.annomojo.annotations.MojoExecute;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
-import org.jfrog.maven.annomojo.annotations.MojoRequiresDependencyResolution;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,29 +12,46 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import com.atlassian.maven.plugins.amps.product.ProductHandler;
+import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.surefire.shade.org.apache.commons.lang.StringUtils;
+
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * Run the webapp
  */
-@MojoGoal("run")
-@MojoExecute(phase = "package")
-@MojoRequiresDependencyResolution
+@Mojo(name = "run", requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Execute(phase = LifecyclePhase.PACKAGE)
 public class RunMojo extends AbstractTestGroupsHandlerMojo
 {
-    @MojoParameter(expression = "${wait}", defaultValue = "true")
+    @Parameter (property = "wait", defaultValue = "true")
     private boolean wait;
 
     /**
      * Whether or not to write properties used by the plugin to amps.properties.
      */
-    @MojoParameter(expression = "${amps.properties}", required = true, defaultValue = "false")
+    @Parameter (property = "amps.properties", required = true, defaultValue = "false")
     protected boolean writePropertiesToFile;
 
     /**
      * Test group to run. If provided, used to determine the products to run.
      */
-    @MojoParameter(expression = "${testGroup}")
+    @Parameter (property = "testGroup")
     protected String testGroup;
 
     /**
@@ -62,7 +64,7 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
      * <li>mvn amps:run -DexcludeInstances={@literal *}/studio-crowd to run only StudioCrowd</li>
      * </ul>
      */
-    @MojoParameter(expression = "${excludeInstances}")
+    @Parameter (property = "excludeInstances")
     protected String excludeInstances;
 
     /**

@@ -2,18 +2,17 @@ package com.atlassian.maven.plugins.amps;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
-import org.jfrog.maven.annomojo.annotations.MojoRequiresDependencyResolution;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
  * Copies bundled dependencies into META-INF/lib
  */
-@MojoGoal("copy-bundled-dependencies")
-@MojoRequiresDependencyResolution
+@Mojo(name = "copy-bundled-dependencies", requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class CopyBundledDependenciesMojo extends AbstractAmpsMojo
 {
-    @MojoParameter(expression = "extractDependencies", defaultValue = "false")
+    @Parameter(property = "extractDependencies", defaultValue = "false")
     private Boolean extractDependencies;
 
     public void execute() throws MojoExecutionException, MojoFailureException
