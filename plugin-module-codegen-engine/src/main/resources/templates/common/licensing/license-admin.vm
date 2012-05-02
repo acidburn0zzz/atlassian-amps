@@ -23,7 +23,7 @@
             <div class="aui-message warning"><span class="aui-icon icon-warning"></span>$warningMessageWithHtml</div>
             #end
 
-            #if (!$upmLicensingAware && $storagePluginIsAvailable)
+            #if (!$upmLicensingAware && $displayLicenseAdminUi)
             <h4>$i18n.getText("plugin.license.storage.admin.license.details")</h4>
             <table class="aui">
                 <tbody>
