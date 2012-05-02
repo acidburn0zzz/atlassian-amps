@@ -93,10 +93,12 @@
                             <td>$i18n.getText("plugin.license.storage.admin.license.attribute.organization.title")</td>
                             <td>$license.get().organization.name</td>
                         </tr>
+                        #if ($license.get().serverId)
                         <tr>
                             <td>$i18n.getText("plugin.license.storage.admin.license.attribute.serverid.title")</td>
                             <td>$license.get().serverId</td>
                         </tr>
+                        #end
                         <tr>
                             <td>$i18n.getText("plugin.license.storage.admin.license.attribute.sen.title")</td>
                             <td>
