@@ -66,9 +66,14 @@ public class ${CLASSNAME} extends HttpServlet
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
-        if (!hasAdminPermission())
+        if (userManager.getRemoteUsername() == null)
         {
             redirectToLogin(req, resp);
+            return;
+        }
+        else if (!hasAdminPermission())
+        {
+            handleUnpermittedUser(req, resp);
             return;
         }
 
@@ -80,9 +85,14 @@ public class ${CLASSNAME} extends HttpServlet
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
-        if (!hasAdminPermission())
+        if (userManager.getRemoteUsername() == null)
         {
             redirectToLogin(req, resp);
+            return;
+        }
+        else if (!hasAdminPermission())
+        {
+            handleUnpermittedUser(req, resp);
             return;
         }
 
@@ -128,7 +138,7 @@ public class ${CLASSNAME} extends HttpServlet
             catch (PluginLicenseStoragePluginUnresolvedException e)
             {
                 context.put("errorMessage", i18nResolver.getText("plugin.license.storage.admin.plugin.unavailable"));
-                context.put("storagePluginIsAvailable", false);
+                context.put("displayLicenseAdminUi", false);
             }
         }
 
@@ -142,10 +152,8 @@ public class ${CLASSNAME} extends HttpServlet
         URI servletUri = URI.create(applicationProperties.getBaseUrl() + "/plugins/servlet/${LICENSE_SERVLET_PATH}");
 
         final Map<String, Object> context = new HashMap<String, Object>();
-
-        resp.setContentType("text/html;charset=utf-8");
         context.put("servletUri", servletUri);
-        context.put("storagePluginIsAvailable", true);
+        context.put("displayLicenseAdminUi", true);
 
         try
         {
@@ -161,7 +169,7 @@ public class ${CLASSNAME} extends HttpServlet
         catch (PluginLicenseStoragePluginUnresolvedException e)
         {
             context.put("errorMessage", i18nResolver.getText("plugin.license.storage.admin.plugin.unavailable"));
-            context.put("storagePluginIsAvailable", false);
+            context.put("displayLicenseAdminUi", false);
         }
 
         return context;
@@ -201,7 +209,7 @@ public class ${CLASSNAME} extends HttpServlet
         catch (PluginLicenseStoragePluginUnresolvedException e)
         {
             context.put("errorMessage", i18nResolver.getText("plugin.license.storage.admin.plugin.unavailable"));
-            context.put("storagePluginIsAvailable", false);
+            context.put("displayLicenseAdminUi", false);
         }
     }
 
@@ -220,8 +228,16 @@ public class ${CLASSNAME} extends HttpServlet
         }
     }
 
-    private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
+    private void redirectToLogin(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
-        response.sendRedirect(loginUriProvider.getLoginUri(URI.create(request.getRequestURL().toString())).toASCIIString());
+        resp.sendRedirect(loginUriProvider.getLoginUri(URI.create(req.getRequestURL().toString())).toASCIIString());
+    }
+
+    private void handleUnpermittedUser(HttpServletRequest req, HttpServletResponse resp) throws IOException
+    {
+        final Map<String, Object> context = new HashMap<String, Object>();
+        context.put("errorMessage", i18nResolver.getText("plugin.license.storage.admin.unpermitted"));
+        context.put("displayLicenseAdminUi", false);
+        renderer.render(TEMPLATE, context, resp.getWriter());
     }
 }
