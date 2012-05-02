@@ -73,10 +73,10 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
     public static final String HELLO_WORLD_SERVLET_NAME_I18N_KEY = "license-hello-world-servlet.name";
     public static final String HELLO_WORLD_SERVLET_DESCRIPTION_I18N_KEY = "license-hello-world-servlet.description";
     
-    public static final String LICENSE_API_VERSION = "2.1";
+    public static final String LICENSE_API_VERSION = "2.2.1";
     public static final VersionId LICENSE_API_VERSION_PROPERTY = versionProperty("upm.license.compatibility.version", LICENSE_API_VERSION);
 
-    public static final String LICENSE_API_IMPORT_VERSION = "2.0.1";
+    public static final String LICENSE_API_IMPORT_VERSION = "${upm.license.compatibility.version}";
     
     public static final ArtifactDependency[] DEPENDENCIES = {
         dependency("com.atlassian.upm", "plugin-license-storage-lib", LICENSE_API_VERSION_PROPERTY, COMPILE),
