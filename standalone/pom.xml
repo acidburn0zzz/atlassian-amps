@@ -23,12 +23,6 @@
                     <configuration>
                         <products>
                             <product>
-                                <id>studio</id>
-                                <version>${studio.version}</version>
-                                <dataVersion>${studio.data.version}</dataVersion>
-                                <output>${project.build.directory}/studio-${studio.version}.log</output>
-                            </product>
-                            <product>
                                 <id>refapp</id>
                                 <version>${refapp.version}</version>
                                 <output>${project.build.directory}/refapp-${refapp.version}.log</output>
