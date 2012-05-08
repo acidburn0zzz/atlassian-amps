@@ -13,6 +13,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -68,6 +69,7 @@ public class TestStudioProductHandler
         FileUtils.deleteQuietly(mockBuildDir);
     }
 
+    @Ignore("AMPS-757 - Studio products are disabled")
     @Test
     public void configureProductsShouldSetCorrectJiraVersionFromOnDemandPom() throws MojoExecutionException
     {
@@ -81,6 +83,7 @@ public class TestStudioProductHandler
         assertEquals("5.0", jira.getVersion());
     }
 
+    @Ignore("AMPS-757 - Studio products are disabled")
     @Test
     public void configureProductsShouldSetCorrectConfluenceVersionFromOnDemandPom() throws MojoExecutionException
     {
@@ -94,6 +97,7 @@ public class TestStudioProductHandler
         assertEquals("4.2", confluence.getVersion());
     }
 
+    @Ignore("AMPS-757 - Studio products are disabled")
     @Test
     public void configureProductsShouldSetOnDemandFecruVersion() throws MojoExecutionException
     {
@@ -107,6 +111,7 @@ public class TestStudioProductHandler
         assertEquals(TEST_ONDEMAND_VERSION, fecru.getVersion());
     }
 
+    @Ignore("AMPS-757 - Studio products are disabled")
     @Test
     public void configureProductsShouldLogWarningIfJiraVersionNotPresentInOnDemandPom() throws MojoExecutionException
     {
@@ -118,6 +123,7 @@ public class TestStudioProductHandler
                         + TEST_ONDEMAND_VERSION + ") not found. OnDemand version will be used instead");
     }
 
+    @Ignore("AMPS-757 - Studio products are disabled")
     @Test
     public void configureProductsShouldLogWarningIfConfluenceVersionNotPresentInOnDemandPom() throws MojoExecutionException
     {
