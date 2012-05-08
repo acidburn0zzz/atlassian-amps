@@ -1006,6 +1006,8 @@ public class StudioProductHandler extends AmpsProductHandler
 
         private Map<String, String> initMappings(Product ondemand) throws MojoExecutionException
         {
+			// AMPS-757: Studio product configuration is temporarily disabled because the on-demand pom logic is so broken
+			
             // Model model = getOnDemandPomModel(ondemand, properties);
             // validate(model);
             ImmutableMap.Builder<String,String> builder = ImmutableMap.builder();
