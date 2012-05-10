@@ -1,4 +1,4 @@
-#set( $mvnCommand = "com.atlassian.maven.plugins:maven-refapp-plugin:$version:create" )
+#set( $mvnCommand = "com.atlassian.maven.plugins:maven-stash-plugin:$version:create" )
 
 #set( $goalhelp = "Creates a Stash plugin." )
 
