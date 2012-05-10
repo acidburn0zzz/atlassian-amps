@@ -6,6 +6,7 @@ import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.StashPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 
 import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
@@ -18,6 +19,7 @@ import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 @ConfluencePluginModuleCreator
 @BambooPluginModuleCreator
 @FeCruPluginModuleCreator
+@StashPluginModuleCreator
 public class WebResourceModuleCreator extends AbstractPluginModuleCreator<WebResourceProperties>
 {
     public static final String MODULE_NAME = "Web Resource";

@@ -27,6 +27,7 @@ public class PluginModuleCreatorRegistryImpl implements PluginModuleCreatorRegis
         creatorRegistry.put(PluginModuleCreatorRegistry.CONFLUENCE, new TreeMap<Class, PluginModuleCreator>(comparator));
         creatorRegistry.put(PluginModuleCreatorRegistry.CROWD, new TreeMap<Class, PluginModuleCreator>(comparator));
         creatorRegistry.put(PluginModuleCreatorRegistry.FECRU, new TreeMap<Class, PluginModuleCreator>(comparator));
+        creatorRegistry.put(PluginModuleCreatorRegistry.STASH, new TreeMap<Class, PluginModuleCreator>(comparator));
         creatorRegistry.put(PluginModuleCreatorRegistry.REFAPP, new TreeMap<Class, PluginModuleCreator>(comparator));
     }
 

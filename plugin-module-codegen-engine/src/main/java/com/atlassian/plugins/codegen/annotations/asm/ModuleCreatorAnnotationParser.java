@@ -33,6 +33,7 @@ public class ModuleCreatorAnnotationParser extends AbstractAnnotationParser
         annotationProductMap.put(BambooPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.BAMBOO);
         annotationProductMap.put(CrowdPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.CROWD);
         annotationProductMap.put(FeCruPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.FECRU);
+        annotationProductMap.put(StashPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.STASH);
         annotationProductMap.put(RefAppPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.REFAPP);
     }
 
