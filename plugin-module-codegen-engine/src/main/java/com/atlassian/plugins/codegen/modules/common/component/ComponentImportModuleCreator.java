@@ -8,6 +8,7 @@ import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.StashPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 
 import static com.atlassian.fugue.Option.option;
@@ -23,6 +24,7 @@ import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 @BambooPluginModuleCreator
 @FeCruPluginModuleCreator
 @CrowdPluginModuleCreator
+@StashPluginModuleCreator
 public class ComponentImportModuleCreator extends AbstractPluginModuleCreator<ComponentImportProperties>
 {
     public static final String MODULE_NAME = "Component Import";

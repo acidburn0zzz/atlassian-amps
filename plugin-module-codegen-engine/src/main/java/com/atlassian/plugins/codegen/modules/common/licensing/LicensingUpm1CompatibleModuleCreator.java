@@ -14,6 +14,7 @@ import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.StashPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletModuleCreator;
@@ -53,6 +54,7 @@ import static com.atlassian.plugins.codegen.modules.Dependencies.TEMPLATE_RENDER
 @BambooPluginModuleCreator
 @FeCruPluginModuleCreator
 @CrowdPluginModuleCreator
+@StashPluginModuleCreator
 public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCreator<LicensingProperties>
 {
     public static final String MODULE_NAME = "Licensing API Support";
