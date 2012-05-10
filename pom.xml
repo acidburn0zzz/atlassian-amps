@@ -197,8 +197,6 @@
                             <artifact>jta:jta:1.0.1B</artifact>
                             <artifact>jta:jta:1.0.1</artifact>
                             <artifact>javax.jms:jms:1.1</artifact>
-                            <artifact>com.atlassian.stash:stash-webapp:${stash.version}:war</artifact>
-                            <artifact>com.atlassian.stash:stash-plugin-test-resources:${stash.data.version}:zip</artifact>
                         </artifacts>
                     </configuration>
                 </plugin>
