@@ -6,6 +6,7 @@ import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.google.common.collect.Maps;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -55,18 +56,23 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     @Override
     public Map<String, String> getSystemProperties(final Product ctx)
     {
-        return new HashMap<String, String>()
-        {
-            {
-               DataSource dataSource = ctx.getDataSource();
-                dataSource.setDefaultValues("jdbc/JiraDS", format("jdbc:hsqldb:%s/database", fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath())),
-                        "org.hsqldb.jdbcDriver", "sa", "", "javax.sql.DataSource", null, null);
-
-                put("jira.home", fixWindowsSlashes(getHomeDirectory(ctx).getPath()));
-                put("cargo.datasource.datasource", dataSource.getCargoString());
-                put("catalina.servlet.uriencoding", "UTF-8");
-            }
-        };
+        Map<String, String> properties = super.getSystemProperties(ctx);
+        properties.put("jira.home", fixWindowsSlashes(getHomeDirectory(ctx).getPath()));
+        properties.put("catalina.servlet.uriencoding", "UTF-8");
+        return properties;
+    }
+    
+    @Override
+    protected DataSource getDefaultDataSource(Product ctx)
+    {
+        DataSource dataSource = new DataSource();
+        dataSource.setJndi("jdbc/JiraDS");
+        dataSource.setUrl(format("jdbc:hsqldb:%s/database", fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath())));
+        dataSource.setDriver("org.hsqldb.jdbcDriver");
+        dataSource.setType("javax.sql.DataSource");
+        dataSource.setUsername("sa");
+        dataSource.setPassword("");
+        return dataSource;
     }
 
     @Override

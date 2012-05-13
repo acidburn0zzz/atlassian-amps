@@ -4,13 +4,12 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-
-import com.google.inject.internal.util.Lists;
+import com.google.common.collect.Lists;
 
 /**
+ * Definition of a datasource.
  * For more information about the properties, see http://cargo.codehaus.org/DataSource+and+Resource+Support
- *
- * @since 3.10
+ * @since 3.11
  */
 public class DataSource
 {
@@ -62,8 +61,8 @@ public class DataSource
      * Cargo-style string to pass to Cargo in the "cargo.datasource.datasource" property.
      * If set, the other properties will not be read.
      * 
-     * <p>
-     * Example: cargo.datasource.username=sa|cargo.datasource.password...|...
+     * <p>Example:
+     * cargo.datasource.username=sa|cargo.datasource.password...|...
      * </p>
      */
     private String cargoString;
@@ -122,16 +121,20 @@ public class DataSource
         this.cargoString = cargoString;
     }
     
-    public void setDefaultValues(String jndi, String url, String driver, String username, String password, String type, String transactionSupport, String properties)
+    /**
+     * Apply default values to the current bean
+     * @param defaultValues a bean that default values will be read from.
+     */
+    public void useForUnsetValues(DataSource defaultValues)
     {
-        if (this.jndi == null)                  this.jndi = jndi;
-        if (this.url == null)                   this.url = url;
-        if (this.driver == null)                this.driver = driver;
-        if (this.username == null)              this.username = username;
-        if (this.password == null)              this.password = password;
-        if (this.type == null)                  this.type = type;
-        if (this.transactionSupport == null)    this.transactionSupport = transactionSupport;
-        if (this.properties == null)            this.properties = properties;
+        if (this.jndi == null)                  this.jndi = defaultValues.jndi;
+        if (this.url == null)                   this.url = defaultValues.url;
+        if (this.driver == null)                this.driver = defaultValues.driver;
+        if (this.username == null)              this.username = defaultValues.username;
+        if (this.password == null)              this.password = defaultValues.password;
+        if (this.type == null)                  this.type = defaultValues.type;
+        if (this.transactionSupport == null)    this.transactionSupport = defaultValues.transactionSupport;
+        if (this.properties == null)            this.properties = defaultValues.properties;
     }
 
     public String getUrl()
@@ -229,4 +232,13 @@ public class DataSource
         this.cargoString = cargoString;
     }
 
+    @Override
+    public String toString()
+    {
+        return "DataSource [url=" + url + ", driver=" + driver + ", username=" + username + ", password=" + password + ", jndi=" + jndi + ", type=" + type
+                + ", transactionSupport=" + transactionSupport + ", properties=" + properties + ", cargoString=" + cargoString + ", libArtifacts="
+                + libArtifacts + "]";
+    }
+
+    
 }

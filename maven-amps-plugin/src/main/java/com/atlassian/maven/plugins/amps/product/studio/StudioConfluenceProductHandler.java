@@ -47,18 +47,23 @@ public class StudioConfluenceProductHandler extends ConfluenceProductHandler imp
     {
         Map<String, String> systemProperties = new HashMap<String, String>(super.getSystemProperties(product));
 
-        DataSource ds = product.getDataSource();
-        ds.setDefaultValues("jdbc/DefaultDS",
-             // This datasource is only used by the Studio version of Confluence:
-                format("jdbc:hsqldb:%s/database/confluencedb;hsqldb.tx=MVCC", fixWindowsSlashes(getHomeDirectory(product).getAbsolutePath())),
-                "org.hsqldb.jdbcDriver", "sa", "", "javax.sql.DataSource", null, null);
-
-        systemProperties.put("cargo.datasource.datasource", ds.getCargoString());
-
         // We also add common studio system properties
         systemProperties.putAll(product.getStudioProperties().getSystemProperties());
 
         return systemProperties;
+    }
+    
+    @Override
+    protected DataSource getDefaultDataSource(Product ctx)
+    {
+        DataSource dataSource = new DataSource();
+        dataSource.setJndi("jdbc/DefaultDS");
+        dataSource.setUrl(format("jdbc:hsqldb:%s/database/confluencedb;hsqldb.tx=MVCC", fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath())));
+        dataSource.setDriver("org.hsqldb.jdbcDriver");
+        dataSource.setType("javax.sql.DataSource");
+        dataSource.setUsername("sa");
+        dataSource.setPassword("");
+        return dataSource;
     }
 
     @Override

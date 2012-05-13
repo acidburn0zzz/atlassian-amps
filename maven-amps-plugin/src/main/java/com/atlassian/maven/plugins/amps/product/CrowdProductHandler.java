@@ -54,7 +54,9 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
     @Override
     public Map<String, String> getSystemProperties(final Product ctx)
     {
-        return ImmutableMap.of("crowd.home", getHomeDirectory(ctx).getPath());
+        Map<String, String> properties = super.getSystemProperties(ctx);
+        properties.put("crowd.home", getHomeDirectory(ctx).getPath());
+        return properties;
     }
 
     @Override

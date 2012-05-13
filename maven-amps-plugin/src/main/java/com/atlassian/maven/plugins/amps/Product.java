@@ -227,14 +227,17 @@ public class Product
      * Tells whether shutdown is enabled for Fisheye. This property is passed on in the properties files.
      */
     protected Boolean shutdownEnabled;
-    
+
     /**
      * Registers a JNDI datasource using cargo.datasource.datasource.
      * <ul>
      * <li>Default values depend on the product.</li>
-     * <li>Only Jira, Studio-Jira, Studio-Bamboo, Studio-Confluence and Studio-Crowd have one by default, and they use hsqldb.</li>
-     * <li>They only use the jndi datasource if the user configured this way. For example, the snapshot confluence-plugin-test-resource.zip
-     * is setup with a direct access to hsqldb.</li>
+     * <li>Default values will be applied to the first datasource if its definition is incomplete.</li>
+     * <li>Only Jira, Studio-Jira, Studio-Bamboo, Studio-Confluence and Studio-Crowd have a datasource by default, and they use hsqldb.</li>
+     * <li>Other products can use datasources if you configure them this way during the setup process (Requires to
+     * start with an empty data home).</li>
+     * <li>There is a simple prerequisite to configuring multiple datasources. You must use {@code <parallel>true</parallel>},
+     * so that a recent version of CodeHaus Cargo is used.</li>
      * </ul>
      * Example:
      * <pre>{@code
@@ -244,25 +247,28 @@ public class Product
      *     <instanceId>jira50</instanceId>
      *     <version>5.0</version>
      *     <dataVersion>5.0</dataVersion>
-     *     <dataSource>
-     *         <url>jdbc:postgresql://localhost:5432/jira</url>
-     *         <username>jira</username>
-     *         <password>jira</password>
-     *         <libArtifacts>
-     *           <libArtifact>
-     *             <groupId>postgresql</groupId>
-     *             <artifactId>postgresql</artifactId>
-     *             <version>9.1-901-1.jdbc4</version>
-     *           </libArtifact>
-     *         </libArtifacts>
-     *     </dataSource>
+     *     <dataSources>
+     *         <dataSource>
+     *             <jndi>jdbc/JiraDS</jndi>
+     *             <url>jdbc:postgresql://localhost:5432/jira</url>
+     *             <username>jira</username>
+     *             <password>jira</password>
+     *             <libArtifacts>
+     *               <libArtifact>
+     *                 <groupId>postgresql</groupId>
+     *                 <artifactId>postgresql</artifactId>
+     *                 <version>9.1-901-1.jdbc4</version>
+     *               </libArtifact>
+     *             </libArtifacts>
+     *         </dataSource>
+     *     </dataSources>
      *   </product>
      * </products>
      * }
      * </pre>
      * 
      */
-    protected DataSource dataSource;
+    protected List<DataSource> dataSources;
     
 
 
@@ -307,7 +313,7 @@ public class Product
         prod.setDataHome(dataHome == null ? product.getDataHome() : dataHome);
         prod.setLog4jProperties(log4jProperties == null ? product.getLog4jProperties() : log4jProperties);
         prod.setJvmArgs(jvmArgs == null ? product.getJvmArgs() : jvmArgs);
-        prod.setDataSource(dataSource == null ? product.getDataSource() : dataSource);
+        prod.setDataSources(dataSources == null ? product.getDataSources() : dataSources);
         prod.setGroupId(groupId == null ? product.getGroupId() : groupId);
         prod.setArtifactId(artifactId == null ? product.getArtifactId() : artifactId);
         prod.setVersion(version == null ? product.getVersion() : version);
@@ -800,19 +806,20 @@ public class Product
     
 
     /**
-     * @return the dataSource. Not null, because initialized in {@link AbstractProductHandlerMojo#setDefaultValues(Product, com.atlassian.maven.plugins.amps.product.ProductHandler)}
+     * @return the dataSources. Not null, because initialized in {@link AbstractProductHandlerMojo#setDefaultValues(Product, com.atlassian.maven.plugins.amps.product.ProductHandler)}
+     * May be empty.
      */
-    public DataSource getDataSource()
+    public List<DataSource> getDataSources()
     {
-        return dataSource;
+        return dataSources;
     }
 
     /**
-     * @param dataSource the dataSource to set
+     * @param dataSources the dataSources to set
      */
-    public void setDataSource(DataSource dataSource)
+    public void setDataSources(List<DataSource> dataSources)
     {
-        this.dataSource = dataSource;
+        this.dataSources = dataSources;    
     }
 
     @Override

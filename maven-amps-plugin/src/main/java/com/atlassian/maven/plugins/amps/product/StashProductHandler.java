@@ -49,16 +49,13 @@ public class StashProductHandler extends AbstractWebappProductHandler
     @Override
     public Map<String, String> getSystemProperties(final Product ctx)
     {
-        return new HashMap<String, String>()
-        {
-            {
-                put("stash.home", fixSlashes(getHomeDirectory(ctx).getPath()));
+        Map<String, String> properties = super.getSystemProperties(ctx);
+        properties.put("stash.home", fixSlashes(getHomeDirectory(ctx).getPath()));
 
-                String baseUrl = MavenGoals.getBaseUrl(ctx, ctx.getHttpPort());
-                put("baseurl", baseUrl);
-                put("baseurl.display", baseUrl);
-            }
-        };
+        String baseUrl = MavenGoals.getBaseUrl(ctx, ctx.getHttpPort());
+        properties.put("baseurl", baseUrl);
+        properties.put("baseurl.display", baseUrl);
+        return properties;
     }
 
     private static String fixSlashes(final String path)

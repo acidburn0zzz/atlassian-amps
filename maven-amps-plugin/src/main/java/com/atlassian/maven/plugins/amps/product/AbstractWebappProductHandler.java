@@ -2,6 +2,7 @@ package com.atlassian.maven.plugins.amps.product;
 
 import java.io.File;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,10 +10,14 @@ import com.atlassian.maven.plugins.amps.MavenContext;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
+import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
+import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
 
@@ -60,4 +65,54 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
     }
 
     protected abstract List<ProductArtifact> getExtraContainerDependencies();
+    
+    
+    
+    @Override
+    protected Map<String, String> getSystemProperties(Product ctx)
+    {
+        Map<String, String> properties = Maps.newHashMap();
+        addDataSourceSystemProperties(properties, ctx);
+        return properties;
+    }
+
+    protected void addDataSourceSystemProperties(Map<String, String> systemProperties, Product context)
+    {
+        List<DataSource> dataSources = context.getDataSources();
+        DataSource defaultValues = getDefaultDataSource(context);
+        
+        if (defaultValues != null)
+        {
+            if (dataSources.isEmpty())
+            {
+                dataSources.add(defaultValues);
+            }
+            else
+            {
+                dataSources.get(0).useForUnsetValues(defaultValues);
+            }
+        }
+        if (dataSources.size()==1)
+        {
+            // TWData Cargo doesn't support other names than "cargo.datasource.datasource".
+            systemProperties.put("cargo.datasource.datasource", dataSources.get(0).getCargoString());
+        }
+        else
+        {
+            // Multiple datasources requires CodeHaus Cargo
+            for (int i = 0; i < dataSources.size(); i++)
+            {
+                systemProperties.put("cargo.datasource.datasource." + i, dataSources.get(i).getCargoString());
+            }
+        }
+    }
+
+    /**
+     * Opportunity for the product handler to define a default datasource for the product.
+     * @return a bean containing the default values for the datasource.
+     */
+    protected DataSource getDefaultDataSource(Product ctx)
+    {
+        return null;
+    }
 }

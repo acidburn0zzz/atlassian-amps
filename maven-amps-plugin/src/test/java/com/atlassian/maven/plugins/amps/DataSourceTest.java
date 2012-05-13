@@ -48,7 +48,18 @@ public class DataSourceTest
     @Test
     public void defaultDoesntOverrideProperties()
     {
-        ds.setDefaultValues("a", "b", "c", "d", "e", "f", "g", "h");
+        DataSource defaultValues = new DataSource();
+        defaultValues.setUrl("x");
+        defaultValues.setDriver("x");
+        defaultValues.setUsername("x");
+        defaultValues.setPassword("x");
+        defaultValues.setJndi("x");
+        defaultValues.setType("x");
+        defaultValues.setTransactionSupport("x");
+        defaultValues.setProperties("x");
+        
+        ds.useForUnsetValues(defaultValues);
+        
         assertEquals("cargo.datasource.url=aUrl" +
                 "|cargo.datasource.driver=aDriver" +
                 "|cargo.datasource.username=aUsername" +
@@ -63,7 +74,18 @@ public class DataSourceTest
     public void defaultSetsProperties()
     {
         ds = new DataSource();
-        ds.setDefaultValues("a", "b", "c", "d", "e", "f", "g", "h");
+
+        DataSource defaultValues = new DataSource();
+        defaultValues.setJndi("a");
+        defaultValues.setUrl("b");
+        defaultValues.setDriver("c");
+        defaultValues.setUsername("d");
+        defaultValues.setPassword("e");
+        defaultValues.setType("f");
+        defaultValues.setTransactionSupport("g");
+        defaultValues.setProperties("h");
+        
+        ds.useForUnsetValues(defaultValues);
         
         assertEquals("cargo.datasource.url=b" +
         		"|cargo.datasource.driver=c" +

@@ -587,11 +587,15 @@ public class MavenGoals
                     element(name("location"), webappContext.getArtifactRetriever().resolve(dep))
             ));
         }
-        for (ProductArtifact containerDependency : webappContext.getDataSource().getLibArtifacts())
+
+        for (DataSource dataSource : webappContext.getDataSources())
         {
-            deps.add(element(name("dependency"),
-                    element(name("location"), webappContext.getArtifactRetriever().resolve(containerDependency))
-            ));
+            for (ProductArtifact containerDependency : dataSource.getLibArtifacts())
+            {
+                deps.add(element(name("dependency"),
+                        element(name("location"), webappContext.getArtifactRetriever().resolve(containerDependency))
+                        ));
+            }
         }
 
         final List<Element> props = new ArrayList<Element>();

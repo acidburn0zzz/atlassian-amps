@@ -52,7 +52,9 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
     @Override
     public Map<String, String> getSystemProperties(Product ctx)
     {
-        return Collections.singletonMap("confluence.home", getHomeDirectory(ctx).getPath());
+        Map<String, String> systemProperties = super.getSystemProperties(ctx);
+        systemProperties.put("confluence.home", getHomeDirectory(ctx).getPath());
+        return systemProperties;
     }
 
     @Override
