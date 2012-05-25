@@ -267,7 +267,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         List<ProductArtifact> artifacts = new ArrayList<ProductArtifact>();
         artifacts.addAll(getDefaultLibPlugins());
         artifacts.addAll(ctx.getLibArtifacts());
-        addArtifactsToDirectory(artifacts, new File(appDir, "WEB-INF/lib"));
+        addArtifactsToDirectory(artifacts, new File(appDir, getLibArtifactTargetDir()));
 
         artifacts = new ArrayList<ProductArtifact>();
         artifacts.addAll(getDefaultBundledPlugins());
@@ -427,5 +427,17 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
      * The artifact of the product (a war, a jar, a binary...)
      */
     protected abstract ProductArtifact getArtifact();
+    
+    /**
+     * Returns the directory where jars listed in  <libArtifacts> are
+     * copied. Default is "WEB-INF/lib"
+     * 
+     * @return
+     */
+    
+    protected String getLibArtifactTargetDir() 
+    {
+    	return "WEB-INF/lib";
+    }
 
 }

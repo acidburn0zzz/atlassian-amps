@@ -351,4 +351,10 @@ public class FeCruProductHandler extends AbstractProductHandler
         FileUtils.deleteQuietly(new File(homeDirectory, "var/plugins"));
         FileUtils.deleteQuietly(new File(homeDirectory, "cache/plugins"));
     }
+    
+    @Override
+    protected String getLibArtifactTargetDir() 
+    {
+		return "lib";
+    }
 }

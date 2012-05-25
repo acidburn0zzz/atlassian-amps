@@ -55,18 +55,18 @@
                 <shitty.product>fecru</shitty.product>
                 <product.version>${fecru.version}</product.version>
                 <product.data.version>${fecru.data.version}</product.data.version>
+                <project.version>${project.version}</project.version>
                 <tests>
                 copyBundledDependencies, create, debug,
                 filterPluginDescriptorWithoutPluginDescriptor,
                 filterPluginDescriptorWithPluginDescriptor, generateManifestWithInstructions,
-                generateManifestWithNoInstructions, generateObr, 
+                generateManifestWithNoInstructions, generateObr, libArtifact
                 <!-- Commenting out tests that start fecru until AMPS-312 is fixed -->
-                <!-- cli, integrationTest, integrationTestWithTestGroup, run, stop-->
+                <!-- cli, integrationTest, integrationTestWithTestGroup, run, stop -->
                 jarWithExistingManifest,  
                 unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
-                validateManifestWithValidManifest
+                validateManifestWithValidManifest, libArtifacts
                 </tests>
-
             </properties>
         </profile>
     </profiles>
