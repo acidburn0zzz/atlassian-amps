@@ -14,6 +14,7 @@ public interface PluginModuleCreatorRegistry
     public static final String BAMBOO = "bamboo";
     public static final String FECRU = "fecru";
     public static final String CROWD = "crowd";
+    public static final String STASH = "stash";
 
     void registerModuleCreator(String productId, PluginModuleCreator moduleCreator);
 

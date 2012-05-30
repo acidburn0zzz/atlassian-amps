@@ -8,7 +8,7 @@
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>3.10.1-SNAPSHOT</version>
+    <version>3.10.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
@@ -197,8 +197,6 @@
                             <artifact>jta:jta:1.0.1B</artifact>
                             <artifact>jta:jta:1.0.1</artifact>
                             <artifact>javax.jms:jms:1.1</artifact>
-                            <artifact>com.atlassian.stash:stash-webapp:${stash.version}:war</artifact>
-                            <artifact>com.atlassian.stash:stash-plugin-test-resources:${stash.data.version}:zip</artifact>
                         </artifacts>
                     </configuration>
                 </plugin>

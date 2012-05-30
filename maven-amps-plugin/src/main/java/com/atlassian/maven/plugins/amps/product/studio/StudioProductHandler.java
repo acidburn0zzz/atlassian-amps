@@ -1006,15 +1006,15 @@ public class StudioProductHandler extends AmpsProductHandler
 
         private Map<String, String> initMappings(Product ondemand) throws MojoExecutionException
         {
-            Model model = getOnDemandPomModel(ondemand, properties);
-            validate(model);
+			// AMPS-757: Studio product configuration is temporarily disabled because the on-demand pom logic is so broken
+			
+            // Model model = getOnDemandPomModel(ondemand, properties);
+            // validate(model);
             ImmutableMap.Builder<String,String> builder = ImmutableMap.builder();
-            builder.put(STUDIO_JIRA, getVersionProperty(JIRA_VERSION_KEY, model.getProperties()));
-            builder.put(STUDIO_CONFLUENCE, getVersionProperty(CONFLUENCE_VERSION_KEY, model.getProperties()));
+            // builder.put(STUDIO_JIRA, getVersionProperty(JIRA_VERSION_KEY, model.getProperties()));
+            // builder.put(STUDIO_CONFLUENCE, getVersionProperty(CONFLUENCE_VERSION_KEY, model.getProperties()));
             return builder.build();
         }
-
-
 
         private void validate(Model model) throws MojoExecutionException
         {

@@ -14,6 +14,7 @@ import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.StashPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletModuleCreator;
@@ -53,6 +54,7 @@ import static com.atlassian.plugins.codegen.modules.Dependencies.TEMPLATE_RENDER
 @BambooPluginModuleCreator
 @FeCruPluginModuleCreator
 @CrowdPluginModuleCreator
+@StashPluginModuleCreator
 public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCreator<LicensingProperties>
 {
     public static final String MODULE_NAME = "Licensing API Support";
@@ -73,7 +75,7 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
     public static final String HELLO_WORLD_SERVLET_NAME_I18N_KEY = "license-hello-world-servlet.name";
     public static final String HELLO_WORLD_SERVLET_DESCRIPTION_I18N_KEY = "license-hello-world-servlet.description";
     
-    public static final String LICENSE_API_VERSION = "2.2.1";
+    public static final String LICENSE_API_VERSION = "2.2.2";
     public static final VersionId LICENSE_API_VERSION_PROPERTY = versionProperty("upm.license.compatibility.version", LICENSE_API_VERSION);
 
     public static final String LICENSE_API_IMPORT_VERSION = "2.0.1";
