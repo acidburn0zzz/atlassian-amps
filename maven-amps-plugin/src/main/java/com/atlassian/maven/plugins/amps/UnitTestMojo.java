@@ -9,9 +9,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
-/**
- *
- */
 @Mojo(name = "unit-test", requiresDependencyResolution = ResolutionScope.TEST)
 public class UnitTestMojo extends AbstractAmpsMojo
 {

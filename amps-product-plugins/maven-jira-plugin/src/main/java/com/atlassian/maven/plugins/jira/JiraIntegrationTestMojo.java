@@ -4,10 +4,13 @@ import com.atlassian.maven.plugins.amps.IntegrationTestMojo;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Mojo(name = "integration-test", requiresDependencyResolution = ResolutionScope.TEST)
 public class JiraIntegrationTestMojo extends IntegrationTestMojo
 {
     @Override
