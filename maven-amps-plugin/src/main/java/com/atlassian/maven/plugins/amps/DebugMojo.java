@@ -17,20 +17,20 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 /**
  * Debug the webapp
  */
-@Mojo (name = "debug", requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(name = "debug", requiresDependencyResolution = ResolutionScope.RUNTIME)
 @Execute(phase = LifecyclePhase.PACKAGE)
 public class DebugMojo extends RunMojo
 {
     /**
      * port for debugging
      */
-    @Parameter (property = "jvm.debug.port", defaultValue = "5005")
+    @Parameter(property = "jvm.debug.port", defaultValue = "5005")
     protected int jvmDebugPort;
 
     /**
      * Suspend when debugging
      */
-    @Parameter (property = "jvm.debug.suspend")
+    @Parameter(property = "jvm.debug.suspend")
     protected boolean jvmDebugSuspend = false;
 
 

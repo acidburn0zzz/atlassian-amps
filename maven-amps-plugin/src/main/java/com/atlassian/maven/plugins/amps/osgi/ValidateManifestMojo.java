@@ -20,13 +20,13 @@ import aQute.lib.osgi.Constants;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 
-@Mojo (name = "validate-manifest")
+@Mojo(name = "validate-manifest")
 public class ValidateManifestMojo extends AbstractAmpsMojo
 {
     /**
      * Whether to skip validation or not
      */
-    @Parameter (property = "manifest.validation.skip")
+    @Parameter(property = "manifest.validation.skip")
     protected boolean skipManifestValidation = false;
 
     /**

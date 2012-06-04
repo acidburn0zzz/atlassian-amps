@@ -41,7 +41,7 @@ import org.codehaus.plexus.archiver.jar.ManifestException;
  * All plugins in the root directory will be installed, while the ones in the "dependencies" directory will be installed
  * only if they are needed.
  */
-@Mojo (name = "generate-obr-artifact")
+@Mojo(name = "generate-obr-artifact")
 public class GenerateObrArtifactMojo extends AbstractAmpsMojo
 {
     @Parameter
@@ -50,7 +50,7 @@ public class GenerateObrArtifactMojo extends AbstractAmpsMojo
     /**
      * The Jar archiver.
      */
-    @Component (role = Archiver.class, hint = "jar")
+    @Component(role = Archiver.class, hint = "jar")
     private JarArchiver jarArchiver;
 
     /**
@@ -63,7 +63,7 @@ public class GenerateObrArtifactMojo extends AbstractAmpsMojo
     /**
      * Specifies whether or not to attach the artifact to the project
      */
-    @Parameter (property = "attach", defaultValue = "true")
+    @Parameter(property = "attach", defaultValue = "true")
     private boolean attach;
 
     @Component
@@ -72,19 +72,19 @@ public class GenerateObrArtifactMojo extends AbstractAmpsMojo
     /**
      * The directory where the generated archive file will be put.
      */
-    @Parameter (property = "project.build.directory")
+    @Parameter(property = "project.build.directory")
     protected File outputDirectory;
 
     /**
      * The filename to be used for the generated archive file.  The "-obr" suffix will be appended.
      */
-    @Parameter (property = "project.build.finalName")
+    @Parameter(property = "project.build.finalName")
     protected String finalName;
 
     /**
      * Contains the full list of projects in the reactor.
      */
-    @Parameter (property = "reactorProjects", readonly = true)
+    @Parameter(property = "reactorProjects", readonly = true)
     protected List<MavenProject> reactorProjects;
 
     @Parameter

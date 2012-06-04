@@ -39,19 +39,19 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 @Execute(phase = LifecyclePhase.PACKAGE)
 public class RunMojo extends AbstractTestGroupsHandlerMojo
 {
-    @Parameter (property = "wait", defaultValue = "true")
+    @Parameter(property = "wait", defaultValue = "true")
     private boolean wait;
 
     /**
      * Whether or not to write properties used by the plugin to amps.properties.
      */
-    @Parameter (property = "amps.properties", required = true, defaultValue = "false")
+    @Parameter(property = "amps.properties", required = true, defaultValue = "false")
     protected boolean writePropertiesToFile;
 
     /**
      * Test group to run. If provided, used to determine the products to run.
      */
-    @Parameter (property = "testGroup")
+    @Parameter(property = "testGroup")
     protected String testGroup;
 
     /**
@@ -64,7 +64,7 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
      * <li>mvn amps:run -DexcludeInstances={@literal *}/studio-crowd to run only StudioCrowd</li>
      * </ul>
      */
-    @Parameter (property = "excludeInstances")
+    @Parameter(property = "excludeInstances")
     protected String excludeInstances;
 
     /**

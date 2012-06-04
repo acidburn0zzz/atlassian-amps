@@ -40,7 +40,7 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo
         GROUP_ID = "com.atlassian.amps",
         ARTIFACT_ID = "standalone";
 
-    @Parameter (property = "component.org.apache.maven.project.MavenProjectBuilder", required = true, readonly = true)
+    @Parameter(property = "component.org.apache.maven.project.MavenProjectBuilder", required = true, readonly = true)
     private MavenProjectBuilder projectBuilder;
 
     private Artifact getStandaloneArtifact()
