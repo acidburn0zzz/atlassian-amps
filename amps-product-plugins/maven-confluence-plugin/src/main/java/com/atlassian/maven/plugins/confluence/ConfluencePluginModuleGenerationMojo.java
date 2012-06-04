@@ -7,7 +7,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 /**
  * @since 3.6
  */
-public class ConfluencePluginModuleGenerartionMojo extends PluginModuleGenerationMojo{
+public class ConfluencePluginModuleGenerationMojo extends PluginModuleGenerationMojo{
 
     @Override
     protected String getDefaultProductId() throws MojoExecutionException
