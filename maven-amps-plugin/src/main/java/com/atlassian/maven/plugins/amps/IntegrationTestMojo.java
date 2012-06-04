@@ -8,61 +8,60 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.atlassian.maven.plugins.amps.product.ProductHandler;
+
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.jfrog.maven.annomojo.annotations.MojoComponent;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
-import org.jfrog.maven.annomojo.annotations.MojoRequiresDependencyResolution;
-
-import com.atlassian.maven.plugins.amps.product.ProductHandler;
 
 /**
  * Run the integration tests against the webapp
  */
-@MojoGoal("integration-test")
-@MojoRequiresDependencyResolution("test")
+@Mojo(name = "integration-test", requiresDependencyResolution = ResolutionScope.TEST)
 public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 {
     /**
      * Pattern for to use to find integration tests.  Only used if no test groups are defined.
      */
-    @MojoParameter(expression = "${functional.test.pattern}")
+    @Parameter(property = "functional.test.pattern")
     private String functionalTestPattern = "it/**";
 
     /**
      * The directory containing generated test classes of the project being tested.
      */
-    @MojoParameter(expression = "${project.build.testOutputDirectory}", required = true)
+    @Parameter(property = "project.build.testOutputDirectory", required = true)
     private File testClassesDirectory;
 
     /**
      * A comma separated list of test groups to run.  If not specified, all
      * test groups are run.
      */
-    @MojoParameter(expression = "${testGroups}")
+    @Parameter(property = "testGroups")
     private String configuredTestGroupsToRun;
 
     /**
      * Whether the reference application will not be started or not
      */
-    @MojoParameter(expression = "${no.webapp}", defaultValue = "false")
+    @Parameter(property = "no.webapp", defaultValue = "false")
     private boolean noWebapp = false;
 
-    @MojoComponent
+    @Component
     private ArtifactHandlerManager artifactHandlerManager;
 
-    @MojoParameter(expression="${maven.test.skip}", defaultValue = "false")
+    @Parameter(property = "maven.test.skip", defaultValue = "false")
     private boolean testsSkip = false;
 
-    @MojoParameter(expression="${skipTests}", defaultValue = "false")
+    @Parameter(property = "skipTests", defaultValue = "false")
     private boolean skipTests = false;
 
     /**
      * Skip the integration tests along with any product startups
      */
-    @MojoParameter(expression="${skipITs}", defaultValue = "false")
+    @Parameter(property = "skipITs", defaultValue = "false")
     private boolean skipITs = false;
 
     protected void doExecute() throws MojoExecutionException

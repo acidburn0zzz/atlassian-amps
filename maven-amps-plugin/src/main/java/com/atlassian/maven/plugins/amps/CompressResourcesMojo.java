@@ -2,8 +2,8 @@ package com.atlassian.maven.plugins.amps;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Compresses JavaScript resources with the YUI compressor Maven plugin.  Creates compressed versions of all
@@ -11,13 +11,13 @@ import org.jfrog.maven.annomojo.annotations.MojoParameter;
  *
  * @since 3.2
  */
-@MojoGoal("compress-resources")
+@Mojo(name = "compress-resources")
 public class CompressResourcesMojo extends AbstractAmpsMojo
 {
     /**
      * Whether to compress the resources or not.  Defaults to true.
      */
-    @MojoParameter(defaultValue = "true")
+    @Parameter(defaultValue = "true")
     private boolean compressResources;
 
     public void execute() throws MojoExecutionException, MojoFailureException

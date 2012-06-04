@@ -1,25 +1,5 @@
 package com.atlassian.maven.plugins.amps;
 
-import com.atlassian.maven.plugins.amps.product.ProductHandler;
-import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
-import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
-import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
-import com.atlassian.maven.plugins.amps.util.ProjectUtils;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.apache.commons.lang.StringUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.model.Resource;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
-import org.jfrog.maven.annomojo.annotations.MojoComponent;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -37,6 +17,28 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import com.atlassian.maven.plugins.amps.product.ProductHandler;
+import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
+import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
+import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
+import com.atlassian.maven.plugins.amps.util.ProjectUtils;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.model.Resource;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 
 import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STUDIO;
 
@@ -83,49 +85,49 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     /**
      * Container to run in
      */
-    @MojoParameter(expression = "${container}", defaultValue = DEFAULT_CONTAINER)
+    @Parameter(property = "container", defaultValue = DEFAULT_CONTAINER)
     protected String containerId;
 
     /**
      * HTTP port for the servlet containers
      */
-    @MojoParameter(expression = "${http.port}", defaultValue = "0")
+    @Parameter(property = "http.port", defaultValue = "0")
     private int httpPort;
 
     /**
      * Application context path
      */
-    @MojoParameter(expression = "${context.path}")
+    @Parameter(property = "context.path")
     protected String contextPath;
 
     /**
      * Application server
      */
-    @MojoParameter(expression = "${server}")
+    @Parameter(property = "server")
     protected String server;
 
     /**
      * Webapp version
      */
-    @MojoParameter(expression = "${product.version}")
+    @Parameter(property = "product.version")
     private String productVersion;
 
     /**
      * JVM arguments to pass to cargo
      */
-    @MojoParameter(expression = "${jvmargs}")
+    @Parameter(property = "jvmargs")
     protected String jvmArgs;
 
     /**
      * Product startup timeout in milliseconds
      */
-    @MojoParameter(expression = "${product.start.timeout}")
+    @Parameter(property = "product.start.timeout")
     private int startupTimeout;
 
     /**
      * Product shutdown timeout in milliseconds
      */
-    @MojoParameter(expression = "${product.stop.timeout}")
+    @Parameter(property = "product.stop.timeout")
     private int shutdownTimeout;
 
     /**
@@ -133,7 +135,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      *
      * @deprecated Since 3.2, use systemPropertyVariables instead
      */
-    @MojoParameter
+    @Parameter
     @Deprecated
     protected Properties systemProperties = new Properties();
 
@@ -142,14 +144,14 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      *
      * @since 3.2
      */
-    @MojoParameter
+    @Parameter
     protected Map<String, Object> systemPropertyVariables = new HashMap<String, Object>();
 
 
     /**
      * A log4j systemProperties file
      */
-    @MojoParameter
+    @Parameter
     protected File log4jProperties;
 
     /**
@@ -157,68 +159,68 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * @deprecated Since 3.0-beta2
      */
     @Deprecated
-    @MojoParameter(expression = "${test.resources.version}")
+    @Parameter(property = "test.resources.version")
     private String testResourcesVersion;
 
     /**
      * The test resources version
      */
-    @MojoParameter(expression = "${product.data.version}", defaultValue = DEFAULT_PRODUCT_DATA_VERSION)
+    @Parameter(property = "product.data.version", defaultValue = DEFAULT_PRODUCT_DATA_VERSION)
     private String productDataVersion;
 
     /**
      * The path to a custom test resources zip
      */
-    @MojoParameter(expression = "${product.data.path}")
+    @Parameter(property = "product.data.path")
     private String productDataPath;
 
     /**
      * If FastDev should be enabled
      */
-    @MojoParameter(expression = "${fastdev.enable}", defaultValue = "true")
+    @Parameter(property = "fastdev.enable", defaultValue = "true")
     protected boolean enableFastdev;
 
     /**
      * The version of FastDev to bundle
      */
-    @MojoParameter(expression = "${fastdev.version}", defaultValue = DEFAULT_FASTDEV_VERSION)
+    @Parameter(property = "fastdev.version", defaultValue = DEFAULT_FASTDEV_VERSION)
     protected String fastdevVersion;
 
     /**
      * If DevToolbox should be enabled
      */
-    @MojoParameter(expression = "${devtoolbox.enable}", defaultValue = "true")
+    @Parameter(property = "devtoolbox.enable", defaultValue = "true")
     protected boolean enableDevToolbox;
 
     /**
      * The version of DevToolbox to bundle
      */
-    @MojoParameter(expression = "${devtoolbox.version}", defaultValue = DEFAULT_DEV_TOOLBOX_VERSION)
+    @Parameter(property = "devtoolbox.version", defaultValue = DEFAULT_DEV_TOOLBOX_VERSION)
     protected String devToolboxVersion;
 
     /**
      * If PDE should be enabled
      */
-    @MojoParameter(expression = "${pde.enable}", defaultValue = "true")
+    @Parameter(property = "pde.enable", defaultValue = "true")
     protected boolean enablePde;
 
     /**
      * The version of the PDE to bundle
      */
-    @MojoParameter(expression = "${pde.version}", defaultValue = DEFAULT_PDE_VERSION)
+    @Parameter(property = "pde.version", defaultValue = DEFAULT_PDE_VERSION)
     protected String pdeVersion;
-    
-    @MojoParameter
+
+    @Parameter
     private List<ProductArtifact> pluginArtifacts = new ArrayList<ProductArtifact>();
 
     /**
      */
-    @MojoParameter
+    @Parameter
     private List<ProductArtifact> libArtifacts = new ArrayList<ProductArtifact>();
 
     /**
      */
-    @MojoParameter
+    @Parameter
     private List<ProductArtifact> bundledArtifacts = new ArrayList<ProductArtifact>();
 
     /**
@@ -226,7 +228,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * @deprecated Since 3.2, use {@link #pluginArtifacts} instead
      */
     @Deprecated
-    @MojoParameter
+    @Parameter
     private String salVersion;
 
     /**
@@ -234,7 +236,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * @deprecated Since 3.2, use {@link #pluginArtifacts} instead
      */
     @Deprecated
-    @MojoParameter(defaultValue = DEFAULT_PDK_VERSION)
+    @Parameter(defaultValue = DEFAULT_PDK_VERSION)
     private String pdkVersion;
 
     /**
@@ -242,7 +244,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * @deprecated Since 3.2, use {@link #pluginArtifacts} instead
      */
     @Deprecated
-    @MojoParameter
+    @Parameter
     private String restVersion;
 
 
@@ -251,7 +253,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * @deprecated Since 3.2, use {@link #pluginArtifacts} instead
      */
     @Deprecated
-    @MojoParameter(defaultValue =  DEFAULT_WEB_CONSOLE_VERSION)
+    @Parameter(defaultValue =  DEFAULT_WEB_CONSOLE_VERSION)
     private String webConsoleVersion;
 
     // ---------------- end product context
@@ -260,39 +262,39 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * Comma-delimited list of plugin artifacts in GROUP_ID:ARTIFACT_ID:VERSION form, where version can be
      * ommitted, defaulting to LATEST
      */
-    @MojoParameter(expression = "${plugins}")
+    @Parameter(property = "plugins")
     private String pluginArtifactsString;
 
     /**
      * Comma-delimited list of lib artifacts in GROUP_ID:ARTIFACT_ID:VERSION form, where version can be
      * ommitted, defaulting to LATEST
      */
-    @MojoParameter(expression = "${lib.plugins}")
+    @Parameter(property = "lib.plugins")
     private String libArtifactsString;
 
     /**
      * Comma-delimited list of bundled plugin artifacts in GROUP_ID:ARTIFACT_ID:VERSION form, where version can be
      * ommitted, defaulting to LATEST
      */
-    @MojoParameter(expression = "${bundled.plugins}")
+    @Parameter(property = "bundled.plugins")
     private String bundledArtifactsString;
 
     /**
      * The build directory
      */
-    @MojoParameter(expression = "${project.build.directory}", required = true)
+    @Parameter(property = "project.build.directory", required = true)
     protected File targetDirectory;
 
     /**
      * The jar name
      */
-    @MojoParameter(expression = "${project.build.finalName}", required = true)
+    @Parameter(property = "project.build.finalName", required = true)
     protected String finalName;
 
     /**
      * If the plugin and optionally its test plugin should be installed
      */
-    @MojoParameter (expression = "${install.plugin}", defaultValue = "true")
+    @Parameter(property = "install.plugin", defaultValue = "true")
     protected boolean installPlugin;
 
     /**
@@ -301,7 +303,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * dependencies in the plugin's POM. Resolving them in a dynamic manner is much better as only
      * the required JARs for the defined embedded container are downloaded.
      */
-    @MojoComponent
+    @Component
     protected ArtifactResolver artifactResolver;
 
     /**
@@ -309,14 +311,14 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * JARs and put them in the local repository so that they won't have to be fetched again next
      * time the plugin is executed.
      */
-    @MojoParameter(expression = "${localRepository}")
+    @Parameter(property = "localRepository")
     protected ArtifactRepository localRepository;
 
 
     /**
      * The remote Maven repositories used by the artifact resolver to look for JARs.
      */
-    @MojoParameter(expression = "${project.remoteArtifactRepositories}")
+    @Parameter(property = "project.remoteArtifactRepositories")
     protected List repositories;
 
     /**
@@ -325,31 +327,31 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * the artifact resolver so that it can download the required JARs to put in the embedded
      * container's classpaths.
      */
-    @MojoComponent
+    @Component
     protected ArtifactFactory artifactFactory;
 
     /**
      * A list of product-specific configurations (as literally provided in the pom.xml)
      */
-    @MojoParameter
+    @Parameter
     protected List<Product> products = new ArrayList<Product>();
-    
+
     /**
      * A map of {instanceId -> Product}, initialized by {@link #createProductContexts()}.
-     * Cannot be set by the user. 
+     * Cannot be set by the user.
      */
     private Map<String, Product> productMap;
 
     /**
      * File the container logging output will be sent to.
      */
-    @MojoParameter
+    @Parameter
     private String output;
 
     /**
      * Start the products in parallel (TestGroups and Studio).
      */
-    @MojoParameter (expression = "${parallel}", defaultValue = "false")
+    @Parameter(property = "parallel", defaultValue = "false")
     protected boolean parallel;
 
 
@@ -536,7 +538,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         {
             product.setPdeVersion(DEFAULT_PDE_VERSION);
         }
-        
+
         if (product.getOutput() == null)
         {
             product.setOutput(output);
@@ -599,7 +601,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         systemPropertyVariables.putAll((Map) systemProperties);
 
         detectDeprecatedVersionOverrides();
-        
+
         doExecute();
     }
 
@@ -651,7 +653,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         // Submit the Studio products for configuration
         StudioProductHandler studioProductHandler = (StudioProductHandler) ProductHandlerFactory.create(ProductHandlerFactory.STUDIO, mavenContext, goals);
         studioProductHandler.configureStudioProducts(productMap);
-        
+
         return productMap;
     }
 
@@ -925,7 +927,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         return productExecutionsIncludingStudio;
     }
-    
+
     protected ProductExecution toProductExecution(Product product)
     {
         return new ProductExecution(product, createProductHandler(product.getId()));

@@ -1,35 +1,36 @@
 package com.atlassian.maven.plugins.amps;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.jfrog.maven.annomojo.annotations.MojoExecute;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
-import org.jfrog.maven.annomojo.annotations.MojoRequiresDependencyResolution;
+import java.util.List;
+
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
 
-import java.util.List;
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
  * Debug the webapp
  */
-@MojoGoal ("debug")
-@MojoExecute (phase = "package")
-@MojoRequiresDependencyResolution
+@Mojo(name = "debug", requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Execute(phase = LifecyclePhase.PACKAGE)
 public class DebugMojo extends RunMojo
 {
     /**
      * port for debugging
      */
-    @MojoParameter (expression = "${jvm.debug.port}", defaultValue = "5005")
+    @Parameter(property = "jvm.debug.port", defaultValue = "5005")
     protected int jvmDebugPort;
 
     /**
      * Suspend when debugging
      */
-    @MojoParameter (expression = "${jvm.debug.suspend}")
+    @Parameter(property = "jvm.debug.suspend")
     protected boolean jvmDebugSuspend = false;
 
 

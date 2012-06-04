@@ -14,7 +14,7 @@ import com.atlassian.webdriver.AtlassianWebDriverModule;
 import com.atlassian.webdriver.pageobjects.DefaultWebDriverTester;
 import com.atlassian.webdriver.pageobjects.WebDriverTester;
 
-@Defaults (instanceId = "studio1", contextPath = "/jira", httpPort = 2990)
+@Defaults(instanceId = "studio1", contextPath = "/jira", httpPort = 2990)
 public class StudioTestedProduct implements TestedProduct<WebDriverTester>
 {
 

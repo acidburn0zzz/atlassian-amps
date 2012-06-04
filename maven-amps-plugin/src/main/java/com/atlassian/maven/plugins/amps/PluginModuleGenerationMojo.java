@@ -27,26 +27,25 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.jfrog.maven.annomojo.annotations.MojoComponent;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoRequiresDependencyResolution;
 
 /**
  * @since 3.6
  */
-@MojoRequiresDependencyResolution("compile")
-@MojoGoal("create-plugin-module")
+@Mojo(name = "create-plugin-module", requiresDependencyResolution = ResolutionScope.COMPILE)
 public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
 {
 
-    @MojoComponent
+    @Component
     private PluginModuleSelectionQueryer pluginModuleSelectionQueryer;
 
-    @MojoComponent
+    @Component
     private PluginModulePrompterFactory pluginModulePrompterFactory;
 
-    @MojoComponent
+    @Component
     private PluginModuleCreatorFactory pluginModuleCreatorFactory;
 
     @Override
@@ -114,18 +113,18 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
 
             modulePrompter.setDefaultBasePackage(project.getGroupId());
             modulePrompter.setPluginKey(project.getGroupId() + "." + project.getArtifactId());
-            
+
             PluginModuleProperties moduleProps = modulePrompter.getModulePropertiesFromInput(moduleLocation);
             moduleProps.setProductId(getGadgetCompatibleProductId(productId));
 
             PluginProjectChangeset changeset = creator.createModule(moduleProps);
-            
+
             getLog().info("Adding the following items to the project:");
             for (String desc : changeset.getChangeDescriptionsOrSummaries())
             {
                 getLog().info("  " + desc);
             }
-            
+
             // edit pom if needed
             try
             {
@@ -135,11 +134,11 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
             {
                 getLog().error("Unable to apply changes to POM: " + e);
             }
-            
+
             // apply changes to project files
             new ProjectFilesRewriter(moduleLocation).applyChanges(changeset);
             new PluginXmlRewriter(moduleLocation).applyChanges(changeset);
-            
+
             if (pluginModuleSelectionQueryer.addAnotherModule())
             {
                 runGeneration(productId, project, moduleLocation);

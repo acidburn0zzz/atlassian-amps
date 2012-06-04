@@ -4,13 +4,13 @@ import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
-@MojoGoal("release")
+@Mojo(name = "release")
 public class ReleaseMojo extends AbstractProductHandlerMojo
 {
-    @MojoParameter(expression = "${maven.args}", defaultValue = "")
+    @Parameter(property = "maven.args", defaultValue = "")
     private String mavenArgs;
 
     @Override

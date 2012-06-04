@@ -4,14 +4,12 @@ import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoRequiresProject;
+import org.apache.maven.plugins.annotations.Mojo;
 
 /**
  * Creates a new plugin
  */
-@MojoGoal("create")
-@MojoRequiresProject(false)
+@Mojo(name = "create", requiresProject = false)
 public class CreateMojo extends AbstractProductAwareMojo
 {
     public void execute() throws MojoExecutionException, MojoFailureException

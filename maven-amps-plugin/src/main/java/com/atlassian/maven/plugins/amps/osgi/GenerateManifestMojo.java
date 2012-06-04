@@ -13,36 +13,36 @@ import com.google.common.collect.ImmutableMap;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
 
 import aQute.lib.osgi.Constants;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 
-@MojoGoal("generate-manifest")
+@Mojo(name = "generate-manifest")
 public class GenerateManifestMojo extends AbstractAmpsMojo
 {
     private static final String BUILD_DATE_ATTRIBUTE = "Atlassian-Build-Date";
-    
+
     private static final DateFormat BUILD_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-    
+
     /**
      * The BND instructions for the bundle.
      */
-    @MojoParameter
+    @Parameter
     private Map<String, String> instructions = new HashMap<String, String>();
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         final MavenProject project = getMavenContext().getProject();
-        
+
         // The Atlassian-Build-Date manifest attribute is used by the Atlassian licensing framework to determine
         // chronological order of bundle versions.
         final String buildDateStr = String.valueOf(BUILD_DATE_FORMAT.format(new Date()));
         final Map<String, String> basicAttributes = ImmutableMap.of(BUILD_DATE_ATTRIBUTE, buildDateStr);
-        
+
         if (!instructions.isEmpty())
         {
             getLog().info("Generating a manifest for this plugin");

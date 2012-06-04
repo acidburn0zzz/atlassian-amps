@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.atlassian.maven.plugins.amps.AbstractAmpsMojo;
@@ -18,14 +18,15 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Build;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.ManifestException;
-import org.jfrog.maven.annomojo.annotations.MojoComponent;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
 
 /**
  * Generates the obr artifact, containing the plugin, its dependencies, and the obr XML file.  The OBR file looks like
@@ -40,53 +41,53 @@ import org.jfrog.maven.annomojo.annotations.MojoParameter;
  * All plugins in the root directory will be installed, while the ones in the "dependencies" directory will be installed
  * only if they are needed.
  */
-@MojoGoal ("generate-obr-artifact")
+@Mojo(name = "generate-obr-artifact")
 public class GenerateObrArtifactMojo extends AbstractAmpsMojo
 {
-    @MojoParameter
+    @Parameter
     private List<PluginDependency> pluginDependencies = new ArrayList<PluginDependency>();
 
     /**
      * The Jar archiver.
      */
-    @MojoComponent (role = "org.codehaus.plexus.archiver.Archiver", roleHint = "jar")
+    @Component(role = Archiver.class, hint = "jar")
     private JarArchiver jarArchiver;
 
     /**
      * The archive configuration to use. See <a href="http://maven.apache.org/shared/maven-archiver/index.html">Maven
      * Archiver Reference</a>.
      */
-    @MojoParameter
+    @Parameter
     private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
     /**
      * Specifies whether or not to attach the artifact to the project
      */
-    @MojoParameter (expression = "${attach}", defaultValue = "true")
+    @Parameter(property = "attach", defaultValue = "true")
     private boolean attach;
 
-    @MojoComponent
+    @Component
     private MavenProjectHelper projectHelper;
 
     /**
      * The directory where the generated archive file will be put.
      */
-    @MojoParameter (defaultValue = "${project.build.directory}")
+    @Parameter(property = "project.build.directory")
     protected File outputDirectory;
 
     /**
      * The filename to be used for the generated archive file.  The "-obr" suffix will be appended.
      */
-    @MojoParameter (defaultValue = "${project.build.finalName}")
+    @Parameter(property = "project.build.finalName")
     protected String finalName;
 
     /**
      * Contains the full list of projects in the reactor.
      */
-    @MojoParameter (expression = "${reactorProjects}", readonly = true)
+    @Parameter(property = "reactorProjects", readonly = true)
     protected List<MavenProject> reactorProjects;
 
-    @MojoParameter
+    @Parameter
     private Map instructions = new HashMap();
 
     public void execute() throws MojoExecutionException, MojoFailureException

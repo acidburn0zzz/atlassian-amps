@@ -1,13 +1,11 @@
 package com.atlassian.maven.plugins.amps;
 
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoRequiresProject;
+import org.apache.maven.plugins.annotations.Mojo;
 
 /**
  * Debug the webapp without a plugin project
  */
-@MojoGoal ("debug-standalone")
-@MojoRequiresProject (false)
+@Mojo(name = "debug-standalone", requiresProject = false)
 public class DebugStandaloneMojo extends RunStandaloneMojo
 {
     @Override
