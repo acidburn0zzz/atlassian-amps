@@ -1,12 +1,16 @@
 <atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
 
     <plugin-info>
-        <description>Test IT Plugin</description>
+        <description>Test IT Plugin with libartifacts</description>
         <version>1</version>
     </plugin-info>
 
     <servlet name="ItServlet" class="com.atlassian.amps.test.it.ItServlet" key="it">
         <url-pattern>/it</url-pattern>
+    </servlet>
+    
+     <servlet name="ServletWithADependency" class="com.atlassian.amps.test.it.ServletWithADependency" key="dep">
+        <url-pattern>/dep</url-pattern>
     </servlet>
 
 </atlassian-plugin>

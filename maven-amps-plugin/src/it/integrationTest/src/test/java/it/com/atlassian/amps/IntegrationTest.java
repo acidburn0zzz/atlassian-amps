@@ -19,6 +19,12 @@ public class IntegrationTest
     {
         assertPresent("/plugins/servlet/it-tests");
     }
+    
+    @Test
+    public void libArtifactsAreDeployed() throws Exception
+    {
+    	assertPresent("/plugins/servlet/dep");
+    }
 
     private void assertPresent(String resourceUrl) throws Exception
     {

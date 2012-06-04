@@ -1,2 +1,0 @@
-${shitty.product}:integration-test -Dallow.google.tracking=false
- -Dmaven.clean.failOnError=false
