@@ -6,6 +6,8 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.common.collect.Lists;
 
+import static com.google.common.base.Objects.firstNonNull;
+
 /**
  * Definition of a datasource.
  * For more information about the properties, see http://cargo.codehaus.org/DataSource+and+Resource+Support
@@ -96,11 +98,11 @@ public class DataSource
             return cargoString;
         
         List<String> cargoProperties = Lists.newArrayList();
-        cargoProperties.add("cargo.datasource.url=" + url);
-        cargoProperties.add("cargo.datasource.driver=" + driver);
-        cargoProperties.add("cargo.datasource.username=" + username);
-        cargoProperties.add("cargo.datasource.password=" + password);
-        cargoProperties.add("cargo.datasource.jndi=" + jndi);
+        cargoProperties.add("cargo.datasource.url=" + firstNonNull(url, ""));
+        cargoProperties.add("cargo.datasource.driver=" + firstNonNull(driver, ""));
+        cargoProperties.add("cargo.datasource.username=" + firstNonNull(username, ""));
+        cargoProperties.add("cargo.datasource.password=" + firstNonNull(password, ""));
+        cargoProperties.add("cargo.datasource.jndi=" + firstNonNull(jndi, ""));
         if (!StringUtils.isBlank(type))
             cargoProperties.add("cargo.datasource.type=" + type);
         if (!StringUtils.isBlank(transactionSupport))
