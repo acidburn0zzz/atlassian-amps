@@ -76,6 +76,8 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
     {
         getGoogleTracker().track(GoogleAmpsTracker.RUN);
 
+        getUpdateChecker().check();
+
         final List<ProductExecution> productExecutions = getProductExecutions();
 
         startProducts(productExecutions);

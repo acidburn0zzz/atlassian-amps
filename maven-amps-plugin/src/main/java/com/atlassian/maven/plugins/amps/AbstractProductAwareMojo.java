@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
 
+import com.atlassian.maven.plugins.amps.util.UpdateChecker;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
 
@@ -39,6 +40,7 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
 
     private GoogleAmpsTracker googleTracker;
 
+    private UpdateChecker updateChecker;
 
     protected String getDefaultProductId() throws MojoExecutionException
     {
@@ -84,5 +86,15 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
 
     protected boolean googleTrackingAllowed() {
         return allowGoogleTracking;
+    }
+
+    protected UpdateChecker getUpdateChecker() throws MojoExecutionException
+    {
+        if (updateChecker == null)
+        {
+            updateChecker = new UpdateChecker(getPluginInformation().getVersion(), getLog());
+        }
+
+        return updateChecker;
     }
 }

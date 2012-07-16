@@ -16,6 +16,8 @@ public class CreateMojo extends AbstractProductAwareMojo
     {
         getGoogleTracker().track(GoogleAmpsTracker.CREATE_PLUGIN);
 
+        getUpdateChecker().check();
+
         getMavenGoals().createPlugin(getProductId());
     }
 
