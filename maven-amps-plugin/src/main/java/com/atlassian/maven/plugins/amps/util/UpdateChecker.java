@@ -1,10 +1,10 @@
 package com.atlassian.maven.plugins.amps.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -35,16 +35,18 @@ public class UpdateChecker {
         this.logger = logger;
     }
 
-    public String check() {
-        if (shouldCheck()) {
-            logger.debug("Starting check for new SDK version. Current version: " + currentVersion);
+    public void check() {
+        if (true) {//shouldCheck()) {
             String latestVersion = getLatestVersion(currentVersion);
-            logger.debug("Found latest SDK version: " + latestVersion);
-            return latestVersion;
-        } else {
-            return currentVersion;
+            if (canUpdate(currentVersion, latestVersion)) {
+                logger.warn("Version " + latestVersion + " of the Atlassian Plugin SDK is now available.");
+                logger.warn("Run the atlas-update command to install it.");
+            }
         }
+    }
 
+    private boolean canUpdate(String currentVersion, String latestVersion) {
+        return versionFromString(latestVersion) > versionFromString(currentVersion);
     }
 
     private boolean shouldCheck() {
@@ -92,8 +94,9 @@ public class UpdateChecker {
             // sigh.
         }
 
-        Document doc = null;
+        Document doc;
         try {
+            logger.debug("Starting check for new SDK version. Current version: " + currentVersion);
             doc = Jsoup.parse(url, TIMEOUT);
         } catch (IOException e) {
             // timeout or network error
@@ -105,10 +108,26 @@ public class UpdateChecker {
         Pattern versionPattern = Pattern.compile(".*atlassian-plugin-sdk/(.*?)/atlassian.*");
         Matcher m = versionPattern.matcher(link);
         if (m.find()) {
-            logger.debug("Scraped latest version: " + m.group(1));
+            logger.debug("Found latest SDK version: " + m.group(1));
             return m.group(1);
         } else {
+            logger.debug("No updated version found, returning current");
             return currentVersion;
         }
+    }
+
+    private double versionFromString(String version) {
+        String[] parts = version.split("\\.");
+        long build = 0;
+        for (int i = 0; i < parts.length; i++) {
+            int part;
+            try {
+                part = Integer.parseInt(parts[i]);
+            } catch (NumberFormatException nfe) {
+                continue;
+            }
+            build += part * Math.pow(10, 10 - i);
+        }
+        return build;
     }
 }
