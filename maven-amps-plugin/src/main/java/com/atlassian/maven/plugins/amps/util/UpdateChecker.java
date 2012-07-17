@@ -116,7 +116,7 @@ public class UpdateChecker {
         }
     }
 
-    private double versionFromString(String version) {
+    private long versionFromString(String version) {
         String[] parts = version.split("\\.");
         long build = 0;
         for (int i = 0; i < parts.length; i++) {
@@ -126,7 +126,7 @@ public class UpdateChecker {
             } catch (NumberFormatException nfe) {
                 continue;
             }
-            build += part * Math.pow(10, 10 - i);
+            build += part * Math.pow(10, 10 - (i * 3));
         }
         return build;
     }
