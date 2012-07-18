@@ -1,0 +1,5 @@
+#set( $mvnCommand = "com.atlassian.maven.plugins:maven-amps-plugin:$version:update" )
+
+#set( $goalhelp = "Updates your SDK to the latest released version from developer.atlassian.com (runs mvn $mvnCommand)." )
+
+#set( $opts = [] )
