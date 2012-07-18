@@ -2,6 +2,7 @@ package com.atlassian.maven.plugins.amps;
 
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 import com.atlassian.maven.plugins.amps.util.ZipUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -48,6 +49,12 @@ public class UpdateMojo extends AbstractAmpsMojo {
     protected List repositories;
 
     /**
+     * The version to update the SDK to (defaults to latest)
+     */
+    @Parameter(property = "update.version")
+    protected String updateVersion;
+
+    /**
      * The artifact factory is used to create valid Maven
      * {@link org.apache.maven.artifact.Artifact} objects. These objects are passed to the
      * Resolver.
@@ -61,7 +68,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
         checkUpdatePreconditions();
 
         String currentVersion = getPluginInformation().getVersion();
-        String latestVersion = VersionUtils.getLatestVersion(currentVersion);
+        String latestVersion = !StringUtils.isBlank(updateVersion) ? updateVersion : VersionUtils.getLatestVersion(currentVersion);
         if (VersionUtils.versionFromString(latestVersion) >
             VersionUtils.versionFromString(currentVersion)) {
             File sdkZip = downloadLatestSdk(latestVersion);

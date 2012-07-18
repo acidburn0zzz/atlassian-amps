@@ -2,4 +2,16 @@
 
 #set( $goalhelp = "Updates your SDK to the latest released version from developer.atlassian.com (runs mvn $mvnCommand)." )
 
-#set( $opts = [] )
+#set( $opts = [{
+    'name' : 'update-version',
+    'short' : 'v',
+    'maven' : 'update.version',
+    'description' : 'Update with this version of the SDK (default is the latest).',
+    'example' : '3.10'
+},{
+    'name' : 'force-update-check',
+    'short' : '-f',
+    'maven' : 'force.update.check',
+    'description' : 'Force the update check to happen regardless of the last time it happened.',
+    'example' : 'true'
+}] )

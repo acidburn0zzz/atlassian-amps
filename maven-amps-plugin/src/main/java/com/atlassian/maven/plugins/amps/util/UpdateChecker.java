@@ -17,14 +17,16 @@ public class UpdateChecker {
 
     private final String currentVersion;
     private final Log logger;
+    private final boolean forceCheck;
 
-    public UpdateChecker(String currentVersion, Log logger) {
+    public UpdateChecker(String currentVersion, Log logger, boolean forceCheck) {
         this.currentVersion = currentVersion;
         this.logger = logger;
+        this.forceCheck = forceCheck;
     }
 
     public void check() {
-        if (true) {//shouldCheck()) {
+        if (shouldCheck()) {
             String latestVersion = VersionUtils.getLatestVersion(currentVersion);
             if (canUpdate(currentVersion, latestVersion)) {
                 logger.warn("Version " + latestVersion + " of the Atlassian Plugin SDK is now available.");
@@ -39,6 +41,11 @@ public class UpdateChecker {
     }
 
     private boolean shouldCheck() {
+        if (forceCheck) {
+            logger.info("SDK update check forced by Maven property.");
+            return true;
+        }
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar now = Calendar.getInstance();
 

@@ -2,9 +2,11 @@ package com.atlassian.maven.plugins.amps;
 
 import java.util.List;
 
+import com.atlassian.maven.plugins.amps.util.UpdateChecker;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -59,6 +61,14 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
      */
     private MavenGoals mavenGoals;
 
+    /**
+     * Flag to force a check for a new SDK regardless of the last time such a check was made.
+     */
+    @Parameter(property = "force.update.check", defaultValue = "false")
+    protected boolean forceUpdateCheck;
+
+    private UpdateChecker updateChecker;
+
     protected MavenContext getMavenContext()
     {
         if (mavenContext == null)
@@ -96,5 +106,15 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
         }
         final String productId = pluginArtifactId.replaceAll("maven-(.*)-plugin", "$1");
         return new PluginInformation(productId, pluginVersion);
+    }
+
+    protected UpdateChecker getUpdateChecker() throws MojoExecutionException
+    {
+        if (updateChecker == null)
+        {
+            updateChecker = new UpdateChecker(getPluginInformation().getVersion(), getLog(), forceUpdateCheck);
+        }
+
+        return updateChecker;
     }
 }
