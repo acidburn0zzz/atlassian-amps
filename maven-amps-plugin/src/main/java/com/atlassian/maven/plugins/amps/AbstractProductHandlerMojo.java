@@ -595,6 +595,8 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     @Override
     public final void execute() throws MojoExecutionException, MojoFailureException
     {
+        getUpdateChecker().check();
+
         stringToArtifactList(pluginArtifactsString, pluginArtifacts);
         stringToArtifactList(libArtifactsString, libArtifacts);
         stringToArtifactList(bundledArtifactsString, bundledArtifacts);

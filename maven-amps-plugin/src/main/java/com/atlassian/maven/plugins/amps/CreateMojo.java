@@ -14,9 +14,9 @@ public class CreateMojo extends AbstractProductAwareMojo
 {
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        getGoogleTracker().track(GoogleAmpsTracker.CREATE_PLUGIN);
-
         getUpdateChecker().check();
+
+        getGoogleTracker().track(GoogleAmpsTracker.CREATE_PLUGIN);
 
         getMavenGoals().createPlugin(getProductId());
     }

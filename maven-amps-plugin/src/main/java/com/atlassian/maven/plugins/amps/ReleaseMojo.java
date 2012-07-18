@@ -18,7 +18,6 @@ public class ReleaseMojo extends AbstractProductHandlerMojo
     {
         String trackingLabel = getPluginInformation().getId() + ":" + getPluginInformation().getVersion();
         getGoogleTracker().track(GoogleAmpsTracker.RELEASE,trackingLabel);
-        getUpdateChecker().check();
 
         getMavenGoals().release(mavenArgs);
     }

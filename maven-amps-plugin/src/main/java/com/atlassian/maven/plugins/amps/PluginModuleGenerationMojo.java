@@ -91,7 +91,6 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
 
         runGeneration(productId, project, moduleLocation);
 
-
     }
 
     private void runGeneration(String productId, MavenProject project, PluginModuleLocation moduleLocation) throws MojoExecutionException
