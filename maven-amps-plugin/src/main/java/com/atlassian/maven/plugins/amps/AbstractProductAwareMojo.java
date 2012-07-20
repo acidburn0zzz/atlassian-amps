@@ -39,7 +39,6 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
 
     private GoogleAmpsTracker googleTracker;
 
-
     protected String getDefaultProductId() throws MojoExecutionException
     {
         // If maven-[product]-plugin didn't override this method, we fetch the
@@ -85,4 +84,5 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
     protected boolean googleTrackingAllowed() {
         return allowGoogleTracking;
     }
+
 }
