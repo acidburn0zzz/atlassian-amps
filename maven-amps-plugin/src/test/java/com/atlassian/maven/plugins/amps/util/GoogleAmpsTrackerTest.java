@@ -30,7 +30,7 @@ public class GoogleAmpsTrackerTest
         prefs.flush();
         
         Log logger = mock(Log.class);
-        GoogleAmpsTracker tracker = new GoogleAmpsTracker("googleTrackingTester",logger);
+        GoogleAmpsTracker tracker = new GoogleAmpsTracker("googleTrackingTester","any",logger);
         tracker.track("testInitialTrack");
 
         prefs.flush();
@@ -47,7 +47,7 @@ public class GoogleAmpsTrackerTest
         prefs.flush();
 
         Log logger = mock(Log.class);
-        GoogleAmpsTracker firstTracker = new GoogleAmpsTracker("googleTrackingTester",logger);
+        GoogleAmpsTracker firstTracker = new GoogleAmpsTracker("googleTrackingTester","any",logger);
         firstTracker.track("testFirstTrack");
 
         prefs.flush();
@@ -64,7 +64,7 @@ public class GoogleAmpsTrackerTest
         //need to wait a second to make sure timestamps are updated
         Thread.sleep(1000);
         
-        GoogleAmpsTracker secondTracker = new GoogleAmpsTracker("googleTrackingTester",logger);
+        GoogleAmpsTracker secondTracker = new GoogleAmpsTracker("googleTrackingTester","any",logger);
         secondTracker.track("testSecondTrack");
         prefs.flush();
 

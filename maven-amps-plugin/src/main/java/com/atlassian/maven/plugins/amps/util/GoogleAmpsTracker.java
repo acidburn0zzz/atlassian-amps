@@ -31,17 +31,17 @@ public class GoogleAmpsTracker
     private final JGoogleAnalyticsTracker tracker;
     private final Log mavenLogger;
     private String productId;
+    private String ampsVersion;
 
-    public GoogleAmpsTracker(String productId, Log mavenLogger)
+    public GoogleAmpsTracker(String productId, String ampsVersion, Log mavenLogger)
     {
-        this(mavenLogger);
         this.productId = productId;
-    }
-
-    public GoogleAmpsTracker(Log mavenLogger)
-    {
+        this.ampsVersion = ampsVersion;
         this.mavenLogger = mavenLogger;
+        
         this.config = new AnalyticsConfigData(TRACKING_CODE, loadVisitorData());
+        config.setFlashVersion(ampsVersion);
+        
         this.tracker = new JGoogleAnalyticsTracker(config, JGoogleAnalyticsTracker.GoogleAnalyticsVersion.V_4_7_2);
 
         tracker.setDispatchMode(JGoogleAnalyticsTracker.DispatchMode.MULTI_THREAD);
