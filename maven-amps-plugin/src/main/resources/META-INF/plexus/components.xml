@@ -97,5 +97,12 @@
                 </requirement>
             </requirements>
         </component>
+
+        <component>
+            <role>com.atlassian.maven.plugins.updater.SdkResource</role>
+            <role-hint>component for getting SDK versions from MPAC</role-hint>
+            <implementation>com.atlassian.maven.plugins.updater.MarketplaceSdkResource</implementation>
+        </component>
+
     </components>
 </component-set>

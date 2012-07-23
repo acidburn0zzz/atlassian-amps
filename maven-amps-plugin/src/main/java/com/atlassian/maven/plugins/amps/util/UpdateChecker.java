@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps.util;
 
+import com.atlassian.maven.plugins.updater.SdkResource;
 import org.apache.maven.plugin.logging.Log;
 
 import java.text.ParseException;
@@ -17,17 +18,19 @@ public class UpdateChecker {
 
     private final String currentVersion;
     private final Log logger;
+    private final SdkResource sdkResource;
     private final boolean forceCheck;
 
-    public UpdateChecker(String currentVersion, Log logger, boolean forceCheck) {
+    public UpdateChecker(String currentVersion, Log logger, SdkResource sdkResource, boolean forceCheck) {
         this.currentVersion = currentVersion;
         this.logger = logger;
+        this.sdkResource = sdkResource;
         this.forceCheck = forceCheck;
     }
 
     public void check() {
         if (shouldCheck()) {
-            String latestVersion = VersionUtils.getLatestVersion(currentVersion);
+            String latestVersion = sdkResource.getLatestSdkVersion();
             if (canUpdate(currentVersion, latestVersion)) {
                 logger.warn("Version " + latestVersion + " of the Atlassian Plugin SDK is now available.");
                 logger.warn("Run the atlas-update command to install it.");
