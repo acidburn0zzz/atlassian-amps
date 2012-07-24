@@ -57,7 +57,6 @@ public class ZipUtils
 
                 File entryFile = new File(destDir + File.separator +
                         trimPathSegments(entry.getName(), leadingPathSegmentsToTrim));
-                System.out.println("writing tar entry " + entry.getName() + " to " + entryFile.getAbsolutePath());
 
                 if (entry.isDirectory())
                 {
