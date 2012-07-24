@@ -71,7 +71,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
     }
 
     private void installSdk(File sdkZip) throws MojoExecutionException {
-        String sdkHome = System.getenv("ATLAS_HOME");
+        String sdkHome = getSdkHome();
         try {
             if (OSUtils.OS == OSUtils.OS.WINDOWS) {
                 ZipUtils.unzip(sdkZip, sdkHome, 1); // skip first directory path of artifact name/version
@@ -84,7 +84,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
     }
 
     private void checkUpdatePreconditions() throws MojoExecutionException {
-        String sdkHome = System.getenv("ATLAS_HOME");
+        String sdkHome = getSdkHome();
         if (sdkHome == null) {
             throw new MojoExecutionException("SDK update must be run from the atlas-update script.");
         }
@@ -93,5 +93,10 @@ public class UpdateMojo extends AbstractAmpsMojo {
             throw new MojoExecutionException("To update successfully, SDK home directory " + sdkHome +
                 " must be writable by the current user.");
         }
+        getLog().debug("Detected current SDK install from ATLAS_HOME in " + sdkHomeDir.getAbsolutePath());
+    }
+
+    private String getSdkHome() {
+        return System.getenv("ATLAS_HOME");
     }
 }
