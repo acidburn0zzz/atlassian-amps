@@ -1,3 +1,4 @@
+#!/bin/sh
 # Determine the location of the script #
 
 # resolve symbolic links
