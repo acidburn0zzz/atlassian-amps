@@ -1,5 +1,0 @@
-#set( $mvnCommand = "mvnDebug" )
-
-#set( $goalhelp = "Execute arbitrary Maven commands (in debug mode) using the version of Maven bundled with the Atlassian Plugin SDK." )
-
-#set( $opts = [] )
