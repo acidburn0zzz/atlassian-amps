@@ -119,10 +119,16 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     {
         if (updateChecker == null)
         {
-            updateChecker = new UpdateChecker(getPluginInformation().getVersion(), getLog(),
+            updateChecker = new UpdateChecker(getSdkVersion(), getLog(),
                     sdkResource, forceUpdateCheck);
         }
 
         return updateChecker;
+    }
+
+    private String getSdkVersion()
+    {
+        String sdkVersion = System.getenv("ATLAS_VERSION");
+        return sdkVersion != null ? sdkVersion : getPluginInformation().getVersion();
     }
 }

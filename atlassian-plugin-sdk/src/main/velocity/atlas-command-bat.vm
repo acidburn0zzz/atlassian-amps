@@ -68,6 +68,7 @@ rem ---------------------------------------------------------------
 
 set M2_HOME=%ATLAS_HOME%\apache-maven
 set MAVEN_EXECUTABLE="%M2_HOME%\bin\mvn.bat"
+set ATLAS_VERSION="${version}"
 
 #if( $echoPaths )
 echo.
