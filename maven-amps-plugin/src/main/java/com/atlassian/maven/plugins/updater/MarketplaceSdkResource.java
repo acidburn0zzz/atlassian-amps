@@ -1,12 +1,14 @@
 package com.atlassian.maven.plugins.updater;
 
 import com.atlassian.maven.plugins.amps.util.OSUtils;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
+
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -20,15 +22,10 @@ public class MarketplaceSdkResource implements SdkResource {
     private static final int CONNECT_TIMEOUT = 15 * 1000;
     private static final int READ_TIMEOUT = 15 * 1000;
 
-    private final HttpClient httpClient;
     private final ObjectMapper mapper;
 
     public MarketplaceSdkResource() {
-        httpClient = new HttpClient();
         mapper = new ObjectMapper();
-
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(CONNECT_TIMEOUT);
-        httpClient.getHttpConnectionManager().getParams().setSoTimeout(READ_TIMEOUT);
     }
 
     @Override
@@ -56,6 +53,7 @@ public class MarketplaceSdkResource implements SdkResource {
         }
 
         File sdkDownloadTempFile;
+        HttpURLConnection conn = null;
         try {
             String tempFileSuffix;
             if (OSUtils.OS == OSUtils.OS.WINDOWS) {
@@ -66,13 +64,21 @@ public class MarketplaceSdkResource implements SdkResource {
             sdkDownloadTempFile = File.createTempFile("atlassian-plugin-sdk-" + version, tempFileSuffix);
             sdkDownloadTempFile.deleteOnExit();
 
-            GetMethod method = new GetMethod(versionDownloadPath);
-            httpClient.executeMethod(method);
-            InputStream responseStream = method.getResponseBodyAsStream();
-            copyResponseStreamToFile(responseStream, sdkDownloadTempFile);
+            URL url;
+            try {
+                url = new URL(versionDownloadPath);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+            conn = (HttpURLConnection) url.openConnection();
+            copyResponseStreamToFile(conn.getInputStream(), sdkDownloadTempFile);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
         return sdkDownloadTempFile;
     }
@@ -103,13 +109,26 @@ public class MarketplaceSdkResource implements SdkResource {
     }
 
     private Map<?, ?> getPluginJsonAsMap() {
-        GetMethod method = new GetMethod(SDK_DOWNLOAD_URL_ROOT + OSUtils.OS.getId());
-        String json;
+        URL url;
         try {
-            httpClient.executeMethod(method);
-            json = method.getResponseBodyAsString();
+            url = new URL(SDK_DOWNLOAD_URL_ROOT + OSUtils.OS.getId());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        String json;
+        HttpURLConnection conn = null;
+        InputStream jsonStream = null;
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+            jsonStream = new BufferedInputStream(conn.getInputStream());
+            json = IOUtils.toString(jsonStream);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            IOUtils.closeQuietly(jsonStream);
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
 
         Map<?, ?> rootAsMap;
