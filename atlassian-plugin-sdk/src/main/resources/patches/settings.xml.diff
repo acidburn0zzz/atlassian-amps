@@ -20,7 +20,7 @@
 >            <url>https://m2proxy.atlassian.com/repository/public</url>
 >            <snapshots>
 >              <enabled>true</enabled>
->              <updatePolicy>daily</updatePolicy>
+>              <updatePolicy>never</updatePolicy>
 >              <checksumPolicy>warn</checksumPolicy>
 >            </snapshots>
 >            <releases>

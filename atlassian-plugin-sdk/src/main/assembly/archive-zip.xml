@@ -1,7 +1,7 @@
 <assembly>
+    <id>bin</id>
     <formats>
         <format>zip</format>
-        <format>tar.gz</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
 
@@ -48,20 +48,6 @@
             <includes>
                 <include>**/*</include>
             </includes>
-        </fileSet>
-
-        <!-- SH files are chmod +x to be executable on unix environments -->
-        <fileSet>
-            <directory>target/bin</directory>
-            <outputDirectory>bin</outputDirectory>
-            <includes>
-                <include>**/*</include>
-            </includes>
-            <excludes>
-                <exclude>**/*.bat</exclude>
-            </excludes>
-            <fileMode>0744</fileMode>
-            <filtered>true</filtered>
         </fileSet>
 
         <!-- BAT files are not chmod +x to prevent autocomplete expansion on shell -->

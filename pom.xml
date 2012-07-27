@@ -125,6 +125,10 @@
                     <version>2.0.1</version>
                 </plugin>
                 <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.2</version>
+                </plugin>
+                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>shitty-maven-plugin</artifactId>
                     <version>1.0-alpha-3-atlassian-7</version>
@@ -291,6 +295,9 @@
             <plugin>
                <artifactId>maven-release-plugin</artifactId>
                <version>2.2.2</version>
+                <configuration>
+                    <releaseProfiles>release,installers</releaseProfiles>
+                </configuration>
             </plugin>
         </plugins>
     </build>
