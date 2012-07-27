@@ -1,0 +1,10 @@
+Essential: no
+Architecture: all
+Description: Development kit to build Atlassian plugins
+Provides: atlassian-plugin-sdk
+Package: atlassian-plugin-sdk
+Section: misc
+Maintainer: Atlassian
+Priority: optional
+Version: ${version}
+Installed-Size: SIZE
