@@ -75,54 +75,13 @@
                             
                         </executions>
                     </plugin>
-                    
-                    <!-- INSTALL BUILDER -->
+
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.1</version>
                         <executions>
-                            <execution>
-                                <id>installbuilder-linux</id>
-                                <phase>compile</phase>
-                                <configuration>
-                                    <executable>${installbuilder.home}/bin/builder</executable>
-                                    <outputFile>${project.build.directory}/ib-out.txt</outputFile>
-                                    <arguments>
-                                        <argument>build</argument>
-                                        <argument>amps-installbuilder.xml</argument>
-                                        <argument>linux</argument>
-                                        <argument>--setvars</argument>
-                                        <argument>project.version=${version}</argument>
-                                        <argument>project.outputDirectory=${project.build.directory}</argument>
-                                        <argument>sdkUnzipDir=${project.build.directory}/unzip/atlassian-plugin-sdk-${project.version}/*</argument>
-                                    </arguments>
-                                </configuration>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>installbuilder-linux64</id>
-                                <phase>compile</phase>
-                                <configuration>
-                                    <executable>${installbuilder.home}/bin/builder</executable>
-                                    <outputFile>${project.build.directory}/ib-out.txt</outputFile>
-                                    <arguments>
-                                        <argument>build</argument>
-                                        <argument>amps-installbuilder.xml</argument>
-                                        <argument>linux-x64</argument>
-                                        <argument>--setvars</argument>
-                                        <argument>project.version=${version}</argument>
-                                        <argument>project.outputDirectory=${project.build.directory}</argument>
-                                        <argument>sdkUnzipDir=${project.build.directory}/unzip/atlassian-plugin-sdk-${project.version}/*</argument>
-                                    </arguments>
-                                </configuration>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                            </execution>
-                   
+                                               
                             <execution>
                                 <id>installbuilder-windows</id>
                                 <phase>compile</phase>
@@ -177,8 +136,6 @@
                             </execution>
                         </executions>
                     </plugin>
-
-
                     
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
@@ -236,16 +193,6 @@
                                         <artifact>
                                             <file>${project.build.directory}/atlassian-plugin-sdk-${project.version}-windows.exe</file>
                                             <type>exe</type>
-                                        </artifact>
-                                        <artifact>
-                                            <file>${project.build.directory}/atlassian-plugin-sdk-${project.version}-linux-x64.run</file>
-                                            <type>run</type>
-                                            <classifier>x64</classifier>
-                                        </artifact>
-                                        <artifact>
-                                            <file>${project.build.directory}/atlassian-plugin-sdk-${project.version}-linux.run</file>
-                                            <type>run</type>
-                                            <classifier>x32</classifier>
                                         </artifact>
                                         <artifact>
                                             <file>${project.build.directory}/atlassian-plugin-sdk-${project.version}-osx.app.tar.gz</file>
