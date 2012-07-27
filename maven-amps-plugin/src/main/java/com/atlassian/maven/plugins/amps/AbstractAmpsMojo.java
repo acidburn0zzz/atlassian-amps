@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps;
 import java.util.List;
 
 import com.atlassian.maven.plugins.amps.util.UpdateChecker;
+import com.atlassian.maven.plugins.updater.SdkResource;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -62,10 +63,16 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     private MavenGoals mavenGoals;
 
     /**
+     * Component for checking for SDK updates.
+     */
+    @Component
+    private SdkResource sdkResource;
+
+    /**
      * Flag to force a check for a new SDK regardless of the last time such a check was made.
      */
     @Parameter(property = "force.update.check", defaultValue = "false")
-    protected boolean forceUpdateCheck;
+    private boolean forceUpdateCheck;
 
     private UpdateChecker updateChecker;
 
@@ -112,9 +119,16 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     {
         if (updateChecker == null)
         {
-            updateChecker = new UpdateChecker(getPluginInformation().getVersion(), getLog(), forceUpdateCheck);
+            updateChecker = new UpdateChecker(getSdkVersion(), getLog(),
+                    sdkResource, forceUpdateCheck);
         }
 
         return updateChecker;
+    }
+
+    private String getSdkVersion()
+    {
+        String sdkVersion = System.getenv("ATLAS_VERSION");
+        return sdkVersion != null ? sdkVersion : getPluginInformation().getVersion();
     }
 }

@@ -1,17 +1,14 @@
 package com.atlassian.maven.plugins.amps.util;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.common.collect.Lists;
 
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -21,6 +18,82 @@ import java.util.zip.ZipOutputStream;
 
 public class ZipUtils
 {
+
+    /**
+     * Ungzips and extracts the specified tar.gz file into the specified directory.
+     * @param targz the tar.gz file to use
+     * @param destDir the directory to contain the extracted contents
+     * @throws IOException
+     */
+    public static void untargz(final File targz, final String destDir) throws IOException
+    {
+        untargz(targz, destDir, 0);
+    }
+
+    /**
+     * Ungzips and extracts the specified tar.gz file into the specified directory, trimming
+     * the specified number of leading path segments from the extraction path.
+     * @param targz the tar.gz file to use
+     * @param destDir the directory to contain the extracted contents
+     * @param leadingPathSegmentsToTrim the number of leading path segments to remove from the
+     *                                  extracted path
+     * @throws IOException
+     */
+    public static void untargz(final File targz, final String destDir, int leadingPathSegmentsToTrim) throws IOException
+    {
+        FileInputStream fin = new FileInputStream(targz);
+        GzipCompressorInputStream gzIn = new GzipCompressorInputStream(fin);
+        TarArchiveInputStream tarIn = new TarArchiveInputStream(gzIn);
+
+        try
+        {
+            while (true)
+            {
+                TarArchiveEntry entry = tarIn.getNextTarEntry();
+                if (entry == null) {
+                    // tar file exhausted
+                    break;
+                }
+
+                File entryFile = new File(destDir + File.separator +
+                        trimPathSegments(entry.getName(), leadingPathSegmentsToTrim));
+
+                if (entry.isDirectory())
+                {
+                    entryFile.mkdirs();
+                    continue;
+                }
+
+                if (!entryFile.getParentFile().exists())
+                {
+                    entryFile.getParentFile().mkdirs();
+                }
+
+                FileOutputStream fos = null;
+                try
+                {
+                    fos = new FileOutputStream(entryFile);
+                    IOUtils.copy(tarIn, fos);
+
+                    // check for user-executable bit on entry and apply to file
+                    if ((entry.getMode() & 0100) != 0) {
+                        entryFile.setExecutable(true);
+                    }
+                }
+                finally
+                {
+                    IOUtils.closeQuietly(fos);
+                }
+            }
+        }
+        finally
+        {
+            IOUtils.closeQuietly(fin);
+            IOUtils.closeQuietly(tarIn);
+            IOUtils.closeQuietly(gzIn);
+        }
+    }
+
     public static void unzip(final File zipFile, final String destDir) throws IOException
     {
         unzip(zipFile, destDir, 0);

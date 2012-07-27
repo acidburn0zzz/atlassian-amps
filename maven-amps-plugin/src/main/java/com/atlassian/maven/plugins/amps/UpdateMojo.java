@@ -1,7 +1,9 @@
 package com.atlassian.maven.plugins.amps;
 
+import com.atlassian.maven.plugins.amps.util.OSUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 import com.atlassian.maven.plugins.amps.util.ZipUtils;
+import com.atlassian.maven.plugins.updater.SdkResource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -25,84 +27,64 @@ import java.util.List;
 @Mojo(name = "update", requiresProject = false)
 public class UpdateMojo extends AbstractAmpsMojo {
 
-    private static final String SDK_GROUPID = "com.atlassian.amps";
-    private static final String SDK_ARTIFACTID = "atlassian-plugin-sdk";
-    private static final String RETRIEVE_SCOPE = "compile";
-    private static final String ARTIFACT_TYPE = "zip";
-
-    /**
-     * Used to retrieve SDK artifacts.
-     */
     @Component
-    protected ArtifactResolver resolver;
-
-    /**
-     * The local Maven repository.
-     */
-    @Parameter(property = "localRepository")
-    protected ArtifactRepository localRepository;
-
-    /**
-     * The remote Maven repositories used by the artifact resolver to look for SDKs.
-     */
-    @Parameter(property = "project.remoteArtifactRepositories")
-    protected List repositories;
+    private SdkResource sdkResource;
 
     /**
      * The version to update the SDK to (defaults to latest)
      */
     @Parameter(property = "update.version")
-    protected String updateVersion;
+    private String updateVersion;
 
     /**
-     * The artifact factory is used to create valid Maven
-     * {@link org.apache.maven.artifact.Artifact} objects. These objects are passed to the
-     * Resolver.
+     * If present, use this file as the SDK archive instead of trying to download it from PAC.
      */
-    @Component
-    protected ArtifactFactory factory;
+    @Parameter(property = "sdk.archive.path")
+    private String sdkArchivePath;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         checkUpdatePreconditions();
 
-        String currentVersion = getPluginInformation().getVersion();
-        String latestVersion = !StringUtils.isBlank(updateVersion) ? updateVersion : VersionUtils.getLatestVersion(currentVersion);
-        if (VersionUtils.versionFromString(latestVersion) >
-            VersionUtils.versionFromString(currentVersion)) {
-            File sdkZip = downloadLatestSdk(latestVersion);
-            installSdk(sdkZip);
+        File sdkArchive;
+        if (StringUtils.isNotBlank(sdkArchivePath)) {
+            // use local file for SDK update
+            sdkArchive = new File(sdkArchivePath);
+            if (!sdkArchive.isFile() || !sdkArchive.canRead()) {
+                throw new MojoExecutionException("Can't read archive file at " + sdkArchivePath);
+            }
+            getLog().info("Using local file " + sdkArchive.getAbsolutePath() + " for SDK install.");
+        } else {
+            // determine which version to download from PAC
+            String downloadVersion = StringUtils.isNotBlank(updateVersion) ?
+                    updateVersion : sdkResource.getLatestSdkVersion();
+            getLog().info("Downloading SDK version " + downloadVersion + " from marketplace.atlassian.com...");
+            sdkArchive = sdkResource.downloadSdk(downloadVersion);
+            getLog().info("Download complete.");
+            getLog().debug("SDK download artifact at " + sdkArchive.getAbsolutePath());
         }
 
-        getLog().info("SDK upgrade successful. New version: " + latestVersion);
-    }
-
-    private File downloadLatestSdk(String latestVersion) throws MojoExecutionException {
-        Artifact artifact = factory.createArtifact(
-                SDK_GROUPID, SDK_ARTIFACTID, latestVersion, RETRIEVE_SCOPE, ARTIFACT_TYPE
-        );
-        try {
-            resolver.resolve(artifact, repositories, localRepository);
-        } catch (ArtifactResolutionException e) {
-            throw new MojoExecutionException("Cannot resolve SDK artifact", e);
-        } catch (ArtifactNotFoundException e) {
-            throw new MojoExecutionException("Cannot find version " + latestVersion + " of SDK", e);
-        }
-        return artifact.getFile();
+        getLog().info("Beginning upgrade of SDK.");
+        installSdk(sdkArchive);
+        getLog().info("SDK upgrade successful.");
     }
 
     private void installSdk(File sdkZip) throws MojoExecutionException {
-        String sdkHome = System.getenv("ATLAS_HOME");
+        String sdkHome = getSdkHome();
         try {
-            ZipUtils.unzip(sdkZip, sdkHome, 1); // skip first directory path of artifact name/version
+            if (OSUtils.OS == OSUtils.OS.WINDOWS) {
+                ZipUtils.unzip(sdkZip, sdkHome, 1); // skip first directory path of artifact name/version
+            } else {
+                ZipUtils.untargz(sdkZip, sdkHome, 1);
+            }
         } catch (IOException e) {
             throw new MojoExecutionException("Error extracting new SDK", e);
         }
     }
 
     private void checkUpdatePreconditions() throws MojoExecutionException {
-        String sdkHome = System.getenv("ATLAS_HOME");
+        String sdkHome = getSdkHome();
         if (sdkHome == null) {
             throw new MojoExecutionException("SDK update must be run from the atlas-update script.");
         }
@@ -111,5 +93,10 @@ public class UpdateMojo extends AbstractAmpsMojo {
             throw new MojoExecutionException("To update successfully, SDK home directory " + sdkHome +
                 " must be writable by the current user.");
         }
+        getLog().debug("Detected current SDK install from ATLAS_HOME in " + sdkHomeDir.getAbsolutePath());
+    }
+
+    private String getSdkHome() {
+        return System.getenv("ATLAS_HOME");
     }
 }
