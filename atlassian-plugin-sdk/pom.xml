@@ -313,6 +313,11 @@
                                     </value>
                                 </property>
                                 <property>
+                                    <name>sdk.tar</name>
+                                    <value>${project.build.directory}/${project.artifactId}-${project.version}.tar.gz
+                                    </value>
+                                </property>
+                                <property>
                                     <name>sdk.base</name>
                                     <value>${project.build.directory}/sdk-temp</value>
                                 </property>

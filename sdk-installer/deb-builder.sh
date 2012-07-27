@@ -5,8 +5,8 @@ rm -rf target/deb-work/usr/bin/
 mkdir -p target/deb-work/usr/bin/
 
 # Add the symlinks we need from /usr/share to /usr/bin
-for f in `find target/deb-work/usr/share/atlassian-plugin-sdk-3.12-SNAPSHOT/bin/ -name "atlas-*" | xargs -n1 basename`; do
-  ln -s /usr/share/atlassian-plugin-sdk-3.12-SNAPSHOT/bin/$f target/deb-work/usr/bin/$f
+for f in `find target/deb-work/usr/share/atlassian-plugin-sdk-$1/bin/ -name "atlas-*" | xargs -n1 basename`; do
+  ln -s /usr/share/atlassian-plugin-sdk-$1/bin/$f target/deb-work/usr/bin/$f
 done
 
 # Add the install size to our conbtrol file

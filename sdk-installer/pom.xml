@@ -129,6 +129,24 @@
                                 <configuration>
                                     <executable>${basedir}/deb-builder.sh</executable>
                                     <outputFile>${project.build.directory}/dpkg-out.txt</outputFile>
+                                    <arguments>
+                                        <argument>${project.version}</argument>
+                                    </arguments>
+                                </configuration>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+
+                            <execution>
+                                <id>native-rpm</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <executable>${basedir}/rpm-builder.sh</executable>
+                                    <outputFile>${project.build.directory}/alien-out.txt</outputFile>
+                                    <arguments>
+                                        <argument>${project.version}</argument>
+                                    </arguments>
                                 </configuration>
                                 <goals>
                                     <goal>exec</goal>
@@ -201,6 +219,10 @@
                                         <artifact>
                                             <file>${project.build.directory}/atlassian-plugin-sdk_${project.version}_all.deb</file>
                                             <type>deb</type>
+                                        </artifact>
+                                        <artifact>
+                                            <file>${project.build.directory}/atlassian-plugin-sdk-${project.version}.noarch.rpm</file>
+                                            <type>rpm</type>
                                         </artifact>
                                     </artifacts>
                                 </configuration>

@@ -1,20 +1,14 @@
 package com.atlassian.sdk.accept;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-
 import java.io.File;
 import java.io.IOException;
-import java.io.FileOutputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Enumeration;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipEntry;
+import java.util.*;
+
+import com.atlassian.maven.plugins.amps.util.ZipUtils;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 
 import junit.framework.Assert;
 
@@ -22,11 +16,13 @@ public class SdkHelper
 {
     public static File setupSdk(File baseDir) throws IOException
     {
-        File sdkZip = new File(System.getProperty("sdk.zip"));
-
+        File sdkZip = isWindows() ? new File(System.getProperty("sdk.zip")) : new File(System.getProperty("sdk.tar"));
+        String extension = isWindows() ? ".zip" : ".tar.gz";
+        
         baseDir.mkdirs();
         unzip(sdkZip, baseDir);
-        return new File(baseDir, sdkZip.getName().substring(0, sdkZip.getName().length() - ".zip".length()));
+
+        return new File(baseDir, StringUtils.substringBefore(sdkZip.getName(),extension));
     }
 
     public static void runSdkScript(File sdkHome, File baseDir, String scriptName, String... args)
@@ -54,10 +50,10 @@ public class SdkHelper
 
         Assert.assertEquals(0, runner.run(baseDir, cmdlist, new HashMap<String, String>()
         {{
-            put("MAVEN_OPTS", "-Xmx256m");
-            put("JAVA_HOME", System.getProperty("java.home"));
-            put("PATH", System.getenv("PATH"));
-        }}));
+                put("MAVEN_OPTS", "-Xmx256m");
+                put("JAVA_HOME", System.getProperty("java.home"));
+                put("PATH", System.getenv("PATH"));
+            }}));
     }
 
     public static boolean isWindows()
@@ -68,21 +64,13 @@ public class SdkHelper
 
     private static void unzip(File zipfile, File baseDir) throws IOException
     {
-        ZipFile zip = new ZipFile(zipfile);
-        for (Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip.entries(); entries.hasMoreElements();)
+        if (FilenameUtils.isExtension(zipfile.getName(), "zip"))
         {
-            ZipEntry entry = entries.nextElement();
-            File target = new File(baseDir, entry.getName());
-            if (entry.isDirectory())
-            {
-                target.mkdirs();
-            }
-            else
-            {
-                FileOutputStream fout = new FileOutputStream(target);
-                IOUtils.copy(zip.getInputStream(entry), fout);
-                IOUtils.closeQuietly(fout);
-            }
+            ZipUtils.unzip(zipfile, baseDir.getAbsolutePath());
+        }
+        else
+        {
+            ZipUtils.untargz(zipfile, baseDir.getAbsolutePath());
         }
     }
 
