@@ -11,7 +11,7 @@ done
 
 # Add the install size to our conbtrol file
 DIRSIZE=`du -ks target/unzip | cut -f 1`
-sed -i "s/SIZE/$DIRSIZE/g" target/deb-work/DEBIAN/control
+sed -i -e "s/SIZE/$DIRSIZE/g" target/deb-work/DEBIAN/control
 
 # Make the deb file
 dpkg --build target/deb-work target
