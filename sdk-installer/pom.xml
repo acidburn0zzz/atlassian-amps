@@ -152,6 +152,21 @@
                                     <goal>exec</goal>
                                 </goals>
                             </execution>
+
+                            <execution>
+                                <id>native-osx</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <executable>${basedir}/osx-builder.sh</executable>
+                                    <outputFile>${project.build.directory}/osx-out.txt</outputFile>
+                                    <arguments>
+                                        <argument>${project.version}</argument>
+                                    </arguments>
+                                </configuration>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
                         </executions>
                     </plugin>
                     
@@ -192,6 +207,23 @@
                                     </descriptors>
                                 </configuration>
                             </execution>
+
+                            <execution>
+                                <id>copy-osx</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <finalName>osx-work</finalName>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <attach>false</attach>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/assembly-osx.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
 
@@ -200,6 +232,13 @@
                         <artifactId>build-helper-maven-plugin</artifactId>
                         <version>1.5</version>
                         <executions>
+                            <execution>
+                                <id>parse-version</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>parse-version</goal>
+                                </goals>
+                            </execution>
                             <execution>
                                 <id>attach-installer</id>
                                 <phase>package</phase>
