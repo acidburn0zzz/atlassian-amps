@@ -10,10 +10,20 @@ for f in `find target/deb-work/usr/share/atlassian-plugin-sdk-$1/bin/ -name "atl
 done
 
 # Add the install size to our conbtrol file
-DIRSIZE=`du -ks target/unzip | cut -f 1`
+DIRSIZE=`du -ks target/deb-work/usr/share/atlassian-plugin-sdk-$1 | cut -f 1`
 sed -i -e "s/SIZE/$DIRSIZE/g" target/deb-work/DEBIAN/control
 
+#If we have a SNAPSHOT, use a timestamp version
+VERSION=$1
+TS=`date +%Y%m%d%H%M%S`
+VERSION=$(echo "$VERSION" | sed "s/-SNAPSHOT/~$TS/")
+
+# update version in control
+sed -i -e "s/VERSION/$VERSION/g" target/deb-work/DEBIAN/control
+
+echo "using deb version: $VERSION"
+
 # Make the deb file
-dpkg --build target/deb-work target
+dpkg --build target/deb-work target/atlassian-plugin-sdk-$1.deb
 
 exit 0

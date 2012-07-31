@@ -51,6 +51,7 @@
         <module>amps-product-archetypes</module>
         <module>standalone</module>
         <module>maven-3-tests</module>
+        <module>sdk-installer</module>
     </modules>
 
     <dependencyManagement>
@@ -296,7 +297,7 @@
                <artifactId>maven-release-plugin</artifactId>
                <version>2.2.2</version>
                 <configuration>
-                    <releaseProfiles>release,installers</releaseProfiles>
+                    <releaseProfiles>release,installer-win,installer-deb,installer-osx</releaseProfiles>
                 </configuration>
             </plugin>
         </plugins>
