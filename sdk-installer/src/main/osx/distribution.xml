@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<installer-gui-script minSpecVersion="1">
+    <background file="background.png" />
+    <pkg-ref id="com.atlassian.atlassian-plugin-sdk">
+        <bundle-version/>
+    </pkg-ref>
+    <options customize="never" require-scripts="false"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.atlassian.atlassian-plugin-sdk"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="com.atlassian.atlassian-plugin-sdk" visible="false">
+        <pkg-ref id="com.atlassian.atlassian-plugin-sdk"/>
+    </choice>
+    <pkg-ref id="com.atlassian.atlassian-plugin-sdk" version="VERSION" onConclusion="none">atlassian-sdk.pkg</pkg-ref>
+</installer-gui-script>

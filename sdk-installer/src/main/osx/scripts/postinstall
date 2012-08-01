@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# set correct perms
+chown -R root:staff /usr/share/atlassian-plugin-sdk-${version}
+chmod -R 755 /usr/share/atlassian-plugin-sdk-${version}/bin
+chmod -R 755 /usr/share/atlassian-plugin-sdk-${version}/apache-maven/bin
+chmod 755 /usr/share/atlassian-plugin-sdk-${version}/uninstall.sh
+
+# Add the symlinks we need from /usr/share to /usr/local/bin
+for f in `find /usr/share/atlassian-plugin-sdk-${version}/bin/ -name "atlas-*" | xargs -n1 basename`; do
+  ln -s /usr/share/atlassian-plugin-sdk-${version}/bin/$f /usr/local/bin/$f
+  chown -R root:staff /usr/local/bin/$f
+done

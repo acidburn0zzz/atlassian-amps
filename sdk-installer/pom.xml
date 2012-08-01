@@ -107,7 +107,7 @@
         </profile>
 
         <profile>
-            <id>installer-deb</id>
+            <id>installer-linux</id>
             <build>
                 <finalName>atlassian-plugin-sdk</finalName>
 
@@ -133,12 +133,8 @@
                                 <configuration>
                                     <artifacts>
                                         <artifact>
-                                            <file>${project.build.directory}/atlassian-plugin-sdk_${parsedVersion.osgiVersion}_all.deb</file>
+                                            <file>${project.build.directory}/atlassian-plugin-sdk-${project.version}.deb</file>
                                             <type>deb</type>
-                                        </artifact>
-                                        <artifact>
-                                            <file>${project.build.directory}/atlassian-plugin-sdk-${parsedVersion.osgiVersion}-1.noarch.rpm</file>
-                                            <type>rpm</type>
                                         </artifact>
                                     </artifacts>
                                 </configuration>
@@ -207,20 +203,6 @@
                                     <outputFile>${project.build.directory}/dpkg-out.txt</outputFile>
                                     <arguments>
                                         <argument>${project.version}</argument>
-                                    </arguments>
-                                </configuration>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>native-rpm</id>
-                                <phase>package</phase>
-                                <configuration>
-                                    <executable>${basedir}/rpm-builder.sh</executable>
-                                    <outputFile>${project.build.directory}/alien-out.txt</outputFile>
-                                    <arguments>
-                                        <argument>${parsedVersion.osgiVersion}</argument>
                                     </arguments>
                                 </configuration>
                                 <goals>
@@ -308,19 +290,11 @@
                             </execution>
                         </executions>
                     </plugin>
-<!--
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
                         <version>1.5</version>
                         <executions>
-                            <execution>
-                                <id>parse-osx-version</id>
-                                <phase>initialize</phase>
-                                <goals>
-                                    <goal>parse-version</goal>
-                                </goals>
-                            </execution>
                             <execution>
                                 <id>attach-osx-installer</id>
                                 <phase>package</phase>
@@ -330,15 +304,14 @@
                                 <configuration>
                                     <artifacts>
                                         <artifact>
-                                            <file>${project.build.directory}/atlassian-plugin-sdk-${project.version}-windows.exe</file>
-                                            <type>exe</type>
+                                            <file>${project.build.directory}/atlassian-plugin-sdk-${project.version}.pkg</file>
+                                            <type>pkg</type>
                                         </artifact>
                                     </artifacts>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                    -->
                 </plugins>
             </build>
         </profile>

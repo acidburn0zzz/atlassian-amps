@@ -297,7 +297,7 @@
                <artifactId>maven-release-plugin</artifactId>
                <version>2.2.2</version>
                 <configuration>
-                    <releaseProfiles>release,installer-win,installer-deb,installer-osx</releaseProfiles>
+                    <releaseProfiles>release,installer-win,installer-linux,installer-osx</releaseProfiles>
                 </configuration>
             </plugin>
         </plugins>
