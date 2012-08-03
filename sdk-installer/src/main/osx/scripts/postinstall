@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# remove any previous symlinks from /usr/local/bin
+for f in `find /usr/local/bin/ -name "atlas-*"`; do
+  rm $f
+done
+    
 # set correct perms
 chown -R root:staff /usr/share/atlassian-plugin-sdk-${version}
 chmod -R 755 /usr/share/atlassian-plugin-sdk-${version}/bin
