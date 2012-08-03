@@ -20,7 +20,7 @@ TS=`date +%Y%m%d%H%M%S`
 VERSION=$(echo "$VERSION" | sed "s/-SNAPSHOT/~$TS/")
 
 # update version in control
-sed -i -e "s/VERSION/$VERSION/g" target/deb-work/DEBIAN/control
+sed -i -e "s/SDKVERSION/$VERSION/g" target/deb-work/DEBIAN/control
 
 echo "using deb version: $VERSION"
 

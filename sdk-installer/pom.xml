@@ -125,7 +125,7 @@
                                 </goals>
                             </execution>
                             <execution>
-                                <id>attach-deb-installer</id>
+                                <id>attach-linux-installers</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>attach-artifact</goal>
@@ -135,6 +135,10 @@
                                         <artifact>
                                             <file>${project.build.directory}/atlassian-plugin-sdk-${project.version}.deb</file>
                                             <type>deb</type>
+                                        </artifact>
+                                        <artifact>
+                                            <file>${project.build.directory}/atlassian-plugin-sdk-${project.version}.noarch.rpm</file>
+                                            <type>rpm</type>
                                         </artifact>
                                     </artifacts>
                                 </configuration>
@@ -165,6 +169,25 @@
                                     </artifactItems>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>unpack-for-rpm</id>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${groupId}</groupId>
+                                            <artifactId>atlassian-plugin-sdk</artifactId>
+                                            <version>${version}</version>
+                                            <type>tar.gz</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/rpm-work/unzip/usr/share/</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
 
@@ -187,6 +210,22 @@
                                     </descriptors>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>copy-rpm</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <finalName>rpm-work</finalName>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <attach>false</attach>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/assembly-rpm.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
 
@@ -201,6 +240,20 @@
                                 <configuration>
                                     <executable>${basedir}/deb-builder.sh</executable>
                                     <outputFile>${project.build.directory}/dpkg-out.txt</outputFile>
+                                    <arguments>
+                                        <argument>${project.version}</argument>
+                                    </arguments>
+                                </configuration>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>native-rpm</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <executable>${basedir}/rpm-builder.sh</executable>
+                                    <outputFile>${project.build.directory}/rpm-out.txt</outputFile>
                                     <arguments>
                                         <argument>${project.version}</argument>
                                     </arguments>

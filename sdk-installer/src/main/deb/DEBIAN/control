@@ -6,5 +6,6 @@ Package: atlassian-plugin-sdk
 Section: misc
 Maintainer: Atlassian
 Priority: optional
-Version: VERSION
+Version: SDKVERSION
 Installed-Size: SIZE
+Homepage: http://developer.atlassian.com
