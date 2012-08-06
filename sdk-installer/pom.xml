@@ -76,7 +76,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>${buildhelper.version}</version>
                         <executions>
                             <execution>
                                 <id>parse-win-version</id>
@@ -115,7 +115,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>${buildhelper.version}</version>
                         <executions>
                             <execution>
                                 <id>parse-deb-version</id>
@@ -123,6 +123,45 @@
                                 <goals>
                                     <goal>parse-version</goal>
                                 </goals>
+                            </execution>
+                            <execution>
+                                <id>timestamp-property</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>timestamp-property</goal>
+                                </goals>
+                                <configuration>
+                                    <name>snap.ts</name>
+                                    <pattern>yyyyMMddHHmmss</pattern>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>deb-version</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>regex-property</goal>
+                                </goals>
+                                <configuration>
+                                    <name>deb.version</name>
+                                    <value>${project.version}</value>
+                                    <regex>-SNAPSHOT</regex>
+                                    <replacement>~${snap.ts}</replacement>
+                                    <failIfNoMatch>false</failIfNoMatch>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>rpm-version</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>regex-property</goal>
+                                </goals>
+                                <configuration>
+                                    <name>rpm.version</name>
+                                    <value>${project.version}</value>
+                                    <regex>-SNAPSHOT</regex>
+                                    <replacement>_${snap.ts}</replacement>
+                                    <failIfNoMatch>false</failIfNoMatch>
+                                </configuration>
                             </execution>
                             <execution>
                                 <id>attach-linux-installers</id>
@@ -133,11 +172,11 @@
                                 <configuration>
                                     <artifacts>
                                         <artifact>
-                                            <file>${project.build.directory}/atlassian-plugin-sdk-${project.version}.deb</file>
+                                            <file>${project.build.directory}/atlassian-plugin-sdk-${deb.version}.deb</file>
                                             <type>deb</type>
                                         </artifact>
                                         <artifact>
-                                            <file>${project.build.directory}/atlassian-plugin-sdk-${project.version}.noarch.rpm</file>
+                                            <file>${project.build.directory}/atlassian-plugin-sdk-${rpm.version}.noarch.rpm</file>
                                             <type>rpm</type>
                                         </artifact>
                                     </artifacts>
@@ -242,6 +281,7 @@
                                     <outputFile>${project.build.directory}/dpkg-out.txt</outputFile>
                                     <arguments>
                                         <argument>${project.version}</argument>
+                                        <argument>${deb.version}</argument>
                                     </arguments>
                                 </configuration>
                                 <goals>
@@ -256,6 +296,7 @@
                                     <outputFile>${project.build.directory}/rpm-out.txt</outputFile>
                                     <arguments>
                                         <argument>${project.version}</argument>
+                                        <argument>${rpm.version}</argument>
                                     </arguments>
                                 </configuration>
                                 <goals>
@@ -346,7 +387,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>${buildhelper.version}</version>
                         <executions>
                             <execution>
                                 <id>attach-osx-installer</id>
@@ -371,5 +412,6 @@
     </profiles>
     <properties>
         <installbuilder.builder>/tools/installbuilder/bin/builder</installbuilder.builder>
+        <buildhelper.version>1.7</buildhelper.version>
     </properties>
 </project>

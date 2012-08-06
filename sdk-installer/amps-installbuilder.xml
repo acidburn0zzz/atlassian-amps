@@ -3,10 +3,10 @@
     <fullName>Atlassian Plugin SDK</fullName>
     <version>1.0</version>
     <installerFilename>atlassian-plugin-sdk-${project.version}-${platform_name}.${platform_exec_suffix}</installerFilename>
-    <leftImage>sidebar-sdk-installer.png</leftImage>
-    <logoImage>sdk-logo.png</logoImage>
-    <splashImage>sdk-splash-screen.png</splashImage>
-    <wmImage>sdk-logo.png</wmImage>
+    <leftImage>images/win/sidebar-sdk-installer.png</leftImage>
+    <logoImage>images/win/sdk-logo.png</logoImage>
+    <splashImage>images/win/sdk-splash-screen.png</splashImage>
+    <wmImage>images/win/sdk-logo.png</wmImage>
     <defaultLanguage>auto</defaultLanguage>
     <allowLanguageSelection>1</allowLanguageSelection>
     <componentList>
@@ -73,21 +73,6 @@
                 </setInstallerVariable>
                 <addDirectoryToPath>
                     <insertAt>end</insertAt>
-                    <path>${'${JAVA_HOME}'}/bin</path>
-                    <scope>user</scope>
-                    <ruleList>
-                        <platformTest negate="1" type="windows"/>
-                        <isTrue>
-                            <value>${hasJava16Home}</value>
-                        </isTrue>
-                        <programTest>
-                            <condition>is_not_in_path</condition>
-                            <name>java</name>
-                        </programTest>
-                    </ruleList>
-                </addDirectoryToPath>
-                <addDirectoryToPath>
-                    <insertAt>end</insertAt>
                     <path>%JAVA_HOME%\bin</path>
                     <scope>user</scope>
                     <ruleList>
@@ -142,18 +127,6 @@
                         </addEnvironmentVariable>
                         <addDirectoryToPath>
                             <insertAt>end</insertAt>
-                            <path>${'${JAVA_HOME}'}/bin</path>
-                            <scope>user</scope>
-                            <ruleList>
-                                <platformTest negate="1" type="windows"/>
-                                <programTest>
-                                    <condition>is_not_in_path</condition>
-                                    <name>java</name>
-                                </programTest>
-                            </ruleList>
-                        </addDirectoryToPath>
-                        <addDirectoryToPath>
-                            <insertAt>end</insertAt>
                             <path>%JAVA_HOME%\bin</path>
                             <scope>user</scope>
                             <ruleList>
@@ -187,77 +160,27 @@
                     <text>${msg(sdk.installer.install.java)}</text>
                     <variable>installJava</variable>
                 </showQuestion>
-                <actionGroup>
+                <showProgressDialog>
+                    <title>${msg(sdk.installer.downloading)}</title>
                     <actionList>
-                        <showProgressDialog>
-                            <title>${msg(sdk.installer.downloading)}</title>
-                            <actionList>
-                                <httpGet>
-                                    <filename>${installdir}/jdk.zip</filename>
-                                    <url>https://developer.atlassian.com/static/javabundles/jdk-6u32-linux-i586.zip</url>
-                                </httpGet>
-                                <changePermissions>
-                                    <files>${installdir}/jdk.zip</files>
-                                    <permissions>775</permissions>
-                                </changePermissions>
-                            </actionList>
-                        </showProgressDialog>
-                        <unzip>
-                            <destinationDirectory>${installdir}/jdk</destinationDirectory>
-                            <zipFile>${installdir}/jdk.zip</zipFile>
-                        </unzip>
-                    </actionList>
-                    <ruleList>
-                        <platformTest negate="1" type="linux-x64"/>
-                        <isTrue value="${installJava}"/>
-                    </ruleList>
-                </actionGroup>
-                <actionGroup>
-                    <actionList>
-                        <showProgressDialog>
-                            <title>${msg(sdk.installer.downloading)}</title>
-                            <actionList>
-                                <httpGet>
-                                    <filename>${installdir}/jdk.zip</filename>
-                                    <url>https://developer.atlassian.com/static/javabundles/jdk-6u32-linux-x64.zip</url>
-                                </httpGet>
-                                <changePermissions>
-                                    <files>${installdir}/jdk.zip</files>
-                                    <permissions>775</permissions>
-                                </changePermissions>
-                            </actionList>
-                        </showProgressDialog>
-                        <unzip>
-                            <destinationDirectory>${installdir}/jdk</destinationDirectory>
-                            <zipFile>${installdir}/jdk.zip</zipFile>
-                        </unzip>
-                    </actionList>
-                    <ruleList>
-                        <platformTest type="linux-x64"/>
-                        <isTrue value="${installJava}"/>
-                    </ruleList>
-                </actionGroup>
-                <actionGroup>
-                    <actionList>
-                        <showProgressDialog>
-                            <title>${msg(sdk.installer.downloading)}</title>
-                            <actionList>
-                                <httpGet>
-                                    <filename>${installdir}\java.exe</filename>
-                                    <url>https://developer.atlassian.com/static/javabundles/jdk-6u32-windows-i586.exe</url>
-                                </httpGet>
-                            </actionList>
-                        </showProgressDialog>
-                        <runProgram>
-                            <program>${installdir}\java.exe</program>
-                            <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
-                        </runProgram>
+                        <httpGet>
+                            <filename>${installdir}\java.exe</filename>
+                            <url>https://developer.atlassian.com/static/javabundles/jdk-6u32-windows-i586.exe</url>
+                        </httpGet>
                     </actionList>
                     <ruleList>
                         <platformTest negate="1" type="windows-x64"/>
                         <isTrue value="${installJava}"/>
                     </ruleList>
-                </actionGroup>
+                </showProgressDialog>
+
+	<!--
+                        <runProgram>
+                            <program>${installdir}\java.exe</program>
+                            <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
+                        </runProgram>
+                        
+
                 <actionGroup>
                     <actionList>
                         <showProgressDialog>
@@ -269,16 +192,19 @@
                                 </httpGet>
                             </actionList>
                         </showProgressDialog>
+                        
                         <runProgram>
                             <program>${installdir}\java.exe</program>
                             <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
                         </runProgram>
+                        
                     </actionList>
                     <ruleList>
                         <platformTest type="windows-x64"/>
                         <isTrue value="${installJava}"/>
                     </ruleList>
                 </actionGroup>
+                
                 <actionGroup>
                     <actionList>
                         <addEnvironmentVariable>
@@ -286,18 +212,6 @@
                             <scope>user</scope>
                             <value>${installdir}${platform_path_separator}jdk</value>
                         </addEnvironmentVariable>
-                        <addDirectoryToPath>
-                            <insertAt>end</insertAt>
-                            <path>${'${JAVA_HOME}'}/bin</path>
-                            <scope>user</scope>
-                            <ruleList>
-                                <platformTest negate="1" type="windows"/>
-                                <programTest>
-                                    <condition>is_not_in_path</condition>
-                                    <name>java</name>
-                                </programTest>
-                            </ruleList>
-                        </addDirectoryToPath>
                         <addDirectoryToPath>
                             <insertAt>end</insertAt>
                             <path>%JAVA_HOME%\bin</path>
@@ -315,7 +229,8 @@
                         <isTrue value="${installJava}"/>
                     </ruleList>
                 </actionGroup>
-            </actionList>
+                -->
+	            </actionList>
             <ruleList>
                 <isFalse>
                     <value>${hasJava16Home}</value>
@@ -325,23 +240,13 @@
                 </isFalse>
             </ruleList>
         </actionGroup>
+
+	<!--
         <addEnvironmentVariable>
             <name>ATLASSIAN_PLUGIN_SDK</name>
             <scope>user</scope>
             <value>${installdir}</value>
         </addEnvironmentVariable>
-        <addDirectoryToPath>
-            <insertAt>end</insertAt>
-            <path>${'${ATLASSIAN_PLUGIN_SDK}'}/bin</path>
-            <scope>user</scope>
-            <ruleList>
-                <platformTest negate="1" type="windows"/>
-                <programTest>
-                    <condition>is_not_in_path</condition>
-                    <name>atlas-version</name>
-                </programTest>
-            </ruleList>
-        </addDirectoryToPath>
         <addDirectoryToPath>
             <insertAt>end</insertAt>
             <path>%ATLASSIAN_PLUGIN_SDK%\bin</path>
@@ -354,7 +259,8 @@
                 </programTest>
             </ruleList>
         </addDirectoryToPath>
-    </postInstallationActionList>
+        -->
+	    </postInstallationActionList>
     <cdromDirectory>${product_version}-cdrom</cdromDirectory>
     <compressionAlgorithm>lzma</compressionAlgorithm>
     <description>Development kit to build Atlassian plugins</description>
@@ -362,15 +268,13 @@
     <enableRollback>0</enableRollback>
     <enableTimestamp>1</enableTimestamp>
     <nativePackageName>atlassian-plugin-sdk</nativePackageName>
-    <osxApplicationBundleIcon>sdk-mac-icon.icns</osxApplicationBundleIcon>
-    <osxUninstallerApplicationBundleIcon>sdk-mac-icon.icns</osxUninstallerApplicationBundleIcon>
     <rebootRequired>1</rebootRequired>
     <saveRelativePaths>1</saveRelativePaths>
     <summary>Development kit to build Atlassian plugins</summary>
     <unattendedModeUI>minimal</unattendedModeUI>
     <vendor>Atlassian</vendor>
-    <windowsExecutableIcon>sdk-win-icon.ico</windowsExecutableIcon>
-    <windowsUninstallerExecutableIcon>sdk-win-icon.ico</windowsUninstallerExecutableIcon>
+    <windowsExecutableIcon>images/win/sdk-win-icon.ico</windowsExecutableIcon>
+    <windowsUninstallerExecutableIcon>images/win/sdk-win-icon.ico</windowsUninstallerExecutableIcon>
     <customLanguageFileList>
         <language>
             <code>en</code>
@@ -379,7 +283,6 @@
         </language>
     </customLanguageFileList>
     <parameterList>
-        
         <directoryParameter>
             <name>installdir</name>
             <description>Installer.Parameter.installdir.description</description>
@@ -416,139 +319,6 @@
                 </throwError>
             </validationActionList>
         </directoryParameter>
-        
-
-	<!-- email subscription 
-
-        <booleanParameterGroup>
-            <name>emailSubscribe</name>
-            <description>Subscribe To Email Updates</description>
-            <explanation></explanation>
-            <value>1</value>
-            <default></default>
-            <insertAfter>installation</insertAfter>
-            <parameterList>
-                <stringParameter>
-                    <name>emailName</name>
-                    <description>Your Name</description>
-                    <explanation></explanation>
-                    <value></value>
-                    <default></default>
-                    <allowEmptyValue>1</allowEmptyValue>
-                    <width>30</width>
-                    <validationActionList>
-                        <throwError>
-                            <text>Please provide your name</text>
-                            <ruleList>
-                                <compareText>
-                                    <logic>equals</logic>
-                                    <text>${emailName}</text>
-                                    <value></value>
-                                </compareText>
-                            </ruleList>
-                        </throwError>
-                    </validationActionList>
-                </stringParameter>
-                <stringParameter>
-                    <name>emailAddress</name>
-                    <description>Email Address</description>
-                    <explanation></explanation>
-                    <value></value>
-                    <default></default>
-                    <allowEmptyValue>1</allowEmptyValue>
-                    <width>30</width>
-                    <validationActionList>
-                        <throwError>
-                            <text>Please provide an email address</text>
-                            <ruleList>
-                                <compareText>
-                                    <logic>equals</logic>
-                                    <text>${emailAddress}</text>
-                                    <value></value>
-                                </compareText>
-                            </ruleList>
-                        </throwError>
-                    </validationActionList>
-                </stringParameter>
-                <choiceParameter>
-                    <name>emailType</name>
-                    <description>Email Type</description>
-                    <explanation></explanation>
-                    <value>HTML</value>
-                    <default></default>
-                    <allowEmptyValue>1</allowEmptyValue>
-                    <displayType>combobox</displayType>
-                    <ordering>default</ordering>
-                    <width>30</width>
-                    <optionList>
-                        <option>
-                            <description></description>
-                            <image></image>
-                            <text>HTML</text>
-                            <value>HTML</value>
-                        </option>
-                        <option>
-                            <description></description>
-                            <image></image>
-                            <text>TEXT</text>
-                            <value>TEXT</value>
-                        </option>
-                    </optionList>
-                </choiceParameter>
-            </parameterList>
-            <postShowPageActionList>
-                <actionGroup>
-                    <actionList>
-                        <httpPost>
-                            <abortOnError>0</abortOnError>
-                            <filename>/home/jdoklovic/tmp/atlassian-sdk-email-subscribe</filename>
-                            <showMessageOnError>0</showMessageOnError>
-                            <url>http://cl.exct.net/subscribe.aspx?lid=1</url>
-                            <queryParameterList>
-                                <queryParameter>
-                                    <name>thx</name>
-                                    <value></value>
-                                </queryParameter>
-                                <queryParameter>
-                                    <name>err</name>
-                                    <value></value>
-                                </queryParameter>
-                                <queryParameter>
-                                    <name>usub</name>
-                                    <value></value>
-                                </queryParameter>
-                                <queryParameter>
-                                    <name>MID</name>
-                                    <value>YOUR MEMBER ID HERE</value>
-                                </queryParameter>
-                                <queryParameter>
-                                    <name>Full+Name</name>
-                                    <value>${emailName}</value>
-                                </queryParameter>
-                                <queryParameter>
-                                    <name>Email+Address</name>
-                                    <value>${emailAddress}</value>
-                                </queryParameter>
-                                <queryParameter>
-                                    <name>Email+Type</name>
-                                    <value>${emailType}</value>
-                                </queryParameter>
-                                <queryParameter>
-                                    <name>SubAction</name>
-                                    <value>sub_add_update</value>
-                                </queryParameter>
-                            </queryParameterList>
-                        </httpPost>
-                    </actionList>
-                    <ruleList>
-                        <isTrue>
-                            <value>${emailSubscribe}</value>
-                        </isTrue>
-                    </ruleList>
-                </actionGroup>
-            </postShowPageActionList>
-        </booleanParameterGroup>
-        -->
-	    </parameterList>
+    </parameterList>
 </project>
 

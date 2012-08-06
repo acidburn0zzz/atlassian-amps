@@ -1,3 +1,18 @@
 #!/bin/sh
+#update file ownership/perms
+for f in `find /usr/share/atlassian-plugin-sdk-${version}/bin/ -name "atlas-*"`; do
+  chown root:root $f
+  chmod 755 $f
+done
+
+for f in `find /usr/share/atlassian-plugin-sdk-${version}/apache-maven/bin/ -name "*"`; do
+  chown root:root $f
+  chmod 755 $f
+done
+
+# Add the symlinks we need from /usr/share to /usr/bin
+for f in `find /usr/bin/ -name "atlas-*"`; do
+  chown root:root $f
+done
 
 exit 0
