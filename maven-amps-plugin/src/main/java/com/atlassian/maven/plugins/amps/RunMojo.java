@@ -74,6 +74,8 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
 
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
+        trackFirstRunIfNeeded();
+        
         getGoogleTracker().track(GoogleAmpsTracker.RUN);
 
         final List<ProductExecution> productExecutions = getProductExecutions();

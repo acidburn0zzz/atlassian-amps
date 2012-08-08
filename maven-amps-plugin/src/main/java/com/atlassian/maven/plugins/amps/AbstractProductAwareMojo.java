@@ -1,5 +1,7 @@
 package com.atlassian.maven.plugins.amps;
 
+import java.util.prefs.Preferences;
+
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
 
@@ -8,6 +10,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
 {
+    private static final String PREF_FIRSTRUN_PREFIX = "sdk-firstrun";
+    
     /**
      * Product id
      */
@@ -83,6 +87,25 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
 
     protected boolean googleTrackingAllowed() {
         return allowGoogleTracking;
+    }
+    
+    protected void trackFirstRunIfNeeded() throws MojoExecutionException
+    {
+        boolean runningShellScript = (null != System.getenv("ATLAS_VERSION"));
+        
+        if(googleTrackingAllowed() && runningShellScript)
+        {
+            String firstRunKey = PREF_FIRSTRUN_PREFIX + "-" + getSdkVersion();
+            Preferences prefs = Preferences.userNodeForPackage(getClass());
+            String alreadyRan = prefs.get(firstRunKey, null);
+            
+            if(null == alreadyRan)
+            {
+                getGoogleTracker().track(GoogleAmpsTracker.SDK_FIRST_RUN,getSdkVersion());
+                prefs.put(firstRunKey,"true");
+            }
+        }
+
     }
 
 }

@@ -32,6 +32,8 @@ public class CreateHomeZipMojo extends AbstractProductHandlerMojo {
 
     public void doExecute() throws MojoExecutionException, MojoFailureException
     {
+        trackFirstRunIfNeeded();
+        
         Product product = getProduct(instanceId, getProductId());
         ProductHandler productHandler = createProductHandler(product.getId());
 

@@ -17,6 +17,7 @@ public class ReleaseMojo extends AbstractProductHandlerMojo
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
         String trackingLabel = getPluginInformation().getId() + ":" + getPluginInformation().getVersion();
+        trackFirstRunIfNeeded();
         getGoogleTracker().track(GoogleAmpsTracker.RELEASE,trackingLabel);
 
         getMavenGoals().release(mavenArgs);

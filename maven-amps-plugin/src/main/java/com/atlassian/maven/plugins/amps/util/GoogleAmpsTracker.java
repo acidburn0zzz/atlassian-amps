@@ -27,6 +27,7 @@ public class GoogleAmpsTracker
     public static final String RELEASE = "Release";
     public static final String CREATE_HOME_ZIP = "Create Home Zip";
     public static final String CREATE_PLUGIN_MODULE = "Create Plugin Module";
+    public static final String SDK_FIRST_RUN = "SDK First Run";
 
     private final AnalyticsConfigData config;
     private final JGoogleAnalyticsTracker tracker;

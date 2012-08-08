@@ -37,6 +37,7 @@ public class DebugMojo extends RunMojo
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
+        trackFirstRunIfNeeded();
         getGoogleTracker().track(GoogleAmpsTracker.DEBUG);
 
         final List<ProductExecution> productExecutions = getProductExecutions();
