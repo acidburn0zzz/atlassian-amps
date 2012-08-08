@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps.util;
 
+import java.util.Locale;
 import java.util.prefs.Preferences;
 
 import com.dmurph.tracking.AnalyticsConfigData;
@@ -32,11 +33,13 @@ public class GoogleAmpsTracker
     private final Log mavenLogger;
     private String productId;
     private String ampsVersion;
+    private String sdkVersion;
 
-    public GoogleAmpsTracker(String productId, String ampsVersion, Log mavenLogger)
+    public GoogleAmpsTracker(String productId, String sdkVersion, String ampsVersion, Log mavenLogger)
     {
         this.productId = productId;
         this.ampsVersion = ampsVersion;
+        this.sdkVersion = sdkVersion;
         this.mavenLogger = mavenLogger;
         
         this.config = new AnalyticsConfigData(TRACKING_CODE, loadVisitorData());
@@ -106,6 +109,7 @@ public class GoogleAmpsTracker
     {
         if (tracker.isEnabled())
         {
+            System.setProperty("http.agent",getUserAgent());
             mavenLogger.info("Sending event to Google Analytics: " + getCategoryName() + " - " + eventName);
             tracker.trackEvent(getCategoryName(), eventName);
             saveVisitorData(config.getVisitorData());
@@ -116,6 +120,7 @@ public class GoogleAmpsTracker
     {
         if (tracker.isEnabled())
         {
+            System.setProperty("http.agent",getUserAgent());
             mavenLogger.info("Sending event to Google Analytics: " + getCategoryName() + " - " + eventName + " - " + label);
             tracker.trackEvent(getCategoryName(), eventName, label);
             saveVisitorData(config.getVisitorData());
@@ -132,6 +137,29 @@ public class GoogleAmpsTracker
         {
             return AMPS;
         }
+    }
+    
+    private String getUserAgent()
+    {
+        StringBuilder sb = new StringBuilder();
+        String browser = (null != System.getenv("ATLAS_VERSION")) ? "Atlassian-SDK" : "Atlassian-AMPS-Plugin";
+        String browserVersion = (null != System.getenv("ATLAS_VERSION")) ? sdkVersion : ampsVersion;
+        
+        sb.append("Mozilla/5.0 (compatible; ")
+          .append(browser)
+          .append(" ")
+          .append(browserVersion)
+          .append("; ")
+          .append(System.getProperty("os.name"))
+          .append(" ")
+          .append(System.getProperty("os.version"))
+          .append("; ")
+          .append(Locale.getDefault().getLanguage().toLowerCase())
+          .append("-")
+          .append(Locale.getDefault().getCountry().toLowerCase())
+          .append(")");
+        
+        return sb.toString();
     }
 
     public VisitorData getVisitorData()

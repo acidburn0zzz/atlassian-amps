@@ -126,7 +126,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
         return updateChecker;
     }
 
-    private String getSdkVersion()
+    protected String getSdkVersion()
     {
         String sdkVersion = System.getenv("ATLAS_VERSION");
         return sdkVersion != null ? sdkVersion : getPluginInformation().getVersion();

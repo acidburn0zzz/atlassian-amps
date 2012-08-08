@@ -68,7 +68,7 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
     {
         if(null == googleTracker)
         {
-            googleTracker = new GoogleAmpsTracker(getProductId(),getPluginInformation().getVersion(),getLog());
+            googleTracker = new GoogleAmpsTracker(getProductId(),getSdkVersion(),getPluginInformation().getVersion(),getLog());
 
             if(googleTrackingAllowed()) {
                 getLog().info("Google Analytics Tracking is enabled to collect AMPS usage statistics.");
