@@ -70,9 +70,7 @@ public class MavenGoals
     private final Map<String, String> defaultArtifactIdToVersionMap = new HashMap<String, String>()
     {{
             put("maven-cli-plugin", "0.7");
-            put("cargo-maven2-plugin", "1.0-beta-2-db2");
-            // Below is a second definition of 'cargo-maven2-plugin', using CodeHaus instead of TwData.
-            put("org.codehaus.cargo:cargo-maven2-plugin", "1.1.3");
+            put("org.codehaus.cargo:cargo-maven2-plugin", "1.2.3");
             put("atlassian-pdk", "2.3.1");
             put("maven-archetype-plugin", "2.0-alpha-4");
             put("maven-bundle-plugin", "2.3.7");
@@ -514,6 +512,17 @@ public class MavenGoals
                 cargo,
                 goal("start"),
                 configurationWithoutNullElements(
+                        element(name("deployables"),
+                                element(name("deployable"),
+                                        element(name("groupId"), "foo"),
+                                        element(name("artifactId"), "bar"),
+                                        element(name("type"), "war"),
+                                        element(name("location"), war.getPath()),
+                                        element(name("properties"),
+                                                element(name("context"), webappContext.getContextPath())
+                                        )
+                                )
+                        ),
                         waitElement(cargo), // This may be null
                         element(name("container"),
                                 element(name("containerId"), container.getId()),
@@ -527,18 +536,8 @@ public class MavenGoals
                         element(name("configuration"),
                                 element(name("home"), container.getConfigDirectory(getBuildDirectory(), productInstanceId)),
                                 element(name("type"), "standalone"),
-                                element(name("properties"), props.toArray(new Element[props.size()])),
-                                element(name("deployables"),
-                                        element(name("deployable"),
-                                                element(name("groupId"), "foo"),
-                                                element(name("artifactId"), "bar"),
-                                                element(name("type"), "war"),
-                                                element(name("location"), war.getPath()),
-                                                element(name("properties"),
-                                                        element(name("context"), webappContext.getContextPath())
-                                                )
-                                        )
-                                )
+                                element(name("properties"), props.toArray(new Element[props.size()]))
+                                
                         )
                 ),
                 executionEnvironment()
@@ -602,33 +601,17 @@ public class MavenGoals
     }
 
     /**
-     * Decides whether to use the org.twdata.maven.cargo-maven2-plugin or the org.codehaus.cargo.cargo-maven2-plugin.
+     * THIS USED TO Decide whether to use the org.twdata.maven.cargo-maven2-plugin or the org.codehaus.cargo.cargo-maven2-plugin.
      * <p/>
-     * The org.twdata.maven plugin is a fork of the org.codehaus.cargo plugin that has been used in AMPS so far. The
-     * org.codehaus.cargo plugin in the more recent version has the advantage of setting the timeout to 0. This skips
-     * waiting for start/stop of the container in order to perform these operations in parallel.
-     *
-     * @param if {@link Product#getSynchronousStartup()} is true, org.twdata.maven.cargo-maven2-plugin is chosen, if it
-     *        is false, org.codehaus.cargo.cargo-maven2-plugin is chosen
+     * This has now been changed to just return the codehaus version since there are new features/fixes we need and the twdata version is no longer useful.
      */
     private Plugin cargo(Product context)
     {
-        if (Boolean.TRUE.equals(context.getSynchronousStartup())
-                // TWData's Cargo doesn't support Tomcat 7
-                && !"tomcat7x".equals(context.getContainerId()))
-        {
-            return plugin(
-                groupId("org.twdata.maven"),
-                artifactId("cargo-maven2-plugin"),
-                version(pluginArtifactIdToVersionMap.get("cargo-maven2-plugin")));
-        }
-        else
-        {
-            return plugin(
+        log.info("using codehaus cargo v" + pluginArtifactIdToVersionMap.get("org.codehaus.cargo:cargo-maven2-plugin"));
+        return plugin(
                 groupId("org.codehaus.cargo"),
                 artifactId("cargo-maven2-plugin"),
                 version(pluginArtifactIdToVersionMap.get("org.codehaus.cargo:cargo-maven2-plugin")));
-        }
     }
 
     private Element waitElement(Plugin cargo)
