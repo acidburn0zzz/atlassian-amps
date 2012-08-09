@@ -173,14 +173,10 @@
                         <isTrue value="${installJava}"/>
                     </ruleList>
                 </showProgressDialog>
-
-	<!--
                         <runProgram>
                             <program>${installdir}\java.exe</program>
                             <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
                         </runProgram>
-                        
-
                 <actionGroup>
                     <actionList>
                         <showProgressDialog>
@@ -229,7 +225,6 @@
                         <isTrue value="${installJava}"/>
                     </ruleList>
                 </actionGroup>
-                -->
 	            </actionList>
             <ruleList>
                 <isFalse>
@@ -241,15 +236,19 @@
             </ruleList>
         </actionGroup>
 
-	<!--
         <addEnvironmentVariable>
-            <name>ATLASSIAN_PLUGIN_SDK</name>
+            <name>ATLAS_HOME</name>
             <scope>user</scope>
             <value>${installdir}</value>
         </addEnvironmentVariable>
+        <addEnvironmentVariable>
+            <name>M2_REPO</name>
+            <scope>user</scope>
+            <value>${user_home_directory}\.m2\repository</value>
+        </addEnvironmentVariable>
         <addDirectoryToPath>
             <insertAt>end</insertAt>
-            <path>%ATLASSIAN_PLUGIN_SDK%\bin</path>
+            <path>%ATLAS_HOME%\bin</path>
             <scope>user</scope>
             <ruleList>
                 <platformTest type="windows"/>
@@ -259,13 +258,13 @@
                 </programTest>
             </ruleList>
         </addDirectoryToPath>
-        -->
 	    </postInstallationActionList>
     <cdromDirectory>${product_version}-cdrom</cdromDirectory>
     <compressionAlgorithm>lzma</compressionAlgorithm>
     <description>Development kit to build Atlassian plugins</description>
     <enableDebugger>1</enableDebugger>
     <enableRollback>0</enableRollback>
+    <enableSslSupport>1</enableSslSupport>
     <enableTimestamp>1</enableTimestamp>
     <nativePackageName>atlassian-plugin-sdk</nativePackageName>
     <rebootRequired>1</rebootRequired>
