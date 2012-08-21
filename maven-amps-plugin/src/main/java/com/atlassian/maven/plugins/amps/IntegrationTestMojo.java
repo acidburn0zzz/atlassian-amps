@@ -10,6 +10,7 @@ import java.util.Set;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -63,6 +64,18 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
      */
     @Parameter(property = "skipITs", defaultValue = "false")
     private boolean skipITs = false;
+
+    /**
+     * port for debugging
+     */
+    @Parameter(property = "jvm.debug.port", defaultValue = "0")
+    protected int jvmDebugPort;
+
+    /**
+     * Suspend when debugging
+     */
+    @Parameter(property = "jvm.debug.suspend")
+    protected boolean jvmDebugSuspend = false;
 
     protected void doExecute() throws MojoExecutionException
     {
@@ -158,6 +171,8 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         List<ProductExecution> productExecutions = includeStudioDependentProducts(executionsDeclaredInPom, goals);
         setParallelMode(productExecutions);
 
+        int counter = 0;
+        
         // Install the plugin in each product and start it
         for (ProductExecution productExecution : productExecutions)
         {
@@ -171,6 +186,24 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
             int actualHttpPort = 0;
             if (!noWebapp)
             {
+                if(jvmDebugPort > 0)
+                {
+                    if (product.getJvmDebugPort() == 0)
+                    {
+                        product.setJvmDebugPort(jvmDebugPort + counter++);
+                    }
+                    final int debugPort = product.getJvmDebugPort();
+                    String debugArgs = " -Xdebug -Xrunjdwp:transport=dt_socket,address=" +
+                            String.valueOf(debugPort) + ",suspend=" + (jvmDebugSuspend ? "y" : "n") + ",server=y ";
+
+                    if (product.getJvmArgs() == null)
+                    {
+                        product.setJvmArgs(StringUtils.defaultString(jvmArgs));
+                    }
+
+                    product.setJvmArgs(product.getJvmArgs() + debugArgs);
+                }
+                
                 actualHttpPort = productHandler.start(product);
             }
 
