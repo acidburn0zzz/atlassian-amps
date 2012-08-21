@@ -45,8 +45,8 @@
             </ruleList>
         </setInstallerVariable>
 
-	<!-- handle already defined JAVA_HOME -->
-	<actionGroup>
+        <!-- handle already defined JAVA_HOME -->
+        <actionGroup>
             <actionList>
                 <runProgram>
                     <abortOnError>0</abortOnError>
@@ -94,8 +94,8 @@
             </ruleList>
         </actionGroup>
 
-	<!-- didn't find java 1.6+, we need to detect it -->
-	<actionGroup>
+        <!-- didn't find java 1.6+, we need to detect it -->
+        <actionGroup>
             <actionList>
                 <autodetectJava>
                     <abortOnError>0</abortOnError>
@@ -152,8 +152,8 @@
             </ruleList>
         </actionGroup>
 
-	<!-- no Java detected, ask if they want to install it -->
-	<actionGroup>
+        <!-- no Java detected, ask if they want to install it -->
+        <actionGroup>
             <actionList>
                 <showQuestion>
                     <default>yes</default>
@@ -173,10 +173,10 @@
                         <isTrue value="${installJava}"/>
                     </ruleList>
                 </showProgressDialog>
-                        <runProgram>
-                            <program>${installdir}\java.exe</program>
-                            <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
-                        </runProgram>
+                <runProgram>
+                    <program>${installdir}\java.exe</program>
+                    <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
+                </runProgram>
                 <actionGroup>
                     <actionList>
                         <showProgressDialog>
@@ -188,19 +188,19 @@
                                 </httpGet>
                             </actionList>
                         </showProgressDialog>
-                        
+
                         <runProgram>
                             <program>${installdir}\java.exe</program>
                             <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
                         </runProgram>
-                        
+
                     </actionList>
                     <ruleList>
                         <platformTest type="windows-x64"/>
                         <isTrue value="${installJava}"/>
                     </ruleList>
                 </actionGroup>
-                
+
                 <actionGroup>
                     <actionList>
                         <addEnvironmentVariable>
@@ -225,7 +225,7 @@
                         <isTrue value="${installJava}"/>
                     </ruleList>
                 </actionGroup>
-	            </actionList>
+            </actionList>
             <ruleList>
                 <isFalse>
                     <value>${hasJava16Home}</value>
@@ -258,7 +258,7 @@
                 </programTest>
             </ruleList>
         </addDirectoryToPath>
-	    </postInstallationActionList>
+    </postInstallationActionList>
     <cdromDirectory>${product_version}-cdrom</cdromDirectory>
     <compressionAlgorithm>lzma</compressionAlgorithm>
     <description>Development kit to build Atlassian plugins</description>
@@ -312,7 +312,7 @@
                         <compareText>
                             <logic>contains</logic>
                             <text>${installdir}</text>
-                            <value></value>
+                            <value> </value>
                         </compareText>
                     </ruleList>
                 </throwError>
