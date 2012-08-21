@@ -61,6 +61,8 @@
                                         <argument>build</argument>
                                         <argument>amps-installbuilder.xml</argument>
                                         <argument>windows</argument>
+                                        <argument>--license</argument>
+                                        <argument>${project.basedir}/installbuilder-license.xml</argument>
                                         <argument>--setvars</argument>
                                         <argument>project.version=${version}</argument>
                                         <argument>project.outputDirectory=${project.build.directory}</argument>
