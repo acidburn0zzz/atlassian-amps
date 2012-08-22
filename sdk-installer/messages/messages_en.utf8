@@ -1,5 +1,5 @@
 sdk.installer.install.java=Sun JDK 1.6+ was not found on your system, would you like to download and install one now?
 sdk.installer.path.with.spaces=This directory path cannot contain spaces, please choose another directory.
 sdk.installer.downloading=Downloading files...
-
+sdk.installer.installing.java=Installing Java. Please wait...
 Installer.Welcome.Title=%1$s ${project.version}

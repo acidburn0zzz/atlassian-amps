@@ -45,8 +45,8 @@
             </ruleList>
         </setInstallerVariable>
 
-        <!-- handle already defined JAVA_HOME -->
-        <actionGroup>
+	<!-- handle already defined JAVA_HOME -->
+	<actionGroup>
             <actionList>
                 <runProgram>
                     <abortOnError>0</abortOnError>
@@ -94,8 +94,8 @@
             </ruleList>
         </actionGroup>
 
-        <!-- didn't find java 1.6+, we need to detect it -->
-        <actionGroup>
+	<!-- didn't find java 1.6+, we need to detect it -->
+	<actionGroup>
             <actionList>
                 <autodetectJava>
                     <abortOnError>0</abortOnError>
@@ -152,31 +152,41 @@
             </ruleList>
         </actionGroup>
 
-        <!-- no Java detected, ask if they want to install it -->
-        <actionGroup>
+	<!-- no Java detected, ask if they want to install it -->
+	<actionGroup>
             <actionList>
                 <showQuestion>
                     <default>yes</default>
                     <text>${msg(sdk.installer.install.java)}</text>
                     <variable>installJava</variable>
                 </showQuestion>
-                <showProgressDialog>
-                    <title>${msg(sdk.installer.downloading)}</title>
+                <actionGroup>
                     <actionList>
-                        <httpGet>
-                            <filename>${installdir}\java.exe</filename>
-                            <url>https://developer.atlassian.com/static/javabundles/jdk-6u32-windows-i586.exe</url>
-                        </httpGet>
+                        <showProgressDialog>
+                            <title>${msg(sdk.installer.downloading)}</title>
+                            <actionList>
+                                <httpGet>
+                                    <filename>${installdir}\java.exe</filename>
+                                    <url>https://developer.atlassian.com/static/javabundles/jdk-6u32-windows-i586.exe</url>
+                                </httpGet>
+                            </actionList>
+                        </showProgressDialog>
+                        <showProgressDialog>
+                            <progressText>${msg(sdk.installer.installing.java)}</progressText>
+                            <title>${msg(sdk.installer.installing.java)}</title>
+                            <actionList>
+                                <runProgram>
+                                    <program>${installdir}\java.exe</program>
+                                    <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
+                                </runProgram>
+                            </actionList>
+                        </showProgressDialog>
                     </actionList>
                     <ruleList>
                         <platformTest negate="1" type="windows-x64"/>
                         <isTrue value="${installJava}"/>
                     </ruleList>
-                </showProgressDialog>
-                <runProgram>
-                    <program>${installdir}\java.exe</program>
-                    <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
-                </runProgram>
+                </actionGroup>
                 <actionGroup>
                     <actionList>
                         <showProgressDialog>
@@ -188,19 +198,22 @@
                                 </httpGet>
                             </actionList>
                         </showProgressDialog>
-
-                        <runProgram>
-                            <program>${installdir}\java.exe</program>
-                            <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
-                        </runProgram>
-
+                        <showProgressDialog>
+                            <progressText>${msg(sdk.installer.installing.java)}</progressText>
+                            <title>${msg(sdk.installer.installing.java)}</title>
+                            <actionList>
+                                <runProgram>
+                                    <program>${installdir}\java.exe</program>
+                                    <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
+                                </runProgram>
+                            </actionList>
+                        </showProgressDialog>
                     </actionList>
                     <ruleList>
                         <platformTest type="windows-x64"/>
                         <isTrue value="${installJava}"/>
                     </ruleList>
                 </actionGroup>
-
                 <actionGroup>
                     <actionList>
                         <addEnvironmentVariable>
@@ -235,7 +248,6 @@
                 </isFalse>
             </ruleList>
         </actionGroup>
-
         <addEnvironmentVariable>
             <name>ATLAS_HOME</name>
             <scope>user</scope>
@@ -259,6 +271,16 @@
             </ruleList>
         </addDirectoryToPath>
     </postInstallationActionList>
+    <postUninstallationActionList>
+        <deleteEnvironmentVariable>
+            <name>ATLAS_HOME</name>
+            <scope>user</scope>
+        </deleteEnvironmentVariable>
+        <removeDirectoryFromPath>
+            <path>%ATLAS_HOME%\bin</path>
+            <scope>user</scope>
+        </removeDirectoryFromPath>
+    </postUninstallationActionList>
     <cdromDirectory>${product_version}-cdrom</cdromDirectory>
     <compressionAlgorithm>lzma</compressionAlgorithm>
     <description>Development kit to build Atlassian plugins</description>
@@ -267,7 +289,6 @@
     <enableSslSupport>1</enableSslSupport>
     <enableTimestamp>1</enableTimestamp>
     <nativePackageName>atlassian-plugin-sdk</nativePackageName>
-    <rebootRequired>1</rebootRequired>
     <saveRelativePaths>1</saveRelativePaths>
     <summary>Development kit to build Atlassian plugins</summary>
     <unattendedModeUI>minimal</unattendedModeUI>
