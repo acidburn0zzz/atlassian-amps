@@ -172,10 +172,10 @@
                             </actionList>
                         </showProgressDialog>
                         <showProgressDialog>
-                            <progressText>${msg(sdk.installer.installing.java)}</progressText>
                             <title>${msg(sdk.installer.installing.java)}</title>
                             <actionList>
                                 <runProgram>
+                                    <progressText>${msg(sdk.installer.installing.java)}</progressText>
                                     <program>${installdir}\java.exe</program>
                                     <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
                                 </runProgram>
@@ -199,10 +199,10 @@
                             </actionList>
                         </showProgressDialog>
                         <showProgressDialog>
-                            <progressText>${msg(sdk.installer.installing.java)}</progressText>
                             <title>${msg(sdk.installer.installing.java)}</title>
                             <actionList>
                                 <runProgram>
+                                    <progressText>${msg(sdk.installer.installing.java)}</progressText>
                                     <program>${installdir}\java.exe</program>
                                     <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
                                 </runProgram>
