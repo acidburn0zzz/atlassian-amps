@@ -146,7 +146,7 @@ public class GoogleAmpsTracker
         String browser = (null != System.getenv("ATLAS_VERSION")) ? "Atlassian-SDK" : "Atlassian-AMPS-Plugin";
         String browserVersion = (null != System.getenv("ATLAS_VERSION")) ? sdkVersion : ampsVersion;
         
-        sb.append("Mozilla/5.0 (compatible; ")
+        sb.append(browser + "/" + browserVersion + "(compatible; ")
           .append(browser)
           .append(" ")
           .append(browserVersion)
