@@ -307,6 +307,43 @@
                             </execution>
                         </executions>
                     </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.6</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.ant</groupId>
+                                <artifactId>ant-jsch</artifactId>
+                                <version>1.8.2</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>jsch</groupId>
+                                <artifactId>jsch</artifactId>
+                                <version>0.1.44</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>upload-to-linux-repos</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <scp todir="${sdk.scp.user}@${sdk.scp.host}:/var/packages/incoming/" port="22" trust="true" verbose="true" keyfile="${sdk.scp.key}">
+                                            <fileset dir="${build.directory}" casesensitive="yes">
+                                                <include name="**/*.deb"/>
+                                                <include name="**/*.rpm"/>
+                                            </fileset>
+                                        </scp>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -415,5 +452,8 @@
     <properties>
         <installbuilder.builder>/tools/installbuilder/bin/builder</installbuilder.builder>
         <buildhelper.version>1.7</buildhelper.version>
+        <sdk.scp.user>${user.name}</sdk.scp.user>
+        <sdk.scp.host>plugin-sdk-repo.private.atlassian.com</sdk.scp.host>
+        <sdk.scp.key>${user.home}/.ssh/id_rsa</sdk.scp.key>
     </properties>
 </project>
