@@ -245,7 +245,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         }
 
         // Actually run the tests
-        goals.runTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory);
+        goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory);
 
         // Shut all products down
         if (!noWebapp)

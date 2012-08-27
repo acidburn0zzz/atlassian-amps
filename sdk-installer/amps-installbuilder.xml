@@ -300,7 +300,7 @@
     <enableSslSupport>1</enableSslSupport>
     <enableTimestamp>1</enableTimestamp>
     <nativePackageName>atlassian-plugin-sdk</nativePackageName>
-    <rebootRequired>0</rebootRequired>
+    <rebootRequired>1</rebootRequired>
     <saveRelativePaths>1</saveRelativePaths>
     <summary>Development kit to build Atlassian plugins</summary>
     <unattendedModeUI>minimal</unattendedModeUI>
