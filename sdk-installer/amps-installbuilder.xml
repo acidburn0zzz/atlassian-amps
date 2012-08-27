@@ -30,6 +30,17 @@
                     </distributionFileList>
                 </folder>
             </folderList>
+            <startMenuShortcutList>
+                <startMenuShortcut>
+                    <comment>Uninstall ${project.fullName}</comment>
+                    <name>Uninstall ${project.fullName}</name>
+                    <runInTerminal>0</runInTerminal>
+                    <windowsExec>${installdir}\${project.uninstallerName}.exe</windowsExec>
+                    <windowsExecArgs></windowsExecArgs>
+                    <windowsIcon></windowsIcon>
+                    <windowsPath>${installdir}\</windowsPath>
+                </startMenuShortcut>
+            </startMenuShortcutList>
         </component>
     </componentList>
     <postInstallationActionList>
@@ -223,7 +234,7 @@
                         </addEnvironmentVariable>
                         <addDirectoryToPath>
                             <insertAt>end</insertAt>
-                            <path>%JAVA_HOME%\bin\</path>
+                            <path>${installdir}${platform_path_separator}jdk${platform_path_separator}bin${platform_path_separator}</path>
                             <scope>user</scope>
                             <ruleList>
                                 <platformTest type="windows"/>
@@ -261,6 +272,7 @@
         <addDirectoryToPath>
             <insertAt>end</insertAt>
             <path>%ATLAS_HOME%\bin\</path>
+            <scope>system</scope>
             <ruleList>
                 <platformTest type="windows"/>
                 <programTest>
@@ -273,6 +285,7 @@
     <postUninstallationActionList>
         <removeDirectoryFromPath>
             <path>%ATLAS_HOME%\bin\</path>
+            <scope>system</scope>
         </removeDirectoryFromPath>
         <deleteEnvironmentVariable>
             <name>ATLAS_HOME</name>
@@ -287,7 +300,7 @@
     <enableSslSupport>1</enableSslSupport>
     <enableTimestamp>1</enableTimestamp>
     <nativePackageName>atlassian-plugin-sdk</nativePackageName>
-    <rebootRequired>1</rebootRequired>
+    <rebootRequired>0</rebootRequired>
     <saveRelativePaths>1</saveRelativePaths>
     <summary>Development kit to build Atlassian plugins</summary>
     <unattendedModeUI>minimal</unattendedModeUI>
