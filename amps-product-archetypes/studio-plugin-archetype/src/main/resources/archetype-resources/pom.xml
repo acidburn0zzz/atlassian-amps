@@ -33,7 +33,7 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-amps-plugin</artifactId>
-                <version>${project.version}</version>
+                <version>\${dollar}{amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <testGroup>studioTestGroup</testGroup>
