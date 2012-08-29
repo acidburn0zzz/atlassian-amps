@@ -82,6 +82,7 @@ public class MavenGoals
             put("maven-dependency-plugin", "2.0");
             put("maven-resources-plugin", "2.3");
             put("maven-jar-plugin", "2.2");
+            //put("maven-surefire-plugin", "2.4.3");
             put("maven-surefire-plugin", "2.12");
 
         }};
@@ -641,7 +642,7 @@ public class MavenGoals
         return server + port + contextPath;
     }
 
-    public void runTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties, final File targetDirectory)
+    public void runIntegrationTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties, final File targetDirectory)
     		throws MojoExecutionException
 	{
     	List<Element> includeElements = new ArrayList<Element>(includes.size());
@@ -663,8 +664,20 @@ public class MavenGoals
         systemProperties.put(reportsDirectory, testOutputDir);
 
         final Element systemProps = convertPropsToElements(systemProperties);
+        final Xpp3Dom config = configuration(
+                element(name("includes"),
+                        includeElements.toArray(new Element[includeElements.size()])
+                ),
+                element(name("excludes"),
+                        excludeElements.toArray(new Element[excludeElements.size()])
+                ),
+                systemProps,
+                element(name(reportsDirectory), testOutputDir)
+        );
 
-
+        log.info("Surefire configuration:");
+        log.info(config.toString());
+        
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -672,16 +685,7 @@ public class MavenGoals
                         version(defaultArtifactIdToVersionMap.get("maven-surefire-plugin"))
                 ),
                 goal("test"),
-                configuration(
-                        element(name("includes"),
-                        		includeElements.toArray(new Element[includeElements.size()])
-                        ),
-                        element(name("excludes"),
-                                excludeElements.toArray(new Element[excludeElements.size()])
-                        ),
-                        systemProps,
-                        element(name(reportsDirectory), testOutputDir)
-                ),
+                config,
                 executionEnvironment()
         );
 	}
@@ -693,9 +697,13 @@ public class MavenGoals
     {
         ArrayList<Element> properties = new ArrayList<Element>();
 
+        /*
+        OLD surefire 2.4.3 style
+         
         // add extra system properties... overwriting any of the hard coded values above.
         for (Map.Entry<String, Object> entry: systemProperties.entrySet())
         {
+            log.info("adding system property to configuration: " + entry.getKey() + "::" + entry.getValue());
             properties.add(
                     element(name("property"),
                             element(name("name"), entry.getKey()),
@@ -703,6 +711,17 @@ public class MavenGoals
         }
 
         return element(name("systemProperties"), properties.toArray(new Element[properties.size()]));
+        */
+        
+        // NEW surefire 2.12 style
+        for (Map.Entry<String, Object> entry: systemProperties.entrySet())
+        {
+            log.info("adding system property to configuration: " + entry.getKey() + "::" + entry.getValue());
+            
+            properties.add(element(name(entry.getKey()),entry.getValue().toString()));
+        }
+
+        return element(name("systemPropertyVariables"), properties.toArray(new Element[properties.size()]));
     }
 
     private Container findContainer(final String containerId)

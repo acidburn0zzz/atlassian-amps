@@ -30,6 +30,24 @@
                     </distributionFileList>
                 </folder>
             </folderList>
+            <startMenuShortcutList>
+                <startMenuShortcut>
+                    <comment>Uninstall ${project.fullName}</comment>
+                    <name>Uninstall ${project.fullName}</name>
+                    <runInTerminal>0</runInTerminal>
+                    <windowsExec>${installdir}\${project.uninstallerName}.exe</windowsExec>
+                    <windowsExecArgs></windowsExecArgs>
+                    <windowsIcon></windowsIcon>
+                    <windowsPath>${installdir}\</windowsPath>
+                </startMenuShortcut>
+                <startMenuLinkShortcut>
+                    <comment>${project.fullName} Documentation</comment>
+                    <name>${project.fullName} Documentation</name>
+                    <runInTerminal>0</runInTerminal>
+                    <url>https://developer.atlassian.com/display/DOCS</url>
+                    <windowsIcon></windowsIcon>
+                </startMenuLinkShortcut>
+            </startMenuShortcutList>
         </component>
     </componentList>
     <postInstallationActionList>
@@ -172,12 +190,12 @@
                             </actionList>
                         </showProgressDialog>
                         <showProgressDialog>
-                            <progressText>${msg(sdk.installer.installing.java)}</progressText>
                             <title>${msg(sdk.installer.installing.java)}</title>
                             <actionList>
                                 <runProgram>
                                     <program>${installdir}\java.exe</program>
                                     <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
+                                    <progressText>${msg(sdk.installer.installing.java)}</progressText>
                                 </runProgram>
                             </actionList>
                         </showProgressDialog>
@@ -199,12 +217,12 @@
                             </actionList>
                         </showProgressDialog>
                         <showProgressDialog>
-                            <progressText>${msg(sdk.installer.installing.java)}</progressText>
                             <title>${msg(sdk.installer.installing.java)}</title>
                             <actionList>
                                 <runProgram>
                                     <program>${installdir}\java.exe</program>
                                     <programArguments>/s INSTALLDIR="${installdir.dos}\jdk" REBOOT=Suppress</programArguments>
+                                    <progressText>${msg(sdk.installer.installing.java)}</progressText>
                                 </runProgram>
                             </actionList>
                         </showProgressDialog>
@@ -223,7 +241,7 @@
                         </addEnvironmentVariable>
                         <addDirectoryToPath>
                             <insertAt>end</insertAt>
-                            <path>%JAVA_HOME%\bin</path>
+                            <path>${installdir}${platform_path_separator}jdk${platform_path_separator}bin${platform_path_separator}</path>
                             <scope>user</scope>
                             <ruleList>
                                 <platformTest type="windows"/>
@@ -250,7 +268,7 @@
         </actionGroup>
         <addEnvironmentVariable>
             <name>ATLAS_HOME</name>
-            <scope>user</scope>
+            <scope>system</scope>
             <value>${installdir}</value>
         </addEnvironmentVariable>
         <addEnvironmentVariable>
@@ -260,8 +278,8 @@
         </addEnvironmentVariable>
         <addDirectoryToPath>
             <insertAt>end</insertAt>
-            <path>%ATLAS_HOME%\bin</path>
-            <scope>user</scope>
+            <path>%ATLAS_HOME%\bin\</path>
+            <scope>system</scope>
             <ruleList>
                 <platformTest type="windows"/>
                 <programTest>
@@ -272,14 +290,14 @@
         </addDirectoryToPath>
     </postInstallationActionList>
     <postUninstallationActionList>
+        <removeDirectoryFromPath>
+            <path>%ATLAS_HOME%\bin\</path>
+            <scope>system</scope>
+        </removeDirectoryFromPath>
         <deleteEnvironmentVariable>
             <name>ATLAS_HOME</name>
-            <scope>user</scope>
+            <scope>system</scope>
         </deleteEnvironmentVariable>
-        <removeDirectoryFromPath>
-            <path>%ATLAS_HOME%\bin</path>
-            <scope>user</scope>
-        </removeDirectoryFromPath>
     </postUninstallationActionList>
     <cdromDirectory>${product_version}-cdrom</cdromDirectory>
     <compressionAlgorithm>lzma</compressionAlgorithm>
@@ -289,6 +307,7 @@
     <enableSslSupport>1</enableSslSupport>
     <enableTimestamp>1</enableTimestamp>
     <nativePackageName>atlassian-plugin-sdk</nativePackageName>
+    <rebootRequired>1</rebootRequired>
     <saveRelativePaths>1</saveRelativePaths>
     <summary>Development kit to build Atlassian plugins</summary>
     <unattendedModeUI>minimal</unattendedModeUI>

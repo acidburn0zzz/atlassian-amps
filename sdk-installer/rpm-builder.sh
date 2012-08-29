@@ -3,6 +3,18 @@
 SDKVERSION=$1
 RPMVERSION=$2
 
+#make sure we use GNU sed (gsed from macports) on OSX
+
+OS=`uname`
+
+echo "OS = $OS"
+
+if [ "${OS}" == "Darwin" ]; then
+    SED=gsed
+else
+	SED=sed
+fi
+
 # Make sure we have a clean /usr/bin
 rm -rf target/rpm-work/unzip/usr/bin/
 mkdir -p target/rpm-work/unzip/usr/bin/
@@ -13,22 +25,22 @@ for f in `find target/rpm-work/unzip/usr/share/atlassian-plugin-sdk-$SDKVERSION/
 done
 
 # update version in spec
-sed -i -e "s/RPMVERSION/$RPMVERSION/g" target/rpm-work/atlassian-plugin-sdk.spec
+$SED -i -e "s/RPMVERSION/$RPMVERSION/g" target/rpm-work/atlassian-plugin-sdk.spec
 
 # update postinst script
-sed -i -e '/POSTINST/{r ./target/deb-work/DEBIAN/postinst' -e 'd}' target/rpm-work/atlassian-plugin-sdk.spec
+$SED -i -e '/POSTINST/{r ./target/deb-work/DEBIAN/postinst' -e 'd}' target/rpm-work/atlassian-plugin-sdk.spec
 
 # update prerm script
-sed -i -e '/PRERM/{r ./target/deb-work/DEBIAN/prerm' -e 'd}' target/rpm-work/atlassian-plugin-sdk.spec
+$SED -i -e '/PRERM/{r ./target/deb-work/DEBIAN/prerm' -e 'd}' target/rpm-work/atlassian-plugin-sdk.spec
 
 # update postrm script
-sed -i -e '/POSTRM/{r ./target/deb-work/DEBIAN/postrm' -e 'd}' target/rpm-work/atlassian-plugin-sdk.spec
+$SED -i -e '/POSTRM/{r ./target/deb-work/DEBIAN/postrm' -e 'd}' target/rpm-work/atlassian-plugin-sdk.spec
 
 echo "using rpm version: $RPMVERSION"
 
 # Make the rpm file
 #cd ./target/rpm-work
-rpmbuild -v --buildroot=${PWD}/target/rpm-work/unzip -bb --target noarch ./target/rpm-work/atlassian-plugin-sdk.spec 2>&1
+sudo rpmbuild -v --buildroot=${PWD}/target/rpm-work/unzip -bb --target=noarch ./target/rpm-work/atlassian-plugin-sdk.spec 2>&1
 
 
 exit 0

@@ -1,3 +1,4 @@
+AutoReqProv: no
 Buildroot: ${project.build.directory}/rpm-work/unzip
 Name: atlassian-plugin-sdk
 Version: RPMVERSION
@@ -7,8 +8,9 @@ License: Apache-2.0
 Group: misc
 
 %define _rpmdir ${project.build.directory}
-%define _rpmfilename %%{NAME}-RPMVERSION.%%{ARCH}.rpm
+%define _rpmfilename %%{NAME}-RPMVERSION.noarch.rpm
 %define _unpackaged_files_terminate_build 0
+
 
 %post
 POSTINST
@@ -26,7 +28,7 @@ POSTRM
 
 
 %clean
-
+echo "clean"
 
 %files
 "/"
