@@ -42,8 +42,13 @@ public class MarketplaceSdkResource implements SdkResource {
         ArrayList<Map<?, ?>> versions = (ArrayList<Map<?, ?>>) versionsElement.get("versions");
         for (Map<?, ?> versionData: versions) {
             if (versionData.get("version").equals(version)) {
-                Map<?, ?> links = (Map<?, ?>) versionData.get("links");
-                versionDownloadPath = (String) links.get("binary");
+                ArrayList<Map<?, ?>> links = (ArrayList<Map<?, ?>>) versionData.get("links");
+                for (Map<?, ?> link: links) {
+                    if (link.get("rel").equals("binary")) {
+                        versionDownloadPath = (String) link.get("href");
+                        break;
+                    }
+                }
             }
         }
 
