@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -77,6 +79,7 @@ public class MavenProjectRewriter implements ProjectRewriter
         modifyPom |= applyBundleInstructionChanges(changes.getItems(BundleInstruction.class));
         modifyPom |= applyPluginArtifactChanges(changes.getItems(com.atlassian.plugins.codegen.PluginArtifact.class));
         modifyPom |= applyAmpsSystemPropertyChanges(changes.getItems(AmpsSystemPropertyVariable.class));
+        modifyPom |= applyAmpsVersionUpdate(changes.getItems(AmpsVersionUpdate.class));
 
         if (modifyPom)
         {
@@ -146,6 +149,57 @@ public class MavenProjectRewriter implements ProjectRewriter
             }
         }
         return modified;
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean applyAmpsVersionUpdate(Iterable<AmpsVersionUpdate> items)
+    {
+        boolean modified = false;
+        
+        //find the highest version in our items.
+        //Note: really there should only be 1 change item
+        DefaultArtifactVersion newAmpsVersion = new DefaultArtifactVersion("0.0");
+        for(AmpsVersionUpdate changeItem : items)
+        {
+            DefaultArtifactVersion changeVersion = new DefaultArtifactVersion(changeItem.getVersion());
+            if(changeVersion.compareTo(newAmpsVersion) > 0)
+            {
+                newAmpsVersion = changeVersion;
+            }
+        }
+        
+        //update the amps plugin version to the property if needed
+        Element ampsVersionElement = getOrCreateElement(findAmpsPlugin(),"version");
+        if(!"${amps.version}".equals(ampsVersionElement.getTextTrim()))
+        {
+            ampsVersionElement.setText("${amps.version}");
+            modified = true;
+        }
+
+        //add the amps.version prop if needed
+        Element ampsVersionProperty = getOrCreateElement(getOrCreateElement(root, "properties"),"amps.version");
+        
+        //update the amps.version prop if our change is a newer version
+        if(StringUtils.isNotBlank(ampsVersionProperty.getTextTrim()))
+        {
+            DefaultArtifactVersion pomVersion = new DefaultArtifactVersion(ampsVersionProperty.getTextTrim());
+            if(newAmpsVersion.compareTo(pomVersion) > 0)
+            {
+                modified = true;
+                ampsVersionProperty.setText(newAmpsVersion.toString());
+            }
+        }
+        else
+        {
+            ampsVersionProperty.setText(newAmpsVersion.toString());
+        }
+        
+        return modified;
+    }
+    
+    public String getAmpsVersionInPom()
+    {
+        return getOrCreateElement(findAmpsPlugin(),"version").getTextTrim();
     }
     
     @SuppressWarnings("unchecked")

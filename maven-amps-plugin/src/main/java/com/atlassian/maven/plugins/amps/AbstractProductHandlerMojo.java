@@ -596,7 +596,9 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     public final void execute() throws MojoExecutionException, MojoFailureException
     {
         getUpdateChecker().check();
-
+        
+        getAmpsPluginVersionChecker().checkAmpsVersionInPom(getSdkVersion(),getMavenContext().getProject());
+        
         stringToArtifactList(pluginArtifactsString, pluginArtifacts);
         stringToArtifactList(libArtifactsString, libArtifacts);
         stringToArtifactList(bundledArtifactsString, bundledArtifacts);

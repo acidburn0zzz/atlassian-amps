@@ -99,6 +99,19 @@
         </component>
 
         <component>
+            <role>com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker</role>
+            <role-hint>amps pom version checker</role-hint>
+            <implementation>com.atlassian.maven.plugins.amps.util.AmpsPluginVersionCheckerImpl</implementation>
+            <requirements>
+                <requirement>
+                    <role>org.codehaus.plexus.components.interactivity.Prompter</role>
+                    <field-name>prompter</field-name>
+                </requirement>
+                
+            </requirements>
+        </component>
+
+        <component>
             <role>com.atlassian.maven.plugins.updater.SdkResource</role>
             <role-hint>component for getting SDK versions from MPAC</role-hint>
             <implementation>com.atlassian.maven.plugins.updater.MarketplaceSdkResource</implementation>

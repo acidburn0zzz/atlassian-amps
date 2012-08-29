@@ -2,6 +2,7 @@ package com.atlassian.maven.plugins.amps;
 
 import java.util.List;
 
+import com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker;
 import com.atlassian.maven.plugins.amps.util.UpdateChecker;
 import com.atlassian.maven.plugins.updater.SdkResource;
 import org.apache.maven.execution.MavenSession;
@@ -76,6 +77,15 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
 
     private UpdateChecker updateChecker;
 
+    /**
+     * Flag to skip checking amps version in pom
+     */
+    @Parameter(property = "skip.amps.pom.check", defaultValue = "false")
+    private boolean skipAmpsPomCheck;
+
+    @Component
+    private AmpsPluginVersionChecker ampsPluginVersionChecker;
+
     protected MavenContext getMavenContext()
     {
         if (mavenContext == null)
@@ -124,6 +134,12 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
         }
 
         return updateChecker;
+    }
+
+    protected AmpsPluginVersionChecker getAmpsPluginVersionChecker()
+    {
+        ampsPluginVersionChecker.skipPomCheck(skipAmpsPomCheck);
+        return ampsPluginVersionChecker;
     }
 
     protected String getSdkVersion()
