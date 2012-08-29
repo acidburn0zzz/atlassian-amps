@@ -40,6 +40,13 @@
                     <windowsIcon></windowsIcon>
                     <windowsPath>${installdir}\</windowsPath>
                 </startMenuShortcut>
+                <startMenuLinkShortcut>
+                    <comment>${project.fullName} Documentation</comment>
+                    <name>${project.fullName} Documentation</name>
+                    <runInTerminal>0</runInTerminal>
+                    <url>https://developer.atlassian.com/display/DOCS</url>
+                    <windowsIcon></windowsIcon>
+                </startMenuLinkShortcut>
             </startMenuShortcutList>
         </component>
     </componentList>
