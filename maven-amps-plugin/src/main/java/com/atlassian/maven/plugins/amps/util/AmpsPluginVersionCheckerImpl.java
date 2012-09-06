@@ -50,7 +50,7 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
     @Override
     public void checkAmpsVersionInPom(String currentVersion, MavenProject project)
     {
-        if(skipCheck)
+        if(skipCheck || (null == project.getFile() || !project.getFile().exists()))
         {
             return;
         }

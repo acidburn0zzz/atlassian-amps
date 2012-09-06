@@ -84,6 +84,7 @@ public class MavenGoals
             put("maven-jar-plugin", "2.2");
             //put("maven-surefire-plugin", "2.4.3");
             put("maven-surefire-plugin", "2.12");
+            put("maven-failsafe-plugin", "2.9");
 
         }};
 
@@ -664,7 +665,7 @@ public class MavenGoals
         systemProperties.put(reportsDirectory, testOutputDir);
 
         final Element systemProps = convertPropsToElements(systemProperties);
-        final Xpp3Dom config = configuration(
+        final Xpp3Dom itconfig = configuration(
                 element(name("includes"),
                         includeElements.toArray(new Element[includeElements.size()])
                 ),
@@ -675,17 +676,30 @@ public class MavenGoals
                 element(name(reportsDirectory), testOutputDir)
         );
 
-        log.info("Surefire configuration:");
-        log.info(config.toString());
+        final Xpp3Dom verifyconfig = configuration(element(name(reportsDirectory), testOutputDir));
+
+        log.info("Failsafe integration-test configuration:");
+        log.info(itconfig.toString());
         
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
-                        artifactId("maven-surefire-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-surefire-plugin"))
+                        artifactId("maven-failsafe-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-failsafe-plugin"))
                 ),
-                goal("test"),
-                config,
+                goal("integration-test"),
+                itconfig,
+                executionEnvironment()
+        );
+
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-failsafe-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-failsafe-plugin"))
+                ),
+                goal("verify"),
+                verifyconfig,
                 executionEnvironment()
         );
 	}
