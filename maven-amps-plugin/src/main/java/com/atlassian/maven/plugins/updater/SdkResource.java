@@ -1,5 +1,7 @@
 package com.atlassian.maven.plugins.updater;
 
+import com.sun.tools.javac.resources.version;
+
 import java.io.File;
 
 /**
@@ -7,10 +9,10 @@ import java.io.File;
  */
 public interface SdkResource {
 
-    public String getLatestSdkVersion();
+    public String getLatestSdkVersion(SdkPackageType packageType);
 
-    public File downloadLatestSdk();
+    public File downloadLatestSdk(SdkPackageType packageType);
 
-    public File downloadSdk(String version);
+    public File downloadSdk(SdkPackageType packageType, String version);
 
 }

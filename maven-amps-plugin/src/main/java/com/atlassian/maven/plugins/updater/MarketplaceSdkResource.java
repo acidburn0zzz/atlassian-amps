@@ -29,13 +29,13 @@ public class MarketplaceSdkResource implements SdkResource {
     }
 
     @Override
-    public File downloadLatestSdk() {
-        return downloadSdk(getLatestSdkVersion());
+    public File downloadLatestSdk(SdkPackageType packageType) {
+        return downloadSdk(packageType, getLatestSdkVersion(packageType));
     }
 
     @Override
-    public File downloadSdk(String version) {
-        Map<?, ?> rootAsMap = getPluginJsonAsMap();
+    public File downloadSdk(SdkPackageType packageType, String version) {
+        Map<?, ?> rootAsMap = getPluginJsonAsMap(packageType);
 
         String versionDownloadPath = null;
         Map<?, ?> versionsElement = (Map<?, ?>) rootAsMap.get("versions");
@@ -53,7 +53,7 @@ public class MarketplaceSdkResource implements SdkResource {
         }
 
         if (versionDownloadPath == null) {
-            throw new RuntimeException("Couldn't find SDK version for " + OSUtils.OS.getId()
+            throw new RuntimeException("Couldn't find SDK version for " + packageType.key()
                     + " on marketplace with version " + version);
         }
 
@@ -61,8 +61,14 @@ public class MarketplaceSdkResource implements SdkResource {
         HttpURLConnection conn = null;
         try {
             String tempFileSuffix;
-            if (OSUtils.OS == OSUtils.OS.WINDOWS) {
-                tempFileSuffix = ".zip";
+            if (packageType == SdkPackageType.WINDOWS) {
+                tempFileSuffix = ".exe";
+            } else if (packageType == SdkPackageType.MAC) {
+                tempFileSuffix = ".pkg";
+            } else if (packageType == SdkPackageType.RPM) {
+                tempFileSuffix = ".rpm";
+            } else if (packageType == SdkPackageType.DEB) {
+                tempFileSuffix = ".deb";
             } else {
                 tempFileSuffix = ".tar.gz";
             }
@@ -89,8 +95,8 @@ public class MarketplaceSdkResource implements SdkResource {
     }
 
     @Override
-    public String getLatestSdkVersion() {
-        Map<?, ?> rootAsMap = getPluginJsonAsMap();
+    public String getLatestSdkVersion(SdkPackageType packageType) {
+        Map<?, ?> rootAsMap = getPluginJsonAsMap(packageType);
         Map<?, ?> version = (Map<?, ?>) rootAsMap.get("version");
         return (String) version.get("version");
     }
@@ -113,10 +119,10 @@ public class MarketplaceSdkResource implements SdkResource {
 
     }
 
-    private Map<?, ?> getPluginJsonAsMap() {
+    private Map<?, ?> getPluginJsonAsMap(SdkPackageType packageType) {
         URL url;
         try {
-            url = new URL(SDK_DOWNLOAD_URL_ROOT + OSUtils.OS.getId());
+            url = new URL(SDK_DOWNLOAD_URL_ROOT + packageType.key());
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
