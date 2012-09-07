@@ -87,6 +87,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
 
         List<String> commands = new ArrayList<String>();
         commands.add(packageType.installCommand());
+        commands.add(packageType.parameters());
         commands.add(sdkInstaller.getAbsolutePath());
         ProcessBuilder installer = new ProcessBuilder(commands);
         BufferedReader in = null, err = null;
