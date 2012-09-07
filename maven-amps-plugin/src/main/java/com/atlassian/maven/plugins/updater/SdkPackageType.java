@@ -7,7 +7,7 @@ public enum SdkPackageType {
 
     WINDOWS("windows", ""),
     MAC("mac", "./"),
-    RPM("rpm", "rpm -i"),
+    RPM("rpm", "rpm -ivh"),
     DEB("deb", "dpkg -i"),
     TGZ("tgz", "");
 
