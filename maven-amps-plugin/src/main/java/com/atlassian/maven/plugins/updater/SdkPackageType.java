@@ -5,9 +5,9 @@ package com.atlassian.maven.plugins.updater;
  */
 public enum SdkPackageType {
 
-    WINDOWS("windows", new String[] {}),
-    MAC("mac", new String[] {}),
-    RPM("rpm", new String[] { "sudo", "rpm", "-ivh" }),
+    WINDOWS("windows", new String[] { "cmd.exe", "/C" }),
+    MAC("mac", new String[] { "open" }),
+    RPM("rpm", new String[] { "sudo", "rpm", "-Uvh" }),
     DEB("deb", new String[] { "sudo", "dpkg", "-i" }),
     TGZ("tgz", new String[] {});
 
