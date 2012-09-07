@@ -597,7 +597,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     {
         getUpdateChecker().check();
         
-        getAmpsPluginVersionChecker().checkAmpsVersionInPom(getSdkVersion(),getMavenContext().getProject());
+        if(!RunStandaloneMojo.class.isAssignableFrom(this.getClass()))
+        {
+            getAmpsPluginVersionChecker().checkAmpsVersionInPom(getSdkVersion(),getMavenContext().getProject());
+        }
+        
+        promptForEmailSubscriptionIfNeeded();
         
         stringToArtifactList(pluginArtifactsString, pluginArtifacts);
         stringToArtifactList(libArtifactsString, libArtifacts);
