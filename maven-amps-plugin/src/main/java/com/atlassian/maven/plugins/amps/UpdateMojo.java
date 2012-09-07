@@ -42,8 +42,8 @@ public class UpdateMojo extends AbstractAmpsMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        checkUpdatePreconditions();
         SdkPackageType packageType = getSdkPackageType();
+        checkUpdatePreconditions(packageType);
 
         File sdkArchive;
         if (StringUtils.isNotBlank(sdkArchivePath)) {
@@ -119,17 +119,21 @@ public class UpdateMojo extends AbstractAmpsMojo {
         }
     }
 
-    private void checkUpdatePreconditions() throws MojoExecutionException {
-        String sdkHome = getSdkHome();
-        if (sdkHome == null) {
-            throw new MojoExecutionException("SDK update must be run from the atlas-update script.");
+    private void checkUpdatePreconditions(SdkPackageType packageType) throws MojoExecutionException {
+        if (packageType == SdkPackageType.TGZ) {
+            // we're about to overwrite an existing tar.gz. Make sure the directory
+            // is defined by the atlas-update script and is writable.
+            String sdkHome = getSdkHome();
+            if (sdkHome == null) {
+                throw new MojoExecutionException("SDK update must be run from the atlas-update script.");
+            }
+            File sdkHomeDir = new File(sdkHome);
+            if (!sdkHomeDir.exists() || !sdkHomeDir.canWrite()) {
+                throw new MojoExecutionException("To update successfully, SDK home directory " + sdkHome +
+                    " must be writable by the current user.");
+            }
+            getLog().debug("Detected current SDK install from ATLAS_HOME in " + sdkHomeDir.getAbsolutePath());
         }
-        File sdkHomeDir = new File(sdkHome);
-        if (!sdkHomeDir.exists() || !sdkHomeDir.canWrite()) {
-            throw new MojoExecutionException("To update successfully, SDK home directory " + sdkHome +
-                " must be writable by the current user.");
-        }
-        getLog().debug("Detected current SDK install from ATLAS_HOME in " + sdkHomeDir.getAbsolutePath());
     }
 
     private SdkPackageType getSdkPackageType() throws MojoExecutionException {
