@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps;
 import java.util.prefs.Preferences;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
+import com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriber;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -11,6 +12,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
 {
     private static final String PREF_FIRSTRUN_PREFIX = "sdk-firstrun";
+    private static final String PREF_EMAIL_PREFIX = "sdk-email-subscribe";
     
     /**
      * Product id
@@ -106,6 +108,22 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
             }
         }
 
+    }
+
+    protected void promptForEmailSubscriptionIfNeeded() throws MojoExecutionException
+    {
+        if(AmpsEmailSubscriber.ALLOWED_PRODUCTS.contains(getProductId()))
+        {
+            String emailCheckKey = PREF_EMAIL_PREFIX + "-" + getProductId();
+            Preferences prefs = Preferences.userNodeForPackage(getClass());
+            String alreadyRan = prefs.get(emailCheckKey, null);
+
+            if(null == alreadyRan)
+            {
+                prefs.put(emailCheckKey,"true");
+                getAmpsEmailSubscriber().promptForSubscription(getProductId());
+            }
+        }
     }
 
 }

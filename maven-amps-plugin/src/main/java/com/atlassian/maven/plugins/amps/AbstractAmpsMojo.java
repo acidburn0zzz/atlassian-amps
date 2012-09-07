@@ -2,6 +2,7 @@ package com.atlassian.maven.plugins.amps;
 
 import java.util.List;
 
+import com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriber;
 import com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
 import com.atlassian.maven.plugins.amps.util.UpdateChecker;
@@ -86,6 +87,9 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
 
     @Component
     private AmpsPluginVersionChecker ampsPluginVersionChecker;
+
+    @Component
+    private AmpsEmailSubscriber ampsEmailSubscriber;
     
     /**
      * Whether the test plugin should be built or not.  If not specified, it detects an atlassian-plugin.xml in the
@@ -148,6 +152,11 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     {
         ampsPluginVersionChecker.skipPomCheck(skipAmpsPomCheck);
         return ampsPluginVersionChecker;
+    }
+
+    protected AmpsEmailSubscriber getAmpsEmailSubscriber()
+    {
+        return ampsEmailSubscriber;
     }
 
     protected String getSdkVersion()
