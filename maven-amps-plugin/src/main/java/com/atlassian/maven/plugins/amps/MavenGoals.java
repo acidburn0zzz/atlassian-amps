@@ -20,11 +20,14 @@ import com.atlassian.core.util.FileUtils;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -200,6 +203,51 @@ public class MavenGoals
         );
     }
 
+    public void copyTestBundledDependencies() throws MojoExecutionException
+    {
+        /*Collection<Dependency> testUtils = Collections2.filter(ctx.getProject().getDependencies(), new Predicate<Dependency>()
+        {
+            @Override
+            public boolean apply(Dependency o)
+            {
+                return (o.getGroupId().equals("com.atlassian.plugins") && o.getArtifactId().equals("atlassian-plugins-osgi-test-utils"));
+            }
+        });
+        
+        if(!testUtils.isEmpty())
+        {
+            executeMojo(
+                    plugin(
+                            groupId("org.apache.maven.plugins"),
+                            artifactId("maven-dependency-plugin"),
+                            version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                    ),
+                    goal("copy-dependencies"),
+                    configuration(
+                            element(name("includeArtifactIds"), "atlassian-plugins-osgi-test-utils"),
+                            element(name("outputDirectory"), "${project.build.testOutputDirectory}/META-INF/lib")
+                    ),
+                    executionEnvironment()
+            );
+        }*/
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("copy-dependencies"),
+                configuration(
+                        element(name("includeScope"), "runtime"),
+                        element(name("excludeScope"), "provided"),
+                        element(name("excludeScope"), "test"),
+                        element(name("includeTypes"), "jar"),
+                        element(name("outputDirectory"), "${project.build.testOutputDirectory}/META-INF/lib")
+                ),
+                executionEnvironment()
+        );
+    }
+
     public void extractBundledDependencies() throws MojoExecutionException
     {
          executeMojo(
@@ -216,6 +264,28 @@ public class MavenGoals
                         element(name("includeTypes"), "jar"),
                         element(name("excludes"), "META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
                         element(name("outputDirectory"), "${project.build.outputDirectory}")
+                ),
+                executionEnvironment()
+        );
+    }
+
+    public void extractTestBundledDependencies() throws MojoExecutionException
+    {
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("unpack-dependencies"),
+                configuration(
+                        element(name("includeScope"), "test"),
+                        element(name("excludeScope"), "compile"),
+                        element(name("excludeScope"), "provided"),
+                        element(name("excludeScope"), "runtime"),
+                        element(name("includeTypes"), "jar"),
+                        element(name("excludes"), "META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
+                        element(name("outputDirectory"), "${project.build.testOutputDirectory}")
                 ),
                 executionEnvironment()
         );
@@ -258,6 +328,31 @@ public class MavenGoals
                                 )
                         ),
                         element(name("outputDirectory"), "${project.build.outputDirectory}")
+                ),
+                executionEnvironment()
+        );
+    }
+
+    public void filterTestPluginDescriptor() throws MojoExecutionException
+    {
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-resources-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-resources-plugin"))
+                ),
+                goal("copy-resources"),
+                configuration(
+                        element(name("encoding"), "UTF-8"),
+                        element(name("resources"),
+                                element(name("resource"),
+                                        element(name("directory"), "src/test/resources"),
+                                        element(name("filtering"), "true"),
+                                        element(name("includes"),
+                                                element(name("include"), "atlassian-plugin.xml"))
+                                )
+                        ),
+                        element(name("outputDirectory"), "${project.build.testOutputDirectory}")
                 ),
                 executionEnvironment()
         );
@@ -717,7 +812,6 @@ public class MavenGoals
         // add extra system properties... overwriting any of the hard coded values above.
         for (Map.Entry<String, Object> entry: systemProperties.entrySet())
         {
-            log.info("adding system property to configuration: " + entry.getKey() + "::" + entry.getValue());
             properties.add(
                     element(name("property"),
                             element(name("name"), entry.getKey()),
@@ -923,6 +1017,43 @@ public class MavenGoals
         );
     }
 
+    public void generateTestBundleManifest(final Map<String, String> instructions, final Map<String, String> basicAttributes) throws MojoExecutionException
+    {
+        final List<Element> instlist = new ArrayList<Element>();
+        for (final Map.Entry<String, String> entry : instructions.entrySet())
+        {
+            instlist.add(element(entry.getKey(), entry.getValue()));
+        }
+        if (!instructions.containsKey(Constants.IMPORT_PACKAGE))
+        {
+            instlist.add(element(Constants.IMPORT_PACKAGE, "*;resolution:=optional"));
+            // BND will expand the wildcard to a list of actually-used packages, but this tells it to mark
+            // them all as optional
+        }
+        for (final Map.Entry<String, String> entry : basicAttributes.entrySet())
+        {
+            instlist.add(element(entry.getKey(), entry.getValue()));
+        }
+        executeMojo(
+                plugin(
+                        groupId("org.apache.felix"),
+                        artifactId("maven-bundle-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
+                ),
+                goal("manifest"),
+                configuration(
+                        element(name("manifestLocation"),"${project.build.testOutputDirectory}/META-INF"),
+                        element(name("supportedProjectTypes"),
+                                element(name("supportedProjectType"), "jar"),
+                                element(name("supportedProjectType"), "bundle"),
+                                element(name("supportedProjectType"), "war"),
+                                element(name("supportedProjectType"), "atlassian-plugin")),
+                        element(name("instructions"), instlist.toArray(new Element[instlist.size()]))
+                ),
+                executionEnvironment()
+        );
+    }
+
     public void generateMinimalManifest(final Map<String, String> basicAttributes) throws MojoExecutionException
     {
         File metaInf = file(ctx.getProject().getBuild().getOutputDirectory(), "META-INF");
@@ -931,6 +1062,36 @@ public class MavenGoals
             metaInf.mkdirs();
         }
         File mf = file(ctx.getProject().getBuild().getOutputDirectory(), "META-INF", "MANIFEST.MF");
+        Manifest m = new Manifest();
+        m.getMainAttributes().putValue("Manifest-Version", "1.0");
+        for (Map.Entry<String, String> entry : basicAttributes.entrySet())
+        {
+            m.getMainAttributes().putValue(entry.getKey(), entry.getValue());
+        }
+        FileOutputStream fos = null;
+        try
+        {
+            fos = new FileOutputStream(mf);
+            m.write(fos);
+        }
+        catch (IOException e)
+        {
+            throw new MojoExecutionException("Unable to create manifest", e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(fos);
+        }
+    }
+
+    public void generateTestMinimalManifest(final Map<String, String> basicAttributes) throws MojoExecutionException
+    {
+        File metaInf = file(ctx.getProject().getBuild().getTestOutputDirectory(), "META-INF");
+        if (!metaInf.exists())
+        {
+            metaInf.mkdirs();
+        }
+        File mf = file(ctx.getProject().getBuild().getTestOutputDirectory(), "META-INF", "MANIFEST.MF");
         Manifest m = new Manifest();
         m.getMainAttributes().putValue("Manifest-Version", "1.0");
         for (Map.Entry<String, String> entry : basicAttributes.entrySet())

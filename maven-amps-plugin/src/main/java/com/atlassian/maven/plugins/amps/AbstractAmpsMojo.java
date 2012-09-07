@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps;
 import java.util.List;
 
 import com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker;
+import com.atlassian.maven.plugins.amps.util.ProjectUtils;
 import com.atlassian.maven.plugins.amps.util.UpdateChecker;
 import com.atlassian.maven.plugins.updater.SdkResource;
 import org.apache.maven.execution.MavenSession;
@@ -77,7 +78,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
 
     private UpdateChecker updateChecker;
 
-    /**
+	/**
      * Flag to skip checking amps version in pom
      */
     @Parameter(property = "skip.amps.pom.check", defaultValue = "false")
@@ -85,6 +86,13 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
 
     @Component
     private AmpsPluginVersionChecker ampsPluginVersionChecker;
+    
+    /**
+     * Whether the test plugin should be built or not.  If not specified, it detects an atlassian-plugin.xml in the
+     * test classes directory and builds if exists.
+     */
+    @Parameter
+    private Boolean buildTestPlugin;
 
     protected MavenContext getMavenContext()
     {
@@ -136,7 +144,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
         return updateChecker;
     }
 
-    protected AmpsPluginVersionChecker getAmpsPluginVersionChecker()
+	protected AmpsPluginVersionChecker getAmpsPluginVersionChecker()
     {
         ampsPluginVersionChecker.skipPomCheck(skipAmpsPomCheck);
         return ampsPluginVersionChecker;
@@ -146,5 +154,23 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     {
         String sdkVersion = System.getenv("ATLAS_VERSION");
         return sdkVersion != null ? sdkVersion : getPluginInformation().getVersion();
+    }
+    
+    protected boolean shouldBuildTestPlugin()
+    {
+        boolean shouldBuild = false;
+        if (buildTestPlugin != null)
+        {
+            if (buildTestPlugin.booleanValue())
+            {
+                shouldBuild = true;
+            }
+        }
+        else if (ProjectUtils.shouldDeployTestJar(getMavenContext()))
+        {
+            shouldBuild = true;
+        }
+        
+        return shouldBuild;
     }
 }

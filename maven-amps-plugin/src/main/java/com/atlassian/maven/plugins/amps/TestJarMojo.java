@@ -42,20 +42,8 @@ public class TestJarMojo extends AbstractAmpsMojo
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        boolean shouldBuild = false;
-        if (buildTestPlugin != null)
-        {
-            if (buildTestPlugin.booleanValue())
-            {
-                shouldBuild = true;
-            }
-        }
-        else if (ProjectUtils.shouldDeployTestJar(getMavenContext()))
-        {
-            shouldBuild = true;
-        }
-
-        if (shouldBuild)
+        
+        if (shouldBuildTestPlugin())
         {
             File mf = file(getMavenContext().getProject().getBuild().getTestOutputDirectory(), "META-INF", "MANIFEST.MF");
             if (!mf.exists())

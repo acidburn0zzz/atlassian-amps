@@ -1,12 +1,7 @@
 package com.atlassian.maven.plugins.amps;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
 
@@ -25,6 +20,12 @@ import org.apache.maven.project.MavenProject;
 @Mojo(name = "integration-test", requiresDependencyResolution = ResolutionScope.TEST)
 public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 {
+    private final List<ProductArtifact> testFrameworkPlugins = new ArrayList<ProductArtifact>()
+    {{
+            add(new ProductArtifact("org.junit","com.springsource.org.junit","4.10.0"));
+            add(new ProductArtifact("com.atlassian.plugins","atlassian-plugins-osgi-testrunner-bundle","1.0"));
+    }};
+
     /**
      * Pattern for to use to find integration tests.  Only used if no test groups are defined.
      */
@@ -172,7 +173,6 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         setParallelMode(productExecutions);
 
         int counter = 0;
-        
         // Install the plugin in each product and start it
         for (ProductExecution productExecution : productExecutions)
         {
@@ -181,6 +181,15 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
             if (product.isInstallPlugin() == null)
             {
                 product.setInstallPlugin(installPlugin);
+            }
+            
+            if(shouldBuildTestPlugin())
+            {
+                List<ProductArtifact> plugins = product.getPluginArtifacts();
+                plugins.addAll(testFrameworkPlugins);
+
+                List<ProductArtifact> libs = product.getLibArtifacts();
+                libs.add(new ProductArtifact("org.junit","com.springsource.org.junit","4.10.0"));
             }
 
             int actualHttpPort = 0;
@@ -195,12 +204,12 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                     final int debugPort = product.getJvmDebugPort();
                     String debugArgs = " -Xdebug -Xrunjdwp:transport=dt_socket,address=" +
                             String.valueOf(debugPort) + ",suspend=" + (jvmDebugSuspend ? "y" : "n") + ",server=y ";
-
+    
                     if (product.getJvmArgs() == null)
                     {
                         product.setJvmArgs(StringUtils.defaultString(jvmArgs));
                     }
-
+    
                     product.setJvmArgs(product.getJvmArgs() + debugArgs);
                 }
                 
