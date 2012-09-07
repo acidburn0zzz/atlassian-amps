@@ -89,22 +89,29 @@ public class UpdateMojo extends AbstractAmpsMojo {
         commands.add(packageType.installCommand());
         commands.add(sdkInstaller.getAbsolutePath());
         ProcessBuilder installer = new ProcessBuilder(commands);
+        BufferedReader in = null, err = null;
         try {
             Process p = installer.start();
-            BufferedReader in  = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            in  = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
             String line;
-            getLog().debug("returned input from installer process follows:");
+            getLog().debug("Returned input from installer process follows:");
             while ((line = in.readLine()) != null) {
                 getLog().debug(line);
             }
 
             if (err.ready()) {
-                getLog().info("Errors returned by subprocess installer");
+                getLog().info("Errors returned by subprocess installer:");
+                while ((line = err.readLine()) != null) {
+                    getLog().error(line);
+                }
             }
         } catch (IOException e) {
             throw new MojoExecutionException("error from installer subprocess", e);
+        } finally {
+            IOUtils.closeQuietly(in);
+            IOUtils.closeQuietly(err);
         }
     }
 
@@ -132,7 +139,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
             getLog().debug("found " + INSTALLTYPE_FILE_NAME + " in ATLAS_HOME");
             String packageType = getInstallType(installType);
             try {
-                detectedType = SdkPackageType.valueOf(packageType);
+                detectedType = SdkPackageType.getType(packageType);
                 getLog().debug("detected install type: " + detectedType);
             } catch (IllegalArgumentException e) {
                 // no match found for package type, fall back to tar.gz
@@ -152,7 +159,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
         BufferedReader in = null;
         try {
             in = new BufferedReader(new FileReader(file));
-            return in.readLine();
+            return in.readLine().trim();
         } catch (FileNotFoundException e) {
             // shouldn't happen, as we did the check above
             throw new MojoExecutionException("file " + file.getAbsolutePath()
