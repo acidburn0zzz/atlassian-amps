@@ -107,6 +107,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
                 while ((line = err.readLine()) != null) {
                     getLog().error(line);
                 }
+                throw new MojoExecutionException("Installer failed; see above for errors.");
             }
         } catch (IOException e) {
             throw new MojoExecutionException("error from installer subprocess", e);
