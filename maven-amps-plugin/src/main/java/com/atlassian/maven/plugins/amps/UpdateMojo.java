@@ -13,6 +13,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -85,8 +86,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
         sdkInstaller.setExecutable(true);
 
         List<String> commands = new ArrayList<String>();
-        commands.add(packageType.installCommand());
-        commands.add(packageType.parameters());
+        Collections.addAll(commands, packageType.installCommands());
         commands.add(sdkInstaller.getAbsolutePath());
         ProcessBuilder installer = new ProcessBuilder(commands);
         BufferedReader in = null, err = null;
@@ -98,7 +98,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
             String line;
             getLog().debug("Returned input from installer process follows:");
             while ((line = in.readLine()) != null) {
-                getLog().debug(line);
+                getLog().info(line);
             }
 
             if (err.ready()) {
@@ -106,6 +106,9 @@ public class UpdateMojo extends AbstractAmpsMojo {
                 while ((line = err.readLine()) != null) {
                     getLog().error(line);
                 }
+            }
+
+            if (p.exitValue() != 0) {
                 throw new MojoExecutionException("Installer failed; see above for errors.");
             }
         } catch (IOException e) {

@@ -5,32 +5,26 @@ package com.atlassian.maven.plugins.updater;
  */
 public enum SdkPackageType {
 
-    WINDOWS("windows", "", ""),
-    MAC("mac", "./", ""),
-    RPM("rpm", "rpm", "-ivh"),
-    DEB("deb", "dpkg", "-i"),
-    TGZ("tgz", "", "");
+    WINDOWS("windows", new String[] {}),
+    MAC("mac", new String[] {}),
+    RPM("rpm", new String[] { "sudo", "rpm", "-ivh" }),
+    DEB("deb", new String[] { "sudo", "dpkg", "-i" }),
+    TGZ("tgz", new String[] {});
 
     private final String key;
-    private final String installCommand;
-    private final String parameters;
+    private final String[] installCommands;
 
-    SdkPackageType(String key, String installCommand, String parameters) {
+    SdkPackageType(String key, String[] installCommands) {
         this.key = key;
-        this.installCommand = installCommand;
-        this.parameters = parameters;
+        this.installCommands = installCommands;
     }
 
     public String key() {
         return key;
     }
 
-    public String installCommand() {
-        return installCommand;
-    }
-
-    public String parameters() {
-        return parameters;
+    public String[] installCommands() {
+        return installCommands;
     }
 
     public static SdkPackageType getType(String key) {
