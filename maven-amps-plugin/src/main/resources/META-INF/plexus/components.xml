@@ -137,5 +137,11 @@
             <implementation>com.atlassian.maven.plugins.updater.MarketplaceSdkResource</implementation>
         </component>
 
+        <component>
+            <role>com.atlassian.maven.plugins.updater.LocalSdk</role>
+            <role-hint>component for providing information about the currently installed SDK</role-hint>
+            <implementation>com.atlassian.maven.plugins.updater.FileSystemLocalSdk</implementation>
+        </component>
+
     </components>
 </component-set>

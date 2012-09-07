@@ -1,6 +1,7 @@
 package com.atlassian.maven.plugins.amps;
 
 import com.atlassian.maven.plugins.amps.util.ZipUtils;
+import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkPackageType;
 import com.atlassian.maven.plugins.updater.SdkResource;
 import org.apache.commons.io.IOUtils;
@@ -27,6 +28,9 @@ public class UpdateMojo extends AbstractAmpsMojo {
     @Component
     private SdkResource sdkResource;
 
+    @Component
+    private LocalSdk localSdk;
+
     /**
      * The version to update the SDK to (defaults to latest)
      */
@@ -42,7 +46,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        SdkPackageType packageType = getSdkPackageType();
+        SdkPackageType packageType = localSdk.sdkPackageType();
         checkUpdatePreconditions(packageType);
 
         File sdkArchive;
@@ -73,7 +77,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
     }
 
     private void installSdkFromTarGz(File sdkZip) throws MojoExecutionException {
-        String sdkHome = getSdkHome();
+        String sdkHome = localSdk.sdkHomeDir();
         try {
             ZipUtils.untargz(sdkZip, sdkHome, 1); // skip first directory path of artifact name/version
         } catch (IOException e) {
@@ -128,7 +132,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
         if (packageType == SdkPackageType.TGZ) {
             // we're about to overwrite an existing tar.gz. Make sure the directory
             // is defined by the atlas-update script and is writable.
-            String sdkHome = getSdkHome();
+            String sdkHome = localSdk.sdkHomeDir();
             if (sdkHome == null) {
                 throw new MojoExecutionException("SDK update must be run from the atlas-update script.");
             }
@@ -141,51 +145,4 @@ public class UpdateMojo extends AbstractAmpsMojo {
         }
     }
 
-    private SdkPackageType getSdkPackageType() throws MojoExecutionException {
-        String sdkHome = getSdkHome();
-        // look for a file installtype.txt which is delivered in the SDK packages;
-        // it tells us what kind of install this is and, therefore, what package
-        // to download from Marketplace.
-        File installType = new File(sdkHome, INSTALLTYPE_FILE_NAME);
-        SdkPackageType detectedType;
-        if (installType.exists() && installType.canRead()) {
-            getLog().debug("found " + INSTALLTYPE_FILE_NAME + " in ATLAS_HOME");
-            String packageType = getInstallType(installType);
-            try {
-                detectedType = SdkPackageType.getType(packageType);
-                getLog().debug("detected install type: " + detectedType);
-            } catch (IllegalArgumentException e) {
-                // no match found for package type, fall back to tar.gz
-                getLog().debug("no package type found for " + packageType + "; falling back to tgz");
-                detectedType = SdkPackageType.TGZ;
-            }
-        } else {
-            // assume it was installed from a tar.gz
-            getLog().debug("no file found at " + installType.getAbsolutePath()
-                    + "; falling back to tgz");
-            detectedType = SdkPackageType.TGZ;
-        }
-        return detectedType;
-    }
-
-    private String getInstallType(File file) throws MojoExecutionException {
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new FileReader(file));
-            return in.readLine().trim();
-        } catch (FileNotFoundException e) {
-            // shouldn't happen, as we did the check above
-            throw new MojoExecutionException("file " + file.getAbsolutePath()
-                    + " wasn't found, even though it exists");
-        } catch (IOException e) {
-            throw new MojoExecutionException("couldn't read from file " + file.getAbsolutePath()
-                    + " even though we checked it for readability");
-        } finally {
-            IOUtils.closeQuietly(in);
-        }
-    }
-
-    private String getSdkHome() {
-        return System.getenv("ATLAS_HOME");
-    }
 }

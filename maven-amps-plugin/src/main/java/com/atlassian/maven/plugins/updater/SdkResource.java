@@ -1,7 +1,5 @@
 package com.atlassian.maven.plugins.updater;
 
-import com.sun.tools.javac.resources.version;
-
 import java.io.File;
 
 /**
