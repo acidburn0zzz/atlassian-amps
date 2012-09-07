@@ -13,13 +13,13 @@ RemoveSDK () {
     done
 
     #remove the sdk from /usr/share
-    rm -rf /usr/share/atlassian-plugin-sdk-3.12-SNAPSHOT
+    rm -rf /usr/share/atlassian-plugin-sdk-${project.version}
 
     echo "Atlassian Plugin SDK has been uninstalled"
 }
 
 while true; do
-    read -p "This will completely remove Atlassian Plugin SDK v3.12-SNAPSHOT! Do you wish to continue? (Y/N) " yn
+    read -p "This will completely remove Atlassian Plugin SDK v${project.version}! Do you wish to continue? (Y/N) " yn
     case $yn in
         [Yy]* ) RemoveSDK; break;;
         [Nn]* ) exit;;

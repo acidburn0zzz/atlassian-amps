@@ -60,6 +60,15 @@
             <filtered>true</filtered>
         </fileSet>
 
+        <!-- the install type for auto-update -->
+        <fileSet>
+            <directory>target/classes/zip</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>installtype.txt</include>
+            </includes>
+        </fileSet>
+
     </fileSets>
 
 

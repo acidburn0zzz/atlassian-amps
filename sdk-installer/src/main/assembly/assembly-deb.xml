@@ -11,8 +11,21 @@
             <includes>
                 <include>**/*</include>
             </includes>
+            <excludes>
+                <exclude>**/installtype.txt</exclude>
+            </excludes>
             <fileMode>0755</fileMode>
             <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/src/main/deb/</directory>
+            <includes>
+                <include>installtype.txt</include>
+            </includes>
+            <fileMode>0755</fileMode>
+            <outputDirectory>/usr/share/atlassian-plugin-sdk-${project.version}</outputDirectory>
             <filtered>true</filtered>
         </fileSet>
 
