@@ -3,7 +3,6 @@ package com.atlassian.maven.plugins.amps.util;
 import com.atlassian.maven.plugins.updater.SdkPackageType;
 import com.atlassian.maven.plugins.updater.SdkResource;
 import org.apache.commons.io.IOUtils;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 
 import java.io.*;
@@ -35,7 +34,6 @@ public class UpdateChecker {
 
     public void check() {
         if (shouldCheck()) {
-            File file = new File(getSdkHome(), INSTALLTYPE_FILE_NAME);
             SdkPackageType packageType = getSdkPackageType();
             String latestVersion = sdkResource.getLatestSdkVersion(packageType);
             if (canUpdate(currentVersion, latestVersion)) {
@@ -46,8 +44,8 @@ public class UpdateChecker {
     }
 
     private boolean canUpdate(String currentVersion, String latestVersion) {
-        return VersionUtils.versionFromString(latestVersion) >
-               VersionUtils.versionFromString(currentVersion);
+        return currentVersion.contains("SNAPSHOT") ||
+                VersionUtils.versionFromString(latestVersion) > VersionUtils.versionFromString(currentVersion);
     }
 
     private boolean shouldCheck() {
