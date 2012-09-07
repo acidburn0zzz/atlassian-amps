@@ -11,7 +11,6 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +86,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
 
         List<String> commands = new ArrayList<String>();
         commands.add(packageType.installCommand());
+        commands.add(packageType.parameters());
         commands.add(sdkInstaller.getAbsolutePath());
         ProcessBuilder installer = new ProcessBuilder(commands);
         BufferedReader in = null, err = null;
@@ -106,6 +106,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
                 while ((line = err.readLine()) != null) {
                     getLog().error(line);
                 }
+                throw new MojoExecutionException("Installer failed; see above for errors.");
             }
         } catch (IOException e) {
             throw new MojoExecutionException("error from installer subprocess", e);
