@@ -108,9 +108,14 @@ public class UpdateMojo extends AbstractAmpsMojo {
                 }
             }
 
-            if (p.exitValue() != 0) {
-                throw new MojoExecutionException("Installer failed; see above for errors.");
+            try {
+                if (p.waitFor() != 0) {
+                    throw new MojoExecutionException("Installer failed; see above for errors.");
+                }
+            } catch (InterruptedException e) {
+                throw new MojoExecutionException("Subprocess installer interrupted", e);
             }
+            sdkInstaller.deleteOnExit();
         } catch (IOException e) {
             throw new MojoExecutionException("error from installer subprocess", e);
         } finally {

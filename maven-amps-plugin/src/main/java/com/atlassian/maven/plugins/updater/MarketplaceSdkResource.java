@@ -73,7 +73,6 @@ public class MarketplaceSdkResource implements SdkResource {
                 tempFileSuffix = ".tar.gz";
             }
             sdkDownloadTempFile = File.createTempFile("atlassian-plugin-sdk-" + version, tempFileSuffix);
-            sdkDownloadTempFile.deleteOnExit();
 
             URL url;
             try {
