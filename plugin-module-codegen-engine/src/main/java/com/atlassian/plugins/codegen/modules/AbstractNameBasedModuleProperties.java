@@ -17,6 +17,11 @@ public abstract class AbstractNameBasedModuleProperties extends AbstractPluginMo
         super();
     }
 
+    protected AbstractNameBasedModuleProperties(AbstractNameBasedModuleProperties from)
+    {
+        super(from);
+    }
+    
     public void setModuleNameAndKey(String moduleName)
     {
         if (StringUtils.isNotBlank(moduleName))

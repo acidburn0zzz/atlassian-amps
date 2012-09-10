@@ -74,7 +74,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      */
     protected PluginProjectChangeset createClass(ClassBasedModuleProperties props, ClassId classId, String templateName) throws Exception
     {
-        return changeset().with(sourceFile(classId, MAIN, fromTemplate(templateName, props)));
+        return changeset().with(sourceFile(classId, MAIN, fromTemplate(templateName, props.withClass(classId))));
     }
 
     /**
@@ -86,7 +86,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      */
     protected PluginProjectChangeset createTestClass(ClassBasedModuleProperties props, ClassId classId, String templateName) throws Exception
     {
-        return changeset().with(sourceFile(classId, TESTS, fromTemplate(templateName, props)));
+        return changeset().with(sourceFile(classId, TESTS, fromTemplate(templateName, props.withClass(classId))));
     }
 
     /**
@@ -102,9 +102,10 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
                                                          String mainTemplate,
                                                          String unitTestTemplate) throws Exception
     {
+        ClassId testClass = testClassFor(props.getClassId());
         return changeset()
             .with(createClass(props, mainTemplate))
-            .with(createTestClass(props, testClassFor(props.getClassId()), unitTestTemplate));
+            .with(createTestClass(props.withClass(testClass), testClass, unitTestTemplate));
     }
     
     /**
@@ -124,8 +125,9 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
                                                          String unitTestTemplate,
                                                          String funcTestTemplate) throws Exception
     {
+        ClassId funcTestClass = funcTestClassFor(props.getClassId());
         return createClassAndTests(props, mainTemplate, unitTestTemplate)
-            .with(createTestClass(props, funcTestClassFor(props.getClassId()), funcTestTemplate));
+            .with(createTestClass(props.withClass(funcTestClass), funcTestClass, funcTestTemplate));
     }
     
     /**
