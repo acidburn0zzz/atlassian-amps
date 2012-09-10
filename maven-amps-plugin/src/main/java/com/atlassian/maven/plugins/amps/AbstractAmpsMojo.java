@@ -2,10 +2,7 @@ package com.atlassian.maven.plugins.amps;
 
 import java.util.List;
 
-import com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriber;
-import com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker;
-import com.atlassian.maven.plugins.amps.util.ProjectUtils;
-import com.atlassian.maven.plugins.amps.util.UpdateCheckerImpl;
+import com.atlassian.maven.plugins.amps.util.*;
 import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkResource;
 import org.apache.maven.execution.MavenSession;
@@ -78,13 +75,14 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     @Component
     private LocalSdk localSdk;
 
+    @Component
+    private UpdateChecker updateChecker;
+
     /**
      * Flag to force a check for a new SDK regardless of the last time such a check was made.
      */
     @Parameter(property = "force.update.check", defaultValue = "false")
     private boolean forceUpdateCheck;
-
-    private UpdateCheckerImpl updateChecker;
 
 	/**
      * Flag to skip checking amps version in pom
@@ -150,7 +148,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
         return new PluginInformation(productId, pluginVersion);
     }
 
-    protected UpdateCheckerImpl getUpdateChecker() throws MojoExecutionException
+    protected UpdateChecker getUpdateChecker() throws MojoExecutionException
     {
         updateChecker.setCurrentVersion(getSdkVersion());
         updateChecker.setForceCheck(forceUpdateCheck);
