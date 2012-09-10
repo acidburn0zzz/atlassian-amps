@@ -150,6 +150,20 @@
                                 </configuration>
                             </execution>
                             <execution>
+                                <id>rpm-snapshot-version</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>regex-property</goal>
+                                </goals>
+                                <configuration>
+                                    <name>rpm.ts.version</name>
+                                    <value>${project.version}</value>
+                                    <regex>-SNAPSHOT</regex>
+                                    <replacement>_${snap.ts}</replacement>
+                                    <failIfNoMatch>false</failIfNoMatch>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>rpm-version</id>
                                 <phase>initialize</phase>
                                 <goals>
@@ -157,9 +171,9 @@
                                 </goals>
                                 <configuration>
                                     <name>rpm.version</name>
-                                    <value>${project.version}</value>
-                                    <regex>-SNAPSHOT</regex>
-                                    <replacement>_${snap.ts}</replacement>
+                                    <value>${rpm.ts.version}</value>
+                                    <regex>[-]</regex>
+                                    <replacement>_</replacement>
                                     <failIfNoMatch>false</failIfNoMatch>
                                 </configuration>
                             </execution>
