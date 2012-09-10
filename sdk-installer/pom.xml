@@ -3,7 +3,7 @@
     <parent>
         <artifactId>atlassian-amps-parent</artifactId>
         <groupId>com.atlassian.amps</groupId>
-        <version>4.0-SNAPSHOT</version>
+        <version>4.0-blitz3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -149,6 +149,21 @@
                                     <failIfNoMatch>false</failIfNoMatch>
                                 </configuration>
                             </execution>
+                        
+                            <execution>
+                                <id>rpm-snapshot-version</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>regex-property</goal>
+                                </goals>
+                                <configuration>
+                                    <name>rpm.ts.version</name>
+                                    <value>${project.version}</value>
+                                    <regex>-SNAPSHOT</regex>
+                                    <replacement>_${snap.ts}</replacement>
+                                    <failIfNoMatch>false</failIfNoMatch>
+                                </configuration>
+                            </execution>
                             <execution>
                                 <id>rpm-version</id>
                                 <phase>initialize</phase>
@@ -157,9 +172,9 @@
                                 </goals>
                                 <configuration>
                                     <name>rpm.version</name>
-                                    <value>${project.version}</value>
-                                    <regex>-SNAPSHOT</regex>
-                                    <replacement>_${snap.ts}</replacement>
+                                    <value>${rpm.ts.version}</value>
+                                    <regex>[-]</regex>
+                                    <replacement>_</replacement>
                                     <failIfNoMatch>false</failIfNoMatch>
                                 </configuration>
                             </execution>
