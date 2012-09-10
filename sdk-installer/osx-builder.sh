@@ -16,6 +16,9 @@ echo "using PackageInfo version: $VERSION"
 echo "Copying uninstaller..."
 cp ./target/osx-work/uninstall.sh ./target/osx-unzip/atlassian-plugin-sdk-$1/
 
+echo "Copying installtype.txt..."
+cp ./target/osx-work/installtype.txt ./target/osx-unzip/atlassian-plugin-sdk-$1/
+
 echo "running pkgbuild..."
 pkgbuild --identifier com.atlassian.atlassian-plugin-sdk --install-location /usr/share/atlassian-plugin-sdk-$1 --ownership preserve --scripts ./target/osx-work/scripts/ --version "$VERSION" --root ./target/osx-unzip/atlassian-plugin-sdk-$1 ./target/atlassian-sdk.pkg
 
