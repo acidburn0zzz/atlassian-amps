@@ -5,7 +5,7 @@ import java.util.List;
 import com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriber;
 import com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
-import com.atlassian.maven.plugins.amps.util.UpdateChecker;
+import com.atlassian.maven.plugins.amps.util.UpdateCheckerImpl;
 import com.atlassian.maven.plugins.updater.SdkResource;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -77,7 +77,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     @Parameter(property = "force.update.check", defaultValue = "false")
     private boolean forceUpdateCheck;
 
-    private UpdateChecker updateChecker;
+    private UpdateCheckerImpl updateChecker;
 
 	/**
      * Flag to skip checking amps version in pom
@@ -97,6 +97,12 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
      */
     @Parameter
     private Boolean buildTestPlugin;
+
+    /**
+     * Flag to skip all prompts so automated builds don't hang
+     */
+    @Parameter(property = "skipAllPrompts", defaultValue = "false")
+    protected boolean skipAllPrompts;
 
     protected MavenContext getMavenContext()
     {
@@ -137,20 +143,26 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
         return new PluginInformation(productId, pluginVersion);
     }
 
-    protected UpdateChecker getUpdateChecker() throws MojoExecutionException
+    protected UpdateCheckerImpl getUpdateChecker() throws MojoExecutionException
     {
         if (updateChecker == null)
         {
-            updateChecker = new UpdateChecker(getSdkVersion(), getLog(),
+            updateChecker = new UpdateCheckerImpl(getSdkVersion(), getLog(),
                     sdkResource, forceUpdateCheck);
         }
 
+        updateChecker.skipCheck(skipAllPrompts);
+        
         return updateChecker;
     }
 
 	protected AmpsPluginVersionChecker getAmpsPluginVersionChecker()
     {
         ampsPluginVersionChecker.skipPomCheck(skipAmpsPomCheck);
+        if(skipAllPrompts)
+        {
+            ampsPluginVersionChecker.skipPomCheck(true);
+        }
         return ampsPluginVersionChecker;
     }
 
