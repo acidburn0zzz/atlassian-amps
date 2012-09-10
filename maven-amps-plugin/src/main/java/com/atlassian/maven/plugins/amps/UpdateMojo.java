@@ -1,6 +1,7 @@
 package com.atlassian.maven.plugins.amps;
 
 import com.atlassian.maven.plugins.amps.util.ZipUtils;
+import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkPackageType;
 import com.atlassian.maven.plugins.updater.SdkResource;
 import org.apache.commons.io.IOUtils;
@@ -27,6 +28,9 @@ public class UpdateMojo extends AbstractAmpsMojo {
     @Component
     private SdkResource sdkResource;
 
+    @Component
+    private LocalSdk localSdk;
+
     /**
      * The version to update the SDK to (defaults to latest)
      */
@@ -42,8 +46,8 @@ public class UpdateMojo extends AbstractAmpsMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        checkUpdatePreconditions();
-        SdkPackageType packageType = getSdkPackageType();
+        SdkPackageType packageType = localSdk.sdkPackageType();
+        checkUpdatePreconditions(packageType);
 
         File sdkArchive;
         if (StringUtils.isNotBlank(sdkArchivePath)) {
@@ -73,7 +77,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
     }
 
     private void installSdkFromTarGz(File sdkZip) throws MojoExecutionException {
-        String sdkHome = getSdkHome();
+        String sdkHome = localSdk.sdkHomeDir();
         try {
             ZipUtils.untargz(sdkZip, sdkHome, 1); // skip first directory path of artifact name/version
         } catch (IOException e) {
@@ -108,9 +112,14 @@ public class UpdateMojo extends AbstractAmpsMojo {
                 }
             }
 
-            if (p.exitValue() != 0) {
-                throw new MojoExecutionException("Installer failed; see above for errors.");
+            try {
+                if (p.waitFor() != 0) {
+                    throw new MojoExecutionException("Installer failed; see above for errors.");
+                }
+            } catch (InterruptedException e) {
+                throw new MojoExecutionException("Subprocess installer interrupted", e);
             }
+            sdkInstaller.deleteOnExit();
         } catch (IOException e) {
             throw new MojoExecutionException("error from installer subprocess", e);
         } finally {
@@ -119,64 +128,21 @@ public class UpdateMojo extends AbstractAmpsMojo {
         }
     }
 
-    private void checkUpdatePreconditions() throws MojoExecutionException {
-        String sdkHome = getSdkHome();
-        if (sdkHome == null) {
-            throw new MojoExecutionException("SDK update must be run from the atlas-update script.");
-        }
-        File sdkHomeDir = new File(sdkHome);
-        if (!sdkHomeDir.exists() || !sdkHomeDir.canWrite()) {
-            throw new MojoExecutionException("To update successfully, SDK home directory " + sdkHome +
-                " must be writable by the current user.");
-        }
-        getLog().debug("Detected current SDK install from ATLAS_HOME in " + sdkHomeDir.getAbsolutePath());
-    }
-
-    private SdkPackageType getSdkPackageType() throws MojoExecutionException {
-        String sdkHome = getSdkHome();
-        // look for a file installtype.txt which is delivered in the SDK packages;
-        // it tells us what kind of install this is and, therefore, what package
-        // to download from Marketplace.
-        File installType = new File(sdkHome, INSTALLTYPE_FILE_NAME);
-        SdkPackageType detectedType;
-        if (installType.exists() && installType.canRead()) {
-            getLog().debug("found " + INSTALLTYPE_FILE_NAME + " in ATLAS_HOME");
-            String packageType = getInstallType(installType);
-            try {
-                detectedType = SdkPackageType.getType(packageType);
-                getLog().debug("detected install type: " + detectedType);
-            } catch (IllegalArgumentException e) {
-                // no match found for package type, fall back to tar.gz
-                getLog().debug("no package type found for " + packageType + "; falling back to tgz");
-                detectedType = SdkPackageType.TGZ;
+    private void checkUpdatePreconditions(SdkPackageType packageType) throws MojoExecutionException {
+        if (packageType == SdkPackageType.TGZ) {
+            // we're about to overwrite an existing tar.gz. Make sure the directory
+            // is defined by the atlas-update script and is writable.
+            String sdkHome = localSdk.sdkHomeDir();
+            if (sdkHome == null) {
+                throw new MojoExecutionException("SDK update must be run from the atlas-update script.");
             }
-        } else {
-            // assume it was installed from a tar.gz
-            getLog().debug("no file found at " + installType.getAbsolutePath()
-                    + "; falling back to tgz");
-            detectedType = SdkPackageType.TGZ;
-        }
-        return detectedType;
-    }
-
-    private String getInstallType(File file) throws MojoExecutionException {
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new FileReader(file));
-            return in.readLine().trim();
-        } catch (FileNotFoundException e) {
-            // shouldn't happen, as we did the check above
-            throw new MojoExecutionException("file " + file.getAbsolutePath()
-                    + " wasn't found, even though it exists");
-        } catch (IOException e) {
-            throw new MojoExecutionException("couldn't read from file " + file.getAbsolutePath()
-                    + " even though we checked it for readability");
-        } finally {
-            IOUtils.closeQuietly(in);
+            File sdkHomeDir = new File(sdkHome);
+            if (!sdkHomeDir.exists() || !sdkHomeDir.canWrite()) {
+                throw new MojoExecutionException("To update successfully, SDK home directory " + sdkHome +
+                    " must be writable by the current user.");
+            }
+            getLog().debug("Detected current SDK install from ATLAS_HOME in " + sdkHomeDir.getAbsolutePath());
         }
     }
 
-    private String getSdkHome() {
-        return System.getenv("ATLAS_HOME");
-    }
 }

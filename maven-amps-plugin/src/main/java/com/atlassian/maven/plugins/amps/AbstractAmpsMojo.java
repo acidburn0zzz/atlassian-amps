@@ -6,6 +6,7 @@ import com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriber;
 import com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
 import com.atlassian.maven.plugins.amps.util.UpdateChecker;
+import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkResource;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -70,6 +71,12 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
      */
     @Component
     private SdkResource sdkResource;
+
+    /**
+     * Component that provides information about the currently installed SDK.
+     */
+    @Component
+    private LocalSdk localSdk;
 
     /**
      * Flag to force a check for a new SDK regardless of the last time such a check was made.
@@ -142,7 +149,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
         if (updateChecker == null)
         {
             updateChecker = new UpdateChecker(getSdkVersion(), getLog(),
-                    sdkResource, forceUpdateCheck);
+                    sdkResource, localSdk, forceUpdateCheck);
         }
 
         return updateChecker;
