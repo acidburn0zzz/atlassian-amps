@@ -1,5 +1,6 @@
 package com.atlassian.plugins.codegen.modules.common;
 
+import com.atlassian.plugins.codegen.ClassId;
 import com.atlassian.plugins.codegen.modules.AbstractClassBasedModuleProperties;
 
 /**
@@ -14,6 +15,16 @@ public class TemplateContextItemProperties extends AbstractClassBasedModulePrope
     public TemplateContextItemProperties()
     {
         this("My Template Context Item");
+    }
+
+    protected TemplateContextItemProperties(TemplateContextItemProperties from, ClassId newClass)
+    {
+        super(from, newClass);
+    }
+
+    public TemplateContextItemProperties withClass(ClassId newClass)
+    {
+        return new TemplateContextItemProperties(this, newClass);
     }
 
     public TemplateContextItemProperties(String moduleName)
