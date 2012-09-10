@@ -137,21 +137,5 @@
             <implementation>com.atlassian.maven.plugins.updater.MarketplaceSdkResource</implementation>
         </component>
 
-        <component>
-            <role>com.atlassian.maven.plugins.amps.util.UpdateChecker</role>
-            <role-hint>amps pom version checker</role-hint>
-            <implementation>com.atlassian.maven.plugins.amps.util.UpdateCheckerImpl</implementation>
-            <requirements>
-                <requirement>
-                    <role>org.codehaus.plexus.components.interactivity.Prompter</role>
-                    <field-name>prompter</field-name>
-                </requirement>
-                <requirement>
-                    <role>com.atlassian.maven.plugins.updater.SdkResource</role>
-                    <field-name>sdkResource</field-name>
-                </requirement>
-
-            </requirements>
-        </component>
     </components>
 </component-set>

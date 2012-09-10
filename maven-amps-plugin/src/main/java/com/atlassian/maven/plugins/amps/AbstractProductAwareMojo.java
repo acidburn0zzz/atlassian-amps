@@ -112,11 +112,6 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
 
     protected void promptForEmailSubscriptionIfNeeded() throws MojoExecutionException
     {
-        if(skipAllPrompts)
-        {
-            return;
-        }
-        
         if(AmpsEmailSubscriber.ALLOWED_PRODUCTS.contains(getProductId()))
         {
             String emailCheckKey = PREF_EMAIL_PREFIX + "-" + getProductId();
