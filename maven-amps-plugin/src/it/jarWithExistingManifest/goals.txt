@@ -1,1 +1,1 @@
-process-resources ${shitty.product}:jar
+process-resources ${shitty.product}:jar -DskipAllPrompts=true

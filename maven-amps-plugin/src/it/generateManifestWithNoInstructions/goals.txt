@@ -1,2 +1,2 @@
-${shitty.product}:generate-manifest
-clean
+${shitty.product}:generate-manifest -DskipAllPrompts=true
+clean -DskipAllPrompts=true

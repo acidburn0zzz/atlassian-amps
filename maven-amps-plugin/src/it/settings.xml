@@ -112,6 +112,7 @@ under the License.
                 <crowd.data.version>${crowd.data.version}</crowd.data.version>
                 <stash.version>${stash.version}</stash.version>
                 <stash.data.version>${stash.data.version}</stash.data.version>
+                <skipAllPrompts>true</skipAllPrompts>
             </properties>
         </profile>
 

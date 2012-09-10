@@ -1,1 +1,1 @@
-test-compile jar:jar ${shitty.product}:integration-test -Dallow.google.tracking=false
+test-compile jar:jar ${shitty.product}:integration-test -Dallow.google.tracking=false -DskipAllPrompts=true
