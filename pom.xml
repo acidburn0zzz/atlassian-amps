@@ -298,6 +298,7 @@
                <version>2.2.2</version>
                 <configuration>
                     <releaseProfiles>release,installer-win,installer-linux,installer-osx</releaseProfiles>
+                    <arguments>-Pinstaller-win,installer-osx,installer-linux</arguments>
                 </configuration>
             </plugin>
         </plugins>
