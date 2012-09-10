@@ -1,5 +1,6 @@
 package com.atlassian.plugins.codegen.modules;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -11,7 +12,6 @@ import com.google.common.collect.Maps;
  */
 public abstract class AbstractPluginModuleProperties extends Properties implements PluginModuleProperties
 {
-
     protected boolean includeExamples;
     protected Map<String, String> i18nProperties;
 
@@ -21,6 +21,14 @@ public abstract class AbstractPluginModuleProperties extends Properties implemen
         i18nProperties = Maps.newHashMap();
         includeExamples = false;
         setProductId("RefApp");
+    }
+
+    protected AbstractPluginModuleProperties(AbstractPluginModuleProperties from)
+    {
+        super();
+        putAll(from);
+        i18nProperties = new HashMap(from.i18nProperties);
+        includeExamples = from.includeExamples;
     }
 
     @Override

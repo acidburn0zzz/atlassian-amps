@@ -17,6 +17,22 @@ public abstract class AbstractClassBasedModuleProperties extends AbstractNameBas
         super();
     }
 
+    protected AbstractClassBasedModuleProperties(AbstractClassBasedModuleProperties from)
+    {
+        super(from);
+        this.classId = from.classId;
+        this.classUnderTestId = classUnderTestId;
+    }
+
+    protected AbstractClassBasedModuleProperties(AbstractClassBasedModuleProperties from, ClassId newClass)
+    {
+        this(from);
+        this.classId = newClass;
+        setProperty(FQ_CLASSNAME, newClass.getFullName());
+        setProperty(PACKAGE, newClass.getPackage());
+        setProperty(CLASSNAME, newClass.getName());
+    }
+
     public void setFullyQualifiedClassname(String fqName)
     {
         classId = fullyQualified(fqName);

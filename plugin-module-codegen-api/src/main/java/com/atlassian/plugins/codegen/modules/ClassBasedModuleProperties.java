@@ -17,4 +17,6 @@ public interface ClassBasedModuleProperties extends NameBasedModuleProperties
     ClassId getClassId();
     
     ClassId getClassUnderTest();
+
+    ClassBasedModuleProperties withClass(ClassId newClass);
 }

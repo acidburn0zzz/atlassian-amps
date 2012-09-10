@@ -1,5 +1,6 @@
 package com.atlassian.plugins.codegen.modules;
 
+import com.atlassian.plugins.codegen.ClassId;
 import com.atlassian.plugins.codegen.util.ClassnameUtil;
 
 /**
@@ -10,6 +11,11 @@ public class BasicClassModuleProperties extends AbstractClassBasedModuleProperti
     public BasicClassModuleProperties()
     {
         this("MyPluginModule");
+    }
+
+    protected BasicClassModuleProperties(BasicClassModuleProperties from, ClassId newClass)
+    {
+        super(from, newClass);
     }
 
     public BasicClassModuleProperties(String fqClassName)
@@ -27,5 +33,8 @@ public class BasicClassModuleProperties extends AbstractClassBasedModuleProperti
         setDescriptionI18nKey(getProperty(MODULE_KEY) + ".description");
     }
 
-
+    public ClassBasedModuleProperties withClass(ClassId newClass)
+    {
+        return new BasicClassModuleProperties(this, newClass);
+    }
 }
