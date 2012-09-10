@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>atlassian-amps-parent</artifactId>
         <groupId>com.atlassian.amps</groupId>
-        <version>4.0-SNAPSHOT</version>
+        <version>4.0-blitz3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -335,18 +333,12 @@
                                     <target>
                                         <scp todir="${sdk.scp.user}@${sdk.scp.host}:/var/packages/incoming" port="22" trust="true" verbose="true" keyfile="${sdk.scp.key}">
                                             <fileset dir="${build.directory}" casesensitive="yes">
-                                                <include name="**/*.deb"/>
-                                                <include name="**/*.rpm"/>
+                                                <include name="**/*.deb" />
+                                                <include name="**/*.rpm" />
                                             </fileset>
                                         </scp>
-                                        <sshexec host="${sdk.scp.host}"
-                                                 username="${sdk.scp.user}"
-                                                 keyfile="${sdk.scp.key}"
-                                                 command="chgrp developer-relations /var/packages/incoming/*"/>
-                                        <sshexec host="${sdk.scp.host}"
-                                                 username="${sdk.scp.user}"
-                                                 keyfile="${sdk.scp.key}"
-                                                 command="chmod 774 /var/packages/incoming/*"/>
+                                        <sshexec host="${sdk.scp.host}" username="${sdk.scp.user}" keyfile="${sdk.scp.key}" command="chgrp developer-relations /var/packages/incoming/*" />
+                                        <sshexec host="${sdk.scp.host}" username="${sdk.scp.user}" keyfile="${sdk.scp.key}" command="chmod 774 /var/packages/incoming/*" />
                                     </target>
                                 </configuration>
                             </execution>
