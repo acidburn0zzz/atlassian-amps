@@ -305,7 +305,7 @@
                         </goals>
                         <phase>integration-test</phase>
                         <configuration>
-                            <skip>false</skip>
+                            <skipTests>false</skipTests>
                             <systemProperties>
                                 <property>
                                     <name>sdk.zip</name>
