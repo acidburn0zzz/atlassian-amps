@@ -40,7 +40,7 @@ echo "using rpm version: $RPMVERSION"
 
 # Make the rpm file
 #cd ./target/rpm-work
-sudo rpmbuild -v --buildroot=${PWD}/target/rpm-work/unzip -bb --target=noarch --buildos=Linux ./target/rpm-work/atlassian-plugin-sdk.spec 2>&1
+sudo rpmbuild -v --buildroot=${PWD}/target/rpm-work/unzip -bb --target=noarch-linux ./target/rpm-work/atlassian-plugin-sdk.spec 2>&1
 
 
 exit 0
