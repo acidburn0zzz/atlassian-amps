@@ -37,6 +37,12 @@ public class DebugMojo extends RunMojo
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
+        getUpdateChecker().check();
+
+        getAmpsPluginVersionChecker().checkAmpsVersionInPom(getSdkVersion(),getMavenContext().getProject());
+
+        promptForEmailSubscriptionIfNeeded();
+        
         trackFirstRunIfNeeded();
         getGoogleTracker().track(GoogleAmpsTracker.DEBUG);
 

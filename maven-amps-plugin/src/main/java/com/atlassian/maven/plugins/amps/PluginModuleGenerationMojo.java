@@ -51,12 +51,8 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        getUpdateChecker().check();
-
         trackFirstRunIfNeeded();
 
-        getAmpsPluginVersionChecker().checkAmpsVersionInPom(getSdkVersion(),getMavenContext().getProject());
-        
         //can't figure out how to get plexus to fire a method after injection, so doing it here
         pluginModulePrompterFactory.setLog(getLog());
         try

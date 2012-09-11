@@ -595,15 +595,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     @Override
     public final void execute() throws MojoExecutionException, MojoFailureException
     {
-        getUpdateChecker().check();
-        
-        if(!RunStandaloneMojo.class.isAssignableFrom(this.getClass()))
-        {
-            getAmpsPluginVersionChecker().checkAmpsVersionInPom(getSdkVersion(),getMavenContext().getProject());
-        }
-        
-        promptForEmailSubscriptionIfNeeded();
-        
         stringToArtifactList(pluginArtifactsString, pluginArtifacts);
         stringToArtifactList(libArtifactsString, libArtifacts);
         stringToArtifactList(bundledArtifactsString, bundledArtifacts);
