@@ -1,0 +1,5 @@
+#!/bin/sh
+
+#make sure our installdirs exist
+mkdir -p /usr/share/
+mkdir -p /usr/local/bin/
