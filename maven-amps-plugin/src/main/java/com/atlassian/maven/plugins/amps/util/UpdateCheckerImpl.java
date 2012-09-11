@@ -11,6 +11,7 @@ import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkPackageType;
 import com.atlassian.maven.plugins.updater.SdkResource;
 
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -96,8 +97,9 @@ public class UpdateCheckerImpl extends AbstractLogEnabled implements UpdateCheck
     }
 
     private boolean canUpdate(String currentVersion, String latestVersion) {
-        return currentVersion.contains("SNAPSHOT") ||
-                VersionUtils.versionFromString(latestVersion) > VersionUtils.versionFromString(currentVersion);
+        DefaultArtifactVersion sdkVersion = new DefaultArtifactVersion(currentVersion);
+        DefaultArtifactVersion mpacVersion = new DefaultArtifactVersion(latestVersion);
+        return sdkVersion.compareTo(mpacVersion) < 0;
     }
 
     private boolean shouldCheck() {
