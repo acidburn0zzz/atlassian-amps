@@ -71,6 +71,12 @@ public class UpdateCheckerImpl extends AbstractLogEnabled implements UpdateCheck
                 {
                     getLogger().error("error prompting for update: " + e.getMessage());
                 }
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Current version ").append(currentVersion);
+                sb.append(" is more recent than MPAC version ").append(latestVersion);
+                sb.append(". No action taken.");
+                getLogger().debug(sb.toString());
             }
         }
     }
