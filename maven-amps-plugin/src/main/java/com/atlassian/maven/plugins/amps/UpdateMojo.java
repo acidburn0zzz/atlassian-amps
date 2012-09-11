@@ -119,7 +119,6 @@ public class UpdateMojo extends AbstractAmpsMojo {
             } catch (InterruptedException e) {
                 throw new MojoExecutionException("Subprocess installer interrupted", e);
             }
-            sdkInstaller.deleteOnExit();
         } catch (IOException e) {
             throw new MojoExecutionException("error from installer subprocess", e);
         } finally {
