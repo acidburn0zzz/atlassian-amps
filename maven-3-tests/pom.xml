@@ -59,7 +59,7 @@
         <dependency>
             <groupId>com.atlassian.labs</groupId>
             <artifactId>fastdev-plugin</artifactId>
-            <version>1.11</version>
+            <version>1.12.1</version>
         </dependency>
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
