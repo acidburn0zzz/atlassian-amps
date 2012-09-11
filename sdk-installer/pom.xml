@@ -160,7 +160,7 @@
                                     <name>rpm.ts.version</name>
                                     <value>${project.version}</value>
                                     <regex>-SNAPSHOT</regex>
-                                    <replacement>_${snap.ts}</replacement>
+                                    <replacement>_${snap.ts}_SNAPSHOT</replacement>
                                     <failIfNoMatch>false</failIfNoMatch>
                                 </configuration>
                             </execution>
