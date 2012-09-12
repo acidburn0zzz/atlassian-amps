@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <installer-gui-script minSpecVersion="1">
-    <title>Atlassian Plugin SDK</title>
+    <title>Atlassian Plugin SDK ${version}</title>
     <background file="background.png" />
+    <conclusion file="conclusion.rtf"/>
     <pkg-ref id="com.atlassian.atlassian-plugin-sdk">
         <bundle-version/>
     </pkg-ref>
-    <options customize="never" require-scripts="false"/>
+    <options customize="never" require-scripts="false" rootVolumeOnly="true"/>
     <choices-outline>
         <line choice="default">
             <line choice="com.atlassian.atlassian-plugin-sdk"/>
