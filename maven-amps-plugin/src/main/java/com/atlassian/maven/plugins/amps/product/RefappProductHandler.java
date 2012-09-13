@@ -5,6 +5,8 @@ import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
+import com.google.common.collect.ImmutableMap;
+
 import java.io.File;
 import java.util.*;
 
@@ -58,11 +60,12 @@ public class RefappProductHandler extends AbstractWebappProductHandler
     @Override
     protected Map<String, String> getSystemProperties(Product ctx)
     {
-        Map<String, String> properties = super.getSystemProperties(ctx);
+        ImmutableMap.Builder<String, String> properties = ImmutableMap.<String, String>builder();
+        properties.putAll(super.getSystemProperties(ctx));
         properties.put("refapp.home", getHomeDirectory(ctx).getPath());
         properties.put("osgi.cache", getHomeDirectory(ctx).getPath()+ "/osgi-cache");
         properties.put("bundledplugins.cache", getHomeDirectory(ctx).getPath()+ "/bundled-plugins");
-        return properties;
+        return properties.build();
     }
 
     @Override

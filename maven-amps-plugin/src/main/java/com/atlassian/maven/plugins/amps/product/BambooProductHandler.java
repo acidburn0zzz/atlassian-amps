@@ -6,6 +6,7 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.google.common.collect.ImmutableMap;
 import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 import java.io.IOException;
@@ -49,10 +50,11 @@ public class BambooProductHandler extends AbstractWebappProductHandler
 
     public Map<String, String> getSystemProperties(Product ctx)
     {
-        Map<String, String> systemProperties = super.getSystemProperties(ctx);
-        systemProperties.put("bamboo.home", getHomeDirectory(ctx).getPath());
-        systemProperties.put("org.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES", "false");
-        return Collections.unmodifiableMap(systemProperties);
+        ImmutableMap.Builder<String, String> properties = ImmutableMap.builder();
+        properties.putAll(super.getSystemProperties(ctx));
+        properties.put("bamboo.home", getHomeDirectory(ctx).getPath());
+        properties.put("org.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES", "false");
+        return properties.build();
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
+import com.google.common.collect.ImmutableMap;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
@@ -65,19 +66,16 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
     }
 
     protected abstract List<ProductArtifact> getExtraContainerDependencies();
-    
-    
-    
+
     @Override
     protected Map<String, String> getSystemProperties(Product ctx)
     {
-        Map<String, String> properties = Maps.newHashMap();
-        addDataSourceSystemProperties(properties, ctx);
-        return properties;
+        return generateDataSourceSystemProperties(ctx);
     }
 
-    protected void addDataSourceSystemProperties(Map<String, String> systemProperties, Product context)
+    protected Map<String, String> generateDataSourceSystemProperties(Product context)
     {
+        ImmutableMap.Builder<String, String> systemProperties = ImmutableMap.builder();
         List<DataSource> dataSources = context.getDataSources();
         DataSource defaultValues = getDefaultDataSource(context);
         
@@ -105,6 +103,7 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
                 systemProperties.put("cargo.datasource.datasource." + i, dataSources.get(i).getCargoString());
             }
         }
+        return systemProperties.build();
     }
 
     /**

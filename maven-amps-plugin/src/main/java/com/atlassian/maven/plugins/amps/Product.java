@@ -251,6 +251,7 @@ public class Product
      *         <dataSource>
      *             <jndi>jdbc/JiraDS</jndi>
      *             <url>jdbc:postgresql://localhost:5432/jira</url>
+     *             <driver>org.postgresql.jdbcDriver</driver>
      *             <username>jira</username>
      *             <password>jira</password>
      *             <libArtifacts>
