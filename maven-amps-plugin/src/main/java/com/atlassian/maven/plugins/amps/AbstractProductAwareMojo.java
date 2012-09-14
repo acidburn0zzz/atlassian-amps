@@ -115,7 +115,7 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
         if(AmpsEmailSubscriber.ALLOWED_PRODUCTS.contains(getProductId()) && !shouldSkipPrompts())
         {
             String emailCheckKey = PREF_EMAIL_PREFIX + "-" + getProductId();
-            Preferences prefs = Preferences.userNodeForPackage(getClass());
+            Preferences prefs = Preferences.userNodeForPackage(AbstractProductAwareMojo.class);
             String alreadyRan = prefs.get(emailCheckKey, null);
 
             if(null == alreadyRan)

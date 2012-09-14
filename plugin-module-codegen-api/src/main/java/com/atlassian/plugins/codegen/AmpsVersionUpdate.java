@@ -9,16 +9,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class AmpsVersionUpdate implements PluginProjectChange
 {
-    private final String version;
+    public static final String PLUGIN = "plugin";
+    public static final String MANAGEMENT = "management";
 
-    public static AmpsVersionUpdate ampsVersionUpdate(String version)
+    private final String version;
+    private final String type;
+
+    public static AmpsVersionUpdate ampsVersionUpdate(String version,String type)
     {
-        return new AmpsVersionUpdate(version);
+        return new AmpsVersionUpdate(version,type);
     }
 
-    private AmpsVersionUpdate(String version)
+    private AmpsVersionUpdate(String version, String type)
     {
         this.version = checkNotNull(version, "version");
+        this.type = checkNotNull(type, "type");
     }
 
     public String getVersion()
@@ -26,9 +31,14 @@ public class AmpsVersionUpdate implements PluginProjectChange
         return version;
     }
 
+    public String getType()
+    {
+        return type;
+    }
+
     @Override
     public String toString()
     {
-        return "[AMPS Version Update: " + version + "]";
+        return "[AMPS " + type + " Version Update: " + version + "]";
     }
 }

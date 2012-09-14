@@ -166,14 +166,20 @@ public class MavenProjectRewriter implements ProjectRewriter
             {
                 newAmpsVersion = changeVersion;
             }
-        }
-        
-        //update the amps plugin version to the property if needed
-        Element ampsVersionElement = getOrCreateElement(findAmpsPlugin(),"version");
-        if(!"${amps.version}".equals(ampsVersionElement.getTextTrim()))
-        {
-            ampsVersionElement.setText("${amps.version}");
-            modified = true;
+            
+            if(AmpsVersionUpdate.PLUGIN.equalsIgnoreCase(changeItem.getType()))
+            {
+                modified = applyAmpsPluginVersionUpdate();
+            }
+
+            if(AmpsVersionUpdate.MANAGEMENT.equalsIgnoreCase(changeItem.getType()))
+            {
+                boolean managementUpdated = applyAmpsPluginManagementVersionUpdate();
+                if(!modified)
+                {
+                    modified = managementUpdated;
+                }
+            }
         }
 
         //add the amps.version prop if needed
@@ -197,9 +203,64 @@ public class MavenProjectRewriter implements ProjectRewriter
         return modified;
     }
     
+    private boolean applyAmpsPluginVersionUpdate()
+    {
+        boolean modified = false;
+        
+        //update the amps plugin version to the property if needed
+        Element ampsVersionElement = getOrCreateElement(findAmpsPlugin(),"version");
+        if(!"${amps.version}".equals(ampsVersionElement.getTextTrim()))
+        {
+            ampsVersionElement.setText("${amps.version}");
+            modified = true;
+        }
+        
+        return modified;
+    }
+
+    private boolean applyAmpsPluginManagementVersionUpdate()
+    {
+        boolean modified = false;
+        //update the amps plugin version to the property if needed
+        Element ampsManagementPlugin = findAmpsPluginManagement();
+        if(null != ampsManagementPlugin)
+        {
+            Element ampsVersionElement = getOrCreateElement(ampsManagementPlugin,"version");
+            if(!"${amps.version}".equals(ampsVersionElement.getTextTrim()))
+            {
+                ampsVersionElement.setText("${amps.version}");
+                modified = true;
+            }
+        }
+        
+        return modified;
+    }
+    
     public String getAmpsVersionInPom()
     {
-        return getOrCreateElement(findAmpsPlugin(),"version").getTextTrim();
+        Element ampsVersion = getElementOrNull(findAmpsPlugin(),"version");
+        if(null != ampsVersion)
+        {
+            return ampsVersion.getTextTrim();
+        }
+        
+        return "";
+    }
+
+    public String getAmpsPluginManagementVersionInPom()
+    {
+        Element ampsManagementPlugin = findAmpsPluginManagement();
+        String version = "";
+        if(null != ampsManagementPlugin)
+        {
+            Element ampsVersion = getElementOrNull(ampsManagementPlugin,"version");
+            if(null != ampsVersion)
+            {
+                version = ampsVersion.getTextTrim();
+            }
+        }
+        
+        return version;
     }
     
     @SuppressWarnings("unchecked")
@@ -246,6 +307,11 @@ public class MavenProjectRewriter implements ProjectRewriter
 
     private boolean applyBundleInstructionChanges(Iterable<BundleInstruction> instructions)
     {
+        if(!instructions.iterator().hasNext())
+        {
+            return false;
+        }
+        
         Element configRoot = getAmpsPluginConfiguration();
         boolean modified = false;
         Element instructionsRoot = getOrCreateElement(configRoot, "instructions");
@@ -363,15 +429,38 @@ public class MavenProjectRewriter implements ProjectRewriter
     @SuppressWarnings("unchecked")
     private Element findAmpsPlugin()
     {
-        for (Element p : (List<Element>) getOrCreateElement(root, "build/plugins").elements("plugin"))
+        Element plugins = getElementOrNull(root, "build/plugins");
+        if(null != plugins)
         {
-            if (p.elementTextTrim("groupId").equals("com.atlassian.maven.plugins")
-                && AMPS_PLUGIN_IDS.contains(p.elementTextTrim("artifactId")))
+            for (Element p : (List<Element>) plugins.elements("plugin"))
             {
-                return p;
+                if (p.elementTextTrim("groupId").equals("com.atlassian.maven.plugins")
+                    && AMPS_PLUGIN_IDS.contains(p.elementTextTrim("artifactId")))
+                {
+                    return p;
+                }
             }
         }
         throw new IllegalStateException("Could not find AMPS plugin element in POM");
+    }
+
+    @SuppressWarnings("unchecked")
+    private Element findAmpsPluginManagement()
+    {
+        Element plugins = getElementOrNull(root, "build/pluginManagement/plugins");
+        if(null != plugins)
+        {
+            for (Element p : (List<Element>) plugins.elements("plugin"))
+            {
+                if (p.elementTextTrim("groupId").equals("com.atlassian.maven.plugins")
+                        && AMPS_PLUGIN_IDS.contains(p.elementTextTrim("artifactId")))
+                {
+                    return p;
+                }
+            }
+        }
+        
+        return null;
     }
 
     private Element getAmpsPluginConfiguration()
@@ -392,6 +481,18 @@ public class MavenProjectRewriter implements ProjectRewriter
             container = last;
         }
         return last;
+    }
+
+    private static Element getElementOrNull(Element container, String path)
+    {
+        for (String pathName : path.split("/"))
+        {
+            if (container != null)
+            {
+                container = container.element(pathName);
+            }
+        }
+        return container;
     }
     
     private Document readPom(File f) throws DocumentException, IOException
