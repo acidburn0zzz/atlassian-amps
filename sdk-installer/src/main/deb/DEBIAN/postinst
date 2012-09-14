@@ -15,4 +15,6 @@ for f in `find /usr/bin/ -name "atlas-*"`; do
   chown root:root $f
 done
 
+echo "If you previously installed a version prior to version 4.0, you will need to remove all references to the atlassian-plugin-sdk directory from your PATH environment variable."
+
 exit 0
