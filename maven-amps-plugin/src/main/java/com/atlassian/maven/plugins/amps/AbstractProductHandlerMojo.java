@@ -61,12 +61,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     /**
       * Default product startup timeout: three minutes
      */
-    private static final int DEFAULT_PRODUCT_STARTUP_TIMEOUT = 1000 * 60 * 3;
+    private static final int DEFAULT_PRODUCT_STARTUP_TIMEOUT = 1000 * 60 * 10;
 
     /**
       * Default product shutdown timeout: three minutes
       */
-    private static final int DEFAULT_PRODUCT_SHUTDOWN_TIMEOUT = 1000 * 60 * 3;
+    private static final int DEFAULT_PRODUCT_SHUTDOWN_TIMEOUT = 1000 * 60 * 10;
 
     static
     {
