@@ -133,5 +133,6 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
         super.cleanupProductHomeForZip(product, snapshotDir);
         FileUtils.deleteDirectory(new File(snapshotDir, "plugins-osgi-cache"));
         FileUtils.deleteDirectory(new File(snapshotDir, "plugins-temp"));
+        FileUtils.deleteDirectory(new File(snapshotDir, "temp"));
     }
 }
