@@ -40,6 +40,17 @@ public class PluginXmlHelper
         reader.setStripWhitespaceText(false);
         this.document = reader.read(new FileInputStream(xmlFile));
     }
+
+    public PluginXmlHelper(File pluginXmlFile) throws IOException, DocumentException
+    {
+        this.location = null;
+        this.xmlFile = pluginXmlFile;
+
+        final SAXReader reader = new SAXReader();
+        reader.setMergeAdjacentText(true);
+        reader.setStripWhitespaceText(false);
+        this.document = reader.read(new FileInputStream(xmlFile));
+    }
     
     public Document getDocument()
     {

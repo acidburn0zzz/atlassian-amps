@@ -1,7 +1,12 @@
-package com.atlassian.maven.plugins.amps;
+package com.atlassian.maven.plugins;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.atlassian.maven.plugins.amps.DebugMojo;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.ProductExecution;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
 
@@ -11,29 +16,18 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
-/**
- * Debug the webapp
- */
-@Mojo(name = "debug", requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(name = "integration-test-console", requiresDependencyResolution = ResolutionScope.TEST)
 @Execute(phase = LifecyclePhase.PACKAGE)
-public class DebugMojo extends RunMojo
+public class IntegrationTestConsoleMojo extends DebugMojo
 {
-    /**
-     * port for debugging
-     */
-    @Parameter(property = "jvm.debug.port", defaultValue = "5005")
-    protected int jvmDebugPort;
-
-    /**
-     * Suspend when debugging
-     */
-    @Parameter(property = "jvm.debug.suspend")
-    protected boolean jvmDebugSuspend = false;
-
-
+    private final List<ProductArtifact> testFrameworkPlugins = new ArrayList<ProductArtifact>()
+    {{
+            add(new ProductArtifact("org.junit","com.springsource.org.junit","4.10.0"));
+            add(new ProductArtifact("com.atlassian.plugins","atlassian-plugins-osgi-testrunner-bundle","1.1-SNAPSHOT"));
+        }};
+    
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
@@ -42,7 +36,7 @@ public class DebugMojo extends RunMojo
         getAmpsPluginVersionChecker().checkAmpsVersionInPom(getSdkVersion(),getMavenContext().getProject());
 
         promptForEmailSubscriptionIfNeeded();
-        
+
         trackFirstRunIfNeeded();
         getGoogleTracker().track(GoogleAmpsTracker.DEBUG);
 
@@ -61,7 +55,7 @@ public class DebugMojo extends RunMojo
             final int port = product.getJvmDebugPort();
 
             String debugArgs = " -Xdebug -Xrunjdwp:transport=dt_socket,address=" +
-                               String.valueOf(port) + ",suspend=" + (jvmDebugSuspend ? "y" : "n") + ",server=y ";
+                    String.valueOf(port) + ",suspend=" + (jvmDebugSuspend ? "y" : "n") + ",server=y ";
 
             if (product.getJvmArgs() == null)
             {
@@ -69,6 +63,15 @@ public class DebugMojo extends RunMojo
             }
 
             product.setJvmArgs(product.getJvmArgs() + debugArgs);
+
+            if(shouldBuildTestPlugin())
+            {
+                List<ProductArtifact> plugins = product.getBundledArtifacts();
+                plugins.addAll(testFrameworkPlugins);
+
+                List<ProductArtifact> libs = product.getLibArtifacts();
+                libs.add(new ProductArtifact("org.junit","com.springsource.org.junit","4.10.0"));
+            }
 
             if (writePropertiesToFile)
             {
@@ -88,11 +91,5 @@ public class DebugMojo extends RunMojo
         }
 
         startProducts(productExecutions);
-    }
-
-    protected boolean debugNotSet()
-    {
-        String atlasOpts = System.getenv("ATLAS_OPTS");
-        return atlasOpts == null || !atlasOpts.contains("-Xdebug");
     }
 }

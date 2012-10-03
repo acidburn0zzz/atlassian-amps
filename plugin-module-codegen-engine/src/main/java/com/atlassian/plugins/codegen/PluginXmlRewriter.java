@@ -1,5 +1,6 @@
 package com.atlassian.plugins.codegen;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -33,6 +34,12 @@ public class PluginXmlRewriter implements ProjectRewriter
     public PluginXmlRewriter(PluginModuleLocation location) throws IOException, DocumentException
     {
         this.xmlHelper = new PluginXmlHelper(location);
+        this.document = xmlHelper.getDocument();
+    }
+
+    public PluginXmlRewriter(File pluginXmlFile) throws IOException, DocumentException
+    {
+        this.xmlHelper = new PluginXmlHelper(pluginXmlFile);
         this.document = xmlHelper.getDocument();
     }
     

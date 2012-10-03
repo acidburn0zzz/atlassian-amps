@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
-import com.atlassian.core.util.FileUtils;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 
@@ -24,6 +23,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -82,7 +82,7 @@ public class MavenGoals
 
             // You can't actually override the version a plugin if defined in the project, so these don't actually do
             // anything, since the super pom already defines versions.
-            put("maven-dependency-plugin", "2.0");
+            put("maven-dependency-plugin", "2.5.1");
             put("maven-resources-plugin", "2.3");
             put("maven-jar-plugin", "2.2");
             //put("maven-surefire-plugin", "2.4.3");
@@ -205,31 +205,7 @@ public class MavenGoals
 
     public void copyTestBundledDependencies() throws MojoExecutionException
     {
-        /*Collection<Dependency> testUtils = Collections2.filter(ctx.getProject().getDependencies(), new Predicate<Dependency>()
-        {
-            @Override
-            public boolean apply(Dependency o)
-            {
-                return (o.getGroupId().equals("com.atlassian.plugins") && o.getArtifactId().equals("atlassian-plugins-osgi-test-utils"));
-            }
-        });
         
-        if(!testUtils.isEmpty())
-        {
-            executeMojo(
-                    plugin(
-                            groupId("org.apache.maven.plugins"),
-                            artifactId("maven-dependency-plugin"),
-                            version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
-                    ),
-                    goal("copy-dependencies"),
-                    configuration(
-                            element(name("includeArtifactIds"), "atlassian-plugins-osgi-test-utils"),
-                            element(name("outputDirectory"), "${project.build.testOutputDirectory}/META-INF/lib")
-                    ),
-                    executionEnvironment()
-            );
-        }*/
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -238,14 +214,35 @@ public class MavenGoals
                 ),
                 goal("copy-dependencies"),
                 configuration(
-                        element(name("includeScope"), "runtime"),
+                        element(name("includeScope"), "test"),
                         element(name("excludeScope"), "provided"),
-                        element(name("excludeScope"), "test"),
-                        element(name("includeTypes"), "jar"),
-                        element(name("outputDirectory"), "${project.build.testOutputDirectory}/META-INF/lib")
+                        element(name("excludeArtifactIds"),"junit"),
+                        element(name("useSubDirectoryPerScope"),"true"),
+                        element(name("outputDirectory"), "${project.build.directory}/testlibs")
                 ),
                 executionEnvironment()
         );
+        
+        File targetDir = new File(ctx.getProject().getBuild().getDirectory());
+        File testlibsDir = new File(targetDir,"testlibs");
+        File compileLibs = new File(testlibsDir,"compile");
+        File testLibs = new File(testlibsDir,"test");
+        
+        
+        File testClassesDir = new File(ctx.getProject().getBuild().getTestOutputDirectory());
+        File metainfDir = new File(testClassesDir,"META-INF");
+        File libDir = new File(metainfDir,"lib");
+
+        try
+        {
+            FileUtils.copyDirectory(compileLibs,libDir);
+            FileUtils.copyDirectory(testLibs,libDir);
+        }
+        catch (IOException e)
+        {
+            throw new MojoExecutionException("unable to copy test libs", e);
+        }
+
     }
 
     public void extractBundledDependencies() throws MojoExecutionException
@@ -356,6 +353,7 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
+
     }
 
     public void runUnitTests(Map<String, Object> systemProperties) throws MojoExecutionException
@@ -1344,22 +1342,22 @@ public class MavenGoals
                 File userAppDocs = new File(prj.getBuild().getOutputDirectory(),"application-doc.xml");
                 if(!userAppDocs.exists())
                 {
-                    String appDocText = FileUtils.getResourceContent("application-doc.xml");
+                    String appDocText = com.atlassian.core.util.FileUtils.getResourceContent("application-doc.xml");
                     appDocText = StringUtils.replace(appDocText, "${rest.doc.title}", pluginInfo.getName());
                     appDocText = StringUtils.replace(appDocText,"${rest.doc.description}",pluginInfo.getDescription());
                     File appDocFile = new File(prj.getBuild().getOutputDirectory(), "application-doc.xml");
 
-                    FileUtils.saveTextFile(appDocText, appDocFile);
+                    FileUtils.writeStringToFile(appDocFile,appDocText);
                     log.info("Wrote " + appDocFile.getAbsolutePath());
                 }
 
                 File userGrammars = new File(prj.getBuild().getOutputDirectory(),"application-grammars.xml");
                 if(!userGrammars.exists())
                 {
-                    String grammarText = FileUtils.getResourceContent("application-grammars.xml");
+                    String grammarText = com.atlassian.core.util.FileUtils.getResourceContent("application-grammars.xml");
                     File grammarFile = new File(prj.getBuild().getOutputDirectory(), "application-grammars.xml");
 
-                    FileUtils.saveTextFile(grammarText, grammarFile);
+                    FileUtils.writeStringToFile(grammarFile,grammarText);
 
                     log.info("Wrote " + grammarFile.getAbsolutePath());
                 }
