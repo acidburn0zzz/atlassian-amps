@@ -77,7 +77,7 @@ public class MavenGoals
             put("atlassian-pdk", "2.3.1");
             put("maven-archetype-plugin", "2.0-alpha-4");
             put("maven-bundle-plugin", "2.3.7");
-            put("yuicompressor-maven-plugin", "0.7.1");
+            put("yuicompressor-maven-plugin", "1.3.0");
             put("build-helper-maven-plugin", "1.7");
 
             // You can't actually override the version a plugin if defined in the project, so these don't actually do
@@ -292,7 +292,7 @@ public class MavenGoals
     {
         executeMojo(
                 plugin(
-                        groupId("net.sf.alchim"),
+                        groupId("net.alchim31.maven"),
                         artifactId("yuicompressor-maven-plugin"),
                         version(defaultArtifactIdToVersionMap.get("yuicompressor-maven-plugin"))
                 ),
