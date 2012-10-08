@@ -1,4 +1,4 @@
-package com.atlassian.maven.plugins;
+package com.atlassian.maven.plugins.amps;
 
 import java.util.ArrayList;
 import java.util.List;
