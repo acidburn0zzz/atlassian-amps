@@ -48,8 +48,8 @@
 },{
   'name' : 'data-version',
   'maven' : 'product.data.version',
-  'description' : 'Version to use for data resources (default is LATEST)',
-  'example' : 'LATEST'
+  'description' : 'Version to use for data resources (default is RELEASE)',
+  'example' : 'RELEASE'
 },{
   'name' : 'sal-version',
   'maven' : 'sal.version',

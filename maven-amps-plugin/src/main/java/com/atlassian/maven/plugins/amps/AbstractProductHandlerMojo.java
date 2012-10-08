@@ -51,7 +51,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
     protected static final String DEFAULT_CONTAINER = "tomcat6x";
     private static final String DEFAULT_SERVER;
-    private static final String DEFAULT_PRODUCT_DATA_VERSION = "LATEST";
     private static final String DEFAULT_PDK_VERSION = "0.4";
     private static final String DEFAULT_WEB_CONSOLE_VERSION = "1.2.8";
     private static final String DEFAULT_FASTDEV_VERSION = "1.12.1";
@@ -165,7 +164,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     /**
      * The test resources version
      */
-    @Parameter(property = "product.data.version", defaultValue = DEFAULT_PRODUCT_DATA_VERSION)
+    @Parameter(property = "product.data.version")
     private String productDataVersion;
 
     /**
@@ -499,11 +498,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             product.setServer(DEFAULT_SERVER);
         }
 
-        if (product.getDataVersion() == null)
-        {
-            product.setDataVersion(DEFAULT_PRODUCT_DATA_VERSION);
-        }
-
         if (product.getPdkVersion() == null)
         {
             product.setPdkVersion(DEFAULT_PDK_VERSION);
@@ -562,6 +556,16 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         if (product.getVersion() == null)
         {
             product.setVersion("RELEASE");
+        }
+
+        if (product.getDataVersion() == null)
+        {
+            // Default the productDataVersion to match the productVersion. Defaulting to LATEST
+            // is bad because there is no guarantee that a snapshots let alone a more recent
+            // version of a product's data is compatible with an earlier version of the product or
+            // that a product is required to provide a 'downgrade' task. Developers can still
+            // specify LATEST explicitly
+            product.setDataVersion(product.getVersion());
         }
 
         if (product.getContextPath() == null)
