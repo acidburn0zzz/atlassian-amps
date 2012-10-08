@@ -349,6 +349,13 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     private String output;
 
     /**
+     * Comma-delimited list of bundled plugin artifacts in GROUP_ID:ARTIFACT_ID:VERSION form, where version can be
+     * ommitted, defaulting to LATEST
+     */
+    @Parameter(property = "additional.resource.folders")
+    private String additionalResourceFolders;
+
+    /**
      * Start the products in parallel (TestGroups and Studio).
      */
     @Parameter(property = "parallel", defaultValue = "false")
@@ -414,6 +421,11 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         // collect all resource directories and make them available for
         // on-the-fly reloading
         StringBuilder resourceProp = new StringBuilder();
+        if(StringUtils.isNotBlank(additionalResourceFolders))
+        {
+            resourceProp.append(additionalResourceFolders).append(",");    
+        }
+        
         MavenProject mavenProject = getMavenContext().getProject();
         @SuppressWarnings("unchecked") List<Resource> resList = mavenProject.getResources();
         for (int i = 0; i < resList.size(); i++) {
