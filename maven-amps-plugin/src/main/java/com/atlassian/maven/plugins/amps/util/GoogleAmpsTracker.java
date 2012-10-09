@@ -8,6 +8,8 @@ import com.dmurph.tracking.JGoogleAnalyticsTracker;
 import com.dmurph.tracking.VisitorData;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.maven.plugin.logging.Log;
 
 /**
@@ -110,10 +112,17 @@ public class GoogleAmpsTracker
     {
         if (tracker.isEnabled())
         {
-            System.setProperty("http.agent",getUserAgent());
-            mavenLogger.info("Sending event to Google Analytics: " + getCategoryName() + " - " + eventName);
-            tracker.trackEvent(getCategoryName(), eventName);
-            saveVisitorData(config.getVisitorData());
+            try
+            {
+                System.setProperty("http.agent",getUserAgent());
+                mavenLogger.info("Sending event to Google Analytics: " + getCategoryName() + " - " + eventName);
+                tracker.trackEvent(getCategoryName(), eventName);
+                saveVisitorData(config.getVisitorData());
+            }
+            catch (Throwable t)
+            {
+                
+            }
         }
     }
 
@@ -121,10 +130,17 @@ public class GoogleAmpsTracker
     {
         if (tracker.isEnabled())
         {
-            System.setProperty("http.agent",getUserAgent());
-            mavenLogger.info("Sending event to Google Analytics: " + getCategoryName() + " - " + eventName + " - " + label);
-            tracker.trackEvent(getCategoryName(), eventName, label);
-            saveVisitorData(config.getVisitorData());
+            try
+            {
+                System.setProperty("http.agent",getUserAgent());
+                mavenLogger.info("Sending event to Google Analytics: " + getCategoryName() + " - " + eventName + " - " + label);
+                tracker.trackEvent(getCategoryName(), eventName, label);
+                saveVisitorData(config.getVisitorData());
+            }
+            catch (Throwable t)
+            {
+                
+            }
         }
     }
 
