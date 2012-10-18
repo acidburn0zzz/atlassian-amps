@@ -1,5 +1,7 @@
 package com.atlassian.maven.plugins.amps;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
@@ -42,6 +44,12 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
      */
     @Parameter(property = "allow.google.tracking", defaultValue = "true")
     protected boolean allowGoogleTracking;
+
+    /**
+     * List of artifacts to exclude when copying test bundle dependencies
+     */
+    @Parameter
+    protected List<ProductArtifact> testBundleExcludes = new ArrayList<ProductArtifact>();
 
     private GoogleAmpsTracker googleTracker;
 

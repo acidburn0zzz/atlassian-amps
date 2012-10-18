@@ -101,6 +101,13 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
      */
     @Parameter(property = "skipAllPrompts", defaultValue = "false")
     private boolean skipAllPrompts;
+
+    /**
+     *  this is just a marker so IDE's don't complain when this property is present.
+     *  Fastdev parses this out of the pom manually
+     */
+    @Parameter(property = "useFastdevCli", defaultValue = "true")
+    private boolean useFastdevCli;
     
     /**
      * Whether the test plugin should be built or not.  If not specified, it detects an atlassian-plugin.xml in the

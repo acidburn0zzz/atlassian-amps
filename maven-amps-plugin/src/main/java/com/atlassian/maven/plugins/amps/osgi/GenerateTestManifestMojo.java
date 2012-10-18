@@ -31,7 +31,7 @@ public class GenerateTestManifestMojo extends AbstractAmpsMojo
     /**
      * The BND instructions for the bundle.
      */
-    @Parameter
+    @Parameter(property = "testInstructions")
     private Map<String, String> testInstructions = new HashMap<String, String>();
 
     @Parameter(property = "project.build.finalName")

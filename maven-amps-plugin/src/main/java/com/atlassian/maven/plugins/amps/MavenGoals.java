@@ -130,20 +130,33 @@ public class MavenGoals
         final List<Element> configs = new ArrayList<Element>();
         configs.add(element(name("commands"),
                 element(name("pi"),
-                        "resources" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
-                        + "compile" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install"),
+                        "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
+                                + "resources" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
+                                + "compile" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install"),
                 element(name("tpi"),
-                        "testResources" + " "
-                        + "testCompile" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-jar" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-install"),
+                        "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
+                                + "resources" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
+                                + "compile" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
+                                +"com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-test-bundled-dependencies" + " "
+                                + "testResources" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-test-plugin-descriptor" + " "
+                                + "org.apache.maven.plugins:maven-compiler-plugin:testCompile" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-test-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-test-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-jar" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-install"),
                 element(name("package"),
                         "resources" + " "
                         + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
@@ -203,8 +216,16 @@ public class MavenGoals
         );
     }
 
-    public void copyTestBundledDependencies() throws MojoExecutionException
+    public void copyTestBundledDependencies(List<ProductArtifact> testBundleExcludes) throws MojoExecutionException
     {
+        StringBuilder sb = new StringBuilder();
+        
+        for(ProductArtifact artifact : testBundleExcludes)
+        {
+                sb.append(",").append(artifact.getArtifactId());
+        }
+        
+        String customExcludes = sb.toString();
         
         executeMojo(
                 plugin(
@@ -216,7 +237,7 @@ public class MavenGoals
                 configuration(
                         element(name("includeScope"), "test"),
                         element(name("excludeScope"), "provided"),
-                        element(name("excludeArtifactIds"),"junit"),
+                        element(name("excludeArtifactIds"),"junit" + customExcludes),
                         element(name("useSubDirectoryPerScope"),"true"),
                         element(name("outputDirectory"), "${project.build.directory}/testlibs")
                 ),
@@ -266,8 +287,17 @@ public class MavenGoals
         );
     }
 
-    public void extractTestBundledDependencies() throws MojoExecutionException
+    public void extractTestBundledDependencies(List<ProductArtifact> testBundleExcludes) throws MojoExecutionException
     {
+        StringBuilder sb = new StringBuilder();
+
+        for(ProductArtifact artifact : testBundleExcludes)
+        {
+            sb.append(",").append(artifact.getArtifactId());
+        }
+
+        String customExcludes = sb.toString();
+        
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -281,6 +311,7 @@ public class MavenGoals
                         element(name("excludeScope"), "provided"),
                         element(name("excludeScope"), "runtime"),
                         element(name("includeTypes"), "jar"),
+                        element(name("excludeArtifactIds"),"junit" + customExcludes),
                         element(name("excludes"), "META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
                         element(name("outputDirectory"), "${project.build.testOutputDirectory}")
                 ),

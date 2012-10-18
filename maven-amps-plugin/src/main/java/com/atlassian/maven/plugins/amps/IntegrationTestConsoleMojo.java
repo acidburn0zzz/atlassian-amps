@@ -25,7 +25,7 @@ public class IntegrationTestConsoleMojo extends DebugMojo
     private final List<ProductArtifact> testFrameworkPlugins = new ArrayList<ProductArtifact>()
     {{
             add(new ProductArtifact("org.junit","com.springsource.org.junit","4.10.0"));
-            add(new ProductArtifact("com.atlassian.plugins","atlassian-plugins-osgi-testrunner-bundle","1.1-SNAPSHOT"));
+            add(new ProductArtifact("com.atlassian.plugins","atlassian-plugins-osgi-testrunner-bundle","1.1-m1"));
         }};
     
     @Override
