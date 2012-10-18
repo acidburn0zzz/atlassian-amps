@@ -63,7 +63,7 @@ if (testCliState.text == '0')
 else if (testCliState.text == '1')
 {
     new HTTPBuilder("$baseUrl/plugins/servlet/testcli").request(GET) {
-      response.failure = { assert false , "Expected request to have worked! Test plugin should have been installed" }
+      response.failure = { assert false , "Expected request to have worked! Test plugin should have been installed: " + it.statusLine.statusCode}
       response.success = { assert it.statusLine.statusCode == 200, "The HTTP GET should have 200'd, the test plugin should have been installed" }
     }
     testCliState.text = '2'

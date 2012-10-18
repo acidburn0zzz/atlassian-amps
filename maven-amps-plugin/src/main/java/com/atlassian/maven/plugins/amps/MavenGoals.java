@@ -132,7 +132,7 @@ public class MavenGoals
                 element(name("pi"),
                         "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
-                                + "resources" + " "
+                                + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
                                 + "compile" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
@@ -142,12 +142,12 @@ public class MavenGoals
                 element(name("tpi"),
                         "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
-                                + "resources" + " "
+                                + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
                                 + "compile" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
                                 +"com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-test-bundled-dependencies" + " "
-                                + "testResources" + " "
+                                + "org.apache.maven.plugins:maven-resources-plugin:testResources" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-test-plugin-descriptor" + " "
                                 + "org.apache.maven.plugins:maven-compiler-plugin:testCompile" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-test-manifest" + " "
@@ -158,7 +158,7 @@ public class MavenGoals
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-install"),
                 element(name("package"),
-                        "resources" + " "
+                        "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
                         + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
                         + "compile" + " "
                         + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
@@ -256,6 +256,10 @@ public class MavenGoals
 
         try
         {
+            compileLibs.mkdirs();
+            testLibs.mkdirs();
+            libDir.mkdirs();
+            
             FileUtils.copyDirectory(compileLibs,libDir);
             FileUtils.copyDirectory(testLibs,libDir);
         }

@@ -31,7 +31,7 @@ public class GenerateManifestMojo extends AbstractAmpsMojo
     /**
      * The BND instructions for the bundle.
      */
-    @Parameter(property = "instructions")
+    @Parameter
     private Map<String, String> instructions = new HashMap<String, String>();
 
     public void execute() throws MojoExecutionException, MojoFailureException
