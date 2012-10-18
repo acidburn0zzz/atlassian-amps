@@ -137,7 +137,7 @@
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-osgi-testrunner</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.1-m1</version>
         </dependency>
     </dependencies>
 
