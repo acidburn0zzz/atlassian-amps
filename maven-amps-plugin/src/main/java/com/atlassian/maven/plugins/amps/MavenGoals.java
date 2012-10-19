@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
-import com.atlassian.core.util.FileUtils;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 
@@ -24,6 +23,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -77,12 +77,12 @@ public class MavenGoals
             put("atlassian-pdk", "2.3.1");
             put("maven-archetype-plugin", "2.0-alpha-4");
             put("maven-bundle-plugin", "2.3.7");
-            put("yuicompressor-maven-plugin", "0.7.1");
+            put("yuicompressor-maven-plugin", "1.3.0");
             put("build-helper-maven-plugin", "1.7");
 
             // You can't actually override the version a plugin if defined in the project, so these don't actually do
             // anything, since the super pom already defines versions.
-            put("maven-dependency-plugin", "2.0");
+            put("maven-dependency-plugin", "2.5.1");
             put("maven-resources-plugin", "2.3");
             put("maven-jar-plugin", "2.2");
             //put("maven-surefire-plugin", "2.4.3");
@@ -130,22 +130,35 @@ public class MavenGoals
         final List<Element> configs = new ArrayList<Element>();
         configs.add(element(name("commands"),
                 element(name("pi"),
-                        "resources" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
-                        + "compile" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install"),
+                        "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
+                                + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
+                                + "compile" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install"),
                 element(name("tpi"),
-                        "testResources" + " "
-                        + "testCompile" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-jar" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-install"),
+                        "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
+                                + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
+                                + "compile" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
+                                +"com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-test-bundled-dependencies" + " "
+                                + "org.apache.maven.plugins:maven-resources-plugin:testResources" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-test-plugin-descriptor" + " "
+                                + "org.apache.maven.plugins:maven-compiler-plugin:testCompile" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-test-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-test-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-jar" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-install"),
                 element(name("package"),
-                        "resources" + " "
+                        "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
                         + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
                         + "compile" + " "
                         + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
@@ -203,33 +216,17 @@ public class MavenGoals
         );
     }
 
-    public void copyTestBundledDependencies() throws MojoExecutionException
+    public void copyTestBundledDependencies(List<ProductArtifact> testBundleExcludes) throws MojoExecutionException
     {
-        /*Collection<Dependency> testUtils = Collections2.filter(ctx.getProject().getDependencies(), new Predicate<Dependency>()
-        {
-            @Override
-            public boolean apply(Dependency o)
-            {
-                return (o.getGroupId().equals("com.atlassian.plugins") && o.getArtifactId().equals("atlassian-plugins-osgi-test-utils"));
-            }
-        });
+        StringBuilder sb = new StringBuilder();
         
-        if(!testUtils.isEmpty())
+        for(ProductArtifact artifact : testBundleExcludes)
         {
-            executeMojo(
-                    plugin(
-                            groupId("org.apache.maven.plugins"),
-                            artifactId("maven-dependency-plugin"),
-                            version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
-                    ),
-                    goal("copy-dependencies"),
-                    configuration(
-                            element(name("includeArtifactIds"), "atlassian-plugins-osgi-test-utils"),
-                            element(name("outputDirectory"), "${project.build.testOutputDirectory}/META-INF/lib")
-                    ),
-                    executionEnvironment()
-            );
-        }*/
+                sb.append(",").append(artifact.getArtifactId());
+        }
+        
+        String customExcludes = sb.toString();
+        
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -238,14 +235,39 @@ public class MavenGoals
                 ),
                 goal("copy-dependencies"),
                 configuration(
-                        element(name("includeScope"), "runtime"),
+                        element(name("includeScope"), "test"),
                         element(name("excludeScope"), "provided"),
-                        element(name("excludeScope"), "test"),
-                        element(name("includeTypes"), "jar"),
-                        element(name("outputDirectory"), "${project.build.testOutputDirectory}/META-INF/lib")
+                        element(name("excludeArtifactIds"),"junit" + customExcludes),
+                        element(name("useSubDirectoryPerScope"),"true"),
+                        element(name("outputDirectory"), "${project.build.directory}/testlibs")
                 ),
                 executionEnvironment()
         );
+        
+        File targetDir = new File(ctx.getProject().getBuild().getDirectory());
+        File testlibsDir = new File(targetDir,"testlibs");
+        File compileLibs = new File(testlibsDir,"compile");
+        File testLibs = new File(testlibsDir,"test");
+        
+        
+        File testClassesDir = new File(ctx.getProject().getBuild().getTestOutputDirectory());
+        File metainfDir = new File(testClassesDir,"META-INF");
+        File libDir = new File(metainfDir,"lib");
+
+        try
+        {
+            compileLibs.mkdirs();
+            testLibs.mkdirs();
+            libDir.mkdirs();
+            
+            FileUtils.copyDirectory(compileLibs,libDir);
+            FileUtils.copyDirectory(testLibs,libDir);
+        }
+        catch (IOException e)
+        {
+            throw new MojoExecutionException("unable to copy test libs", e);
+        }
+
     }
 
     public void extractBundledDependencies() throws MojoExecutionException
@@ -269,8 +291,17 @@ public class MavenGoals
         );
     }
 
-    public void extractTestBundledDependencies() throws MojoExecutionException
+    public void extractTestBundledDependencies(List<ProductArtifact> testBundleExcludes) throws MojoExecutionException
     {
+        StringBuilder sb = new StringBuilder();
+
+        for(ProductArtifact artifact : testBundleExcludes)
+        {
+            sb.append(",").append(artifact.getArtifactId());
+        }
+
+        String customExcludes = sb.toString();
+        
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -284,6 +315,7 @@ public class MavenGoals
                         element(name("excludeScope"), "provided"),
                         element(name("excludeScope"), "runtime"),
                         element(name("includeTypes"), "jar"),
+                        element(name("excludeArtifactIds"),"junit" + customExcludes),
                         element(name("excludes"), "META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
                         element(name("outputDirectory"), "${project.build.testOutputDirectory}")
                 ),
@@ -295,7 +327,7 @@ public class MavenGoals
     {
         executeMojo(
                 plugin(
-                        groupId("net.sf.alchim"),
+                        groupId("net.alchim31.maven"),
                         artifactId("yuicompressor-maven-plugin"),
                         version(defaultArtifactIdToVersionMap.get("yuicompressor-maven-plugin"))
                 ),
@@ -356,6 +388,7 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
+
     }
 
     public void runUnitTests(Map<String, Object> systemProperties) throws MojoExecutionException
@@ -586,6 +619,16 @@ public class MavenGoals
             deps.add(element(name("dependency"),
                     element(name("location"), webappContext.getArtifactRetriever().resolve(dep))
             ));
+        }
+
+        for (DataSource dataSource : webappContext.getDataSources())
+        {
+            for (ProductArtifact containerDependency : dataSource.getLibArtifacts())
+            {
+                deps.add(element(name("dependency"),
+                        element(name("location"), webappContext.getArtifactRetriever().resolve(containerDependency))
+                        ));
+            }
         }
 
         final List<Element> props = new ArrayList<Element>();
@@ -1334,22 +1377,22 @@ public class MavenGoals
                 File userAppDocs = new File(prj.getBuild().getOutputDirectory(),"application-doc.xml");
                 if(!userAppDocs.exists())
                 {
-                    String appDocText = FileUtils.getResourceContent("application-doc.xml");
+                    String appDocText = com.atlassian.core.util.FileUtils.getResourceContent("application-doc.xml");
                     appDocText = StringUtils.replace(appDocText, "${rest.doc.title}", pluginInfo.getName());
                     appDocText = StringUtils.replace(appDocText,"${rest.doc.description}",pluginInfo.getDescription());
                     File appDocFile = new File(prj.getBuild().getOutputDirectory(), "application-doc.xml");
 
-                    FileUtils.saveTextFile(appDocText, appDocFile);
+                    FileUtils.writeStringToFile(appDocFile,appDocText);
                     log.info("Wrote " + appDocFile.getAbsolutePath());
                 }
 
                 File userGrammars = new File(prj.getBuild().getOutputDirectory(),"application-grammars.xml");
                 if(!userGrammars.exists())
                 {
-                    String grammarText = FileUtils.getResourceContent("application-grammars.xml");
+                    String grammarText = com.atlassian.core.util.FileUtils.getResourceContent("application-grammars.xml");
                     File grammarFile = new File(prj.getBuild().getOutputDirectory(), "application-grammars.xml");
 
-                    FileUtils.saveTextFile(grammarText, grammarFile);
+                    FileUtils.writeStringToFile(grammarFile,grammarText);
 
                     log.info("Wrote " + grammarFile.getAbsolutePath());
                 }

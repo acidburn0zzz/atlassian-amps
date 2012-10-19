@@ -411,6 +411,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         final Map<String, String> properties = new HashMap<String, String>();
 
         properties.putAll(getSystemProperties(ctx));
+        
         for (Map.Entry<String, Object> entry : ctx.getSystemPropertyVariables().entrySet())
         {
             properties.put(entry.getKey(), (String) entry.getValue());

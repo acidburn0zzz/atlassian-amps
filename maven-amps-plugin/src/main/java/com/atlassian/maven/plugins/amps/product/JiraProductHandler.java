@@ -1,10 +1,13 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -54,28 +57,24 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     @Override
     public Map<String, String> getSystemProperties(final Product ctx)
     {
-        return new HashMap<String, String>()
-        {
-            {
-                final String dburl = System.getProperty("amps.datasource.url", format("jdbc:hsqldb:%s/database", fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath())));
-                final String driverClass = System.getProperty("amps.datasource.driver", "org.hsqldb.jdbcDriver");
-                final String username = System.getProperty("amps.datasource.username", "sa");
-                final String password = System.getProperty("amps.datasource.password", "");
-                final String datasourceTypeClass = "javax.sql.DataSource";
-
-                final String datasource = format("cargo.datasource.url=%s", dburl);
-                final String driver = format("cargo.datasource.driver=%s", driverClass);
-                final String datasourceUsername = format("cargo.datasource.username=%s", username);
-                final String datasourcePassword = format("cargo.datasource.password=%s", password);
-                final String datasourceType = "cargo.datasource.type=" + datasourceTypeClass;
-                final String jndi = "cargo.datasource.jndi=jdbc/JiraDS";
-
-                put("jira.home", fixWindowsSlashes(getHomeDirectory(ctx).getPath()));
-                put("cargo.datasource.datasource", format("%s|%s|%s|%s|%s|%s", datasource, driver, datasourceUsername, datasourcePassword, datasourceType, jndi));
-                
-                put("catalina.servlet.uriencoding", "UTF-8");
-            }
-        };
+        ImmutableMap.Builder<String, String> properties = ImmutableMap.<String, String>builder();
+        properties.putAll(super.getSystemProperties(ctx));
+        properties.put("jira.home", fixWindowsSlashes(getHomeDirectory(ctx).getPath()));
+        properties.put("catalina.servlet.uriencoding", "UTF-8");
+        return properties.build();
+    }
+    
+    @Override
+    protected DataSource getDefaultDataSource(Product ctx)
+    {
+        DataSource dataSource = new DataSource();
+        dataSource.setJndi("jdbc/JiraDS");
+        dataSource.setUrl(format("jdbc:hsqldb:%s/database", fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath())));
+        dataSource.setDriver("org.hsqldb.jdbcDriver");
+        dataSource.setType("javax.sql.DataSource");
+        dataSource.setUsername("sa");
+        dataSource.setPassword("");
+        return dataSource;
     }
 
     @Override

@@ -2,6 +2,7 @@
 package com.atlassian.maven.plugins.amps.product.studio;
 
 import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STUDIO_CROWD;
+import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static java.lang.String.format;
 
 import java.io.File;
@@ -9,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
+
+import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
@@ -57,26 +60,24 @@ public class StudioCrowdProductHandler extends CrowdProductHandler implements St
     public Map<String, String> getSystemProperties(Product product)
     {
         Map<String, String> systemProperties = new HashMap<String, String>(super.getSystemProperties(product));
-        final String dbUrl = format("jdbc:hsqldb:%s/database", getHomeDirectory(product).getPath());
-        final String driverClass = "org.hsqldb.jdbcDriver";
-        final String username = "sa";
-        final String password = "";
-        final String datasourceTypeClass = "javax.sql.DataSource";
-
-        final String datasource = format("cargo.datasource.url=%s", dbUrl);
-        final String driver = format("cargo.datasource.driver=%s", driverClass);
-        final String datasourceUsername = format("cargo.datasource.username=%s", username);
-        final String datasourcePassword = format("cargo.datasource.password=%s", password);
-        final String datasourceType = format("cargo.datasource.type=%s", datasourceTypeClass);
-        final String jndi = "cargo.datasource.jndi=jdbc/DefaultDS";
-
-        systemProperties.put("cargo.datasource.datasource",
-                format("%s|%s|%s|%s|%s|%s", datasource, driver, datasourceUsername, datasourcePassword, datasourceType, jndi));
 
         // We also add common studio system properties
         systemProperties.putAll(product.getStudioProperties().getSystemProperties());
 
         return systemProperties;
+    }
+    
+    @Override
+    protected DataSource getDefaultDataSource(Product ctx)
+    {
+        DataSource dataSource = new DataSource();
+        dataSource.setJndi("jdbc/DefaultDS");
+        dataSource.setUrl(format("jdbc:hsqldb:%s/database", fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath())));
+        dataSource.setDriver("org.hsqldb.jdbcDriver");
+        dataSource.setType("javax.sql.DataSource");
+        dataSource.setUsername("sa");
+        dataSource.setPassword("");
+        return dataSource;
     }
 
 }

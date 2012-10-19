@@ -90,7 +90,7 @@ public class DebugMojo extends RunMojo
         startProducts(productExecutions);
     }
 
-    private boolean debugNotSet()
+    protected boolean debugNotSet()
     {
         String atlasOpts = System.getenv("ATLAS_OPTS");
         return atlasOpts == null || !atlasOpts.contains("-Xdebug");

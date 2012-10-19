@@ -23,7 +23,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
     private final List<ProductArtifact> testFrameworkPlugins = new ArrayList<ProductArtifact>()
     {{
             add(new ProductArtifact("org.junit","com.springsource.org.junit","4.10.0"));
-            add(new ProductArtifact("com.atlassian.plugins","atlassian-plugins-osgi-testrunner-bundle","1.0"));
+            add(new ProductArtifact("com.atlassian.plugins","atlassian-plugins-osgi-testrunner-bundle","1.1-SNAPSHOT"));
     }};
 
     /**
@@ -185,7 +185,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
             
             if(shouldBuildTestPlugin())
             {
-                List<ProductArtifact> plugins = product.getPluginArtifacts();
+                List<ProductArtifact> plugins = product.getBundledArtifacts();
                 plugins.addAll(testFrameworkPlugins);
 
                 List<ProductArtifact> libs = product.getLibArtifacts();

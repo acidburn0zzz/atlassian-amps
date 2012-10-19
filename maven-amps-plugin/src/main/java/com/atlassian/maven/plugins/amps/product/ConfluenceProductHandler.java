@@ -6,6 +6,7 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
@@ -52,7 +53,10 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
     @Override
     public Map<String, String> getSystemProperties(Product ctx)
     {
-        return Collections.singletonMap("confluence.home", getHomeDirectory(ctx).getPath());
+        ImmutableMap.Builder<String, String> systemProperties = ImmutableMap.<String, String>builder();
+        systemProperties.putAll(super.getSystemProperties(ctx));
+        systemProperties.put("confluence.home", getHomeDirectory(ctx).getPath());
+        return systemProperties.build();
     }
 
     @Override
