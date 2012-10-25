@@ -222,6 +222,7 @@ public class MavenGoals
         
         for(ProductArtifact artifact : testBundleExcludes)
         {
+            log.info("excluding artifact from test jar: " + artifact.getArtifactId());
                 sb.append(",").append(artifact.getArtifactId());
         }
         

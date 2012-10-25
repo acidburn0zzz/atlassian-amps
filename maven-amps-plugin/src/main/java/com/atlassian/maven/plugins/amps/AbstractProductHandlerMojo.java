@@ -53,7 +53,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     private static final String DEFAULT_SERVER;
     private static final String DEFAULT_PDK_VERSION = "0.4";
     private static final String DEFAULT_WEB_CONSOLE_VERSION = "1.2.8";
-    private static final String DEFAULT_FASTDEV_VERSION = "2.0-m1";
+    private static final String DEFAULT_FASTDEV_VERSION = "2.0-SNAPSHOT";
     private static final String DEFAULT_DEV_TOOLBOX_VERSION = "2.0.3";
     private static final String DEFAULT_PDE_VERSION = "1.2";
 
@@ -375,7 +375,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         // If they aren't defined, define those system properties. They will override the product
         // handler's properties.
         Map<String, Object> properties = new HashMap<String, Object>(systemPropertyVariables);
-        properties.put("atlassian.sdk.version", getPluginInformation().getVersion());
+        properties.put("atlassian.sdk.version", getSdkVersion());
         setDefaultSystemProperty(properties, "atlassian.dev.mode", "true");
         setDefaultSystemProperty(properties, "java.awt.headless", "true");
         setDefaultSystemProperty(properties, "plugin.resource.directories", buildResourcesList());

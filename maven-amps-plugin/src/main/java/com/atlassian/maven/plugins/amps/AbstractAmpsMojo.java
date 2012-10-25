@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.atlassian.maven.plugins.amps.util.*;
@@ -108,6 +109,12 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
      */
     @Parameter(property = "useFastdevCli", defaultValue = "true")
     private boolean useFastdevCli;
+
+    /**
+     * List of artifacts to exclude when copying test bundle dependencies
+     */
+    @Parameter
+    protected List<ProductArtifact> testBundleExcludes = new ArrayList<ProductArtifact>();
     
     /**
      * Whether the test plugin should be built or not.  If not specified, it detects an atlassian-plugin.xml in the

@@ -56,6 +56,10 @@ public class GenerateTestManifestMojo extends AbstractAmpsMojo
                 {
                     testInstructions.put(Constants.BUNDLE_SYMBOLICNAME, finalName + "-tests");
                 }
+                else if(!testInstructions.get(Constants.BUNDLE_SYMBOLICNAME).endsWith("-tests"))
+                {
+                    testInstructions.put(Constants.BUNDLE_SYMBOLICNAME, testInstructions.get(Constants.BUNDLE_SYMBOLICNAME) + "-tests");
+                }
 
                 if (!testInstructions.containsKey(Constants.BUNDLE_NAME))
                 {
