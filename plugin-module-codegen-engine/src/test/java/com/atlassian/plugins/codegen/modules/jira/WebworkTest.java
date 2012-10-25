@@ -45,7 +45,7 @@ public class WebworkTest extends AbstractModuleCreatorTestCase<WebworkProperties
     @Test
     public void singleActionTestClassFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "ActionOneTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "ActionOneTest");
     }
 
     @Test
@@ -61,7 +61,7 @@ public class WebworkTest extends AbstractModuleCreatorTestCase<WebworkProperties
     {
         props.addAction(action2);
 
-        getTestSourceFile(PACKAGE_NAME, "ActionTwoTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "ActionTwoTest");
     }
 
     @Test

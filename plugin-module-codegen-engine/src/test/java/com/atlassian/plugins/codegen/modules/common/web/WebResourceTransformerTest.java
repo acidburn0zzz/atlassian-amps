@@ -13,6 +13,7 @@ import static junit.framework.Assert.assertEquals;
 public class WebResourceTransformerTest extends AbstractModuleCreatorTestCase<WebResourceTransformerProperties>
 {
     public static final String PACKAGE_NAME = "com.atlassian.plugin.webresource";
+    public static final String TEST_PACKAGE_NAME = "ut.com.atlassian.plugin.webresource";
 
     public WebResourceTransformerTest()
     {
@@ -35,7 +36,7 @@ public class WebResourceTransformerTest extends AbstractModuleCreatorTestCase<We
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MyWebResourceTransformerTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyWebResourceTransformerTest");
     }
 
     @Test

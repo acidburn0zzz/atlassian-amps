@@ -45,7 +45,7 @@ public class ComponentTest extends AbstractCodegenTestCase<ComponentProperties>
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "CustomComponentTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "CustomComponentTest");
     }
 
     @Test

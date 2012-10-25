@@ -1,21 +1,18 @@
 package com.atlassian.maven.plugins.amps;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
+import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
+import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 
@@ -25,6 +22,9 @@ import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Dependency;
@@ -32,7 +32,9 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.twdata.maven.mojoexecutor.MojoExecutor;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
@@ -179,21 +181,76 @@ public class MavenGoals
                 executionEnvironment());
     }
 
-    public void createPlugin(final String productId) throws MojoExecutionException
+    public void createPlugin(final String productId, AmpsCreatePluginPrompter createPrompter) throws MojoExecutionException
     {
-        executeMojo(
-                plugin(
-                        groupId("org.apache.maven.plugins"),
-                        artifactId("maven-archetype-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-archetype-plugin"))
-                ),
-                goal("generate"),
-                configuration(
-                        element(name("archetypeGroupId"), "com.atlassian.maven.archetypes"),
-                        element(name("archetypeArtifactId"), (productId.equals("all") ? "" : productId + "-" ) + "plugin-archetype"),
-                        element(name("archetypeVersion"), VersionUtils.getVersion())
-                ),
-                executionEnvironment());
+        CreatePluginProperties props = null;
+        try
+        {
+            props = createPrompter.prompt();
+        }
+        catch (PrompterException e)
+        {
+            throw new MojoExecutionException("Unable to gather properties",e);
+        }
+        
+        if(null != props)
+        {
+            ExecutionEnvironment execEnv = executionEnvironment();
+
+            Properties sysProps = execEnv.getMavenSession().getExecutionProperties();
+            sysProps.setProperty("groupId",props.getGroupId());
+            sysProps.setProperty("artifactId",props.getArtifactId());
+            sysProps.setProperty("version",props.getVersion());
+            sysProps.setProperty("package",props.getThePackage());
+            
+            executeMojo(
+                    plugin(
+                            groupId("org.apache.maven.plugins"),
+                            artifactId("maven-archetype-plugin"),
+                            version(defaultArtifactIdToVersionMap.get("maven-archetype-plugin"))
+                    ),
+                    goal("generate"),
+                    configuration(
+                            element(name("archetypeGroupId"), "com.atlassian.maven.archetypes"),
+                            element(name("archetypeArtifactId"), (productId.equals("all") ? "" : productId + "-") + "plugin-archetype"),
+                            element(name("archetypeVersion"), VersionUtils.getVersion()),
+                            element(name("interactiveMode"), "false")
+                    ),
+                    execEnv);
+            
+            File pluginDir = new File(ctx.getProject().getBasedir(),props.getArtifactId());
+            
+            if(pluginDir.exists())
+            {
+                File src = new File(pluginDir,"src");
+                File test = new File(src,"test");
+                File java = new File(test,"java");
+                
+                if(java.exists())
+                {
+                    File ut = new File(java,"ut");
+                    try
+                    {
+                        IOFileFilter filter = FileFilterUtils.and(FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("it")),FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("ut")));
+                        Collection<File> filesToRemove = FileUtils.listFilesAndDirs(java, TrueFileFilter.TRUE,filter);
+                        FileUtils.copyDirectory(java, ut, filter);
+                        
+                        for(File f : filesToRemove)
+                        {
+                            if(!f.equals(java))
+                            {
+                                FileUtils.deleteQuietly(f);
+                            }
+                        }
+                       
+                    }
+                    catch (IOException e)
+                    {
+                        //for now just ignore
+                    }
+                }
+            }
+        }
     }
 
     public void copyBundledDependencies() throws MojoExecutionException

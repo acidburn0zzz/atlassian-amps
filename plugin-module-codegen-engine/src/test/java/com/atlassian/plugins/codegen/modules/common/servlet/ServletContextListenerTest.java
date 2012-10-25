@@ -33,7 +33,7 @@ public class ServletContextListenerTest extends AbstractModuleCreatorTestCase<Se
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MyServletContextListenerTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyServletContextListenerTest");
     }
 
     @Test

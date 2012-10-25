@@ -36,7 +36,7 @@ public class CustomFieldTest extends AbstractModuleCreatorTestCase<CustomFieldPr
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MyCustomFieldTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyCustomFieldTest");
     }
     
     @Test

@@ -33,7 +33,7 @@ public class WebPanelRendererTest extends AbstractModuleCreatorTestCase<WebPanel
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MyWebPanelRendererTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyWebPanelRendererTest");
     }
     
     @Test

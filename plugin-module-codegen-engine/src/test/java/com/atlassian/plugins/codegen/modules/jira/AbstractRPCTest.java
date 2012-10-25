@@ -46,7 +46,7 @@ public abstract class AbstractRPCTest extends AbstractModuleCreatorTestCase<RPCP
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MyEndpointImplTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyEndpointImplTest");
     }
 
     @Test

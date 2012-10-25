@@ -21,6 +21,7 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
 {
     public static final String PACKAGE_NAME = "com.atlassian.plugins.test";
     public static final String FUNC_TEST_PACKAGE_NAME = "it.com.atlassian.plugins.test";
+    public static final String TEST_PACKAGE_NAME = "ut.com.atlassian.plugins.test";
 
     protected T props;
     protected PluginModuleCreator creator;

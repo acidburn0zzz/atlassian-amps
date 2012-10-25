@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class AbstractTabPanelTest extends AbstractModuleCreatorTestCase<TabPanelProperties>
 {
     public static final String PACKAGE_NAME = "com.atlassian.plugins.jira.tabpanels";
+    public static final String TEST_PACKAGE_NAME = "ut.com.atlassian.plugins.jira.tabpanels";
     
     public AbstractTabPanelTest(String type, PluginModuleCreator<TabPanelProperties> creator)
     {
@@ -46,7 +47,7 @@ public abstract class AbstractTabPanelTest extends AbstractModuleCreatorTestCase
     {
         props.setUseCustomClass(true);
 
-        getTestSourceFile(PACKAGE_NAME, "MyTabPanelTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyTabPanelTest");
     }
 
     @Test

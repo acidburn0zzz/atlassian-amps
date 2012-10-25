@@ -1,4 +1,4 @@
-package ${package};
+package ut.${package};
 
 import com.atlassian.pageobjects.Defaults;
 import com.atlassian.pageobjects.Page;

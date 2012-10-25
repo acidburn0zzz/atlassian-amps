@@ -36,7 +36,7 @@ public class ReportTest extends AbstractModuleCreatorTestCase<ReportProperties>
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MyReportTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyReportTest");
     }
     
     @Test

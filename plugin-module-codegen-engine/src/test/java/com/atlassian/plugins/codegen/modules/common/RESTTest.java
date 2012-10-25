@@ -48,7 +48,7 @@ public class RESTTest extends AbstractModuleCreatorTestCase<RESTProperties>
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MyRestResourceTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyRestResourceTest");
     }
 
     @Test

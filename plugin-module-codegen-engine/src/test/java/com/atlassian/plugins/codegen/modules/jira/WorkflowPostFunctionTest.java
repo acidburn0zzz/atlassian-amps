@@ -40,7 +40,7 @@ public class WorkflowPostFunctionTest extends AbstractModuleCreatorTestCase<Work
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MyWorkflowFunctionTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyWorkflowFunctionTest");
     }
    
     @Test

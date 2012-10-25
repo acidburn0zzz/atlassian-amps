@@ -41,7 +41,7 @@ public class SearchRequestViewTest extends AbstractModuleCreatorTestCase<SearchR
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MySearchRequestViewTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MySearchRequestViewTest");
     }
     
     @Test

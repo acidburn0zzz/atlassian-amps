@@ -44,7 +44,7 @@ public class ModuleTypeTest extends AbstractModuleCreatorTestCase<ModuleTypeProp
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "DictionaryModuleDescriptorTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "DictionaryModuleDescriptorTest");
     }
 
     @Test

@@ -39,7 +39,7 @@ public class WorkflowConditionTest extends AbstractModuleCreatorTestCase<Workflo
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MyWorkflowConditionTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyWorkflowConditionTest");
     }
    
     @Test

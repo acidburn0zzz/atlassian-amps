@@ -32,6 +32,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
 {
     public static final String DEFAULT_I18N_NAME = "atlassian-plugin";
     public static final String FUNC_TEST_PACKAGE = "it";
+    public static final String UNIT_TEST_PACKAGE = "ut";
     public static final String TEST_SUFFIX = "Test";
     public static final String FUNCT_TEST_SUFFIX = "FuncTest";
     public static final String GENERIC_TEMPLATE_PREFIX = "templates/generic/";
@@ -236,7 +237,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      */
     protected ClassId testClassFor(ClassId mainClass)
     {
-        return mainClass.classNameSuffix(TEST_SUFFIX);
+        return mainClass.packageNamePrefix(UNIT_TEST_PACKAGE).classNameSuffix(TEST_SUFFIX);
     }
     
     /**

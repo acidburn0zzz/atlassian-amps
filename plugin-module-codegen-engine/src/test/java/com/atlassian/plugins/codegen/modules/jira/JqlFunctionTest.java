@@ -33,7 +33,7 @@ public class JqlFunctionTest extends AbstractModuleCreatorTestCase<JqlFunctionPr
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MyJqlFunctionTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyJqlFunctionTest");
     }
     
     @Test

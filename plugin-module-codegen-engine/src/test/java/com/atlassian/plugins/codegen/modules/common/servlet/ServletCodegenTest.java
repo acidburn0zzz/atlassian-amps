@@ -35,7 +35,7 @@ public class ServletCodegenTest extends AbstractModuleCreatorTestCase<ServletPro
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MyServletTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyServletTest");
     }
 
     @Test

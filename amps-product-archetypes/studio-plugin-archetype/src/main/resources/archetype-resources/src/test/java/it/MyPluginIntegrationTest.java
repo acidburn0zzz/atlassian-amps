@@ -3,9 +3,9 @@ package it;
 import org.junit.Test;
 
 import com.atlassian.pageobjects.elements.query.Poller;
-import ${package}.HeaderSection;
-import ${package}.StudioLoginPage;
-import ${package}.StudioTestedProduct;
+import ut.${package}.HeaderSection;
+import ut.${package}.StudioLoginPage;
+import ut.${package}.StudioTestedProduct;
 
 public class MyPluginIntegrationTest
 {

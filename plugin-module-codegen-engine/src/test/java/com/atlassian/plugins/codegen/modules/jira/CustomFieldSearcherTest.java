@@ -43,7 +43,7 @@ public class CustomFieldSearcherTest extends AbstractModuleCreatorTestCase<Custo
     {
         props.setGenerateClass(true);
         
-        getTestSourceFile(PACKAGE_NAME, "MyCustomFieldSearcherTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyCustomFieldSearcherTest");
     }
 
     @Test

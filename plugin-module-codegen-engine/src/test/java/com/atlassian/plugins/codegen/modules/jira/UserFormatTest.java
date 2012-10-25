@@ -38,7 +38,7 @@ public class UserFormatTest extends AbstractModuleCreatorTestCase<UserFormatProp
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(PACKAGE_NAME, "MyUserFormatTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyUserFormatTest");
     }
     
     @Test
