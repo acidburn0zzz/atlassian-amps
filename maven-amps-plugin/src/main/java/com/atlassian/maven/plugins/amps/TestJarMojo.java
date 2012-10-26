@@ -117,7 +117,6 @@ public class TestJarMojo extends AbstractAmpsMojo
                     for(File classFile : classFiles)
                     {
                         String className = getClassnameFromFile(classFile,prj.getBuild().getTestOutputDirectory());
-                        getLog().info("trying to load class: " + className);
                         Class itClass = ucl.loadClass(className);
                         if(isPluginTest(itClass))
                         {
@@ -167,7 +166,6 @@ public class TestJarMojo extends AbstractAmpsMojo
 
     private boolean isPluginTest(Class testClass)
     {
-        getLog().info("testing for test class: " + testClass.getName());
         Annotation[] annos = testClass.getAnnotations();
 
         for(Annotation anno : annos)
@@ -175,12 +173,9 @@ public class TestJarMojo extends AbstractAmpsMojo
 
             if(anno.annotationType().equals(RunWith.class) && ((RunWith)anno).value().equals(AtlassianPluginsTestRunner.class))
             {
-                getLog().info("it's a test!");
                 return true;
             }
         }
-
-        getLog().info("it's NOT a test!");
         return false;
         /*
         if(testClass.isAnonymousClass() 

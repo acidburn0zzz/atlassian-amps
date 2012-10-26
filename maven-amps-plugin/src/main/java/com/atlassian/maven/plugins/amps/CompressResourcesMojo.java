@@ -24,7 +24,7 @@ public class CompressResourcesMojo extends AbstractAmpsMojo
     {
         if (compressResources)
         {
-            getMavenGoals().compressResources();
+            getMavenGoals().compressResources(closureJsCompiler);
         }
         else
         {

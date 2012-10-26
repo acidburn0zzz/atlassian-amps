@@ -11,10 +11,8 @@ import java.util.*;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
-import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
-import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
-import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
-import com.atlassian.maven.plugins.amps.util.VersionUtils;
+import com.atlassian.maven.plugins.amps.util.*;
+import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -381,8 +379,11 @@ public class MavenGoals
         );
     }
 
-    public void compressResources() throws MojoExecutionException
+    public void compressResources(boolean useClosureForJs) throws MojoExecutionException
     {
+        
+        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), new File(ctx.getProject().getBuild().getOutputDirectory()), useClosureForJs, log);
+        /*
         executeMojo(
                 plugin(
                         groupId("net.alchim31.maven"),
@@ -396,6 +397,7 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
+        */
     }
 
     public void filterPluginDescriptor() throws MojoExecutionException

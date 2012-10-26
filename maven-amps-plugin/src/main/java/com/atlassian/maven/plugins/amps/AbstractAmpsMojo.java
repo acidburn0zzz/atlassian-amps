@@ -91,6 +91,12 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     @Parameter(property = "skip.amps.pom.check", defaultValue = "false")
     private boolean skipAmpsPomCheck;
 
+    /**
+     * Flag to use google closure instead of YUI for js compilation
+     */
+    @Parameter(property = "closure.js.compiler", defaultValue = "false")
+    protected boolean closureJsCompiler;
+    
     @Component
     private AmpsPluginVersionChecker ampsPluginVersionChecker;
 
