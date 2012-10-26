@@ -53,6 +53,16 @@ public class GoogleAmpsTracker
         tracker.setDispatchMode(JGoogleAnalyticsTracker.DispatchMode.MULTI_THREAD);
     }
 
+    public GoogleAmpsTracker()
+    {
+        this.productId = null;
+        this.ampsVersion = null;
+        this.sdkVersion = null;
+        this.mavenLogger = null;
+        this.config = null;
+        this.tracker = null;
+    }
+
     private VisitorData loadVisitorData()
     {
         Preferences prefs = Preferences.userNodeForPackage(getClass());
@@ -110,7 +120,7 @@ public class GoogleAmpsTracker
 
     public void track(String eventName)
     {
-        if (tracker.isEnabled())
+        if (null != tracker && tracker.isEnabled())
         {
             try
             {
@@ -128,7 +138,7 @@ public class GoogleAmpsTracker
 
     public void track(String eventName, String label)
     {
-        if (tracker.isEnabled())
+        if (null != tracker && tracker.isEnabled())
         {
             try
             {

@@ -74,7 +74,7 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
 
     protected GoogleAmpsTracker getGoogleTracker() throws MojoExecutionException
     {
-        if(null == googleTracker)
+        if(null == googleTracker && googleTrackingAllowed())
         {
             googleTracker = new GoogleAmpsTracker(getProductId(),getSdkVersion(),getPluginInformation().getVersion(),getLog());
 
@@ -82,9 +82,16 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
                 getLog().info("Google Analytics Tracking is enabled to collect AMPS usage statistics.");
                 getLog().info("Although no personal information is sent, you may disable tracking by adding <allowGoogleTracking>false</allowGoogleTracking> to the amps plugin configuration in your pom.xml");
             }
+
+            googleTracker.setEnabled(googleTrackingAllowed());
+        } 
+        else
+        {
+            //no-arg constructor is a NOOP tracker
+            googleTracker = new GoogleAmpsTracker();
         }
 
-        googleTracker.setEnabled(googleTrackingAllowed());
+        
 
         return googleTracker;
     }
