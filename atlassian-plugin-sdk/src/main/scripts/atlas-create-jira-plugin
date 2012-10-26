@@ -17,12 +17,11 @@ done
 PRGDIR=`dirname "${PRG}"`
 
 echo "A new plugin structure is required for JIRA 5 plugins due to significant changes in the APIs."
-echo "Create a plugin for?"
 
 while true; do
     echo "Create a plugin for?"
-    echo "1) Shiny new JIRA 5"
-    echo "2) Regular 'ol JIRA 4 (or earlier)"
+    echo "1) JIRA 5"
+    echo "2) JIRA 4 (or earlier)"
     
     read n
     case $n in
