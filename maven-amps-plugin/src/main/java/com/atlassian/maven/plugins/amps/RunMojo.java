@@ -34,9 +34,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 @Execute(phase = LifecyclePhase.PACKAGE)
 public class RunMojo extends AbstractTestGroupsHandlerMojo
 {
-    public static final String JUNIT_VERSION = "4.10.0";
-    public static final String TESTRUNNER_VERSION = "1.1-SNAPSHOT";
-    
+   
     @Parameter(property = "wait", defaultValue = "true")
     private boolean wait;
 
@@ -70,14 +68,7 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
      */
     protected final Map<String, String> properties = new HashMap<String, String>();
 
-    /**
-     *  The artifacts to deploy for the test console if needed
-     */
-    protected final List<ProductArtifact> testFrameworkPlugins = new ArrayList<ProductArtifact>()
-    {{
-            add(new ProductArtifact("org.junit","com.springsource.org.junit",JUNIT_VERSION));
-            add(new ProductArtifact("com.atlassian.plugins","atlassian-plugins-osgi-testrunner-bundle",TESTRUNNER_VERSION));
-        }};
+    
 
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {

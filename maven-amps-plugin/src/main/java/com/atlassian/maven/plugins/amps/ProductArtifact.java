@@ -5,7 +5,7 @@ package com.atlassian.maven.plugins.amps;
  */
 public class ProductArtifact
 {
-    private String groupId, artifactId, version;
+    private String groupId, artifactId, version, type;
 
     public ProductArtifact() {
     }
@@ -13,12 +13,21 @@ public class ProductArtifact
     public ProductArtifact(final String groupId, final String artifactId) {
         this.groupId = groupId;
         this.artifactId = artifactId;
+        this.type = "jar";
     }
 
     public ProductArtifact(final String groupId, final String artifactId, final String version) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+        this.type = "jar";
+    }
+
+    public ProductArtifact(final String groupId, final String artifactId, final String version, final String type) {
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
+        this.type = type;
     }
 
     public String getGroupId() {
@@ -45,9 +54,19 @@ public class ProductArtifact
         this.version = version;
     }
 
+    public String getType()
+    {
+        return type;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+
     @Override
     public String toString()
     {
-        return new StringBuilder(groupId).append(":").append(artifactId).append(":").append(version).toString();
+        return new StringBuilder(groupId).append(":").append(artifactId).append(":").append(version).append(":").append(type).toString();
     }
 }

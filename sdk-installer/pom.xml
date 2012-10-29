@@ -345,7 +345,7 @@
                                     <goal>run</goal>
                                 </goals>
                                 <configuration>
-                                    <target>
+                                    <target unless="no.installer.deploy">
                                         <scp todir="${sdk.scp.user}@${sdk.scp.host}:/var/packages/incoming" port="22" trust="true" verbose="true" keyfile="${sdk.scp.key}">
                                             <fileset dir="${build.directory}" casesensitive="yes">
                                                 <include name="**/*.deb" />

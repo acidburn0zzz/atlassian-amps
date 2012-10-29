@@ -15,7 +15,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandlerMojo
 {
-    protected static final String NO_TEST_GROUP = "__no_test_group__";
 
     /**
      * The list of configured test groups

@@ -20,11 +20,6 @@ import org.apache.maven.project.MavenProject;
 @Mojo(name = "integration-test", requiresDependencyResolution = ResolutionScope.TEST)
 public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 {
-    private final List<ProductArtifact> testFrameworkPlugins = new ArrayList<ProductArtifact>()
-    {{
-            add(new ProductArtifact("org.junit","com.springsource.org.junit","4.10.0"));
-            add(new ProductArtifact("com.atlassian.plugins","atlassian-plugins-osgi-testrunner-bundle","1.1-SNAPSHOT"));
-    }};
 
     /**
      * Pattern for to use to find integration tests.  Only used if no test groups are defined.
@@ -189,7 +184,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                 plugins.addAll(testFrameworkPlugins);
 
                 List<ProductArtifact> libs = product.getLibArtifacts();
-                libs.add(new ProductArtifact("org.junit","com.springsource.org.junit","4.10.0"));
+                libs.add(new ProductArtifact("org.junit","com.springsource.org.junit",JUNIT_VERSION));
             }
 
             int actualHttpPort = 0;

@@ -177,57 +177,7 @@ public class TestJarMojo extends AbstractAmpsMojo
             }
         }
         return false;
-        /*
-        if(testClass.isAnonymousClass() 
-                || testClass.isInterface() 
-                || testClass.isLocalClass() 
-                || testClass.isSynthetic()
-                || Modifier.isAbstract(testClass.getModifiers())
-                || Modifier.isPrivate(testClass.getModifiers())
-                || Modifier.isProtected(testClass.getModifiers())
-                )
-        {
-            return false;
-        }
         
-        //we can't include tests that are in a package that exists in the production plugin as this blows up OSGi package import/export
-        String testClassPackage = testClass.getPackage().getName().replaceAll("\\.", File.separator);
-        File classesDir = new File(getMavenContext().getProject().getBuild().getOutputDirectory());
-        File productionPackageDir = new File(classesDir,testClassPackage);
-        
-        if(productionPackageDir.exists())
-        {
-            return false;
-        }
-        
-        Annotation[] annos = testClass.getAnnotations();
-        
-        for(Annotation anno : annos)
-        {
-           
-           if(anno.annotationType().equals(Test.class) || (anno.annotationType().equals(RunWith.class) && ((RunWith)anno).value().equals(AtlassianPluginsTestRunner.class)))
-           {
-               getLog().info("it's a test!");
-               return true;
-           }
-        }
-        
-        //check for junit 4 @Test anno on methods
-        if(hasTestMethod(testClass))
-        {
-            return true;
-        }
-        
-        //see if it's a junit 3 class
-        if(junit.framework.TestCase.class.isAssignableFrom(testClass))
-        {
-            getLog().info("it's a test!");
-            return true;
-        }
-        
-        getLog().info("it's NOT a test!");
-        return false;
-        */
     }
 
     private boolean hasTestMethod(Class<?> testClass)

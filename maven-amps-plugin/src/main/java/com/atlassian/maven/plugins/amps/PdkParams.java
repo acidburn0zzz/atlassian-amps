@@ -1,5 +1,7 @@
 package com.atlassian.maven.plugins.amps;
 
+import org.apache.commons.lang.StringUtils;
+
 public class PdkParams
 {
     private final String pluginKey;
@@ -65,6 +67,7 @@ public class PdkParams
         private String username;
         private String password;
         private boolean testPlugin;
+        private String pluginFile;
 
         public Builder pluginKey(String pluginKey)
         {
@@ -108,14 +111,24 @@ public class PdkParams
             return this;
         }
 
+        public Builder pluginFile(String file)
+        {
+            this.pluginFile = file;
+            return this;
+        }
+
 
         public PdkParams build()
         {
-            String pluginFile = "${project.build.directory}/${project.build.finalName}.jar";
-            if (testPlugin)
+            if(StringUtils.isBlank(pluginFile))
             {
-                pluginFile = "${project.build.directory}/${project.build.finalName}-tests.jar";
+                pluginFile = "${project.build.directory}/${project.build.finalName}.jar";
+                if (testPlugin)
+                {
+                    pluginFile = "${project.build.directory}/${project.build.finalName}-tests.jar";
+                }
             }
+            
             return new PdkParams(pluginKey, server, port, contextPath, username, password, pluginFile);
         }
     }
