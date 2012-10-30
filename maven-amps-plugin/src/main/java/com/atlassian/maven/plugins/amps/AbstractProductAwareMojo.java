@@ -121,9 +121,7 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
 
     protected void promptForEmailSubscriptionIfNeeded() throws MojoExecutionException
     {
-        //TODO: this is commented out until we can get exact target double opt-in working.
         
-        /*
         if(AmpsEmailSubscriber.ALLOWED_PRODUCTS.contains(getProductId()) && !shouldSkipPrompts())
         {
             String emailCheckKey = PREF_EMAIL_PREFIX + "-" + getProductId();
@@ -135,7 +133,7 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
                 prefs.put(emailCheckKey,"true");
                 getAmpsEmailSubscriber().promptForSubscription(getProductId());
             }
-        }*/
+        }
     }
 
 }

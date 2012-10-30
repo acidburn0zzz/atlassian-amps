@@ -54,12 +54,12 @@
         <dependency>
             <groupId>com.atlassian.devrel</groupId>
             <artifactId>developer-toolbox-plugin</artifactId>
-            <version>2.0.3</version>
+            <version>2.0.4-rc1</version>
         </dependency>
         <dependency>
             <groupId>com.atlassian.labs</groupId>
             <artifactId>fastdev-plugin</artifactId>
-            <version>2.0-m1</version>
+            <version>2.0-rc1</version>
         </dependency>
         <dependency>
             <groupId>com.atlassian.plugins</groupId>

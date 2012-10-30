@@ -14,6 +14,7 @@ import com.atlassian.plugins.codegen.MavenProjectRewriter;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.ProjectRewriter;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.project.MavenProject;
@@ -64,7 +65,7 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
             return;
         }
 
-        String prefKey = POM_UPDATE_PREF_PREFIX + "-" + currentVersion + "-" + project.getArtifactId();
+        String prefKey = POM_UPDATE_PREF_PREFIX + "-" + currentVersion + "-" + DigestUtils.md5Hex(project.getArtifactId());
         Preferences prefs = Preferences.userNodeForPackage(AmpsPluginVersionCheckerImpl.class);
         String alreadyRan = prefs.get(prefKey, null);
 

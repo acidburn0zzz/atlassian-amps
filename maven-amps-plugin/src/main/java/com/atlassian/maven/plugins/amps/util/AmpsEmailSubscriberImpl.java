@@ -115,17 +115,33 @@ public class AmpsEmailSubscriberImpl extends AbstractLogEnabled implements AmpsE
 
     private void doSubscribe(String product, String email) throws IOException, PrompterException
     {
-        String list;
-        if(ProductHandlerFactory.FECRU.equals(product))
+        String list = "";
+        if(ProductHandlerFactory.FECRU.equalsIgnoreCase(product))
         {
-            list = "FISHEYE_DEVELOPER";
+            list = "1165632";
         }
-        else
+        if(ProductHandlerFactory.BAMBOO.equalsIgnoreCase(product))
         {
-            list = product.toUpperCase() + "_DEVELOPER";
+            list = "1165631";
+        }
+        if(ProductHandlerFactory.CONFLUENCE.equalsIgnoreCase(product))
+        {
+            list = "1165629";
+        }
+        if(ProductHandlerFactory.CROWD.equalsIgnoreCase(product))
+        {
+            list = "1165630";
+        }
+        if(ProductHandlerFactory.JIRA.equalsIgnoreCase(product))
+        {
+            list = "1165627";
+        }
+        if(ProductHandlerFactory.STASH.equalsIgnoreCase(product))
+        {
+            list = "1235071";
         }
         
-        String subscribeUrl = EMAIL_SUBSCRIBE_ROOT + email + "/subscribe?name=" + list;
+        String subscribeUrl = EMAIL_SUBSCRIBE_ROOT + email + "/subscribe?mailingListId=" + list;
 
         HttpURLConnection conn = null;
         try
@@ -140,13 +156,13 @@ public class AmpsEmailSubscriberImpl extends AbstractLogEnabled implements AmpsE
             int responseCode = conn.getResponseCode();
             if(200 != responseCode)
             {
-                getLogger().error("There was an error subscribing to the email list.");
+                getLogger().error("There was an error subscribing to the email list. Perhaps you're already on it?");
             }
             else
             {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Your subscription request has been sent.\n")
-                        .append("Check your email for a confirmation and click the opt-in link to complete the subscription process.\n")
+                        .append("Check your email for a confirmation (takes about 5 minutes) and click the opt-in link to complete the subscription process.\n")
                         .append("Press ENTER to continue");
                 
                 prompter.prompt(sb.toString());
