@@ -126,8 +126,8 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
      * Whether the test plugin should be built or not.  If not specified, it detects an atlassian-plugin.xml in the
      * test classes directory and builds if exists.
      */
-    @Parameter
-    private Boolean buildTestPlugin;
+    @Parameter(property = "buildTestPlugin", defaultValue = "false")
+    private boolean buildTestPlugin;
 
     protected MavenContext getMavenContext()
     {
@@ -202,12 +202,9 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     protected boolean shouldBuildTestPlugin()
     {
         boolean shouldBuild = false;
-        if (buildTestPlugin != null)
+        if(buildTestPlugin)
         {
-            if (buildTestPlugin.booleanValue())
-            {
-                shouldBuild = true;
-            }
+           shouldBuild = true;
         }
         else if (ProjectUtils.shouldDeployTestJar(getMavenContext()))
         {

@@ -167,12 +167,12 @@ public class MavenProjectRewriter implements ProjectRewriter
                 newAmpsVersion = changeVersion;
             }
             
-            if(AmpsVersionUpdate.PLUGIN.equalsIgnoreCase(changeItem.getType()))
+            if(AmpsVersionUpdate.PLUGIN.equalsIgnoreCase(changeItem.getType()) && changeItem.isApplyConfig())
             {
                 modified = applyAmpsPluginVersionUpdate();
             }
 
-            if(AmpsVersionUpdate.MANAGEMENT.equalsIgnoreCase(changeItem.getType()))
+            if(AmpsVersionUpdate.MANAGEMENT.equalsIgnoreCase(changeItem.getType()) && changeItem.isApplyConfig())
             {
                 boolean managementUpdated = applyAmpsPluginManagementVersionUpdate();
                 if(!modified)
@@ -180,26 +180,30 @@ public class MavenProjectRewriter implements ProjectRewriter
                     modified = managementUpdated;
                 }
             }
-        }
-
-        //add the amps.version prop if needed
-        Element ampsVersionProperty = getOrCreateElement(getOrCreateElement(root, "properties"),"amps.version");
-        
-        //update the amps.version prop if our change is a newer version
-        if(StringUtils.isNotBlank(ampsVersionProperty.getTextTrim()))
-        {
-            DefaultArtifactVersion pomVersion = new DefaultArtifactVersion(ampsVersionProperty.getTextTrim());
-            if(newAmpsVersion.compareTo(pomVersion) > 0)
+            
+            if(changeItem.isApplyProp())
             {
-                modified = true;
-                ampsVersionProperty.setText(newAmpsVersion.toString());
+                //add the amps.version prop if needed
+                Element ampsVersionProperty = getOrCreateElement(getOrCreateElement(root, "properties"),"amps.version");
+
+                //update the amps.version prop if our change is a newer version
+                if(StringUtils.isNotBlank(ampsVersionProperty.getTextTrim()))
+                {
+                    DefaultArtifactVersion pomVersion = new DefaultArtifactVersion(ampsVersionProperty.getTextTrim());
+                    if(newAmpsVersion.compareTo(pomVersion) > 0)
+                    {
+                        modified = true;
+                        ampsVersionProperty.setText(newAmpsVersion.toString());
+                    }
+                }
+                else
+                {
+                    ampsVersionProperty.setText(newAmpsVersion.toString());
+                    modified = true;
+                }
             }
         }
-        else
-        {
-            ampsVersionProperty.setText(newAmpsVersion.toString());
-        }
-        
+
         return modified;
     }
     
@@ -245,6 +249,17 @@ public class MavenProjectRewriter implements ProjectRewriter
         }
         
         return "";
+    }
+
+    public boolean definesProperty(String propName)
+    {
+        Element properties = getElementOrNull(root, "properties");
+        if(null != properties)
+        {
+            return null != getElementOrNull(properties,propName);
+        }
+
+        return false;
     }
 
     public String getAmpsPluginManagementVersionInPom()
@@ -377,6 +392,11 @@ public class MavenProjectRewriter implements ProjectRewriter
     @SuppressWarnings("unchecked")
     private boolean applyPluginArtifactChanges(Iterable<com.atlassian.plugins.codegen.PluginArtifact> pluginArtifacts)
     {
+        if(!pluginArtifacts.iterator().hasNext())
+        {
+            return false;
+        }
+        
         Element configRoot = getAmpsPluginConfiguration();
         boolean modified = false;
         for (com.atlassian.plugins.codegen.PluginArtifact p : pluginArtifacts)
@@ -396,6 +416,11 @@ public class MavenProjectRewriter implements ProjectRewriter
 
     private boolean applyAmpsSystemPropertyChanges(Iterable<AmpsSystemPropertyVariable> propertyVariables)
     {
+        if(!propertyVariables.iterator().hasNext())
+        {
+            return false;
+        }
+        
         Element configRoot = getAmpsPluginConfiguration();
         boolean modified = false;
         for (AmpsSystemPropertyVariable propertyVariable : propertyVariables)

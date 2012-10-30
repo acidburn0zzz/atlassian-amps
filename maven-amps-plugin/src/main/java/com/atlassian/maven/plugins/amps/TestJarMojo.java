@@ -48,13 +48,6 @@ public class TestJarMojo extends AbstractAmpsMojo
 {
 
     /**
-     * Whether the test plugin should be built or not.  If not specified, it detects an atlassian-plugin.xml in the
-     * test classes directory and builds if exists.
-     */
-    @Parameter
-    private Boolean buildTestPlugin;
-
-    /**
      * The final name for the test plugin, without the "-tests" suffix.
      */
     @Parameter(property = "project.build.finalName")

@@ -14,16 +14,21 @@ public class AmpsVersionUpdate implements PluginProjectChange
 
     private final String version;
     private final String type;
+    private final boolean applyConfig;
+    private final boolean applyProp;
+    
 
-    public static AmpsVersionUpdate ampsVersionUpdate(String version,String type)
+    public static AmpsVersionUpdate ampsVersionUpdate(String version,String type,boolean applyConfig,boolean applyProp)
     {
-        return new AmpsVersionUpdate(version,type);
+        return new AmpsVersionUpdate(version,type,applyConfig,applyProp);
     }
 
-    private AmpsVersionUpdate(String version, String type)
+    private AmpsVersionUpdate(String version, String type,boolean applyConfig,boolean applyProp)
     {
         this.version = checkNotNull(version, "version");
         this.type = checkNotNull(type, "type");
+        this.applyConfig = applyConfig;
+        this.applyProp = applyProp;
     }
 
     public String getVersion()
@@ -34,6 +39,16 @@ public class AmpsVersionUpdate implements PluginProjectChange
     public String getType()
     {
         return type;
+    }
+
+    public boolean isApplyConfig()
+    {
+        return applyConfig;
+    }
+
+    public boolean isApplyProp()
+    {
+        return applyProp;
     }
 
     @Override
