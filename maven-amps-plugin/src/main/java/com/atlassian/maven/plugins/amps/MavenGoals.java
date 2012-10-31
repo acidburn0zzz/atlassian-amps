@@ -182,13 +182,31 @@ public class MavenGoals
     public void createPlugin(final String productId, AmpsCreatePluginPrompter createPrompter) throws MojoExecutionException
     {
         CreatePluginProperties props = null;
-        try
+        Properties systemProps = System.getProperties();
+        
+        if(systemProps.containsKey("groupId") 
+                && systemProps.containsKey("artifactId")
+                && systemProps.containsKey("version")
+                && systemProps.containsKey("package")
+                )
         {
-            props = createPrompter.prompt();
+            props = new CreatePluginProperties(systemProps.getProperty("groupId")
+                    ,systemProps.getProperty("artifactId")
+                    ,systemProps.getProperty("version")
+                    ,systemProps.getProperty("package")
+                    );
         }
-        catch (PrompterException e)
+        
+        if(null == props)
         {
-            throw new MojoExecutionException("Unable to gather properties",e);
+            try
+            {
+                props = createPrompter.prompt();
+            }
+            catch (PrompterException e)
+            {
+                throw new MojoExecutionException("Unable to gather properties",e);
+            }
         }
         
         if(null != props)
