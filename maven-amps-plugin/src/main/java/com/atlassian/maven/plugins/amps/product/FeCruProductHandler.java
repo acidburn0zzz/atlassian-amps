@@ -1,8 +1,5 @@
 package com.atlassian.maven.plugins.amps.product;
 
-import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
-import static com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory.output;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
@@ -14,13 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
-
-import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.tools.ant.taskdefs.Java;
-import org.apache.tools.ant.types.Path;
-
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
@@ -29,8 +19,15 @@ import com.atlassian.maven.plugins.amps.util.ZipUtils;
 import com.atlassian.maven.plugins.amps.util.ant.AntJavaExecutorThread;
 import com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.tools.ant.taskdefs.Java;
+import org.apache.tools.ant.types.Path;
+
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
+import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
+import static com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory.output;
 
 public class FeCruProductHandler extends AbstractProductHandler
 {
@@ -74,20 +71,6 @@ public class FeCruProductHandler extends AbstractProductHandler
         }
 
         waitForFishEyeToStop(ctx);
-    }
-
-    @Override
-    protected void extractProductHomeData(File productHomeZip, File homeDir, Product ctx)
-            throws MojoExecutionException
-    {
-        try
-        {
-            unzip(productHomeZip, homeDir.getPath());
-        }
-        catch (final IOException ex)
-        {
-            throw new MojoExecutionException("Unable to copy home directory", ex);
-        }
     }
 
     @Override
