@@ -65,12 +65,15 @@ public class TestJarMojo extends AbstractAmpsMojo
             {
                 try
                 {
+                    String symbolicName = prj.getGroupId() + "." + prj.getArtifactId() + "-tests";
                     FileUtils.writeStringToFile(mf,
                            "Manifest-Version: 1.0\n" +
-                           "Bundle-SymbolicName: plugin-tests\n" +
+                           "Bundle-SymbolicName: " + symbolicName + "\n" +
                            "Bundle-Version: 1.0\n" +
                            "Bundle-Name: " + finalName + "-tests\n" +
-                           "DynamicImport-Package: *\n");
+                           "DynamicImport-Package: *\n" + 
+                           "Atlassian-Plugin-Key: " + symbolicName + "\n"
+                    );
                 }
                 catch (IOException e)
                 {
