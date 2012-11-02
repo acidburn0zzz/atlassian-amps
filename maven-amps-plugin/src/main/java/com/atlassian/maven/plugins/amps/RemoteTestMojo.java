@@ -26,6 +26,7 @@ import org.codehaus.plexus.archiver.jar.ManifestException;
 import org.junit.runner.RunWith;
 
 @Mojo(name = "remote-test", requiresDependencyResolution = ResolutionScope.TEST, defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST)
+@Execute(phase = LifecyclePhase.PACKAGE)
 public class RemoteTestMojo extends AbstractProductHandlerMojo
 {
 
@@ -72,7 +73,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
     /**
      * HTTP port for the servlet containers
      */
-    @Parameter(property = "http.port", required = true)
+    @Parameter(property = "http.port", defaultValue = "80")
     protected int httpPort;
 
     /**
@@ -95,10 +96,14 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
             return;
         }
 
-        if (StringUtils.isBlank(contextPath))
+        if (null == contextPath || StringUtils.trim(contextPath).equals("/"))
         {
-            getLog().error("context.path is not set!");
-            return;
+            contextPath = "";
+        }
+        
+        if(httpPort < 1)
+        {
+            httpPort = 80;
         }
 
         if (!shouldBuildTestPlugin())

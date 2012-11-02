@@ -310,7 +310,15 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
             {
                 if (group.getId().equals(testGroupId))
                 {
-                    return group.getIncludes();
+                    List<String> groupIncludes =  group.getIncludes();
+                    if(groupIncludes.isEmpty())
+                    {
+                        return Collections.singletonList(functionalTestPattern);
+                    }
+                    else
+                    {
+                        return groupIncludes;
+                    }
                 }
             }
         }

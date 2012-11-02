@@ -472,7 +472,16 @@ public class MavenGoals
     public void runUnitTests(Map<String, Object> systemProperties) throws MojoExecutionException
     {
         final Element systemProps = convertPropsToElements(systemProperties);
-
+        Xpp3Dom config = configuration(
+                systemProps,
+                element(name("excludes"),
+                        element(name("exclude"), "it/**"),
+                        element(name("exclude"), "**/*$*"))
+        );
+        
+        log.info("surefire unit-test configuration:");
+        log.info(config.toString());
+        
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -480,12 +489,7 @@ public class MavenGoals
                         version(defaultArtifactIdToVersionMap.get("maven-surefire-plugin"))
                 ),
                 goal("test"),
-                configuration(
-                        systemProps,
-                        element(name("excludes"),
-                                element(name("exclude"), "it/**"),
-                                element(name("exclude"), "**/*$*"))
-                ),
+                config,
                 executionEnvironment()
         );
     }
@@ -1349,6 +1353,8 @@ public class MavenGoals
                 goal("prepare"),
                 configuration(
                         element(name("arguments"), args)
+                        ,element(name("autoVersionSubmodules"),"true")
+                        ,element(name("useReleaseProfile"),"true")
                 ),
                 executionEnvironment()
         );
