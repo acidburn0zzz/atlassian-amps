@@ -340,4 +340,37 @@ public class FeCruProductHandler extends AbstractProductHandler
     {
 		return "lib";
     }
+
+    /**
+     * Overridden as most FeCru ZIPped test data is of a different non-standard structure,
+     * i.e. standard structure should have a single root folder.
+     * If it finds something looking like the old structure it will re-organize the data to match what is expected
+     * of the new structure.
+     * @param tmpDir
+     * @param ctx
+     * @return
+     * @throws MojoExecutionException
+     * @throws IOException
+     */
+    @Override
+    protected File getRootDir(File tmpDir, Product ctx) throws MojoExecutionException, IOException
+    {
+        File[] topLevelFiles = tmpDir.listFiles();
+        if (topLevelFiles.length != 1)
+        {
+            log.info("Non-standard zip structure identified. Assume using older non-standard FECRU zip format");
+            log.info("Therefore reorganise unpacked data directories to match standard format.");
+            File tmpGen = new File(tmpDir, "generated-resources");
+            File tmpHome = new File(tmpGen, ctx.getId() + "-home");
+
+            for(File file : topLevelFiles)
+            {
+                FileUtils.moveToDirectory(file, tmpHome, true);
+            }
+
+            return tmpGen;
+        }
+        return topLevelFiles[0];
+    }
+
 }

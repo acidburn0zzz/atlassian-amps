@@ -109,32 +109,50 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
 
                 unzip(productHomeData, tmpDir.getPath());
 
-                File[] topLevelFiles = tmpDir.listFiles();
-                if (topLevelFiles.length != 1)
+                File rootDir = getRootDir(tmpDir, ctx);
+
+                copyDirectory(rootDir, getBaseDirectory(ctx), true);
+
+                for( File f : tmp.listFiles())
                 {
-                    Iterable<String> filenames = Iterables.transform(Arrays.asList(topLevelFiles), new Function<File, String>(){
-                        @Override
-                        public String apply(File from)
-                        {
-                            return from.getName();
-                        }
-                    });
-                    throw new MojoExecutionException("Expected a single top-level directory in test resources. Got: "
-                            + Joiner.on(", ").join(filenames));
+                    log.error("tmp dir: " + f.getAbsolutePath());
                 }
 
-                copyDirectory(topLevelFiles[0], getBaseDirectory(ctx), true);
                 moveDirectory(tmp, homeDir);
             }
             else if (productHomeData.isDirectory())
             {
                 copyDirectory(productHomeData, homeDir);
             }
+
+            for( File f : homeDir.listFiles())
+            {
+                log.error("Home dir: " + f.getAbsolutePath());
+            }
         }
         catch (final IOException ex)
         {
             throw new MojoExecutionException("Unable to copy home directory", ex);
         }
+    }
+
+    protected File getRootDir(File tmpDir, Product ctx) throws MojoExecutionException, IOException
+    {
+        File[] topLevelFiles = tmpDir.listFiles();
+        if (topLevelFiles.length != 1)
+        {
+            Iterable<String> filenames = Iterables.transform(Arrays.asList(topLevelFiles), new Function<File, String>()
+            {
+                @Override
+                public String apply(File from)
+                {
+                    return from.getName();
+                }
+            });
+            throw new MojoExecutionException("Expected a single top-level directory in test resources. Got: "
+                    + Joiner.on(", ").join(filenames));
+        }
+        return topLevelFiles[0];
     }
 
     /**
