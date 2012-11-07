@@ -82,18 +82,19 @@ public class TestJarMojo extends AbstractAmpsMojo
             }
             
             File pluginXml = file(testClassesDir,"atlassian-plugin.xml");
-            //File itPackageDir = file(testClassesDir,"it");
+            File itPackageDir = file(testClassesDir,"it");
             
-            if(pluginXml.exists() && testClassesDir.exists())
+            if(pluginXml.exists() && itPackageDir.exists())
             {
                 PluginProjectChangeset changes = new PluginProjectChangeset();
                 
-                Collection<File> classFiles = FileUtils.listFiles(testClassesDir, new String[]{"class"}, true);
+                Collection<File> classFiles = FileUtils.listFiles(itPackageDir, new String[]{"class"}, true);
                 try
                 {
                     Set<String> classpathPaths = new HashSet<String>();
                     classpathPaths.add(testClassesDir.getPath());
                     classpathPaths.addAll(prj.getCompileClasspathElements());
+                    classpathPaths.addAll(prj.getTestClasspathElements());
                     classpathPaths.addAll(prj.getRuntimeClasspathElements());
                     classpathPaths.addAll(prj.getSystemClasspathElements());
                     

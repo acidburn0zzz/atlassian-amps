@@ -387,16 +387,35 @@ public class MavenGoals
                 goal("unpack-dependencies"),
                 configuration(
                         element(name("includeScope"), "test"),
-                        element(name("excludeScope"), "compile"),
                         element(name("excludeScope"), "provided"),
-                        element(name("excludeScope"), "runtime"),
-                        element(name("includeTypes"), "jar"),
                         element(name("excludeArtifactIds"),"junit" + customExcludes),
-                        element(name("excludes"), "META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
-                        element(name("outputDirectory"), "${project.build.testOutputDirectory}")
+                        element(name("includeTypes"), "jar"),
+                        element(name("useSubDirectoryPerScope"),"true"),
+                        element(name("outputDirectory"), "${project.build.directory}/testlibs")
                 ),
                 executionEnvironment()
         );
+
+        File targetDir = new File(ctx.getProject().getBuild().getDirectory());
+        File testlibsDir = new File(targetDir,"testlibs");
+        File compileLibs = new File(testlibsDir,"compile");
+        File testLibs = new File(testlibsDir,"test");
+
+
+        File testClassesDir = new File(ctx.getProject().getBuild().getTestOutputDirectory());
+
+        try
+        {
+            compileLibs.mkdirs();
+            testLibs.mkdirs();
+
+            FileUtils.copyDirectory(compileLibs,testClassesDir,FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("META-INF")));
+            FileUtils.copyDirectory(testLibs,testClassesDir,FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("META-INF")));
+        }
+        catch (IOException e)
+        {
+            throw new MojoExecutionException("unable to copy test libs", e);
+        }
     }
 
     public void compressResources(boolean useClosureForJs) throws MojoExecutionException
