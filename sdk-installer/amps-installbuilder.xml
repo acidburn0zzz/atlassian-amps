@@ -172,7 +172,7 @@
 
 	    <addEnvironmentVariable>
             <name>ATLAS_HOME</name>
-            <scope>system</scope>
+            <scope>user</scope>
             <value>${installdir}</value>
         </addEnvironmentVariable>
         <addEnvironmentVariable>
@@ -182,8 +182,8 @@
         </addEnvironmentVariable>
         <addDirectoryToPath>
             <insertAt>end</insertAt>
-            <path>%ATLAS_HOME%\bin\</path>
-            <scope>system</scope>
+            <path>${installdir}\bin\</path>
+            <scope>user</scope>
             <ruleList>
                 <platformTest type="windows"/>
                 <programTest>
@@ -195,23 +195,23 @@
     </postInstallationActionList>
     <postUninstallationActionList>
         <removeDirectoryFromPath>
-            <path>%ATLAS_HOME%\bin\</path>
-            <scope>system</scope>
+            <path>${installdir}\bin\</path>
+            <scope>user</scope>
         </removeDirectoryFromPath>
         <deleteEnvironmentVariable>
             <name>ATLAS_HOME</name>
-            <scope>system</scope>
+            <scope>user</scope>
         </deleteEnvironmentVariable>
     </postUninstallationActionList>
     <cdromDirectory>${product_version}-cdrom</cdromDirectory>
     <compressionAlgorithm>lzma</compressionAlgorithm>
     <description>Development kit to build Atlassian plugins</description>
-    <enableDebugger>1</enableDebugger>
+    <enableDebugger>0</enableDebugger>
     <enableRollback>0</enableRollback>
     <enableSslSupport>1</enableSslSupport>
     <enableTimestamp>1</enableTimestamp>
     <nativePackageName>atlassian-plugin-sdk</nativePackageName>
-    <rebootRequired>1</rebootRequired>
+    <rebootRequired>0</rebootRequired>
     <saveRelativePaths>1</saveRelativePaths>
     <summary>Development kit to build Atlassian plugins</summary>
     <unattendedModeUI>minimal</unattendedModeUI>
@@ -231,7 +231,7 @@
             <description>Installer.Parameter.installdir.description</description>
             <explanation>Installer.Parameter.installdir.explanation</explanation>
             <value></value>
-            <default>${user_home_directory}${platform_path_separator}atlassian-plugin-sdk-${project.version}</default>
+            <default>${user_home_directory}${platform_path_separator}atlassian-plugin-sdk</default>
             <allowEmptyValue>0</allowEmptyValue>
             <ask>yes</ask>
             <cliOptionName>prefix</cliOptionName>
@@ -241,12 +241,12 @@
             <validationActionList>
                 <setInstallerVariable>
                     <name>installdir</name>
-                    <value>${installdir}${platform_path_separator}atlassian-plugin-sdk-${project.version}</value>
+                    <value>${installdir}${platform_path_separator}atlassian-plugin-sdk</value>
                     <ruleList>
                         <compareText>
                             <logic>does_not_contain</logic>
                             <text>${installdir}</text>
-                            <value>atlassian-plugin-sdk-${project.version}</value>
+                            <value>atlassian-plugin-sdk</value>
                         </compareText>
                     </ruleList>
                 </setInstallerVariable>
