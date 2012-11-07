@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -88,6 +89,7 @@ public class MavenGoals
             //put("maven-surefire-plugin", "2.4.3");
             put("maven-surefire-plugin", "2.12");
             put("maven-failsafe-plugin", "2.9");
+            put("maven-exec-plugin", "1.2.1");
 
         }};
 
@@ -1504,6 +1506,61 @@ public class MavenGoals
                 throw new MojoExecutionException("Error writing REST application xml files",e);
             }
         }
+    }
+
+    public void copyContainerToOutputDirectory(String containerVersion) throws
+            MojoExecutionException
+    {
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("copy"),
+                configuration(
+                        element(name("artifactItems"),
+                                element(name("artifactItem"),
+                                        element(name("groupId"), "com.atlassian.plugins"),
+                                        element(name("artifactId"), "remotable-plugins-container"),
+                                        element(name("version"), containerVersion))),
+                        element(name("stripVersion"), "true"),
+                        element(name("outputDirectory"), "${project.build.directory}")
+                ),
+                executionEnvironment()
+        );
+    }
+
+    public void debugStandaloneContainer(File pluginFile) throws MojoExecutionException
+    {
+        StringBuilder resourceProp = new StringBuilder();
+        @SuppressWarnings("unchecked") List<Resource> resList = getContextProject().getResources();
+        for (int i = 0; i < resList.size(); i++) {
+            resourceProp.append(resList.get(i).getDirectory());
+            if (i + 1 != resList.size()) {
+                resourceProp.append(",");
+            }
+        }
+
+        executeMojo(
+                plugin(
+                        groupId("org.codehaus.mojo"),
+                        artifactId("exec-maven-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-exec-plugin"))
+                ),
+                goal("exec"),
+                configuration(
+                        element(name("executable"), "java"),
+                        element(name("arguments"),
+                                element(name("argument"), "-Datlassian.dev.mode=true"),
+                                element(name("argument"), "-Dplugin.resource.directories=" + resourceProp),
+                                element(name("argument"), "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5004"),
+                                element(name("argument"), "-jar"),
+                                element(name("argument"), "${project.build.directory}/remotable-plugins-container-standalone.jar"),
+                                element(name("argument"), pluginFile.getPath()))
+                ),
+                executionEnvironment()
+        );
     }
 
     private static class Container extends ProductArtifact
