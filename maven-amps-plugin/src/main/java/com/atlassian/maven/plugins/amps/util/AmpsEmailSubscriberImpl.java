@@ -46,33 +46,28 @@ public class AmpsEmailSubscriberImpl extends AbstractLogEnabled implements AmpsE
     }
 
     @Override
-    public void promptForSubscription(String product)
+    public void promptForSubscription()
     {
-        if(ALLOWED_PRODUCTS.contains(product))
-        {
             try
             {
                 if (useAnsiColor)
                 {
-                    promptForEmailAnsi(product);
+                    promptForEmailAnsi();
                 } else
                 {
-                    promptForEmailPlain(product);
+                    promptForEmailPlain();
                 }
             }
             catch (Throwable e)
             {
                 
             }
-        }
     }
 
-    private void promptForEmailPlain(String product) throws PrompterException, IOException
+    private void promptForEmailPlain() throws PrompterException, IOException
     {
         StringBuilder builder = new StringBuilder();
-        builder.append("Would you like to subscribe to the ")
-               .append(product)
-               .append(" developer mailing list?");
+        builder.append("Would you like to subscribe to the Atlassian developer mailing list?");
 
         boolean signUp = promptForBoolean(builder.toString(), "Y");
         
@@ -81,18 +76,16 @@ public class AmpsEmailSubscriberImpl extends AbstractLogEnabled implements AmpsE
             String email = prompter.prompt("Please enter your email address (leave blank to cancel):");
             if(StringUtils.isNotBlank(email) && EmailValidator.getInstance().isValid(email))
             {
-                doSubscribe(product,email);
+                doSubscribe(email);
             }
         }
     }
 
-    private void promptForEmailAnsi(String product) throws PrompterException, IOException
+    private void promptForEmailAnsi() throws PrompterException, IOException
     {
         ANSIBuffer ansiBuffer = new ANSIBuffer();
         ansiBuffer.append(ANSIBuffer.ANSICodes.attrib(PrettyPrompter.FG_YELLOW))
-                  .append("Would you like to subscribe to the ")
-                  .append(product)
-                  .append(" developer mailing list?")
+                  .append("Would you like to subscribe to the Atlassian developer mailing list?")
                   .append(ANSIBuffer.ANSICodes.attrib(PrettyPrompter.OFF));
 
         boolean signUp = promptForBoolean(ansiBuffer.toString(),"Y");
@@ -108,39 +101,15 @@ public class AmpsEmailSubscriberImpl extends AbstractLogEnabled implements AmpsE
             
             if(StringUtils.isNotBlank(email) && EmailValidator.getInstance().isValid(email))
             {
-                doSubscribe(product,email);
+                doSubscribe(email);
             }
         }
     }
 
-    private void doSubscribe(String product, String email) throws IOException, PrompterException
+    private void doSubscribe(String email) throws IOException, PrompterException
     {
-        String list = "";
-        if(ProductHandlerFactory.FECRU.equalsIgnoreCase(product))
-        {
-            list = "1165632";
-        }
-        if(ProductHandlerFactory.BAMBOO.equalsIgnoreCase(product))
-        {
-            list = "1165631";
-        }
-        if(ProductHandlerFactory.CONFLUENCE.equalsIgnoreCase(product))
-        {
-            list = "1165629";
-        }
-        if(ProductHandlerFactory.CROWD.equalsIgnoreCase(product))
-        {
-            list = "1165630";
-        }
-        if(ProductHandlerFactory.JIRA.equalsIgnoreCase(product))
-        {
-            list = "1165627";
-        }
-        if(ProductHandlerFactory.STASH.equalsIgnoreCase(product))
-        {
-            list = "1235071";
-        }
-        
+        String list = "1243499";
+                
         String subscribeUrl = EMAIL_SUBSCRIBE_ROOT + email + "/subscribe?mailingListId=" + list;
 
         HttpURLConnection conn = null;
