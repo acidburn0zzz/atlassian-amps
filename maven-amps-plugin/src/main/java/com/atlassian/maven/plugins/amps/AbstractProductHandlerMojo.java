@@ -107,6 +107,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     private int httpPort;
 
     /**
+     * If product should be started with https on port 443
+     */
+    @Parameter(property = "use.https", defaultValue = "false")
+    protected boolean useHttps;
+
+    /**
      * Application context path
      */
     @Parameter(property = "context.path")
@@ -400,6 +406,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setPluginArtifacts(pluginArtifacts);
         ctx.setLog4jProperties(log4jProperties);
         ctx.setHttpPort(httpPort);
+        ctx.setUseHttps(useHttps);
 
         ctx.setVersion(productVersion);
         ctx.setDataVersion(productDataVersion);
@@ -580,6 +587,11 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         if (product.getHttpPort() == 0)
         {
             product.setHttpPort(handler.getDefaultHttpPort());
+        }
+
+        if (product.getUseHttps() == null)
+        {
+            product.setUseHttps(false);
         }
 
         if (product.getVersion() == null)

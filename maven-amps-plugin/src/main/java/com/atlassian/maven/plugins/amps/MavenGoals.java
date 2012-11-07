@@ -682,7 +682,19 @@ public class MavenGoals
         }
 
         final int rmiPort = pickFreePort(0);
-        final int actualHttpPort = pickFreePort(webappContext.getHttpPort());
+        int actualHttpPort;
+        String protocol = "http";
+        
+        if(webappContext.getUseHttps())
+        {
+            actualHttpPort = 443;
+            protocol = "https";
+        }
+        else
+        {
+            actualHttpPort = pickFreePort(webappContext.getHttpPort());
+        }
+
         final List<Element> sysProps = new ArrayList<Element>();
 
         for (final Map.Entry<String, String> entry : systemProperties.entrySet())
@@ -690,7 +702,7 @@ public class MavenGoals
             sysProps.add(element(name(entry.getKey()), entry.getValue()));
         }
         log.info("Starting " + productInstanceId + " on the " + container.getId() + " container on ports "
-                + actualHttpPort + " (http) and " + rmiPort + " (rmi)");
+                + actualHttpPort + " (" + protocol + ") and " + rmiPort + " (rmi)");
 
         final String baseUrl = getBaseUrl(webappContext, actualHttpPort);
         sysProps.add(element(name("baseurl"), baseUrl));
@@ -719,6 +731,12 @@ public class MavenGoals
             props.add(element(name(entry.getKey()), entry.getValue()));
         }
         props.add(element(name("cargo.servlet.port"), String.valueOf(actualHttpPort)));
+        
+        if(webappContext.getUseHttps())
+        {
+            props.add(element(name("cargo.protocol"), protocol));
+        }
+        
         props.add(element(name("cargo.rmi.port"), String.valueOf(rmiPort)));
         props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs()));
 
