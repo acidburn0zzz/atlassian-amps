@@ -32,6 +32,25 @@
             <version>2.4</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- WIRED TEST RUNNER DEPENDENCIES -->
+        <dependency>
+            <groupId>com.atlassian.plugins</groupId>
+            <artifactId>atlassian-plugins-osgi-testrunner</artifactId>
+            <version>${dollar}{plugin.testrunner.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+            <version>1.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.2-atlassian-1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -60,6 +79,7 @@
         <crowd.version>${crowd.version}</crowd.version>
         <crowd.data.version>${crowd.data.version}</crowd.data.version>
         <amps.version>${project.version}</amps.version>
+        <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
     </properties>
 
 </project>
