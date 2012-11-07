@@ -24,10 +24,10 @@
                             </process-classes>
                             <generate-test-resources>
                                 org.apache.maven.plugins:maven-resources-plugin:testResources
-                                com.atlassian.maven.plugins:maven-amps-plugin:copy-test-bundled-dependencies
+                                com.atlassian.maven.plugins:maven-amps-plugin:filter-test-plugin-descriptor
                             </generate-test-resources>
                             <process-test-resources>
-                                com.atlassian.maven.plugins:maven-amps-plugin:filter-test-plugin-descriptor
+                                com.atlassian.maven.plugins:maven-amps-plugin:copy-test-bundled-dependencies
                             </process-test-resources>
                             <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
                             <test>com.atlassian.maven.plugins:maven-amps-plugin:unit-test</test>

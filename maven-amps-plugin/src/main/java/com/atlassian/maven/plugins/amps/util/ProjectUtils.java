@@ -1,8 +1,12 @@
 package com.atlassian.maven.plugins.amps.util;
 
 import java.io.File;
+import java.util.List;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
+
+import org.apache.maven.model.Resource;
+
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 
 /**
@@ -18,7 +22,10 @@ public class ProjectUtils
      */
     public static boolean shouldDeployTestJar(MavenContext context)
     {
-        return file(context.getProject().getBuild().getTestOutputDirectory(), "atlassian-plugin.xml").exists();
+        File testResources = file(context.getProject().getBasedir(),"src","test","resources");
+        File pluginXml = new File(testResources,"atlassian-plugin.xml");
+        
+        return pluginXml.exists();
     }
 
     /**

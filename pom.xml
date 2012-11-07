@@ -356,6 +356,6 @@
         <stash.version>1.2.4</stash.version>
         <stash.data.version>1.2.4</stash.data.version>
         <skipCodegenTests>false</skipCodegenTests>
-        <plugin.testrunner.version>1.1-rc2</plugin.testrunner.version>
+        <plugin.testrunner.version>1.1-rc3</plugin.testrunner.version>
     </properties>
 </project>

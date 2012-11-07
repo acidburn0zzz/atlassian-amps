@@ -106,9 +106,6 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
             {
                 List<ProductArtifact> plugins = product.getBundledArtifacts();
                 plugins.addAll(testFrameworkPlugins);
-
-                List<ProductArtifact> libs = product.getLibArtifacts();
-                //libs.add(new ProductArtifact("org.junit","com.springsource.org.junit",JUNIT_VERSION));
             }
 
             // Leave a blank line and say what it's doing
