@@ -1573,7 +1573,8 @@ public class MavenGoals
                         element(name("arguments"),
                                 element(name("argument"), "-Datlassian.dev.mode=true"),
                                 element(name("argument"), "-Dplugin.resource.directories=" + resourceProp),
-                                element(name("argument"), "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5004"),
+                                element(name("argument"), "-Xdebug"),
+                                element(name("argument"), "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5004"),
                                 element(name("argument"), "-jar"),
                                 element(name("argument"), "${project.build.directory}/remotable-plugins-container-standalone.jar"),
                                 element(name("argument"), pluginFile.getPath()))
