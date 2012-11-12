@@ -1,1 +1,1 @@
-${shitty.product}:copy-bundled-dependencies -DskipAllPrompts=true
+${shitty.product}:copy-bundled-dependencies -DskipAllPrompts=true -DextractDependencies=false

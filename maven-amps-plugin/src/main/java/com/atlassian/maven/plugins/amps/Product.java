@@ -26,6 +26,11 @@ public class Product
     protected int httpPort = 0;
 
     /**
+     * if we should start with https on port 443
+     */
+    private Boolean useHttps;
+
+    /**
      * Application context path, in the format: /context-path
      */
     protected String contextPath;
@@ -324,6 +329,7 @@ public class Product
         prod.setContainerId(containerId == null ? product.getContainerId() : containerId);
         prod.setHttpPort(httpPort == 0 ? product.getHttpPort() : httpPort);
         prod.setJvmDebugPort(jvmDebugPort == 0 ? product.getJvmDebugPort() : jvmDebugPort);
+        prod.setUseHttps(useHttps == null ? product.getUseHttps() : useHttps);
 
         prod.setStartupTimeout(startupTimeout == 0 ? product.getStartupTimeout() : startupTimeout);
         prod.setShutdownTimeout(shutdownTimeout == 0 ? product.getShutdownTimeout() : shutdownTimeout);
@@ -365,6 +371,16 @@ public class Product
     public void setHttpPort(int httpPort)
     {
         this.httpPort = httpPort;
+    }
+
+    public Boolean getUseHttps()
+    {
+        return useHttps;
+    }
+
+    public void setUseHttps(Boolean useHttps)
+    {
+        this.useHttps = useHttps;
     }
 
     public String getContextPath()

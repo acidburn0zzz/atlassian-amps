@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -64,7 +65,7 @@ public class MavenGoals
     {{
             put("tomcat5x", new Container("tomcat5x", "org.apache.tomcat", "apache-tomcat", "5.5.26"));
             put("tomcat6x", new Container("tomcat6x", "org.apache.tomcat", "apache-tomcat", "6.0.20"));
-            put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.22", "windows-x64"));
+            put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.32", "windows-x64"));
             put("resin3x", new Container("resin3x", "com.caucho", "resin", "3.0.26"));
             put("jboss42x", new Container("jboss42x", "org.jboss.jbossas", "jbossas", "4.2.3.GA"));
             put("jetty6x", new Container("jetty6x"));
@@ -88,6 +89,7 @@ public class MavenGoals
             //put("maven-surefire-plugin", "2.4.3");
             put("maven-surefire-plugin", "2.12");
             put("maven-failsafe-plugin", "2.9");
+            put("maven-exec-plugin", "1.2.1");
 
         }};
 
@@ -146,9 +148,9 @@ public class MavenGoals
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
                                 + "compile" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
-                                +"com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-test-bundled-dependencies" + " "
                                 + "org.apache.maven.plugins:maven-resources-plugin:testResources" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-test-plugin-descriptor" + " "
+                                +"com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-test-bundled-dependencies" + " "
                                 + "org.apache.maven.plugins:maven-compiler-plugin:testCompile" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-test-manifest" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
@@ -385,16 +387,35 @@ public class MavenGoals
                 goal("unpack-dependencies"),
                 configuration(
                         element(name("includeScope"), "test"),
-                        element(name("excludeScope"), "compile"),
                         element(name("excludeScope"), "provided"),
-                        element(name("excludeScope"), "runtime"),
-                        element(name("includeTypes"), "jar"),
                         element(name("excludeArtifactIds"),"junit" + customExcludes),
-                        element(name("excludes"), "META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
-                        element(name("outputDirectory"), "${project.build.testOutputDirectory}")
+                        element(name("includeTypes"), "jar"),
+                        element(name("useSubDirectoryPerScope"),"true"),
+                        element(name("outputDirectory"), "${project.build.directory}/testlibs")
                 ),
                 executionEnvironment()
         );
+
+        File targetDir = new File(ctx.getProject().getBuild().getDirectory());
+        File testlibsDir = new File(targetDir,"testlibs");
+        File compileLibs = new File(testlibsDir,"compile");
+        File testLibs = new File(testlibsDir,"test");
+
+
+        File testClassesDir = new File(ctx.getProject().getBuild().getTestOutputDirectory());
+
+        try
+        {
+            compileLibs.mkdirs();
+            testLibs.mkdirs();
+
+            FileUtils.copyDirectory(compileLibs,testClassesDir,FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("META-INF")));
+            FileUtils.copyDirectory(testLibs,testClassesDir,FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("META-INF")));
+        }
+        catch (IOException e)
+        {
+            throw new MojoExecutionException("unable to copy test libs", e);
+        }
     }
 
     public void compressResources(boolean useClosureForJs) throws MojoExecutionException
@@ -682,7 +703,19 @@ public class MavenGoals
         }
 
         final int rmiPort = pickFreePort(0);
-        final int actualHttpPort = pickFreePort(webappContext.getHttpPort());
+        int actualHttpPort;
+        String protocol = "http";
+        
+        if(webappContext.getUseHttps())
+        {
+            actualHttpPort = 443;
+            protocol = "https";
+        }
+        else
+        {
+            actualHttpPort = pickFreePort(webappContext.getHttpPort());
+        }
+
         final List<Element> sysProps = new ArrayList<Element>();
 
         for (final Map.Entry<String, String> entry : systemProperties.entrySet())
@@ -690,7 +723,7 @@ public class MavenGoals
             sysProps.add(element(name(entry.getKey()), entry.getValue()));
         }
         log.info("Starting " + productInstanceId + " on the " + container.getId() + " container on ports "
-                + actualHttpPort + " (http) and " + rmiPort + " (rmi)");
+                + actualHttpPort + " (" + protocol + ") and " + rmiPort + " (rmi)");
 
         final String baseUrl = getBaseUrl(webappContext, actualHttpPort);
         sysProps.add(element(name("baseurl"), baseUrl));
@@ -719,6 +752,12 @@ public class MavenGoals
             props.add(element(name(entry.getKey()), entry.getValue()));
         }
         props.add(element(name("cargo.servlet.port"), String.valueOf(actualHttpPort)));
+        
+        if(webappContext.getUseHttps())
+        {
+            props.add(element(name("cargo.protocol"), protocol));
+        }
+        
         props.add(element(name("cargo.rmi.port"), String.valueOf(rmiPort)));
         props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs()));
 
@@ -1486,6 +1525,62 @@ public class MavenGoals
                 throw new MojoExecutionException("Error writing REST application xml files",e);
             }
         }
+    }
+
+    public void copyContainerToOutputDirectory(String containerVersion) throws
+            MojoExecutionException
+    {
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("copy"),
+                configuration(
+                        element(name("artifactItems"),
+                                element(name("artifactItem"),
+                                        element(name("groupId"), "com.atlassian.plugins"),
+                                        element(name("artifactId"), "remotable-plugins-container"),
+                                        element(name("version"), containerVersion))),
+                        element(name("stripVersion"), "true"),
+                        element(name("outputDirectory"), "${project.build.directory}")
+                ),
+                executionEnvironment()
+        );
+    }
+
+    public void debugStandaloneContainer(File pluginFile) throws MojoExecutionException
+    {
+        StringBuilder resourceProp = new StringBuilder();
+        @SuppressWarnings("unchecked") List<Resource> resList = getContextProject().getResources();
+        for (int i = 0; i < resList.size(); i++) {
+            resourceProp.append(resList.get(i).getDirectory());
+            if (i + 1 != resList.size()) {
+                resourceProp.append(",");
+            }
+        }
+
+        executeMojo(
+                plugin(
+                        groupId("org.codehaus.mojo"),
+                        artifactId("exec-maven-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-exec-plugin"))
+                ),
+                goal("exec"),
+                configuration(
+                        element(name("executable"), "java"),
+                        element(name("arguments"),
+                                element(name("argument"), "-Datlassian.dev.mode=true"),
+                                element(name("argument"), "-Dplugin.resource.directories=" + resourceProp),
+                                element(name("argument"), "-Xdebug"),
+                                element(name("argument"), "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5004"),
+                                element(name("argument"), "-jar"),
+                                element(name("argument"), "${project.build.directory}/remotable-plugins-container-standalone.jar"),
+                                element(name("argument"), pluginFile.getPath()))
+                ),
+                executionEnvironment()
+        );
     }
 
     private static class Container extends ProductArtifact

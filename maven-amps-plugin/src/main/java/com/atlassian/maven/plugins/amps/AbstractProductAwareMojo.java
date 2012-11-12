@@ -122,16 +122,16 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
     protected void promptForEmailSubscriptionIfNeeded() throws MojoExecutionException
     {
         
-        if(AmpsEmailSubscriber.ALLOWED_PRODUCTS.contains(getProductId()) && !shouldSkipPrompts())
+        if(!shouldSkipPrompts())
         {
-            String emailCheckKey = PREF_EMAIL_PREFIX + "-" + getProductId();
+            String emailCheckKey = PREF_EMAIL_PREFIX;
             Preferences prefs = Preferences.userNodeForPackage(AbstractProductAwareMojo.class);
             String alreadyRan = prefs.get(emailCheckKey, null);
 
             if(null == alreadyRan)
             {
                 prefs.put(emailCheckKey,"true");
-                getAmpsEmailSubscriber().promptForSubscription(getProductId());
+                getAmpsEmailSubscriber().promptForSubscription();
             }
         }
     }

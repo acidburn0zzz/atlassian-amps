@@ -1,4 +1,4 @@
-package it.${package};
+package it;
 
 import static org.junit.Assert.assertTrue;
 
