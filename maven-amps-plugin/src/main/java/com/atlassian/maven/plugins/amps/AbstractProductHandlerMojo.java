@@ -53,12 +53,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected static final String JUNIT_VERSION = "4.10.0";
     protected static final String ATLASSIAN_TEST_RUNNER_VERSION = "1.1-rc4";
     protected static final String NO_TEST_GROUP = "__no_test_group__";
-    private static final String DEFAULT_SERVER;
-    private static final String DEFAULT_PDK_VERSION = "0.4";
-    private static final String DEFAULT_WEB_CONSOLE_VERSION = "1.2.8";
-    private static final String DEFAULT_FASTDEV_VERSION = "2.0-rc2";
-    private static final String DEFAULT_DEV_TOOLBOX_VERSION = "2.0.4-rc3";
-    private static final String DEFAULT_PDE_VERSION = "1.2";
+    protected static final String DEFAULT_SERVER;
+    protected static final String DEFAULT_PDK_VERSION = "0.4";
+    protected static final String DEFAULT_WEB_CONSOLE_VERSION = "1.2.8";
+    protected static final String DEFAULT_FASTDEV_VERSION = "2.0-rc2";
+    protected static final String DEFAULT_DEV_TOOLBOX_VERSION = "2.0.4-rc3";
+    protected static final String DEFAULT_PDE_VERSION = "1.2";
 
     /**
      *  The artifacts to deploy for the test console if needed

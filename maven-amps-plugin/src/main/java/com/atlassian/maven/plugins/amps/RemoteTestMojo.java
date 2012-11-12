@@ -84,6 +84,9 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
     @Parameter(property = "pdk.password", defaultValue = "admin")
     protected String pdkPassword;
 
+    @Parameter
+    private List<ProductArtifact> deployArtifacts = new ArrayList<ProductArtifact>();
+
     protected void doExecute() throws MojoExecutionException
     {
         if (StringUtils.isBlank(server))
@@ -272,6 +275,11 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
 
     private List<File> getFrameworkFiles() throws MojoExecutionException
     {
+        List<ProductArtifact> pluginsToDeploy = new ArrayList<ProductArtifact>();
+        pluginsToDeploy.addAll(testFrameworkPlugins);
+        pluginsToDeploy.add(new ProductArtifact("com.atlassian.labs","fastdev-plugin",DEFAULT_FASTDEV_VERSION));
+        pluginsToDeploy.addAll(deployArtifacts);
+        
         try
         {
             File tmpDir = new File(getMavenContext().getProject().getBuild().getDirectory(), "tmp-artifacts");
