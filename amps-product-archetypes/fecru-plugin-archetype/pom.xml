@@ -12,6 +12,8 @@
     <groupId>com.atlassian.maven.archetypes</groupId>
     <artifactId>fecru-plugin-archetype</artifactId>
 
+    <packaging>jar</packaging>
+    
     <name>Atlassian Crucible Plugin Archetype</name>
     <description>This archetype can be used to create a new Atlassian FishEye / Crucible plugin project</description>
 </project>

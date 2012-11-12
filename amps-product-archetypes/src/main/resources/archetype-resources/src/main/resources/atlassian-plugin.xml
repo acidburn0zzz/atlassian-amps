@@ -1,0 +1,33 @@
+#set( $dollar = '$' )
+<atlassian-plugin key="${dollar}{project.groupId}.${dollar}{project.artifactId}" name="${dollar}{project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${dollar}{project.description}</description>
+        <version>${dollar}{project.version}</version>
+        <vendor name="${dollar}{project.organization.name}" url="${dollar}{project.organization.url}" />
+        <param name="plugin-icon">images/pluginIcon.png</param>
+        <param name="plugin-logo">images/pluginLogo.png</param>
+    </plugin-info>
+
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="${artifactId}"/>
+    
+    <!-- add our web resources -->
+    <web-resource key="${artifactId}-resources" name="${artifactId} Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        
+        <resource type="download" name="${artifactId}.css" location="/css/${artifactId}.css"/>
+        <resource type="download" name="${artifactId}.js" location="/css/${artifactId}.js"/>
+        <resource type="download" name="images/" location="/images"/>
+
+        <context>${artifactId}</context>
+    </web-resource>
+    
+    <!-- publish our component -->
+    <component key="myPluginComponent" class="${package}.MyPluginComponentImpl" public="true">
+        <interface>${package}.MyPluginComponent</interface>
+    </component>
+    
+    <!-- import from the product container -->
+    <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" />
+    
+</atlassian-plugin>

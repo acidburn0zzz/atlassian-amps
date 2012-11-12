@@ -11,6 +11,7 @@
 
     <groupId>com.atlassian.maven.archetypes</groupId>
     <artifactId>bamboo-plugin-archetype</artifactId>
+    <packaging>jar</packaging>
     
     <name>Atlassian Bamboo Plugin Archetype</name>
     <description>This archetype can be used to create a new Atlassian Bamboo plugin project</description>

@@ -11,6 +11,8 @@
 
     <groupId>com.atlassian.maven.archetypes</groupId>
     <artifactId>refapp-plugin-archetype</artifactId>
+
+    <packaging>jar</packaging>
     
     <name>Atlassian Refapp Plugin Archetype</name>
     <description>This archetype can be used to create a new Atlassian Refapp plugin project</description>

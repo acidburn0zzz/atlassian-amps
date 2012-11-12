@@ -244,22 +244,31 @@ public class MavenGoals
                 File test = new File(src,"test");
                 File java = new File(test,"java");
                 
-                if(java.exists())
+                String packagePath = props.getThePackage().replaceAll("\\.", Matcher.quoteReplacement(File.separator));
+                File packageFile = new File(java,packagePath);
+                File packageUT = new File(packageFile,"ut");
+                File packageIT = new File(packageFile,"it");
+
+                File ut = new File(new File(java,"ut"),packagePath);
+                File it = new File(new File(java,"it"),packagePath);
+                
+                if(packageFile.exists())
                 {
-                    File ut = new File(java,"ut");
                     try
                     {
-                        IOFileFilter filter = FileFilterUtils.and(FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("it")),FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("ut")));
-                        Collection<File> filesToRemove = FileUtils.listFilesAndDirs(java, TrueFileFilter.TRUE,filter);
-                        FileUtils.copyDirectory(java, ut, filter);
-                        
-                        for(File f : filesToRemove)
+                        if(packageUT.exists())
                         {
-                            if(!f.equals(java))
-                            {
-                                FileUtils.deleteQuietly(f);
-                            }
+                            FileUtils.copyDirectory(packageUT, ut);
                         }
+
+                        if(packageIT.exists())
+                        {
+                            FileUtils.copyDirectory(packageIT, it);
+                        }
+
+                        IOFileFilter filter = FileFilterUtils.and(FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("it")),FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("ut")));
+                        
+                        com.atlassian.maven.plugins.amps.util.FileUtils.cleanDirectory(java,filter);
                        
                     }
                     catch (IOException e)
