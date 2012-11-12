@@ -1,10 +1,11 @@
 package it;
 
-public class IntegrationTestMyPlugin extends AbstractIntegrationTestCase
+import org.junit.Test;
+
+public class IntegrationTestMyPlugin
 {
-	public void testSomething()
-	{
-        gotoPage("");
-        assertTextPresent("Welcome");
-	}
+    @Test
+    public void integrationTest()
+    {
+    }
 }
