@@ -2,12 +2,9 @@ package com.atlassian.maven.plugins.amps;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.*;
 
-import com.atlassian.plugins.osgi.test.AtlassianPluginsTestRunner;
+import com.atlassian.maven.plugins.amps.util.ClassUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -23,7 +20,6 @@ import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.ManifestException;
-import org.junit.runner.RunWith;
 
 @Mojo(name = "remote-test", requiresDependencyResolution = ResolutionScope.TEST, defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST)
 @Execute(phase = LifecyclePhase.PACKAGE)
@@ -161,7 +157,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
             File buildDir = new File(build.getDirectory());
             File testClassesDir = new File(build.getTestOutputDirectory());
 
-            List<Class<?>> wiredTestClasses = getWiredTestClasses(testClassesDir);
+            List<String> wiredTestClasses = getWiredTestClassnames(testClassesDir);
             
             if(wiredTestClasses.isEmpty())
             {
@@ -170,9 +166,9 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
             }
             
             List<String> includes = new ArrayList<String>(wiredTestClasses.size());
-            for(Class<?> wiredClass : wiredTestClasses)
+            for(String wiredClass : wiredTestClasses)
             {
-                String includePath = wiredClass.getName().replaceAll("\\.", "/");
+                String includePath = wiredClass.replaceAll("\\.", "/");
                 includes.add(includePath + "*");
             }
             
@@ -251,78 +247,27 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
                 .build());
     }
 
-    private List<Class<?>> getWiredTestClasses(File testClassesDir) throws Exception
+    private List<String> getWiredTestClassnames(File testClassesDir) throws Exception
     {
         MavenProject prj = getMavenContext().getProject();
-        List<Class<?>> wiredClasses = new ArrayList<Class<?>>();
+        List<String> wiredClasses = new ArrayList<String>();
         
         if (testClassesDir.exists())
         {
-
             Collection<File> classFiles = FileUtils.listFiles(testClassesDir, new String[]{"class"}, true);
-            Set<String> classpathPaths = new HashSet<String>();
-            classpathPaths.add(testClassesDir.getPath());
-            classpathPaths.addAll(prj.getCompileClasspathElements());
-            classpathPaths.addAll(prj.getRuntimeClasspathElements());
-            classpathPaths.addAll(prj.getSystemClasspathElements());
-
-            Set<URL> classpathUrlSet = new HashSet<URL>(classpathPaths.size());
-            for (String path : classpathPaths)
-            {
-                File cpFile = new File(path);
-                if (cpFile.exists())
-                {
-                    classpathUrlSet.add(cpFile.toURI().toURL());
-                }
-            }
-
-            URL[] classpathUrls = classpathUrlSet.toArray(new URL[0]);
-            URLClassLoader ucl = new URLClassLoader(classpathUrls, this.getClass().getClassLoader());
 
             for (File classFile : classFiles)
             {
-                String className = getClassnameFromFile(classFile, prj.getBuild().getTestOutputDirectory());
-                Class itClass = ucl.loadClass(className);
-                if (isPluginTest(itClass))
+                String className = ClassUtils.getClassnameFromFile(classFile, prj.getBuild().getTestOutputDirectory());
+                if (ClassUtils.isWiredPluginTestClass(classFile))
                 {
-                    wiredClasses.add(itClass);
+                    wiredClasses.add(className);
                 }
             }
 
         }
 
         return wiredClasses;
-    }
-
-    private boolean isPluginTest(Class testClass)
-    {
-        if(!testClass.getPackage().getName().startsWith("it."))
-        {
-            return false;    
-        }
-        
-        Annotation[] annos = testClass.getAnnotations();
-
-        for(Annotation anno : annos)
-        {
-
-            if(anno.annotationType().equals(RunWith.class) && ((RunWith)anno).value().equals(AtlassianPluginsTestRunner.class))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private String getClassnameFromFile(File classFile, String removePrefix)
-    {
-        return StringUtils.removeEnd(
-                StringUtils.removeStart(
-                        StringUtils.removeStart(
-                                classFile.getAbsolutePath(), removePrefix)
-                                   .replaceAll(File.separator, ".")
-                        , ".")
-                , ".class");
     }
 
     private List<File> getFrameworkFiles() throws MojoExecutionException
