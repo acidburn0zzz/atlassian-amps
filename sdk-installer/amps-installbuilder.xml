@@ -180,16 +180,23 @@
             <scope>user</scope>
             <value>${user_home_directory}\.m2\repository</value>
         </addEnvironmentVariable>
+        
+        <!-- remove old system dir from path -->
+        <removeDirectoryFromPath>
+            <path>${installdir}-4.0\bin\</path>
+            <scope>system</scope>
+        </removeDirectoryFromPath>
+        <removeDirectoryFromPath>
+            <path>%ATLAS_HOME%\bin\</path>
+            <scope>system</scope>
+        </removeDirectoryFromPath>
+        
         <addDirectoryToPath>
             <insertAt>end</insertAt>
             <path>${installdir}\bin\</path>
             <scope>user</scope>
             <ruleList>
                 <platformTest type="windows"/>
-                <programTest>
-                    <condition>is_not_in_path</condition>
-                    <name>atlas-version</name>
-                </programTest>
             </ruleList>
         </addDirectoryToPath>
     </postInstallationActionList>
