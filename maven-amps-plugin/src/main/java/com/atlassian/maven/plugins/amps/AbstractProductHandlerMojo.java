@@ -51,7 +51,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
     protected static final String DEFAULT_CONTAINER = "tomcat6x";
     protected static final String JUNIT_VERSION = "4.10_1";
-    protected static final String ATLASSIAN_TEST_RUNNER_VERSION = "1.1-rc5";
+    protected static final String ATLASSIAN_TEST_RUNNER_VERSION = "1.1-rc6";
     protected static final String NO_TEST_GROUP = "__no_test_group__";
     protected static final String DEFAULT_SERVER;
     protected static final String DEFAULT_PDK_VERSION = "0.4";
