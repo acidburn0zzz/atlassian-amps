@@ -193,7 +193,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
             //we MUST install junit first!
             for(File obrFile : obrFiles)
             {
-                if(obrFile.getName().startsWith("com.springsource.org.junit"))
+                if(obrFile.getName().startsWith("org.apache.servicemix.bundles.junit"))
                 {
                     junit = obrFile;
                     obrFiles.remove(obrFile);

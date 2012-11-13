@@ -50,7 +50,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     // ------ start inline product context
 
     protected static final String DEFAULT_CONTAINER = "tomcat6x";
-    protected static final String JUNIT_VERSION = "4.10.0";
+    protected static final String JUNIT_VERSION = "4.10_1";
     protected static final String ATLASSIAN_TEST_RUNNER_VERSION = "1.1-SNAPSHOT";
     protected static final String NO_TEST_GROUP = "__no_test_group__";
     protected static final String DEFAULT_SERVER;
@@ -65,7 +65,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      */
     protected final List<ProductArtifact> testFrameworkPlugins = new ArrayList<ProductArtifact>()
     {{
-            add(new ProductArtifact("org.junit","com.springsource.org.junit",JUNIT_VERSION));
+            add(new ProductArtifact("org.apache.servicemix.bundles","org.apache.servicemix.bundles.junit",JUNIT_VERSION));
             add(new ProductArtifact("com.atlassian.plugins","atlassian-plugins-osgi-testrunner-bundle",ATLASSIAN_TEST_RUNNER_VERSION));
         }};
     
