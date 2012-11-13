@@ -140,6 +140,7 @@ public class MavenGoals
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " "
+                                + "org.apache.maven.plugins:maven-install-plugin:install" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install"),
                 element(name("tpi"),
                         "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
@@ -157,6 +158,7 @@ public class MavenGoals
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-test-manifest" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-jar" + " "
+                                + "org.apache.maven.plugins:maven-install-plugin:install" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-install"),
                 element(name("package"),
