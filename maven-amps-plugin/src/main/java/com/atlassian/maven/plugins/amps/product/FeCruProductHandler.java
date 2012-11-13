@@ -1,8 +1,5 @@
 package com.atlassian.maven.plugins.amps.product;
 
-import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
-import static com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory.output;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
@@ -14,13 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
-
-import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.tools.ant.taskdefs.Java;
-import org.apache.tools.ant.types.Path;
-
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
@@ -29,8 +19,15 @@ import com.atlassian.maven.plugins.amps.util.ZipUtils;
 import com.atlassian.maven.plugins.amps.util.ant.AntJavaExecutorThread;
 import com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.tools.ant.taskdefs.Java;
+import org.apache.tools.ant.types.Path;
+
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
+import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
+import static com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory.output;
 
 public class FeCruProductHandler extends AbstractProductHandler
 {
@@ -74,20 +71,6 @@ public class FeCruProductHandler extends AbstractProductHandler
         }
 
         waitForFishEyeToStop(ctx);
-    }
-
-    @Override
-    protected void extractProductHomeData(File productHomeZip, File homeDir, Product ctx)
-            throws MojoExecutionException
-    {
-        try
-        {
-            unzip(productHomeZip, homeDir.getPath());
-        }
-        catch (final IOException ex)
-        {
-            throw new MojoExecutionException("Unable to copy home directory", ex);
-        }
     }
 
     @Override
@@ -357,4 +340,37 @@ public class FeCruProductHandler extends AbstractProductHandler
     {
 		return "lib";
     }
+
+    /**
+     * Overridden as most FeCru ZIPped test data is of a different non-standard structure,
+     * i.e. standard structure should have a single root folder.
+     * If it finds something looking like the old structure it will re-organize the data to match what is expected
+     * of the new structure.
+     * @param tmpDir
+     * @param ctx
+     * @return
+     * @throws MojoExecutionException
+     * @throws IOException
+     */
+    @Override
+    protected File getRootDir(File tmpDir, Product ctx) throws MojoExecutionException, IOException
+    {
+        File[] topLevelFiles = tmpDir.listFiles();
+        if (topLevelFiles.length != 1)
+        {
+            log.info("Non-standard zip structure identified. Assume using older non-standard FECRU zip format");
+            log.info("Therefore reorganise unpacked data directories to match standard format.");
+            File tmpGen = new File(tmpDir, "generated-resources");
+            File tmpHome = new File(tmpGen, ctx.getId() + "-home");
+
+            for(File file : topLevelFiles)
+            {
+                FileUtils.moveToDirectory(file, tmpHome, true);
+            }
+
+            return tmpGen;
+        }
+        return topLevelFiles[0];
+    }
+
 }

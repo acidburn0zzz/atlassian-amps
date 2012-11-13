@@ -57,6 +57,7 @@
                 <product.data.version>${fecru.data.version}</product.data.version>
                 <project.version>${project.version}</project.version>
                 <tests>
+                product,
                 copyBundledDependencies, create, debug,
                 filterPluginDescriptorWithoutPluginDescriptor,
                 filterPluginDescriptorWithPluginDescriptor, generateManifestWithInstructions,
