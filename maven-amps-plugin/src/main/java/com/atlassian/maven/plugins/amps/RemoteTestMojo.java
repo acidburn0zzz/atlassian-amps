@@ -286,7 +286,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
             FileUtils.forceMkdir(tmpDir);
             FileUtils.cleanDirectory(tmpDir);
 
-            getMavenGoals().copyPlugins(tmpDir, testFrameworkPlugins);
+            getMavenGoals().copyPlugins(tmpDir, pluginsToDeploy);
 
             return new ArrayList<File>(Arrays.asList(tmpDir.listFiles()));
             
