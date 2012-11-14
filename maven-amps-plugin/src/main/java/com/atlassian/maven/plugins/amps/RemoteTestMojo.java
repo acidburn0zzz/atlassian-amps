@@ -85,7 +85,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
     protected String pdkPassword;
 
     @Parameter
-    private List<ProductArtifact> deployArtifacts = new ArrayList<ProductArtifact>();
+    protected List<ProductArtifact> deployArtifacts = new ArrayList<ProductArtifact>();
 
     protected void doExecute() throws MojoExecutionException
     {

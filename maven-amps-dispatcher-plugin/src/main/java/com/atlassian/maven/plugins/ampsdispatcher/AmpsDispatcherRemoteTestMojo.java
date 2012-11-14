@@ -9,7 +9,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 
 @Mojo(name = "remote-test", requiresDependencyResolution = ResolutionScope.TEST, defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST)
 @Execute(phase = LifecyclePhase.PACKAGE)
-public class AmpsDispatcherRemoteTestMojo extends RemoteTestMojo
+public class AmpsDispatcherRemoteTestMojo extends AbstractAmpsDispatcherMojo
 {
 
 }
