@@ -95,8 +95,7 @@ public class ModuleCreatorAnnotationParser extends AbstractAnnotationParser
                 return hasInterface;
             }
 
-            ClassLoader classLoader = Thread.currentThread()
-                    .getContextClassLoader();
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             String path = superName.replace('.', '/');
 
             InputStream is = null;
