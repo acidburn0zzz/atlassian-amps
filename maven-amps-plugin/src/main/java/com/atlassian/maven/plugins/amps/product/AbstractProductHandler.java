@@ -113,21 +113,11 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
 
                 copyDirectory(rootDir, getBaseDirectory(ctx), true);
 
-                for( File f : tmp.listFiles())
-                {
-                    log.error("tmp dir: " + f.getAbsolutePath());
-                }
-
                 moveDirectory(tmp, homeDir);
             }
             else if (productHomeData.isDirectory())
             {
                 copyDirectory(productHomeData, homeDir);
-            }
-
-            for( File f : homeDir.listFiles())
-            {
-                log.error("Home dir: " + f.getAbsolutePath());
             }
         }
         catch (final IOException ex)
