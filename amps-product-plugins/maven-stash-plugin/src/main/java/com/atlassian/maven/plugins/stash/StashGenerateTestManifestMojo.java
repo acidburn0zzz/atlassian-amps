@@ -7,5 +7,4 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name = "generate-test-manifest")
 public class StashGenerateTestManifestMojo extends GenerateTestManifestMojo
 {
-
 }

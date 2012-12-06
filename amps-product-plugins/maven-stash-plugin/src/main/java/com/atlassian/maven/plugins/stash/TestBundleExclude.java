@@ -5,5 +5,4 @@ package com.atlassian.maven.plugins.stash;
  */
 public class TestBundleExclude extends com.atlassian.maven.plugins.amps.TestBundleExclude
 {
-
 }

@@ -12,7 +12,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 public class StashCreateMojo extends CreateMojo
 {
     @Override
-    protected String getDefaultProductId() throws MojoExecutionException {
+    protected String getDefaultProductId() throws MojoExecutionException
+    {
         return ProductHandlerFactory.STASH;
     }
 }

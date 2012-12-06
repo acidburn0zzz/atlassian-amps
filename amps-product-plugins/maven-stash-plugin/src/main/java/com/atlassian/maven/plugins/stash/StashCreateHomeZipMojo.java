@@ -8,5 +8,6 @@ import org.apache.maven.plugins.annotations.Mojo;
  * @since 3.10
  */
 @Mojo(name = "create-home-zip")
-public class StashCreateHomeZipMojo extends CreateHomeZipMojo {
+public class StashCreateHomeZipMojo extends CreateHomeZipMojo
+{
 }

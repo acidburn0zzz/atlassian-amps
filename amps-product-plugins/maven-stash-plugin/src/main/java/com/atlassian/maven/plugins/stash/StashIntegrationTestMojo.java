@@ -18,5 +18,4 @@ public class StashIntegrationTestMojo extends IntegrationTestMojo
     {
         return ProductHandlerFactory.STASH;
     }
-
 }

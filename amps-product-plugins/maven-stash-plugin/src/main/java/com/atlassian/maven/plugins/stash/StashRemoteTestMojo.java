@@ -11,5 +11,4 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 @Execute(phase = LifecyclePhase.PACKAGE)
 public class StashRemoteTestMojo extends RemoteTestMojo
 {
-
 }

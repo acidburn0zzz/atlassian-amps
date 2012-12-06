@@ -10,8 +10,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  * @since 3.10
  */
 @Mojo(name = "create-plugin-module", requiresDependencyResolution = ResolutionScope.COMPILE)
-public class StashPluginModuleGenerationMojo extends PluginModuleGenerationMojo {
-
+public class StashPluginModuleGenerationMojo extends PluginModuleGenerationMojo
+{
     @Override
     protected String getDefaultProductId() throws MojoExecutionException
     {

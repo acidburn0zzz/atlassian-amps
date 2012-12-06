@@ -8,5 +8,4 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 @Mojo(name = "copy-test-bundled-dependencies", requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class StashCopyTestBundledDependenciesMojo extends CopyTestBundledDependenciesMojo
 {
-
 }
