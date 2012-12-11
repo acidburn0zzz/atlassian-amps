@@ -79,6 +79,7 @@
         <confluence.version>${confluence.version}</confluence.version>
         <confluence.data.version>${confluence.data.version}</confluence.data.version>
         <amps.version>${project.version}</amps.version>
+        <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
     </properties>
 
 </project>
