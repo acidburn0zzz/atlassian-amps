@@ -129,6 +129,9 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     @Parameter(property = "buildTestPlugin", defaultValue = "false")
     private boolean buildTestPlugin;
 
+    @Parameter(property = "offline", defaultValue = "${settings.offline}")
+    protected boolean offline;
+    
     protected MavenContext getMavenContext()
     {
         if (mavenContext == null)
@@ -172,7 +175,10 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     {
         updateChecker.setCurrentVersion(getSdkVersion());
         updateChecker.setForceCheck(forceUpdateCheck);
-        updateChecker.setSkipCheck(shouldSkipPrompts());
+        
+        boolean skipCheck = (shouldSkipPrompts() || offline);
+        
+        updateChecker.setSkipCheck(skipCheck);
         
         return updateChecker;
     }
