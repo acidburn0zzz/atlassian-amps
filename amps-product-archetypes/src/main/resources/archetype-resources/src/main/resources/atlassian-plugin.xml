@@ -16,7 +16,7 @@
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         
         <resource type="download" name="${artifactId}.css" location="/css/${artifactId}.css"/>
-        <resource type="download" name="${artifactId}.js" location="/css/${artifactId}.js"/>
+        <resource type="download" name="${artifactId}.js" location="/js/${artifactId}.js"/>
         <resource type="download" name="images/" location="/images"/>
 
         <context>${artifactId}</context>
