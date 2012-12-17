@@ -2,6 +2,7 @@ package com.atlassian.maven.plugins.amps.util;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -409,6 +410,25 @@ public class TestZipUtils
         assertTrue("nested prefix folder in zip should have been trimmed", !nestedUnzip.exists());
     }
 
+    @Test
+    public void unzipExecutable() throws IOException
+    {
+        File zipFile = new File(tempDir, "zip-executable.zip");
+        File executable = new File(sourceZipDir, "executable.sh");
+        executable.createNewFile();
+
+        // This won't work under Windows - not much we can but ignore this test
+        Assume.assumeTrue(executable.setExecutable(true));
+
+        ZipUtils.zipDir(zipFile, sourceZipDir, "");
+
+        File unzipDir = new File(tempDir, "unzip-executable");
+        ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath(), 1);
+
+        File nestedUnzip = new File(unzipDir, "executable.sh");
+
+        assertTrue("Zip/Unzip should preserve executable permissions", nestedUnzip.canExecute());
+    }
 
     @Test
     public void countNoNestingLevel()
