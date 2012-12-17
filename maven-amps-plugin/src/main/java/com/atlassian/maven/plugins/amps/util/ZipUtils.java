@@ -2,6 +2,9 @@ package com.atlassian.maven.plugins.amps.util;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -13,8 +16,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 public class ZipUtils
 {
@@ -116,10 +117,10 @@ public class ZipUtils
         final ZipFile zip = new ZipFile(zipFile);
         try
         {
-            final Enumeration<? extends ZipEntry> entries = zip.entries();
+            final Enumeration<? extends ZipArchiveEntry> entries = zip.getEntries();
             while (entries.hasMoreElements())
             {
-                final ZipEntry zipEntry = entries.nextElement();
+                final ZipArchiveEntry zipEntry = entries.nextElement();
                 String zipPath = trimPathSegments(zipEntry.getName(), leadingPathSegmentsToTrim);
                 final File file = new File(destDir + "/" + zipPath);
                 if (zipEntry.isDirectory())
@@ -140,6 +141,12 @@ public class ZipUtils
                     is = zip.getInputStream(zipEntry);
                     fos = new FileOutputStream(file);
                     IOUtils.copy(is, fos);
+
+                    // check for user-executable bit on entry and apply to file
+                    if ((zipEntry.getUnixMode() & 0100) != 0)
+                    {
+                        file.setExecutable(true);
+                    }
                 }
                 finally
                 {
@@ -176,7 +183,7 @@ public class ZipUtils
         try
         {
             zipFile = new ZipFile(zip);
-            List<String> filenames = toList(zipFile.entries());
+            List<String> filenames = toList(zipFile.getEntries());
             return countNestingLevel(filenames);
         }
         finally
@@ -242,7 +249,7 @@ public class ZipUtils
      */
     public static void zipDir(final File zipFile, final File srcDir, final String prefix) throws IOException
     {
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile));
+        ZipArchiveOutputStream out = new ZipArchiveOutputStream(new FileOutputStream(zipFile));
         try
         {
             addZipPrefixes(srcDir, out, prefix);
@@ -255,7 +262,7 @@ public class ZipUtils
         }
     }
 
-    private static void addZipPrefixes(File dirObj, ZipOutputStream out, String prefix) throws IOException
+    private static void addZipPrefixes(File dirObj, ZipArchiveOutputStream out, String prefix) throws IOException
     {
         // need to manually add the prefix folders
         String entryPrefix = ensurePrefixWithSlash(dirObj, prefix);
@@ -264,15 +271,15 @@ public class ZipUtils
         String lastPrefix = "";
         for (int i = 0; i < prefixes.length; i++)
         {
-            ZipEntry entry = new ZipEntry(lastPrefix + prefixes[i] + "/");
-            out.putNextEntry(entry);
-            out.closeEntry();
+            ZipArchiveEntry entry = new ZipArchiveEntry(lastPrefix + prefixes[i] + "/");
+            out.putArchiveEntry(entry);
+            out.closeArchiveEntry();
 
             lastPrefix = prefixes[i] + "/";
         }
     }
 
-    private static void addZipDir(File dirObj, ZipOutputStream out, String prefix) throws IOException
+    private static void addZipDir(File dirObj, ZipArchiveOutputStream out, String prefix) throws IOException
     {
         File[] files = dirObj.listFiles();
         byte[] tmpBuf = new byte[1024];
@@ -288,9 +295,9 @@ public class ZipUtils
                 entryName = entryPrefix + currentFile.getName() + "/";
 
                 // need to manually add folders so entries are in order
-                ZipEntry entry = new ZipEntry(entryName);
-                out.putNextEntry(entry);
-                out.closeEntry();
+                ZipArchiveEntry entry = new ZipArchiveEntry(entryName);
+                out.putArchiveEntry(entry);
+                out.closeArchiveEntry();
 
                 // add the files in the folder
                 addZipDir(currentFile, out, entryName);
@@ -302,7 +309,12 @@ public class ZipUtils
                 FileInputStream in = new FileInputStream(currentFile.getAbsolutePath());
                 try
                 {
-                    out.putNextEntry(new ZipEntry(entryName));
+                    ZipArchiveEntry entry = new ZipArchiveEntry(entryName);
+                    out.putArchiveEntry(entry);
+                    if (currentFile.canExecute())
+                    {
+                        entry.setUnixMode(0700);
+                    }
                     // Transfer from the file to the ZIP file
                     int len;
                     while ((len = in.read(tmpBuf)) > 0)
@@ -311,7 +323,7 @@ public class ZipUtils
                     }
 
                     // Complete the entry
-                    out.closeEntry();
+                    out.closeArchiveEntry();
                 }
                 finally
                 {
