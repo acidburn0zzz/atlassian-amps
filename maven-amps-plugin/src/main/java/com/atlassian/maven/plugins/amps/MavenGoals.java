@@ -1094,7 +1094,7 @@ public class MavenGoals
         if(!restModules.isEmpty() && packagesPath.length() > 0)
         {
             Set<String> docletPaths = new HashSet<String>();
-            StringBuffer docletPath = new StringBuffer(":" + prj.getBuild().getOutputDirectory());
+            StringBuffer docletPath = new StringBuffer(File.pathSeparator + prj.getBuild().getOutputDirectory());
             String resourcedocPath = fixWindowsSlashes(prj.getBuild().getOutputDirectory() + File.separator + "resourcedoc.xml");
 
             PluginXmlUtils.PluginInfo pluginInfo = PluginXmlUtils.getPluginInfo(ctx);
@@ -1109,7 +1109,7 @@ public class MavenGoals
                 URL[] pluginUrls = ((URLClassLoader)Thread.currentThread().getContextClassLoader()).getURLs();
                 for(URL pluginUrl : pluginUrls)
                 {
-                    docletPaths.add(pluginUrl.getFile());
+                    docletPaths.add(new File(pluginUrl.getFile()).getPath());
                 }
 
                 for(String path : docletPaths) {
