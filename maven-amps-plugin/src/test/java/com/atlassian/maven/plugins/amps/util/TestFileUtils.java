@@ -34,7 +34,8 @@ public class TestFileUtils extends TestCase
             src.mkdirs();
             File file = new File(src, "something");
             file.createNewFile();
-            file.setExecutable(true);
+            // Ignore the executable assert on Windows
+            boolean executable = file.setExecutable(true);
             new File(src, "a/b").mkdirs();
             new File(src, "a/b/c").createNewFile();
             new File(src, "a/d").createNewFile();
@@ -42,7 +43,7 @@ public class TestFileUtils extends TestCase
             assertTrue(new File(dest, "a/b/c").exists());
             assertTrue(new File(dest, "a/d").exists());
             assertFalse(new File(dest, "a/d").canExecute());
-            assertTrue(new File(dest, file.getName()).canExecute());
+            assertEquals(executable, new File(dest, file.getName()).canExecute());
         }
         finally
         {
