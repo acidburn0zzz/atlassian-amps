@@ -1,7 +1,7 @@
 package com.atlassian.maven.plugins.amps.product;
 
 
-import static org.apache.commons.io.FileUtils.copyDirectory;
+import static com.atlassian.maven.plugins.amps.util.FileUtils.copyDirectory;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import java.io.File;
@@ -96,7 +96,7 @@ public abstract class AmpsProductHandler implements ProductHandler
             }
 
             homeSnapshot.mkdirs();
-            FileUtils.copyDirectory(homeDirectory, homeSnapshot, true);
+            copyDirectory(homeDirectory, homeSnapshot, true);
 
             cleanupProductHomeForZip(product, homeSnapshot);
             ZipUtils.zipDir(targetZip, homeSnapshot, entryBase);
@@ -196,7 +196,7 @@ public abstract class AmpsProductHandler implements ProductHandler
             final File srcDir = new File(project.getBasedir(), "src/test/resources/" + ctx.getInstanceId() + "-home");
             if (srcDir.exists() && homeDir.exists())
             {
-                copyDirectory(srcDir, homeDir);
+                copyDirectory(srcDir, homeDir, false);
             }
         }
         catch (IOException e)
