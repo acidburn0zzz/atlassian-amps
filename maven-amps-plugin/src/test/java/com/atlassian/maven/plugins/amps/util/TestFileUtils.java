@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 public class TestFileUtils extends TestCase
 {
@@ -27,8 +28,8 @@ public class TestFileUtils extends TestCase
 
     public void testCopyDirectory() throws IOException
     {
-        File src = new File("src");
-        File dest = new File("dest");
+        File src = tempDirectory();
+        File dest = tempDirectory();
         try
         {
             src.mkdirs();
@@ -52,4 +53,8 @@ public class TestFileUtils extends TestCase
         }
     }
 
+    private static File tempDirectory()
+    {
+        return new File(new File(System.getProperty("java.io.tmpdir")), UUID.randomUUID().toString());
+    }
 }
