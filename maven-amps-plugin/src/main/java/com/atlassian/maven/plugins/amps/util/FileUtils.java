@@ -106,9 +106,9 @@ public class FileUtils
             else
             {
                 copyFile(srcFile, dstFile, preserveFileAttrs);
-                if (preserveFileAttrs)
+                if (preserveFileAttrs && srcFile.canExecute())
                 {
-                    dstFile.setExecutable(srcFile.canExecute());
+                    dstFile.setExecutable(true);
                 }
             }
         }
