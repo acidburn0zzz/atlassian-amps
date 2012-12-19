@@ -23,11 +23,26 @@ public class CopyTestBundledDependenciesMojo extends AbstractProductAwareMojo
         {
             if (!extractTestDependencies)
             {
-                getMavenGoals().copyTestBundledDependencies(testBundleExcludes);
+                if(excludeAllTestDependencies)
+                {
+                    getMavenGoals().copyTestBundledDependenciesExcludingTestScope(testBundleExcludes);
+                }
+                else
+                {
+                    getMavenGoals().copyTestBundledDependencies(testBundleExcludes);
+                }
+                
             }
             else
             {
-                getMavenGoals().extractTestBundledDependencies(testBundleExcludes);
+                if(excludeAllTestDependencies)
+                {
+                    getMavenGoals().extractTestBundledDependenciesExcludingTestScope(testBundleExcludes);
+                }
+                else
+                {
+                    getMavenGoals().extractTestBundledDependencies(testBundleExcludes);
+                }
             }
         }
     }

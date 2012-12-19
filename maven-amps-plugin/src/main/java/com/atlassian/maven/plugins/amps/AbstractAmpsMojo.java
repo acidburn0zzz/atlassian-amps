@@ -129,6 +129,13 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     @Parameter(property = "buildTestPlugin", defaultValue = "false")
     private boolean buildTestPlugin;
 
+    /**
+     * Whether the test plugin should exclude test scoped dependencies.
+     * This should always be false for running "wired" integration tests
+     */
+    @Parameter(property = "excludeAllTestDependencies", defaultValue = "false")
+    protected boolean excludeAllTestDependencies;
+
     @Parameter(property = "offline", defaultValue = "${settings.offline}")
     protected boolean offline;
     

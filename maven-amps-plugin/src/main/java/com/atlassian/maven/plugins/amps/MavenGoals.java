@@ -357,6 +357,37 @@ public class MavenGoals
 
     }
 
+    public void copyTestBundledDependenciesExcludingTestScope(List<ProductArtifact> testBundleExcludes) throws MojoExecutionException
+    {
+        StringBuilder sb = new StringBuilder();
+
+        for(ProductArtifact artifact : testBundleExcludes)
+        {
+            log.info("excluding artifact from test jar: " + artifact.getArtifactId());
+            sb.append(",").append(artifact.getArtifactId());
+        }
+
+        String customExcludes = sb.toString();
+
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("copy-dependencies"),
+                configuration(
+                        element(name("includeScope"), "runtime"),
+                        element(name("excludeScope"), "provided"),
+                        element(name("excludeScope"), "test"),
+                        element(name("includeTypes"), "jar"),
+                        element(name("excludeArtifactIds"),"junit" + customExcludes),
+                        element(name("outputDirectory"), "${project.build.testOutputDirectory}/META-INF/lib")
+                ),
+                executionEnvironment()
+        );
+    }
+
     public void extractBundledDependencies() throws MojoExecutionException
     {
          executeMojo(
@@ -378,7 +409,7 @@ public class MavenGoals
         );
     }
 
-    public void extractTestBundledDependencies(List<ProductArtifact> testBundleExcludes) throws MojoExecutionException
+    public void extractTestBundledDependenciesExcludingTestScope(List<ProductArtifact> testBundleExcludes) throws MojoExecutionException
     {
         StringBuilder sb = new StringBuilder();
 
@@ -389,6 +420,37 @@ public class MavenGoals
 
         String customExcludes = sb.toString();
         
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("unpack-dependencies"),
+                configuration(
+                        element(name("includeScope"), "runtime"),
+                        element(name("excludeScope"), "provided"),
+                        element(name("excludeScope"), "test"),
+                        element(name("includeTypes"), "jar"),
+                        element(name("excludeArtifactIds"),"junit" + customExcludes),
+                        element(name("excludes"), "META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
+                        element(name("outputDirectory"), "${project.build.testOutputDirectory}")
+                ),
+                executionEnvironment()
+        );
+    }
+
+    public void extractTestBundledDependencies(List<ProductArtifact> testBundleExcludes) throws MojoExecutionException
+    {
+        StringBuilder sb = new StringBuilder();
+
+        for(ProductArtifact artifact : testBundleExcludes)
+        {
+            sb.append(",").append(artifact.getArtifactId());
+        }
+
+        String customExcludes = sb.toString();
+
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
