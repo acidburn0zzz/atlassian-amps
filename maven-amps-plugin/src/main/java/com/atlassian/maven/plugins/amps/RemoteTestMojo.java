@@ -2,9 +2,19 @@ package com.atlassian.maven.plugins.amps;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+
+import javax.annotation.Nullable;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 
 import com.atlassian.maven.plugins.amps.util.ClassUtils;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -16,10 +26,15 @@ import org.apache.maven.model.Build;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
+import org.apache.wink.client.*;
+import org.apache.wink.client.handlers.BasicAuthSecurityHandler;
+import org.apache.wink.common.http.HttpStatus;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.ManifestException;
+
+import aQute.lib.osgi.Constants;
 
 @Mojo(name = "remote-test", requiresDependencyResolution = ResolutionScope.TEST, defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST)
 @Execute(phase = LifecyclePhase.PACKAGE)
@@ -187,16 +202,21 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
                 systemProperties.put("baseurl", getBaseUrl(server, httpPort, contextPath));
             }
 
-            List<File> obrFiles = getFrameworkFiles();
-            File junit = null;
+            Map<ProductArtifact,File> frameworkFiles = getFrameworkFiles();
+            File junitFile = null;
+            ProductArtifact junitArtifact = null;
             
             //we MUST install junit first!
-            for(File obrFile : obrFiles)
+            for(Map.Entry<ProductArtifact,File> entry : frameworkFiles.entrySet())
             {
-                if(obrFile.getName().startsWith("org.apache.servicemix.bundles.junit"))
+                ProductArtifact artifact = entry.getKey();
+                File artifactFile = entry.getValue();
+                
+                if(artifactFile.getName().startsWith("org.apache.servicemix.bundles.junit"))
                 {
-                    junit = obrFile;
-                    obrFiles.remove(obrFile);
+                    junitFile = artifactFile;
+                    junitArtifact = artifact;
+                    frameworkFiles.remove(artifact);
                     break;
                 }
             }
@@ -204,20 +224,20 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
             File mainPlugin = new File(buildDir, finalName + ".jar");
             File testPlugin = new File(buildDir, finalName + "-tests.jar");
 
-            obrFiles.add(mainPlugin);
-            obrFiles.add(testPlugin);
-            
-            if(null == junit || !junit.exists())
+            if(null == junitFile || !junitFile.exists())
             {
                 throw new MojoExecutionException("couldn't find junit!!!!");
             }
 
-            installPluginFile(junit);
-            
-            for(File pluginFile : obrFiles)
+            installPluginFileIfNotInstalled(junitArtifact,junitFile);
+
+            for(Map.Entry<ProductArtifact,File> pluginEntry : frameworkFiles.entrySet())
             {
-                installPluginFile(pluginFile);
+                installPluginFileIfNotInstalled(pluginEntry.getKey(), pluginEntry.getValue());
             }
+
+            installPluginFile(mainPlugin);
+            installPluginFile(testPlugin);
 
             // Actually run the tests
             goals.runIntegrationTests("group-" + testGroupId, "remote", includes, excludes, systemProperties, targetDirectory);
@@ -227,6 +247,81 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
             throw new MojoExecutionException("Error running remote tests...", e);
         }
 
+    }
+
+    private void installPluginFileIfNotInstalled(ProductArtifact pluginArtifact, File pluginFile) throws IOException, MojoExecutionException
+    {
+        JarFile jar = new JarFile(pluginFile);
+        Manifest mf = jar.getManifest();
+        String pluginKey = null;
+        String pluginVersion = null;
+        
+        if(null != mf)
+        {
+            pluginKey = mf.getMainAttributes().getValue(Constants.BUNDLE_SYMBOLICNAME);
+            pluginVersion = mf.getMainAttributes().getValue(Constants.BUNDLE_VERSION);
+        }
+        
+        if(StringUtils.isBlank(pluginKey))
+        {
+            //just install it
+            installPluginFile(pluginFile);
+        }
+        else
+        {
+            boolean foundPlugin = false;
+            
+            ClientConfig config = new ApacheHttpClientConfig();
+            config.readTimeout(1800000);
+            BasicAuthSecurityHandler basicAuthHandler = new BasicAuthSecurityHandler();
+            basicAuthHandler.setUserName(pdkUsername);
+            basicAuthHandler.setPassword(pdkPassword);
+            config.handlers(basicAuthHandler);
+            config.followRedirects(true);
+
+            RestClient client = new RestClient(config);
+            URI uri = UriBuilder.fromPath(contextPath + "/rest/plugins/1.0/" + pluginKey + "-key")
+                    .scheme("http")
+                    .host(server)
+                    .port(httpPort)
+                    .build();
+            
+            Resource resource = client.resource(uri);
+
+            ClientResponse response = resource.get();
+            
+            if(response.getStatusCode() == HttpStatus.NOT_FOUND.getCode())
+            {
+                //try again with version tacked on
+                uri = UriBuilder.fromPath(contextPath + "/rest/plugins/1.0/" + pluginKey + "-" + pluginVersion + "-key")
+                                    .scheme("http")
+                                    .host(server)
+                                    .port(httpPort)
+                                    .build();
+
+                resource = client.resource(uri);
+                response = resource.get();
+
+                if(response.getStatusCode() != HttpStatus.NOT_FOUND.getCode())
+                {
+                    foundPlugin = true;
+                }
+            }
+            else
+            {
+                foundPlugin = true;
+            }
+            
+            if(!foundPlugin)
+            {
+                installPluginFile(pluginFile);
+            }
+            else
+            {
+                //TODO: check version and remove/install if we have an update
+            }
+            
+        }
     }
 
     private void installPluginFile(File pluginFile) throws MojoExecutionException
@@ -273,12 +368,14 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
         return wiredClasses;
     }
 
-    private List<File> getFrameworkFiles() throws MojoExecutionException
+    private Map<ProductArtifact,File> getFrameworkFiles() throws MojoExecutionException
     {
         List<ProductArtifact> pluginsToDeploy = new ArrayList<ProductArtifact>();
         pluginsToDeploy.addAll(testFrameworkPlugins);
         pluginsToDeploy.add(new ProductArtifact("com.atlassian.labs","fastdev-plugin",DEFAULT_FASTDEV_VERSION));
         pluginsToDeploy.addAll(deployArtifacts);
+
+        Map<ProductArtifact,File> artifactFileMap = new HashMap<ProductArtifact, File>(pluginsToDeploy.size());
         
         try
         {
@@ -288,7 +385,25 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
 
             getMavenGoals().copyPlugins(tmpDir, pluginsToDeploy);
 
-            return new ArrayList<File>(Arrays.asList(tmpDir.listFiles()));
+            for(File file : tmpDir.listFiles())
+            {
+                final File artifactFile = file;
+                
+                Collection<ProductArtifact> filtered = Collections2.filter(pluginsToDeploy,new Predicate<ProductArtifact>() {
+                    @Override
+                    public boolean apply(@Nullable ProductArtifact productArtifact)
+                    {
+                        return artifactFile.getName().startsWith(productArtifact.getArtifactId());
+                    }
+                });
+                
+                if(!filtered.isEmpty())
+                {
+                    artifactFileMap.put(filtered.iterator().next(),artifactFile);
+                }
+            }
+            
+            return artifactFileMap;
             
         }
         catch (Exception e)

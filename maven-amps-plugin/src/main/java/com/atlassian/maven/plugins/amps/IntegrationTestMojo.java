@@ -240,10 +240,15 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         systemProperties.put("testGroup", testGroupId);
         systemProperties.putAll(getTestGroupSystemProperties(testGroupId));
 
-        if (parallel)
+        /*
+        Commenting out the parallel check so we ALWAYS wait until the products are started
+         */
+        /*if (parallel)
         {
             waitForProducts(productExecutions, true);
-        }
+        }*/
+
+        waitForProducts(productExecutions, true);
 
         // Actually run the tests
         goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory);
