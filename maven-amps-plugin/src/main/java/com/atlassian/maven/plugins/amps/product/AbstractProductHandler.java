@@ -230,15 +230,25 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
             throws IOException, MojoExecutionException, Exception
     {
         File pluginsDir = getUserInstalledPluginsDirectory(appDir, homeDir);
-        final File bundledPluginsDir = new File(getBaseDirectory(ctx), "bundled-plugins");
+        File bundledPluginsDir = new File(getBaseDirectory(ctx), "bundled-plugins");
 
         bundledPluginsDir.mkdir();
         // add bundled plugins
-        final File bundledPluginsZip = new File(appDir, getBundledPluginPath(ctx));
-        if (bundledPluginsZip.exists())
+        final File bundledPluginsFile = getBundledPluginPath(ctx, appDir);
+        if (bundledPluginsFile.exists())
         {
-            unzip(bundledPluginsZip, bundledPluginsDir.getPath());
+            if (bundledPluginsFile.isDirectory())
+            {
+                bundledPluginsDir = bundledPluginsFile;
+            }
+            else
+            {
+                unzip(bundledPluginsFile, bundledPluginsDir.getPath());
+            }
         }
+
+        // todo: handle dirs
+
 
         if (isStaticPlugin())
         {
@@ -285,7 +295,10 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
 
         if (bundledPluginsDir.list().length > 0)
         {
-            com.atlassian.core.util.FileUtils.createZipFile(bundledPluginsDir, bundledPluginsZip);
+            if (!bundledPluginsFile.isDirectory())
+            {
+                com.atlassian.core.util.FileUtils.createZipFile(bundledPluginsDir, bundledPluginsFile);
+            }
         }
 
         if (ctx.getLog4jProperties() != null && getLog4jPropertiesPath() != null)
@@ -307,7 +320,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     abstract protected boolean supportsStaticPlugins();
     abstract protected Collection<? extends ProductArtifact> getDefaultBundledPlugins();
     abstract protected Collection<? extends ProductArtifact> getDefaultLibPlugins();
-    abstract protected String getBundledPluginPath(Product ctx);
+    abstract protected File getBundledPluginPath(Product ctx, File appDir);
     abstract protected File getUserInstalledPluginsDirectory(File webappDir, File homeDir);
 
     protected String getLog4jPropertiesPath()

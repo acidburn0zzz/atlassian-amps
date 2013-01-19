@@ -68,9 +68,9 @@ public class BambooProductHandler extends AbstractWebappProductHandler
         return Collections.emptyList();
     }
 
-    public String getBundledPluginPath(Product ctx)
+    public File getBundledPluginPath(Product ctx, File appDir)
     {
-        return "WEB-INF/classes/atlassian-bundled-plugins.zip";
+        return new File(appDir, "WEB-INF/classes/atlassian-bundled-plugins.zip");
     }
 
     public void processHomeDirectory(final Product ctx, final File homeDir) throws MojoExecutionException
