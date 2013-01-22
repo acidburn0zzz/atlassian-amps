@@ -247,9 +247,6 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
             }
         }
 
-        // todo: handle dirs
-
-
         if (isStaticPlugin())
         {
             if (!supportsStaticPlugins())
