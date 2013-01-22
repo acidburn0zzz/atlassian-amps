@@ -78,10 +78,10 @@ public class StashProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    public String getBundledPluginPath(Product ctx)
+    public File getBundledPluginPath(Product ctx, File appDir)
     {
         String bundledPluginPluginsPath = "WEB-INF/classes/stash-bundled-plugins.zip";
-        return bundledPluginPluginsPath;
+        return new File(appDir, bundledPluginPluginsPath);
     }
 
     @Override

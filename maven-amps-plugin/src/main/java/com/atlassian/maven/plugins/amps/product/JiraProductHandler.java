@@ -105,7 +105,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    public String getBundledPluginPath(Product ctx)
+    public File getBundledPluginPath(Product ctx, File appDir)
     {
         // this location used from 4.1 onwards (inclusive)
         String bundledPluginPluginsPath = "WEB-INF/classes/atlassian-bundled-plugins.zip";
@@ -126,7 +126,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             log.debug(String.format("Unable to parse JIRA version '%s', assuming JIRA 4.1 or newer.", ctx.getVersion()), e);
         }
 
-        return bundledPluginPluginsPath;
+        return new File(appDir, bundledPluginPluginsPath);
     }
 
     @Override

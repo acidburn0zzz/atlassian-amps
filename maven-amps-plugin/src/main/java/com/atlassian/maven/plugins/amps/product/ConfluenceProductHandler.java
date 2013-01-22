@@ -73,9 +73,18 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    public String getBundledPluginPath(Product ctx)
+    public File getBundledPluginPath(Product ctx, File appDir)
     {
-        return "WEB-INF/classes/com/atlassian/confluence/setup/atlassian-bundled-plugins.zip";
+        String bundleDirPath = "WEB-INF/atlassian-bundled-plugins";
+        final File bundleDir = new File(appDir, bundleDirPath);
+        if (bundleDir.exists() && bundleDir.isDirectory())
+        {
+            return bundleDir;
+        }
+        else
+        {
+            return new File(appDir, "WEB-INF/classes/com/atlassian/confluence/setup/atlassian-bundled-plugins.zip");
+        }
     }
 
     @Override

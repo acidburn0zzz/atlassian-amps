@@ -40,9 +40,9 @@ public class RefappProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    protected String getBundledPluginPath(Product ctx)
+    protected File getBundledPluginPath(Product ctx, File appDir)
     {
-        return "WEB-INF/classes/atlassian-bundled-plugins.zip";
+        return new File(appDir, "WEB-INF/classes/atlassian-bundled-plugins.zip");
     }
 
     @Override

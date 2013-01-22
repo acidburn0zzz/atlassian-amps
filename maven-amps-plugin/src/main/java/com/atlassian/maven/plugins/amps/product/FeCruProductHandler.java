@@ -143,9 +143,9 @@ public class FeCruProductHandler extends AbstractProductHandler
     }
 
     @Override
-    protected String getBundledPluginPath(Product ctx)
+    protected File getBundledPluginPath(Product ctx, File appDir)
     {
-        return "plugins/bundled-plugins.zip";
+        return new File(appDir, "plugins/bundled-plugins.zip");
     }
 
     @Override
