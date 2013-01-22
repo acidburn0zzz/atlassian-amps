@@ -236,6 +236,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
                 installPluginFileIfNotInstalled(pluginEntry.getKey(), pluginEntry.getValue());
             }
 
+
             installPluginFile(mainPlugin);
             installPluginFile(testPlugin);
 
@@ -251,6 +252,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
 
     private void installPluginFileIfNotInstalled(ProductArtifact pluginArtifact, File pluginFile) throws IOException, MojoExecutionException
     {
+        getLog().info("checking to see if we need to install " + pluginFile.getName());
         JarFile jar = new JarFile(pluginFile);
         Manifest mf = jar.getManifest();
         String pluginKey = null;
@@ -260,10 +262,16 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
         {
             pluginKey = mf.getMainAttributes().getValue(Constants.BUNDLE_SYMBOLICNAME);
             pluginVersion = mf.getMainAttributes().getValue(Constants.BUNDLE_VERSION);
+            getLog().info("pluginKet from manifest is: " + pluginKey);
+        }
+        else
+        {
+            getLog().info("no manifext found for plugin!!");
         }
         
         if(StringUtils.isBlank(pluginKey))
         {
+            getLog().info("no plugin key found, installing without check...");
             //just install it
             installPluginFile(pluginFile);
         }
@@ -285,13 +293,15 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
                     .host(server)
                     .port(httpPort)
                     .build();
-            
+
+            getLog().info("looking up plugin from: " + uri.toURL().toString());
             Resource resource = client.resource(uri);
 
             ClientResponse response = resource.get();
             
             if(response.getStatusCode() == HttpStatus.NOT_FOUND.getCode())
             {
+                getLog().info("got a 404, trying again with version tacked on...");
                 //try again with version tacked on
                 uri = UriBuilder.fromPath(contextPath + "/rest/plugins/1.0/" + pluginKey + "-" + pluginVersion + "-key")
                                     .scheme("http")
@@ -299,21 +309,25 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
                                     .port(httpPort)
                                     .build();
 
+                getLog().info("looking up plugin from: " + uri.toURL().toString());
                 resource = client.resource(uri);
                 response = resource.get();
 
                 if(response.getStatusCode() != HttpStatus.NOT_FOUND.getCode())
                 {
+                    getLog().info("found the plugin!!");
                     foundPlugin = true;
                 }
             }
             else
             {
+                getLog().info("found the plugin!!");
                 foundPlugin = true;
             }
             
             if(!foundPlugin)
             {
+                getLog().info("didn't find the plugin so I'm installing it...");
                 installPluginFile(pluginFile);
             }
             else
