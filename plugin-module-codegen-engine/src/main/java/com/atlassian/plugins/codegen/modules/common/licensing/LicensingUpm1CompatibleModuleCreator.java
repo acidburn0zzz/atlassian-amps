@@ -93,7 +93,6 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
     };
     
     public static final PluginArtifact[] BUNDLED_ARTIFACTS = {
-        pluginArtifact(BUNDLED_ARTIFACT, artifactId("com.atlassian.upm", "atlassian-universal-plugin-manager-plugin"), version("1.6.3")),
         pluginArtifact(BUNDLED_ARTIFACT, artifactId("com.atlassian.upm", "plugin-license-storage-plugin"), LICENSE_API_VERSION_PROPERTY)
     };
     

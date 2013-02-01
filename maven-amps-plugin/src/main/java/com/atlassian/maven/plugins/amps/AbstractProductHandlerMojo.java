@@ -57,7 +57,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected static final String DEFAULT_PDK_VERSION = "0.4";
     protected static final String DEFAULT_WEB_CONSOLE_VERSION = "1.2.8";
     protected static final String DEFAULT_FASTDEV_VERSION = "2.0";
-    protected static final String DEFAULT_DEV_TOOLBOX_VERSION = "2.0.4";
+    protected static final String DEFAULT_DEV_TOOLBOX_VERSION = "2.0.5";
     protected static final String DEFAULT_PDE_VERSION = "1.2";
 
     /**
