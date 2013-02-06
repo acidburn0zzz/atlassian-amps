@@ -27,6 +27,8 @@ public interface ProductHandler
 
     int getDefaultHttpPort();
 
+    String getDefaultContainerId();
+
     /**
      * Return the directory to snapshot when we want to restore
      * the state of the instance.

@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
+import com.atlassian.maven.plugins.amps.product.AmpsDefaults;
 import com.atlassian.maven.plugins.amps.util.ClassUtils;
 
 import com.google.common.base.Predicate;
@@ -386,7 +387,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
     {
         List<ProductArtifact> pluginsToDeploy = new ArrayList<ProductArtifact>();
         pluginsToDeploy.addAll(testFrameworkPlugins);
-        pluginsToDeploy.add(new ProductArtifact("com.atlassian.labs","fastdev-plugin",DEFAULT_FASTDEV_VERSION));
+        pluginsToDeploy.add(new ProductArtifact("com.atlassian.labs","fastdev-plugin", AmpsDefaults.DEFAULT_FASTDEV_VERSION));
         pluginsToDeploy.addAll(deployArtifacts);
 
         Map<ProductArtifact,File> artifactFileMap = new HashMap<ProductArtifact, File>(pluginsToDeploy.size());
