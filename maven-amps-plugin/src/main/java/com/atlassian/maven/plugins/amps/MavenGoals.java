@@ -87,7 +87,7 @@ public class MavenGoals
             put("maven-resources-plugin", "2.3");
             put("maven-jar-plugin", "2.2");
             //put("maven-surefire-plugin", "2.4.3");
-            put("maven-surefire-plugin", "2.12");
+            put("maven-surefire-plugin", "2.12.4");
             put("maven-failsafe-plugin", "2.9");
             put("maven-exec-plugin", "1.2.1");
 
@@ -187,8 +187,8 @@ public class MavenGoals
     {
         CreatePluginProperties props = null;
         Properties systemProps = System.getProperties();
-        
-        if(systemProps.containsKey("groupId") 
+
+        if(systemProps.containsKey("groupId")
                 && systemProps.containsKey("artifactId")
                 && systemProps.containsKey("version")
                 && systemProps.containsKey("package")
@@ -200,7 +200,7 @@ public class MavenGoals
                     ,systemProps.getProperty("package")
                     );
         }
-        
+
         if(null == props)
         {
             try
@@ -212,7 +212,7 @@ public class MavenGoals
                 throw new MojoExecutionException("Unable to gather properties",e);
             }
         }
-        
+
         if(null != props)
         {
             ExecutionEnvironment execEnv = executionEnvironment();
@@ -222,7 +222,7 @@ public class MavenGoals
             sysProps.setProperty("artifactId",props.getArtifactId());
             sysProps.setProperty("version",props.getVersion());
             sysProps.setProperty("package",props.getThePackage());
-            
+
             executeMojo(
                     plugin(
                             groupId("org.apache.maven.plugins"),
@@ -237,15 +237,15 @@ public class MavenGoals
                             element(name("interactiveMode"), "false")
                     ),
                     execEnv);
-            
+
             File pluginDir = new File(ctx.getProject().getBasedir(),props.getArtifactId());
-            
+
             if(pluginDir.exists())
             {
                 File src = new File(pluginDir,"src");
                 File test = new File(src,"test");
                 File java = new File(test,"java");
-                
+
                 String packagePath = props.getThePackage().replaceAll("\\.", Matcher.quoteReplacement(File.separator));
                 File packageFile = new File(java,packagePath);
                 File packageUT = new File(packageFile,"ut");
@@ -253,7 +253,7 @@ public class MavenGoals
 
                 File ut = new File(new File(java,"ut"),packagePath);
                 File it = new File(new File(java,"it"),packagePath);
-                
+
                 if(packageFile.exists())
                 {
                     try
@@ -269,9 +269,9 @@ public class MavenGoals
                         }
 
                         IOFileFilter filter = FileFilterUtils.and(FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("it")),FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("ut")));
-                        
+
                         com.atlassian.maven.plugins.amps.util.FileUtils.cleanDirectory(java,filter);
-                       
+
                     }
                     catch (IOException e)
                     {
@@ -305,15 +305,15 @@ public class MavenGoals
     public void copyTestBundledDependencies(List<ProductArtifact> testBundleExcludes) throws MojoExecutionException
     {
         StringBuilder sb = new StringBuilder();
-        
+
         for(ProductArtifact artifact : testBundleExcludes)
         {
             log.info("excluding artifact from test jar: " + artifact.getArtifactId());
                 sb.append(",").append(artifact.getArtifactId());
         }
-        
+
         String customExcludes = sb.toString();
-        
+
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -330,13 +330,13 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
-        
+
         File targetDir = new File(ctx.getProject().getBuild().getDirectory());
         File testlibsDir = new File(targetDir,"testlibs");
         File compileLibs = new File(testlibsDir,"compile");
         File testLibs = new File(testlibsDir,"test");
-        
-        
+
+
         File testClassesDir = new File(ctx.getProject().getBuild().getTestOutputDirectory());
         File metainfDir = new File(testClassesDir,"META-INF");
         File libDir = new File(metainfDir,"lib");
@@ -346,7 +346,7 @@ public class MavenGoals
             compileLibs.mkdirs();
             testLibs.mkdirs();
             libDir.mkdirs();
-            
+
             FileUtils.copyDirectory(compileLibs,libDir);
             FileUtils.copyDirectory(testLibs,libDir);
         }
@@ -419,7 +419,7 @@ public class MavenGoals
         }
 
         String customExcludes = sb.toString();
-        
+
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -493,7 +493,7 @@ public class MavenGoals
 
     public void compressResources(boolean useClosureForJs) throws MojoExecutionException
     {
-        
+
         ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), new File(ctx.getProject().getBuild().getOutputDirectory()), useClosureForJs, log);
         /*
         executeMojo(
@@ -563,19 +563,25 @@ public class MavenGoals
 
     }
 
-    public void runUnitTests(Map<String, Object> systemProperties) throws MojoExecutionException
+    public void runUnitTests(Map<String, Object> systemProperties) throws MojoExecutionException {
+        runUnitTests(systemProperties, null);
+    }
+
+    public void runUnitTests(Map<String, Object> systemProperties, String excludedGroups) throws MojoExecutionException
     {
         final Element systemProps = convertPropsToElements(systemProperties);
         Xpp3Dom config = configuration(
                 systemProps,
                 element(name("excludes"),
                         element(name("exclude"), "it/**"),
-                        element(name("exclude"), "**/*$*"))
+                        element(name("exclude"), "**/*$*")),
+
+                element(name("excludedGroups"), excludedGroups)
         );
-        
+
         log.info("surefire unit-test configuration:");
         log.info(config.toString());
-        
+
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -778,7 +784,7 @@ public class MavenGoals
         final int rmiPort = pickFreePort(0);
         int actualHttpPort;
         String protocol = "http";
-        
+
         if(webappContext.getUseHttps())
         {
             actualHttpPort = 443;
@@ -825,12 +831,12 @@ public class MavenGoals
             props.add(element(name(entry.getKey()), entry.getValue()));
         }
         props.add(element(name("cargo.servlet.port"), String.valueOf(actualHttpPort)));
-        
+
         if(webappContext.getUseHttps())
         {
             props.add(element(name("cargo.protocol"), protocol));
         }
-        
+
         props.add(element(name("cargo.rmi.port"), String.valueOf(rmiPort)));
         props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs()));
 
@@ -871,7 +877,7 @@ public class MavenGoals
                                 element(name("home"), container.getConfigDirectory(getBuildDirectory(), productInstanceId)),
                                 element(name("type"), "standalone"),
                                 element(name("properties"), props.toArray(new Element[props.size()]))
-                                
+
                         )
                 ),
                 executionEnvironment()
@@ -1012,7 +1018,7 @@ public class MavenGoals
 
         log.info("Failsafe integration-test configuration:");
         log.info(itconfig.toString());
-        
+
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -1045,7 +1051,7 @@ public class MavenGoals
 
         /*
         OLD surefire 2.4.3 style
-         
+
         // add extra system properties... overwriting any of the hard coded values above.
         for (Map.Entry<String, Object> entry: systemProperties.entrySet())
         {
@@ -1057,12 +1063,12 @@ public class MavenGoals
 
         return element(name("systemProperties"), properties.toArray(new Element[properties.size()]));
         */
-        
+
         // NEW surefire 2.12 style
         for (Map.Entry<String, Object> entry: systemProperties.entrySet())
         {
             log.info("adding system property to configuration: " + entry.getKey() + "::" + entry.getValue());
-            
+
             properties.add(element(name(entry.getKey()),entry.getValue().toString()));
         }
 

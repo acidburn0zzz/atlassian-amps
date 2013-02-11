@@ -20,8 +20,18 @@ public class UnitTestMojo extends AbstractAmpsMojo
     @Parameter
     protected Map<String, Object> systemPropertyVariables = new HashMap<String, Object>();
 
+    /**
+     * Sets the excludedGroups element in surefire. This will allow your unit tests to be excluded
+     * depending on the value of this element. See {@link http://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#excludedGroups}
+     * Defaults to null.
+     *
+     * @since 4.1.5
+     */
+    @Parameter
+    protected String excludedGroups;
+
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        getMavenGoals().runUnitTests(systemPropertyVariables);
+        getMavenGoals().runUnitTests(systemPropertyVariables, excludedGroups);
     }
 }
