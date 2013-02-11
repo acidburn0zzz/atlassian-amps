@@ -24,8 +24,11 @@ public class UnitTestMojo extends AbstractAmpsMojo
     @MojoParameter
     protected Map<String, Object> systemPropertyVariables = new HashMap<String, Object>();
 
+    @MojoParameter
+    protected String excludedGroups;
+
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        getMavenGoals().runUnitTests(systemPropertyVariables);
+        getMavenGoals().runUnitTests(systemPropertyVariables, excludedGroups);
     }
 }

@@ -83,7 +83,7 @@ public class MavenGoals
             put("maven-dependency-plugin", "2.0");
             put("maven-resources-plugin", "2.3");
             put("maven-jar-plugin", "2.2");
-            put("maven-surefire-plugin", "2.4.3");
+            put("maven-surefire-plugin", "2.12.4");
 
         }};
 
@@ -264,6 +264,11 @@ public class MavenGoals
 
     public void runUnitTests(Map<String, Object> systemProperties) throws MojoExecutionException
     {
+        runUnitTests(systemProperties, null);
+    }
+
+    public void runUnitTests(Map<String, Object> systemProperties, String excludedGroups) throws MojoExecutionException
+    {
         final Element systemProps = convertPropsToElements(systemProperties);
 
         executeMojo(
@@ -277,7 +282,8 @@ public class MavenGoals
                         systemProps,
                         element(name("excludes"),
                                 element(name("exclude"), "it/**"),
-                                element(name("exclude"), "**/*$*"))
+                                element(name("exclude"), "**/*$*")),
+                        element(name("excludedGroups"), excludedGroups)
                 ),
                 executionEnvironment()
         );
