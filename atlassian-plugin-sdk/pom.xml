@@ -299,6 +299,5 @@
     </build>
     <properties>
         <script.output.directory>target/bin</script.output.directory>
-        <it.skip.tests>false</it.skip.tests>
     </properties>
 </project>

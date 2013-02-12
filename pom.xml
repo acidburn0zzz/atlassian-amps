@@ -330,6 +330,12 @@
                 <skipCodegenTests>true</skipCodegenTests>
             </properties>
         </profile>
+        <profile>
+            <id>release</id>
+            <properties>
+                <it.skip.tests>true</it.skip.tests>
+            </properties>
+        </profile>
     </profiles>
 
     <properties>
@@ -353,5 +359,6 @@
         <studio.version>108.2</studio.version>
         <studio.data.version>108.2-m0</studio.data.version>
         <skipCodegenTests>false</skipCodegenTests>
+        <it.skip.tests>false</it.skip.tests>
     </properties>
 </project>
