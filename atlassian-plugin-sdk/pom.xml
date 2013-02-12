@@ -279,7 +279,7 @@
                         </goals>
                         <phase>integration-test</phase>
                         <configuration>
-                            <skip>false</skip>
+                            <skip>${it.skip.tests}</skip>
                             <systemProperties>
                                 <property>
                                     <name>sdk.zip</name>
@@ -299,5 +299,6 @@
     </build>
     <properties>
         <script.output.directory>target/bin</script.output.directory>
+        <it.skip.tests>false</it.skip.tests>
     </properties>
 </project>
