@@ -86,7 +86,7 @@ public class MavenGoals
             put("maven-resources-plugin", "2.3");
             put("maven-jar-plugin", "2.2");
             //put("maven-surefire-plugin", "2.4.3");
-            put("maven-surefire-plugin", "2.12");
+            put("maven-surefire-plugin", "2.12.4");
             put("maven-failsafe-plugin", "2.9");
 
         }};
@@ -213,7 +213,7 @@ public class MavenGoals
                 return (o.getGroupId().equals("com.atlassian.plugins") && o.getArtifactId().equals("atlassian-plugins-osgi-test-utils"));
             }
         });
-        
+
         if(!testUtils.isEmpty())
         {
             executeMojo(
@@ -360,6 +360,11 @@ public class MavenGoals
 
     public void runUnitTests(Map<String, Object> systemProperties) throws MojoExecutionException
     {
+        runUnitTests(systemProperties, null);
+    }
+
+    public void runUnitTests(Map<String, Object> systemProperties, String excludedGroups) throws MojoExecutionException
+    {
         final Element systemProps = convertPropsToElements(systemProperties);
 
         executeMojo(
@@ -373,7 +378,8 @@ public class MavenGoals
                         systemProps,
                         element(name("excludes"),
                                 element(name("exclude"), "it/**"),
-                                element(name("exclude"), "**/*$*"))
+                                element(name("exclude"), "**/*$*")),
+                        element(name("excludedGroups"), excludedGroups)
                 ),
                 executionEnvironment()
         );
@@ -634,7 +640,7 @@ public class MavenGoals
                                 element(name("home"), container.getConfigDirectory(getBuildDirectory(), productInstanceId)),
                                 element(name("type"), "standalone"),
                                 element(name("properties"), props.toArray(new Element[props.size()]))
-                                
+
                         )
                 ),
                 executionEnvironment()
@@ -775,7 +781,7 @@ public class MavenGoals
 
         log.info("Failsafe integration-test configuration:");
         log.info(itconfig.toString());
-        
+
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -808,7 +814,7 @@ public class MavenGoals
 
         /*
         OLD surefire 2.4.3 style
-         
+
         // add extra system properties... overwriting any of the hard coded values above.
         for (Map.Entry<String, Object> entry: systemProperties.entrySet())
         {
@@ -820,12 +826,12 @@ public class MavenGoals
 
         return element(name("systemProperties"), properties.toArray(new Element[properties.size()]));
         */
-        
+
         // NEW surefire 2.12 style
         for (Map.Entry<String, Object> entry: systemProperties.entrySet())
         {
             log.info("adding system property to configuration: " + entry.getKey() + "::" + entry.getValue());
-            
+
             properties.add(element(name(entry.getKey()),entry.getValue().toString()));
         }
 
