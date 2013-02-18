@@ -28,6 +28,12 @@
         </dependency>
         <dependency>
             <groupId>com.atlassian.stash</groupId>
+            <artifactId>stash-spi</artifactId>
+            <version>\${dollar}{stash.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.stash</groupId>
             <artifactId>stash-page-objects</artifactId>
             <version>\${dollar}{stash.version}</version>
             <scope>provided</scope>
