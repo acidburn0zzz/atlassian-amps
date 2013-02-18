@@ -284,7 +284,7 @@
                             <goal>attached</goal>
                         </goals>
                         <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
+                            <appendAssemblyId>${it.skip.tests}</appendAssemblyId>
                             <descriptors>
                                 <descriptor>src/main/assembly/archive-tar.xml</descriptor>
                             </descriptors>
@@ -305,7 +305,7 @@
                         </goals>
                         <phase>integration-test</phase>
                         <configuration>
-                            <skipTests>false</skipTests>
+                            <skipTests>${it.skip.tests}</skipTests>
                             <systemProperties>
                                 <property>
                                     <name>sdk.zip</name>
