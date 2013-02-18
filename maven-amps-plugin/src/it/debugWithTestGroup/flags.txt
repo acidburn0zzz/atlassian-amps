@@ -2,6 +2,6 @@
 ${project.build.directory}/it/settings.xml
 -Dproduct.version=${product.version}
 -Dproduct.data.version=${product.data.version}
--Dhttp.port=${it.http.port}
--Drmi.port=${it.rmi.port}
+-Dhttp.port.bak=${it.http.port}
+-Drmi.port.bak=${it.rmi.port}
 -DtestGroup=bar
