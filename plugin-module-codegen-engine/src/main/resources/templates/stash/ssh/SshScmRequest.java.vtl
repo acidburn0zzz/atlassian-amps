@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class ${CLASSNAME} extends AbstractSshRequest {
+public class ${REQUEST_CLASSNAME} extends AbstractSshRequest {
 
-    private static final Logger log = LoggerFactory.getLogger(${CLASSNAME}.class);
+    private static final Logger log = LoggerFactory.getLogger(${REQUEST_CLASSNAME}.class);
 
     private static final int BUFFER_SIZE = 1024;
 
@@ -19,7 +19,7 @@ public class ${CLASSNAME} extends AbstractSshRequest {
     private final OutputStream out;
     private final ExitCodeCallback exitCodeCallback;
 
-    public ${CLASSNAME}(InputStream in, OutputStream out, ExitCodeCallback exitCodeCallback) {
+    public ${REQUEST_CLASSNAME}(InputStream in, OutputStream out, ExitCodeCallback exitCodeCallback) {
         this.in = in;
         this.out = out;
         this.exitCodeCallback = exitCodeCallback;

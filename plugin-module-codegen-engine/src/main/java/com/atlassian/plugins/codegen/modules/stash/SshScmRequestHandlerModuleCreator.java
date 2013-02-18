@@ -1,5 +1,6 @@
 package com.atlassian.plugins.codegen.modules.stash;
 
+import com.atlassian.plugins.codegen.ClassId;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.StashPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
@@ -14,17 +15,20 @@ public class SshScmRequestHandlerModuleCreator extends AbstractPluginModuleCreat
     private static final String TEMPLATE_PREFIX = "templates/stash/ssh/";
 
     private static final String REQUEST_TEMPLATE = TEMPLATE_PREFIX + "SshScmRequest.java.vtl";
+    private static final String REQUEST_TEST_TEMPLATE = TEMPLATE_PREFIX + "SshScmRequestTest.java.vtl";
     private static final String HANDLER_TEMPLATE = TEMPLATE_PREFIX + "SshScmRequestHandler.java.vtl";
+    private static final String HANDLER_TEST_TEMPLATE = TEMPLATE_PREFIX + "SshScmRequestHandlerTest.java.vtl";
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "ssh-request-handler-plugin.xml.vtl";
 
     @Override
     public PluginProjectChangeset createModule(SshScmRequestHandlerProperties props) throws Exception {
-        PluginProjectChangeset ret = new PluginProjectChangeset()
+        ClassId requestTestClass = testClassFor(props.getRequestClassId());
+        return new PluginProjectChangeset()
                 .with(MOCKITO_TEST)
-                .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
-
-        return ret.with(createClass(props, REQUEST_TEMPLATE))
-                  .with(createClass(props, props.getHandlerClassId(), HANDLER_TEMPLATE));
+                .with(createModule(props, PLUGIN_MODULE_TEMPLATE))
+                .with(createClass(props, props.getRequestClassId(), REQUEST_TEMPLATE))
+                .with(createTestClass(props.withClass(requestTestClass), requestTestClass, REQUEST_TEST_TEMPLATE))
+                .with(createClassAndTests(props, HANDLER_TEMPLATE, HANDLER_TEST_TEMPLATE));
     }
 
     @Override

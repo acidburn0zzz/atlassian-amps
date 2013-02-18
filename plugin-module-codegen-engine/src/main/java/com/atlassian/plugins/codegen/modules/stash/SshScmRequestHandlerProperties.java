@@ -9,47 +9,35 @@ public class SshScmRequestHandlerProperties extends BasicClassModuleProperties {
 
     public static final String FQ_HANDLER_CLASSNAME = "FQ_HANDLER_CLASSNAME";
     public static final String HANDLER_CLASSNAME = "HANDLER_CLASSNAME";
+    public static final String FQ_REQUEST_CLASSNAME = "FQ_REQUEST_CLASSNAME";
     public static final String REQUEST_CLASSNAME = "REQUEST_CLASSNAME";
 
-    private ClassId handlerClassId;
+    private ClassId requestClassId;
 
-    public SshScmRequestHandlerProperties(String fqClassName)
-    {
-        super(fqClassName);
+    public SshScmRequestHandlerProperties(String fqRequestClassName) {
+        this(fqRequestClassName, fqRequestClassName + "Handler");
     }
 
-    @Override
-    public void setFullyQualifiedClassname(String fqName)
-    {
-        super.setFullyQualifiedClassname(fqName);
-        setFullyQualifiedHandlerClassname(fqName + "Handler");
-        setRequestClassname(getClassId().getName());
+    private SshScmRequestHandlerProperties(String fqRequestClassName, String fqHandlerClassName) {
+        super(fqHandlerClassName);
+        setFullyQualifiedHandlerClassname(fqHandlerClassName);
+        setFullyQualifiedRequestClassname(fqRequestClassName);
     }
 
-    public void setRequestClassname(String name) {
-        setProperty(REQUEST_CLASSNAME, name);
+    public void setFullyQualifiedRequestClassname(String fqName) {
+        requestClassId = fullyQualified(fqName);
+        setProperty(FQ_REQUEST_CLASSNAME, fqName);
+        setProperty(REQUEST_CLASSNAME, requestClassId.getName());
     }
 
-    public void setFullyQualifiedHandlerClassname(String fqName)
-    {
-        handlerClassId = fullyQualified(fqName);
+    public void setFullyQualifiedHandlerClassname(String fqName) {
+        ClassId handlerClassId = fullyQualified(fqName);
         setProperty(FQ_HANDLER_CLASSNAME, fqName);
         setProperty(HANDLER_CLASSNAME, handlerClassId.getName());
     }
 
-    public ClassId getHandlerClassId()
-    {
-        return handlerClassId;
-    }
-
-    public String getFullyQualifiedHandlerClassname()
-    {
-        return handlerClassId.getFullName();
-    }
-
-    public String getHandlerClassname()
-    {
-        return handlerClassId.getName();
+    public ClassId getRequestClassId() {
+        return requestClassId;
     }
 
 }
