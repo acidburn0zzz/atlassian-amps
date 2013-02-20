@@ -1,0 +1,18 @@
+{namespace ${PACKAGE}}
+
+/**
+ * @param config
+ * @param? errors
+ */
+{template .view}
+    #foreach($FIELD in $FIELDS)
+    {call aui.form.textField}
+        {param id: '${FIELD}' /}
+        {param initialValue: $config['${FIELD}'] /}
+        {param labelContent: '${FIELD}'  /}
+        {param descriptionText: 'Some description for ${FIELD}' /}
+        {param errorTexts: $errors /}
+    {/call}
+    #end
+
+{/template}
