@@ -1,0 +1,68 @@
+package ${PACKAGE};
+
+import com.atlassian.stash.content.Changeset;
+import com.atlassian.stash.idx.IndexingContext;
+import com.atlassian.stash.repository.Repository;
+import com.atlassian.stash.user.Person;
+import com.google.common.collect.Lists;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Collections;
+
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import ${FQ_CLASS_UNDER_TEST};
+
+@RunWith(MockitoJUnitRunner.class)
+public class ${CLASSNAME} {
+
+    @Mock
+    Repository repository;
+    @Mock
+    Changeset changeset;
+    @Mock
+    Person author;
+    @Mock
+    IndexingContext indexingContext;
+
+    ${CLASS_UNDER_TEST} indexer;
+
+    @Before
+    public void setUp() {
+        when(changeset.getAuthor()).thenReturn(author);
+        indexer = new ${CLASS_UNDER_TEST}();
+    }
+
+    /**
+     * This example test adds a single changeset to the index, and verifies that the indexer under test successfully
+     * adds an attribute to the IndexingContext.
+     */
+    @Test
+    public void changesetAdded() {
+        when(author.getEmailAddress()).thenReturn("tim@atlassian.com");
+        simulateIndexerLifecycle(Lists.newArrayList(changeset), Collections.<Changeset>emptyList());
+        verify(indexingContext).put(eq("byAtlassian"), eq(true));
+        verifyNoMoreInteractions(indexingContext);
+    }
+
+    private void simulateIndexerLifecycle(Iterable<Changeset> added, Iterable<Changeset> removed) {
+        assertTrue(indexer.isEnabledForRepository(repository));
+        indexer.onBeforeIndexing(indexingContext);
+        for (Changeset changeset : added) {
+            indexer.onChangesetAdded(changeset, indexingContext);
+        }
+        for (Changeset changeset : removed) {
+            indexer.onChangesetRemoved(changeset, indexingContext);
+        }
+        indexer.onAfterIndexing(indexingContext);
+    }
+
+}

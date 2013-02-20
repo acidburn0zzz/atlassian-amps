@@ -1,10 +1,10 @@
-package com.atlassian.maven.plugins.amps.codegen.prompter.stash;
+package com.atlassian.maven.plugins.amps.codegen.prompter.stash.ssh;
 
 import com.atlassian.maven.plugins.amps.codegen.annotations.ModuleCreatorClass;
 import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter;
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-import com.atlassian.plugins.codegen.modules.stash.SshScmRequestHandlerModuleCreator;
-import com.atlassian.plugins.codegen.modules.stash.SshScmRequestHandlerProperties;
+import com.atlassian.plugins.codegen.modules.stash.ssh.SshScmRequestHandlerModuleCreator;
+import com.atlassian.plugins.codegen.modules.stash.ssh.SshScmRequestHandlerProperties;
 import com.atlassian.plugins.codegen.util.ClassnameUtil;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;

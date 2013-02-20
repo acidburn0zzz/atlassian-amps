@@ -1,4 +1,4 @@
-package com.atlassian.plugins.codegen.modules.stash;
+package com.atlassian.plugins.codegen.modules.stash.ssh;
 
 import com.atlassian.plugins.codegen.ClassId;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
