@@ -1,15 +1,17 @@
-package com.atlassian.plugins.codegen.modules.jira;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+package com.atlassian.plugins.codegen.modules.common.keyboard;
 
 import com.atlassian.plugins.codegen.modules.BasicNameModuleProperties;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @since 3.6
  */
-public class KeyboardShortcutProperties extends BasicNameModuleProperties
+public abstract class AbstractKeyboardShortcutProperties extends BasicNameModuleProperties
 {
 
     public static final String HIDDEN = "HIDDEN";
@@ -19,46 +21,29 @@ public class KeyboardShortcutProperties extends BasicNameModuleProperties
     public static final String OPERATION_VALUE = "OPERATION_VALUE";
     public static final String CONTEXT = "CONTEXT";
 
-    public static final List<String> ALLOWED_CONTEXTS = initContexts();
-    public static final List<String> ALLOWED_OPERATIONS = initOperations();
+    public static final List<String> OPERATIONS = Lists.newArrayList("click", "evaluate", "execute", "followLink",
+            "goTo", "moveToAndClick", "moveToAndFocus", "moveToNextItem", "moveToPrevItem");
 
-    private static List<String> initContexts()
-    {
-        List<String> contexts = new ArrayList<String>(3);
-        contexts.add("global");
-        contexts.add("issueaction");
-        contexts.add("issuenavigation");
+    private static final List<String> XPRODUCT_CONTEXTS = Lists.newArrayList("global");
 
-        return Collections.unmodifiableList(contexts);
-    }
+    private final List<String> allowedContexts;
 
-    private static List<String> initOperations()
-    {
-        List<String> operations = new ArrayList<String>();
-        operations.add("click");
-        operations.add("evaluate");
-        operations.add("execute");
-        operations.add("followLink");
-        operations.add("goTo");
-        operations.add("moveToAndClick");
-        operations.add("moveToAndFocus");
-        operations.add("moveToNextItem");
-        operations.add("moveToPrevItem");
-
-        return Collections.unmodifiableList(operations);
-    }
-
-    public KeyboardShortcutProperties()
+    public AbstractKeyboardShortcutProperties()
     {
         this("My Keyboard Shortcut");
     }
 
-    public KeyboardShortcutProperties(String moduleName)
+    public AbstractKeyboardShortcutProperties(String moduleName)
     {
         super(moduleName);
         setHidden(false);
         setOrder(10);
         setContext("global");
+        allowedContexts = ImmutableList.copyOf(Iterables.concat(XPRODUCT_CONTEXTS, getAdditionalContexts()));
+    }
+
+    public List<String> getAllowedContexts() {
+        return allowedContexts;
     }
 
     public void setHidden(boolean hidden)
@@ -124,5 +109,12 @@ public class KeyboardShortcutProperties extends BasicNameModuleProperties
     public String getOperationValue()
     {
         return getProperty(OPERATION_VALUE);
+    }
+
+    /**
+     * @return additional contexts allowed by the specific product the plugin is targeting
+     */
+    protected List<String> getAdditionalContexts() {
+        return Collections.emptyList();
     }
 }

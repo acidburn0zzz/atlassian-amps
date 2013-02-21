@@ -1,15 +1,14 @@
 package com.atlassian.maven.plugins.amps.codegen.prompter.jira;
 
-import java.util.Arrays;
-
 import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractPrompterTest;
 import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompter;
-import com.atlassian.plugins.codegen.modules.jira.KeyboardShortcutProperties;
-
+import com.atlassian.plugins.codegen.modules.jira.keyboard.JiraKeyboardShortcutProperties;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter.MODULE_DESCRIP_PROMPT;
 import static com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter.MODULE_KEY_PROMPT;
@@ -54,9 +53,9 @@ public class KeyboardShortcutPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Show Advanced Setup?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
-        KeyboardShortcutPrompter modulePrompter = new KeyboardShortcutPrompter(prompter);
+        JiraKeyboardShortcutPrompter modulePrompter = new JiraKeyboardShortcutPrompter(prompter);
         modulePrompter.setUseAnsiColor(false);
-        KeyboardShortcutProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
+        JiraKeyboardShortcutProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
         assertEquals("wrong module key", MODULE_KEY, props.getModuleKey());
@@ -92,9 +91,9 @@ public class KeyboardShortcutPrompterTest extends AbstractPrompterTest
 
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
-        KeyboardShortcutPrompter modulePrompter = new KeyboardShortcutPrompter(prompter);
+        JiraKeyboardShortcutPrompter modulePrompter = new JiraKeyboardShortcutPrompter(prompter);
         modulePrompter.setUseAnsiColor(false);
-        KeyboardShortcutProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
+        JiraKeyboardShortcutProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv module name", MODULE_NAME, props.getModuleName());
         assertEquals("wrong adv module key", ADV_MODULE_KEY, props.getModuleKey());
