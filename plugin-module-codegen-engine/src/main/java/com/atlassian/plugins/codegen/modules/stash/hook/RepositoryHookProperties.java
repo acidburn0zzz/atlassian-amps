@@ -1,4 +1,4 @@
-package com.atlassian.plugins.codegen.modules.stash;
+package com.atlassian.plugins.codegen.modules.stash.hook;
 
 import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
 import com.google.common.collect.Lists;

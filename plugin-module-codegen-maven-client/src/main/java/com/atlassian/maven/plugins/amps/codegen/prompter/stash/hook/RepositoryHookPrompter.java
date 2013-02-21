@@ -1,10 +1,10 @@
-package com.atlassian.maven.plugins.amps.codegen.prompter.stash;
+package com.atlassian.maven.plugins.amps.codegen.prompter.stash.hook;
 
 import com.atlassian.maven.plugins.amps.codegen.annotations.ModuleCreatorClass;
 import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter;
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-import com.atlassian.plugins.codegen.modules.stash.RepositoryHookModuleCreator;
-import com.atlassian.plugins.codegen.modules.stash.RepositoryHookProperties;
+import com.atlassian.plugins.codegen.modules.stash.hook.RepositoryHookModuleCreator;
+import com.atlassian.plugins.codegen.modules.stash.hook.RepositoryHookProperties;
 import com.atlassian.plugins.codegen.util.ClassnameUtil;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
