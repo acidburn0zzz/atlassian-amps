@@ -1,0 +1,30 @@
+package ${PACKAGE};
+
+import com.atlassian.stash.scm.ScmRequest;
+import com.atlassian.stash.scm.ScmRequestCheck;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.util.Calendar;
+
+public class ${CLASSNAME} implements ScmRequestCheck {
+
+    @Override
+    public boolean check(@Nonnull ScmRequest scmRequest) throws IOException {
+        // example code: prevent pushes and send a stern message to the client after 5pm on a Friday
+        if (scmRequest.isWrite() && isAfter5pmOnAFriday()) {
+            scmRequest.sendError("It's after 5pm!", "What are you still doing here? Go home!");
+            return false;
+        }
+        // end example code
+
+        return true;
+    }
+
+    public boolean isAfter5pmOnAFriday() {
+        Calendar now = Calendar.getInstance();
+        return now.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY &&
+               now.get(Calendar.HOUR_OF_DAY) >= 17;
+    }
+
+}
