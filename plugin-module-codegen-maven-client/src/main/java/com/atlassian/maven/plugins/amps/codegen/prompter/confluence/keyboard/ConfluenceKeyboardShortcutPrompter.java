@@ -7,14 +7,17 @@ import com.atlassian.plugins.codegen.modules.confluence.keyboard.ConfluenceKeybo
 import org.codehaus.plexus.components.interactivity.Prompter;
 
 @ModuleCreatorClass(ConfluenceKeyboardShortcutModuleCreator.class)
-public class ConfluenceKeyboardShortcutPrompter extends AbstractKeyboardShortcutPrompter<ConfluenceKeyboardShortcutProperties> {
+public class ConfluenceKeyboardShortcutPrompter extends AbstractKeyboardShortcutPrompter<ConfluenceKeyboardShortcutProperties>
+{
 
-    public ConfluenceKeyboardShortcutPrompter(Prompter prompter) {
+    public ConfluenceKeyboardShortcutPrompter(Prompter prompter)
+    {
         super(prompter);
     }
 
     @Override
-    protected ConfluenceKeyboardShortcutProperties createProperties(String moduleName) {
+    protected ConfluenceKeyboardShortcutProperties createProperties(String moduleName)
+    {
         return new ConfluenceKeyboardShortcutProperties(moduleName);
     }
 

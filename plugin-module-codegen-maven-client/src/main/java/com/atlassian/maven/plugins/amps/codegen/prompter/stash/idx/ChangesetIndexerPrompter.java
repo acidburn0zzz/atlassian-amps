@@ -10,14 +10,17 @@ import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 
 @ModuleCreatorClass(ChangesetIndexerModuleCreator.class)
-public class ChangesetIndexerPrompter extends AbstractModulePrompter<ChangesetIndexerProperties> {
+public class ChangesetIndexerPrompter extends AbstractModulePrompter<ChangesetIndexerProperties>
+{
 
-    public ChangesetIndexerPrompter(Prompter prompter) {
+    public ChangesetIndexerPrompter(Prompter prompter)
+    {
         super(prompter);
     }
 
     @Override
-    public ChangesetIndexerProperties promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException {
+    public ChangesetIndexerProperties promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException
+    {
         String className = promptJavaClassname("Enter New Classname", "MyChangesetIndexer");
         String packageName = promptJavaPackagename("Enter Package Name", getDefaultBasePackage() + ".idx");
 

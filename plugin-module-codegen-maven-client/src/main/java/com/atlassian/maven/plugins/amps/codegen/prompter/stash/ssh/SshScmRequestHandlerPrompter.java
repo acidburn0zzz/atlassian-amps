@@ -10,14 +10,17 @@ import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 
 @ModuleCreatorClass(SshScmRequestHandlerModuleCreator.class)
-public class SshScmRequestHandlerPrompter extends AbstractModulePrompter<SshScmRequestHandlerProperties> {
+public class SshScmRequestHandlerPrompter extends AbstractModulePrompter<SshScmRequestHandlerProperties>
+{
 
-    public SshScmRequestHandlerPrompter(Prompter prompter) {
+    public SshScmRequestHandlerPrompter(Prompter prompter)
+    {
         super(prompter);
     }
 
     @Override
-    public SshScmRequestHandlerProperties promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException {
+    public SshScmRequestHandlerProperties promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException
+    {
         String className = promptJavaClassname("Enter New Classname", "MySshRequest");
         String packageName = promptJavaPackagename("Enter Package Name", getDefaultBasePackage() + ".ssh");
 

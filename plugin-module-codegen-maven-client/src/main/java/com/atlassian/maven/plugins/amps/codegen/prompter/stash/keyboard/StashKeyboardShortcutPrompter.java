@@ -7,14 +7,17 @@ import com.atlassian.plugins.codegen.modules.stash.keyboard.StashKeyboardShortcu
 import org.codehaus.plexus.components.interactivity.Prompter;
 
 @ModuleCreatorClass(StashKeyboardShortcutModuleCreator.class)
-public class StashKeyboardShortcutPrompter extends AbstractKeyboardShortcutPrompter<StashKeyboardShortcutProperties> {
+public class StashKeyboardShortcutPrompter extends AbstractKeyboardShortcutPrompter<StashKeyboardShortcutProperties>
+{
 
-    public StashKeyboardShortcutPrompter(Prompter prompter) {
+    public StashKeyboardShortcutPrompter(Prompter prompter)
+    {
         super(prompter);
     }
 
     @Override
-    protected StashKeyboardShortcutProperties createProperties(String moduleName) {
+    protected StashKeyboardShortcutProperties createProperties(String moduleName)
+    {
         return new StashKeyboardShortcutProperties(moduleName);
     }
 

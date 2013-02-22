@@ -10,14 +10,17 @@ import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 
 @ModuleCreatorClass(ScmRequestCheckModuleCreator.class)
-public class ScmRequestCheckPrompter extends AbstractModulePrompter<ScmRequestCheckProperties> {
+public class ScmRequestCheckPrompter extends AbstractModulePrompter<ScmRequestCheckProperties>
+{
 
-    public ScmRequestCheckPrompter(Prompter prompter) {
+    public ScmRequestCheckPrompter(Prompter prompter)
+    {
         super(prompter);
     }
 
     @Override
-    public ScmRequestCheckProperties promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException {
+    public ScmRequestCheckProperties promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException
+    {
         String className = promptJavaClassname("Enter New Classname", "MyScmRequestCheck");
         String packageName = promptJavaPackagename("Enter Package Name", getDefaultBasePackage() + ".scm");
 
@@ -27,7 +30,8 @@ public class ScmRequestCheckPrompter extends AbstractModulePrompter<ScmRequestCh
     }
 
     @Override
-    public void promptForAdvancedProperties(ScmRequestCheckProperties props, PluginModuleLocation moduleLocation) throws PrompterException {
+    public void promptForAdvancedProperties(ScmRequestCheckProperties props, PluginModuleLocation moduleLocation) throws PrompterException
+    {
         // 150 puts it in the default request check pipeline after authz but before throttling
         props.setWeight(promptForInt("Weight", 150));
     }
