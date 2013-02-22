@@ -9,7 +9,8 @@ import javax.annotation.Nullable;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class ${CLASSNAME} implements SshScmRequestHandler {
+public class ${CLASSNAME} implements SshScmRequestHandler
+{
 
     private static final String COMMAND = "echo";
 
@@ -19,9 +20,11 @@ public class ${CLASSNAME} implements SshScmRequestHandler {
                                 @Nonnull InputStream in,
                                 @Nonnull OutputStream out,
                                 @Nonnull OutputStream error,
-                                @Nonnull ExitCodeCallback exitCodeCallback) {
+                                @Nonnull ExitCodeCallback exitCodeCallback)
+    {
         // check whether the command string is supported by this handler
-        if (remoteCommand.equalsIgnoreCase(COMMAND)) {
+        if (remoteCommand.equalsIgnoreCase(COMMAND))
+        {
             return new ${REQUEST_CLASSNAME}(in, out, exitCodeCallback);
         }
 

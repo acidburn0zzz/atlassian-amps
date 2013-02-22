@@ -8,7 +8,8 @@ import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 
 @StashPluginModuleCreator
-public class SshScmRequestHandlerModuleCreator extends AbstractPluginModuleCreator<SshScmRequestHandlerProperties> {
+public class SshScmRequestHandlerModuleCreator extends AbstractPluginModuleCreator<SshScmRequestHandlerProperties>
+{
 
     public static final String MODULE_NAME = "SSH Request Handler";
 
@@ -21,7 +22,8 @@ public class SshScmRequestHandlerModuleCreator extends AbstractPluginModuleCreat
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "ssh-request-handler-plugin.xml.vtl";
 
     @Override
-    public PluginProjectChangeset createModule(SshScmRequestHandlerProperties props) throws Exception {
+    public PluginProjectChangeset createModule(SshScmRequestHandlerProperties props) throws Exception
+    {
         ClassId requestTestClass = testClassFor(props.getRequestClassId());
         return new PluginProjectChangeset()
                 .with(MOCKITO_TEST)
@@ -32,7 +34,8 @@ public class SshScmRequestHandlerModuleCreator extends AbstractPluginModuleCreat
     }
 
     @Override
-    public String getModuleName() {
+    public String getModuleName()
+    {
         return MODULE_NAME;
     }
 

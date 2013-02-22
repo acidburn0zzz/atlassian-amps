@@ -9,7 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class ${REQUEST_CLASSNAME} extends AbstractSshRequest {
+public class ${REQUEST_CLASSNAME} extends AbstractSshRequest
+{
 
     private static final Logger log = LoggerFactory.getLogger(${REQUEST_CLASSNAME}.class);
 
@@ -19,19 +20,22 @@ public class ${REQUEST_CLASSNAME} extends AbstractSshRequest {
     private final OutputStream out;
     private final ExitCodeCallback exitCodeCallback;
 
-    public ${REQUEST_CLASSNAME}(InputStream in, OutputStream out, ExitCodeCallback exitCodeCallback) {
+    public ${REQUEST_CLASSNAME}(InputStream in, OutputStream out, ExitCodeCallback exitCodeCallback)
+    {
         this.in = in;
         this.out = out;
         this.exitCodeCallback = exitCodeCallback;
     }
 
     @Override
-    public void handleRequest() throws IOException {
+    public void handleRequest() throws IOException
+    {
         // example code (simply echoing the input stream back to client)
         final byte[] buffer = new byte[BUFFER_SIZE];
         long bytesCopied = 0;
         int n;
-        while (-1 != (n = in.read(buffer))) {
+        while (-1 != (n = in.read(buffer)))
+        {
             out.write(buffer, 0, n);
             out.flush();
             bytesCopied += n;

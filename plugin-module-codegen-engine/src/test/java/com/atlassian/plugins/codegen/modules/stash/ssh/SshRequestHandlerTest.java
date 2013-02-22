@@ -6,9 +6,11 @@ import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 
-public class SshRequestHandlerTest extends AbstractModuleCreatorTestCase<SshScmRequestHandlerProperties> {
+public class SshRequestHandlerTest extends AbstractModuleCreatorTestCase<SshScmRequestHandlerProperties>
+{
 
-    public SshRequestHandlerTest() {
+    public SshRequestHandlerTest()
+    {
         super("ssh-request-handler", new SshScmRequestHandlerModuleCreator());
     }
 

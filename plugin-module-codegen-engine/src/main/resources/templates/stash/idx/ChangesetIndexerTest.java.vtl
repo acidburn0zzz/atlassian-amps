@@ -22,7 +22,8 @@ import static org.mockito.Mockito.when;
 import ${FQ_CLASS_UNDER_TEST};
 
 @RunWith(MockitoJUnitRunner.class)
-public class ${CLASSNAME} {
+public class ${CLASSNAME}
+{
 
     @Mock
     Repository repository;
@@ -36,7 +37,8 @@ public class ${CLASSNAME} {
     ${CLASS_UNDER_TEST} indexer;
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         when(changeset.getAuthor()).thenReturn(author);
         indexer = new ${CLASS_UNDER_TEST}();
     }
@@ -46,20 +48,24 @@ public class ${CLASSNAME} {
      * adds an attribute to the IndexingContext.
      */
     @Test
-    public void changesetAdded() {
+    public void changesetAdded()
+    {
         when(author.getEmailAddress()).thenReturn("tim@atlassian.com");
         simulateIndexerLifecycle(Lists.newArrayList(changeset), Collections.<Changeset>emptyList());
         verify(indexingContext).put(eq("byAtlassian"), eq(true));
         verifyNoMoreInteractions(indexingContext);
     }
 
-    private void simulateIndexerLifecycle(Iterable<Changeset> added, Iterable<Changeset> removed) {
+    private void simulateIndexerLifecycle(Iterable<Changeset> added, Iterable<Changeset> removed)
+    {
         assertTrue(indexer.isEnabledForRepository(repository));
         indexer.onBeforeIndexing(indexingContext);
-        for (Changeset changeset : added) {
+        for (Changeset changeset : added)
+        {
             indexer.onChangesetAdded(changeset, indexingContext);
         }
-        for (Changeset changeset : removed) {
+        for (Changeset changeset : removed)
+        {
             indexer.onChangesetRemoved(changeset, indexingContext);
         }
         indexer.onAfterIndexing(indexingContext);

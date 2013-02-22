@@ -5,16 +5,19 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
-public class ConfluenceKeyboardShortcutProperties extends AbstractKeyboardShortcutProperties {
+public class ConfluenceKeyboardShortcutProperties extends AbstractKeyboardShortcutProperties
+{
 
     private static final List<String> CONFLUENCE_CONTEXTS = Lists.newArrayList("viewcontent", "viewinfo");
 
-    public ConfluenceKeyboardShortcutProperties(String moduleName) {
+    public ConfluenceKeyboardShortcutProperties(String moduleName)
+    {
         super(moduleName);
     }
 
     @Override
-    protected List<String> getAdditionalContexts() {
+    protected List<String> getAdditionalContexts()
+    {
         return CONFLUENCE_CONTEXTS;
     }
 

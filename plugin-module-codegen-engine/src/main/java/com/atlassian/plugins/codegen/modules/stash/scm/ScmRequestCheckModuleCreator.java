@@ -7,7 +7,8 @@ import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 
 @StashPluginModuleCreator
-public class ScmRequestCheckModuleCreator extends AbstractPluginModuleCreator<ScmRequestCheckProperties> {
+public class ScmRequestCheckModuleCreator extends AbstractPluginModuleCreator<ScmRequestCheckProperties>
+{
 
     public static final String MODULE_NAME = "SCM Request Check";
 
@@ -18,7 +19,8 @@ public class ScmRequestCheckModuleCreator extends AbstractPluginModuleCreator<Sc
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "scm-request-check-plugin.xml.vtl";
 
     @Override
-    public PluginProjectChangeset createModule(ScmRequestCheckProperties props) throws Exception {
+    public PluginProjectChangeset createModule(ScmRequestCheckProperties props) throws Exception
+    {
         return new PluginProjectChangeset()
                 .with(MOCKITO_TEST)
                 .with(createModule(props, PLUGIN_MODULE_TEMPLATE))
@@ -26,7 +28,8 @@ public class ScmRequestCheckModuleCreator extends AbstractPluginModuleCreator<Sc
     }
 
     @Override
-    public String getModuleName() {
+    public String getModuleName()
+    {
         return MODULE_NAME;
     }
 

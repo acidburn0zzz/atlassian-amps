@@ -42,7 +42,8 @@ public abstract class AbstractKeyboardShortcutProperties extends BasicNameModule
         allowedContexts = ImmutableList.copyOf(Iterables.concat(XPRODUCT_CONTEXTS, getAdditionalContexts()));
     }
 
-    public List<String> getAllowedContexts() {
+    public List<String> getAllowedContexts()
+    {
         return allowedContexts;
     }
 
@@ -114,7 +115,8 @@ public abstract class AbstractKeyboardShortcutProperties extends BasicNameModule
     /**
      * @return additional contexts allowed by the specific product the plugin is targeting
      */
-    protected List<String> getAdditionalContexts() {
+    protected List<String> getAdditionalContexts()
+    {
         return Collections.emptyList();
     }
 }

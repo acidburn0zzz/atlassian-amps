@@ -6,9 +6,11 @@ import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 
-public class ScmRequestCheckTest extends AbstractModuleCreatorTestCase<ScmRequestCheckProperties> {
+public class ScmRequestCheckTest extends AbstractModuleCreatorTestCase<ScmRequestCheckProperties>
+{
 
-    public ScmRequestCheckTest() {
+    public ScmRequestCheckTest()
+    {
         super("scm-request-check", new ScmRequestCheckModuleCreator());
     }
 

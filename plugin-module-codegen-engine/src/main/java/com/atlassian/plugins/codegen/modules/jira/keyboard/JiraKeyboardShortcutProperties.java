@@ -5,16 +5,19 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
-public class JiraKeyboardShortcutProperties extends AbstractKeyboardShortcutProperties {
+public class JiraKeyboardShortcutProperties extends AbstractKeyboardShortcutProperties
+{
 
     private static final List<String> JIRA_CONTEXTS = Lists.newArrayList("issueaction", "issuenavigation");
 
-    public JiraKeyboardShortcutProperties(String moduleName) {
+    public JiraKeyboardShortcutProperties(String moduleName)
+    {
         super(moduleName);
     }
 
     @Override
-    protected List<String> getAdditionalContexts() {
+    protected List<String> getAdditionalContexts()
+    {
         return JIRA_CONTEXTS;
     }
 

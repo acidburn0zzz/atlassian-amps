@@ -6,9 +6,11 @@ import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 
-public class ChangesetIndexerTest extends AbstractModuleCreatorTestCase<ChangesetIndexerProperties> {
+public class ChangesetIndexerTest extends AbstractModuleCreatorTestCase<ChangesetIndexerProperties>
+{
 
-    public ChangesetIndexerTest() {
+    public ChangesetIndexerTest()
+    {
         super("changeset-indexer", new ChangesetIndexerModuleCreator());
     }
 

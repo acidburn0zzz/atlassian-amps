@@ -19,7 +19,8 @@ import ${FQ_HANDLER_CLASSNAME};
 import ${FQ_REQUEST_CLASSNAME};
 
 @RunWith(MockitoJUnitRunner.class)
-public class ${REQUEST_CLASSNAME}Test {
+public class ${REQUEST_CLASSNAME}Test
+{
 
     @Mock
     ExitCodeCallback exitCodeCallback;
@@ -29,27 +30,32 @@ public class ${REQUEST_CLASSNAME}Test {
     SettableInputStream in;
 
     @Before
-    public void setup() {
+    public void setup()
+    {
         in = new SettableInputStream();
         out = new ByteArrayOutputStream();
         sshRequest = new ${REQUEST_CLASSNAME}(in, out, exitCodeCallback);
     }
 
     @Test
-    public void echo() throws Exception {
+    public void echo() throws Exception
+    {
         in.setBytes("Hello, Stash!".getBytes());
         sshRequest.handleRequest();
         assertEquals("Unexpected output from handleRequest()!", "Hello, Stash!", out.toString());
         verify(exitCodeCallback).onExit(eq(0));
     }
 
-    private static class SettableInputStream extends FilterInputStream {
+    private static class SettableInputStream extends FilterInputStream
+    {
 
-        private SettableInputStream() {
+        private SettableInputStream()
+        {
             super(new ByteArrayInputStream(new byte[0]));
         }
 
-        public void setBytes(byte[] bytes) {
+        public void setBytes(byte[] bytes)
+        {
             in = new ByteArrayInputStream(bytes);
         }
 

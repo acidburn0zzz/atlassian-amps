@@ -15,7 +15,8 @@ import static org.mockito.Mockito.*;
 import ${FQ_CLASS_UNDER_TEST};
 
 @RunWith(MockitoJUnitRunner.class)
-public class ${CLASSNAME} {
+public class ${CLASSNAME}
+{
 
     @Mock
     ScmRequest scmRequest;
@@ -23,13 +24,15 @@ public class ${CLASSNAME} {
     ${CLASS_UNDER_TEST} check;
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         check = new ${CLASS_UNDER_TEST}();
         when(scmRequest.isWrite()).thenReturn(true);
     }
 
     @Test
-    public void after5pmOnFriday() throws Exception {
+    public void after5pmOnFriday() throws Exception
+    {
         mockAfter5pmOnAFriday(true);
         assertFalse(check.check(scmRequest));
         verify(scmRequest).isWrite();
@@ -37,14 +40,16 @@ public class ${CLASSNAME} {
     }
 
     @Test
-    public void before5pmOnFriday() throws Exception {
+    public void before5pmOnFriday() throws Exception
+    {
         mockAfter5pmOnAFriday(false);
         assertTrue(check.check(scmRequest));
         verify(scmRequest).isWrite();
         verifyNoMoreInteractions(scmRequest);
     }
 
-    private void mockAfter5pmOnAFriday(boolean val) {
+    private void mockAfter5pmOnAFriday(boolean val)
+    {
         check = spy(check);
         when(check.isAfter5pmOnAFriday()).thenReturn(val);
     }

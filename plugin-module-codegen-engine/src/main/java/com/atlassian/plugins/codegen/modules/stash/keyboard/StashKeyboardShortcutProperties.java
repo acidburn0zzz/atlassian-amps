@@ -5,17 +5,20 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
-public class StashKeyboardShortcutProperties extends AbstractKeyboardShortcutProperties {
+public class StashKeyboardShortcutProperties extends AbstractKeyboardShortcutProperties
+{
 
     private static final List<String> STASH_CONTEXTS = Lists.newArrayList("branch", "changeset", "commits",
             "filebrowser", "sourceview");
 
-    public StashKeyboardShortcutProperties(String moduleName) {
+    public StashKeyboardShortcutProperties(String moduleName)
+    {
         super(moduleName);
     }
 
     @Override
-    protected List<String> getAdditionalContexts() {
+    protected List<String> getAdditionalContexts()
+    {
         return STASH_CONTEXTS;
     }
 
