@@ -18,6 +18,7 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 
+import com.atlassian.maven.plugins.amps.util.FileUtils;
 import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -28,7 +29,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.doesFileNameMatchArtifact;
 import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
-import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.iterateFiles;
 import static org.apache.commons.io.FileUtils.moveDirectory;
@@ -111,13 +111,13 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
 
                 File rootDir = getRootDir(tmpDir, ctx);
 
-                copyDirectory(rootDir, getBaseDirectory(ctx), true);
+                FileUtils.copyDirectory(rootDir, getBaseDirectory(ctx), true);
 
                 moveDirectory(tmp, homeDir);
             }
             else if (productHomeData.isDirectory())
             {
-                copyDirectory(productHomeData, homeDir);
+                FileUtils.copyDirectory(productHomeData, homeDir, true);
             }
         }
         catch (final IOException ex)
@@ -415,7 +415,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         final File srcDir = new File(project.getBasedir(), "src/test/resources/" + ctx.getInstanceId() + "-app");
         if (srcDir.exists() && appDir.exists())
         {
-            copyDirectory(srcDir, appDir);
+            FileUtils.copyDirectory(srcDir, appDir, true);
         }
     }
 
