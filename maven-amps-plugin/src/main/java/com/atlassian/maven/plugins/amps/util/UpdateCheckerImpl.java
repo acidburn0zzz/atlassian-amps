@@ -84,22 +84,26 @@ public class UpdateCheckerImpl extends AbstractLogEnabled implements UpdateCheck
     private void promptPlain(String latestVersion) throws PrompterException
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("Version " + latestVersion + " of the Atlassian Plugin SDK is now available.\n")
-          .append("Run the atlas-update command to install it.\n")
-          .append("Press ENTER to continue");
+        sb.append("************************************************************")
+          .append("Version " + latestVersion + " of the Atlassian Plugin SDK is now available.\n")
+          .append("Run the atlas-update command to update.\n")
+          .append("************************************************************");
 
-        prompter.prompt(sb.toString());
+        getLogger().warn(sb.toString());
+        // prompter.prompt(sb.toString());
     }
 
     private void promptAnsi(String latestVersion) throws PrompterException
     {
         ANSIBuffer ansiBuffer = new ANSIBuffer();
         ansiBuffer.append(ANSIBuffer.ANSICodes.attrib(PrettyPrompter.FG_YELLOW))
-                  .append("Version " + latestVersion + " of the Atlassian Plugin SDK is now available.\n")
-                  .append("Run the atlas-update command to install it.\n")
-                  .append(ANSIBuffer.ANSICodes.attrib(PrettyPrompter.OFF))
-                  .append("Press ENTER to continue");
-        prompter.prompt(ansiBuffer.toString());
+                  .append("************************************************************")
+                  .append("\nVersion " + latestVersion + " of the Atlassian Plugin SDK is now available.\n")
+                  .append("Run the atlas-update command to update.\n")
+                  .append("************************************************************")
+                  .append(ANSIBuffer.ANSICodes.attrib(PrettyPrompter.OFF));
+        getLogger().warn(ansiBuffer.toString());
+        // prompter.prompt(ansiBuffer.toString());
     }
 
     private boolean canUpdate(String currentVersion, String latestVersion) {
@@ -115,7 +119,7 @@ public class UpdateCheckerImpl extends AbstractLogEnabled implements UpdateCheck
         }
         
         if (forceCheck) {
-            getLogger().info("SDK update check forced by Maven property.");
+            getLogger().warn("SDK update check forced by Maven property.");
             return true;
         }
 
