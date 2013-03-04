@@ -1,0 +1,65 @@
+package ${PACKAGE};
+
+import com.atlassian.stash.scm.ssh.ExitCodeCallback;
+import com.atlassian.stash.scm.ssh.SshScmRequest;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import static junit.framework.Assert.assertNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+
+import ${FQ_CLASS_UNDER_TEST};
+import ${FQ_REQUEST_CLASSNAME};
+
+@RunWith(MockitoJUnitRunner.class)
+public class ${CLASSNAME}
+{
+
+    @Mock
+    InputStream in;
+    @Mock
+    OutputStream out;
+    @Mock
+    OutputStream error;
+    @Mock
+    ExitCodeCallback exitCodeCallback;
+
+    ${CLASS_UNDER_TEST} sshRequestHandler;
+
+    @Before
+    public void setUp()
+    {
+        sshRequestHandler = new ${CLASS_UNDER_TEST}();
+    }
+
+    @Test
+    public void echo()
+    {
+        assertCommandMatches("echo");
+        assertCommandMatches("eChO");
+    }
+
+    @Test
+    public void notEcho()
+    {
+        assertNull(createSshRequest("fishsticks"));
+    }
+
+    private void assertCommandMatches(String command)
+    {
+        assertThat(createSshRequest(command), instanceOf(${REQUEST_CLASSNAME}.class));
+    }
+
+    private SshScmRequest createSshRequest(String command)
+    {
+        return sshRequestHandler.create(command, in, out, error, exitCodeCallback);
+    }
+
+}

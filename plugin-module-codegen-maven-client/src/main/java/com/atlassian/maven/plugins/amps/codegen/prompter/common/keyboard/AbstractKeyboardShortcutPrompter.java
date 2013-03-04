@@ -1,59 +1,53 @@
-package com.atlassian.maven.plugins.amps.codegen.prompter.jira;
+package com.atlassian.maven.plugins.amps.codegen.prompter.common.keyboard;
+
+import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter;
+import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
+import com.atlassian.plugins.codegen.modules.common.keyboard.AbstractKeyboardShortcutProperties;
+import org.codehaus.plexus.components.interactivity.Prompter;
+import org.codehaus.plexus.components.interactivity.PrompterException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.atlassian.maven.plugins.amps.codegen.annotations.ModuleCreatorClass;
-import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-import com.atlassian.plugins.codegen.modules.jira.KeyboardShortcutModuleCreator;
-import com.atlassian.plugins.codegen.modules.jira.KeyboardShortcutProperties;
-
-import org.codehaus.plexus.components.interactivity.Prompter;
-import org.codehaus.plexus.components.interactivity.PrompterException;
-
 /**
  * @since 3.6
  */
-@ModuleCreatorClass(KeyboardShortcutModuleCreator.class)
-public class KeyboardShortcutPrompter extends AbstractModulePrompter<KeyboardShortcutProperties>
+public abstract class AbstractKeyboardShortcutPrompter<T extends AbstractKeyboardShortcutProperties> extends AbstractModulePrompter<T>
 {
 
-    public KeyboardShortcutPrompter(Prompter prompter)
+    public AbstractKeyboardShortcutPrompter(Prompter prompter)
     {
         super(prompter);
-
     }
 
     @Override
-    public KeyboardShortcutProperties promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException
+    public T promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException
     {
         suppressAdvancedNamePrompt();
 
         String moduleName = promptNotBlank("Enter Keyboard Shortcut Name", "My Keyboard Shortcut");
 
-        KeyboardShortcutProperties props = new KeyboardShortcutProperties(moduleName);
+        T props = createProperties(moduleName);
         props.setShortcut(promptNotBlank("Enter Shortcut Character"));
-        props.setContext(promptForContext());
+        props.setContext(promptForContext(props));
         props.setOperationType(promptForOperation());
         props.setOperationValue(promptNotBlank("Enter Operation Value"));
-
         return props;
     }
 
     @Override
-    public void promptForAdvancedProperties(KeyboardShortcutProperties props, PluginModuleLocation moduleLocation) throws PrompterException
+    public void promptForAdvancedProperties(AbstractKeyboardShortcutProperties props, PluginModuleLocation moduleLocation) throws PrompterException
     {
         props.setHidden(promptForBoolean("Hidden?", "N"));
         props.setOrder(promptForInt("Order", 10));
     }
 
-    protected String promptForOperation() throws PrompterException
+    private String promptForOperation() throws PrompterException
     {
         String operation = "";
-        List<String> operations = KeyboardShortcutProperties.ALLOWED_OPERATIONS;
+        List<String> operations = AbstractKeyboardShortcutProperties.OPERATIONS;
         StringBuilder operationQuery = new StringBuilder("Choose An Operation\n");
         List<String> indexChoices = new ArrayList<String>(operations.size());
         Map<String, String> indexedValues = new HashMap<String, String>();
@@ -75,10 +69,10 @@ public class KeyboardShortcutPrompter extends AbstractModulePrompter<KeyboardSho
         return operation;
     }
 
-    protected String promptForContext() throws PrompterException
+    private String promptForContext(T props) throws PrompterException
     {
         String context = "";
-        List<String> contexts = KeyboardShortcutProperties.ALLOWED_CONTEXTS;
+        List<String> contexts = props.getAllowedContexts();
         StringBuilder contextQuery = new StringBuilder("Choose A Context\n");
         List<String> indexChoices = new ArrayList<String>(contexts.size());
         Map<String, String> indexedValues = new HashMap<String, String>();
@@ -99,4 +93,7 @@ public class KeyboardShortcutPrompter extends AbstractModulePrompter<KeyboardSho
 
         return context;
     }
+
+    protected abstract T createProperties(String moduleName);
+
 }

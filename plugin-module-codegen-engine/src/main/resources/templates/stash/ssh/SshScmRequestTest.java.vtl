@@ -1,0 +1,64 @@
+package ${PACKAGE};
+
+import com.atlassian.stash.scm.ssh.ExitCodeCallback;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FilterInputStream;
+
+import static junit.framework.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+
+import ${FQ_HANDLER_CLASSNAME};
+import ${FQ_REQUEST_CLASSNAME};
+
+@RunWith(MockitoJUnitRunner.class)
+public class ${REQUEST_CLASSNAME}Test
+{
+
+    @Mock
+    ExitCodeCallback exitCodeCallback;
+
+    ${REQUEST_CLASSNAME} sshRequest;
+    ByteArrayOutputStream out;
+    SettableInputStream in;
+
+    @Before
+    public void setup()
+    {
+        in = new SettableInputStream();
+        out = new ByteArrayOutputStream();
+        sshRequest = new ${REQUEST_CLASSNAME}(in, out, exitCodeCallback);
+    }
+
+    @Test
+    public void echo() throws Exception
+    {
+        in.setBytes("Hello, Stash!".getBytes());
+        sshRequest.handleRequest();
+        assertEquals("Unexpected output from handleRequest()!", "Hello, Stash!", out.toString());
+        verify(exitCodeCallback).onExit(eq(0));
+    }
+
+    private static class SettableInputStream extends FilterInputStream
+    {
+
+        private SettableInputStream()
+        {
+            super(new ByteArrayInputStream(new byte[0]));
+        }
+
+        public void setBytes(byte[] bytes)
+        {
+            in = new ByteArrayInputStream(bytes);
+        }
+
+    }
+
+}

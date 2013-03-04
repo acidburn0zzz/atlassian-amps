@@ -1,0 +1,9 @@
+package com.atlassian.plugins.codegen.modules.confluence.keyboard;
+
+import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
+import com.atlassian.plugins.codegen.modules.common.keyboard.AbstractKeyboardShortcutModuleCreator;
+
+@ConfluencePluginModuleCreator
+public class ConfluenceKeyboardShortcutModuleCreator extends AbstractKeyboardShortcutModuleCreator<ConfluenceKeyboardShortcutProperties>
+{
+}
