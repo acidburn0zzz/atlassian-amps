@@ -1,0 +1,26 @@
+package ${PACKAGE};
+
+import com.atlassian.stash.hook.*;
+import com.atlassian.stash.hook.repository.*;
+import com.atlassian.stash.repository.*;
+import java.util.Collection;
+
+public class ${CLASSNAME} implements PreReceiveRepositoryHook
+{
+    /**
+     * Disables deletion of branches
+     */
+    @Override
+    public boolean onReceive(RepositoryHookContext context, Collection<RefChange> refChanges, HookResponse hookResponse)
+    {
+        for (RefChange refChange : refChanges)
+        {
+            if (refChange.getType() == RefChangeType.DELETE)
+            {
+                hookResponse.err().println("The ref '" + refChange.getRefId() + "' cannot be deleted.");
+                return false;
+            }
+        }
+        return true;
+    }
+}
