@@ -55,7 +55,7 @@ public class ResourcesMinifier
         }
 
         processJs(resourceDir,destDir,resource.getExcludes(),useClosureForJs,log);
-        processCss(resourceDir,destDir,resource.getExcludes());
+        processCss(resourceDir,destDir,resource.getExcludes(), log);
     }
     
     public void processJs(File resourceDir, File destDir, List<String> excludes, boolean useClosure, Log log)
@@ -89,6 +89,13 @@ public class ResourcesMinifier
             
             if(sourceFile.exists() && sourceFile.canRead())
             {
+                if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
+                {
+                    log.info("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
+                    continue;
+                }
+
+                log.info("compressing to " + destFile.getAbsolutePath());
                 if(useClosure)
                 {
                     closureJsCompile(sourceFile,destFile);
@@ -101,7 +108,7 @@ public class ResourcesMinifier
         }
     }
 
-    public void processCss(File resourceDir, File destDir, List<String> excludes)
+    public void processCss(File resourceDir, File destDir, List<String> excludes, Log log)
     {
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(resourceDir);
@@ -117,12 +124,18 @@ public class ResourcesMinifier
 
         for(String name : scanner.getIncludedFiles())
         {
-            File sourceFile = new File(destDir,name);
+            File sourceFile = new File(resourceDir,name);
             String baseName = FilenameUtils.removeExtension(name);
             File destFile = new File(destDir,baseName + "-min.css");
 
             if(sourceFile.exists() && sourceFile.canRead())
             {
+                if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
+                {
+                    log.info("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
+                    continue;
+                }
+                log.info("compressing to " + destFile.getAbsolutePath());
                 yuiCssCompile(sourceFile,destFile);
             }
         }
