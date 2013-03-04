@@ -82,7 +82,6 @@
                         <product>
                             <id>stash</id>
                             <instanceId>stash</instanceId>
-                            <containerId>\${dollar}{stash.containerId}</containerId>
                             <version>\${dollar}{stash.version}</version>
                             <dataVersion>\${dollar}{stash.data.version}</dataVersion>
                         </product>  
@@ -102,7 +101,6 @@
     <properties>
         <stash.version>${stash.version}</stash.version>
         <stash.data.version>${stash.version}</stash.data.version>
-        <stash.containerId>${stash.containerId}</stash.containerId>
         <amps.version>${project.version}</amps.version>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
     </properties>

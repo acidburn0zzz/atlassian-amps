@@ -20,6 +20,15 @@ public class StashProductHandler extends AbstractWebappProductHandler
         super(context, goals, new StashPluginProvider());
     }
 
+    @Override
+    public void cleanupProductHomeForZip(Product product, File snapshotDir) throws MojoExecutionException, IOException
+    {
+        super.cleanupProductHomeForZip(product, snapshotDir);
+        FileUtils.deleteQuietly(new File(snapshotDir, "log/atlassian-stash.log"));
+        FileUtils.deleteQuietly(new File(snapshotDir, ".osgi-cache"));
+    }
+
+    @Override
     public String getId()
     {
         return ProductHandlerFactory.STASH;
@@ -32,63 +41,10 @@ public class StashProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    public ProductArtifact getTestResourcesArtifact()
-    {
-        return new ProductArtifact("com.atlassian.stash", "stash-plugin-test-resources");
-    }
-
-    public int getDefaultHttpPort()
-    {
-        return 7990;
-    }
-/*
-    protected static File getHsqlDatabaseFile(final File homeDirectory)
-    {
-        return new File(homeDirectory, "database");
-    }*/
-
-    @Override
-    public Map<String, String> getSystemProperties(final Product ctx)
-    {
-        ImmutableMap.Builder<String, String> properties = ImmutableMap.<String, String>builder();
-        properties.putAll(super.getSystemProperties(ctx));
-        properties.put("stash.home", fixSlashes(getHomeDirectory(ctx).getPath()));
-
-        String baseUrl = MavenGoals.getBaseUrl(ctx, ctx.getHttpPort());
-        properties.put("baseurl", baseUrl);
-        properties.put("baseurl.display", baseUrl);
-        return properties.build();
-    }
-
-    private static String fixSlashes(final String path)
-    {
-        return path.replaceAll("\\\\", "/");
-    }
-
-    @Override
-    public File getUserInstalledPluginsDirectory(final File webappDir, final File homeDir)
-    {
-        return new File(new File(homeDir, "plugins"), "installed-plugins");
-    }
-
-    @Override
-    public List<ProductArtifact> getExtraContainerDependencies()
-    {
-        return Collections.emptyList();
-    }
-
-    @Override
     public File getBundledPluginPath(Product ctx, File appDir)
     {
         String bundledPluginPluginsPath = "WEB-INF/classes/stash-bundled-plugins.zip";
         return new File(appDir, bundledPluginPluginsPath);
-    }
-
-    @Override
-    public List<Replacement> getReplacements(Product ctx)
-    {
-        List<Replacement> replacements = super.getReplacements(ctx);
-        return replacements;
     }
 
     @Override
@@ -102,15 +58,64 @@ public class StashProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
+    public List<ProductArtifact> getDefaultBundledPlugins()
+    {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public String getDefaultContainerId()
+    {
+        return "tomcat7x";
+    }
+
+    @Override
+    public int getDefaultHttpPort()
+    {
+        return 7990;
+    }
+
+    @Override
     public List<ProductArtifact> getDefaultLibPlugins()
     {
         return Collections.emptyList();
     }
 
     @Override
-    public List<ProductArtifact> getDefaultBundledPlugins()
+    public List<ProductArtifact> getExtraContainerDependencies()
     {
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<Replacement> getReplacements(Product ctx)
+    {
+        return super.getReplacements(ctx);
+    }
+
+    @Override
+    public Map<String, String> getSystemProperties(final Product ctx)
+    {
+        ImmutableMap.Builder<String, String> properties = ImmutableMap.builder();
+        properties.putAll(super.getSystemProperties(ctx));
+        properties.put("stash.home", fixSlashes(getHomeDirectory(ctx).getPath()));
+
+        String baseUrl = MavenGoals.getBaseUrl(ctx, ctx.getHttpPort());
+        properties.put("baseurl", baseUrl);
+        properties.put("baseurl.display", baseUrl);
+        return properties.build();
+    }
+
+    @Override
+    public ProductArtifact getTestResourcesArtifact()
+    {
+        return new ProductArtifact("com.atlassian.stash", "stash-plugin-test-resources");
+    }
+
+    @Override
+    public File getUserInstalledPluginsDirectory(final File webappDir, final File homeDir)
+    {
+        return new File(new File(homeDir, "plugins"), "installed-plugins");
     }
 
     private static class StashPluginProvider extends AbstractPluginProvider
@@ -123,13 +128,9 @@ public class StashProductHandler extends AbstractWebappProductHandler
         }
     }
 
-    @Override
-    public void cleanupProductHomeForZip(Product product, File snapshotDir) throws MojoExecutionException, IOException
+    private static String fixSlashes(final String path)
     {
-        super.cleanupProductHomeForZip(product, snapshotDir);
-        FileUtils.deleteQuietly(new File(snapshotDir, "log/atlassian-stash.log"));
-        FileUtils.deleteQuietly(new File(snapshotDir, ".osgi-cache"));
+        return path.replaceAll("\\\\", "/");
     }
-
 
 }

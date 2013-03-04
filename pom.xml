@@ -353,9 +353,8 @@
         <clover.version>3.1.7</clover.version>
         <studio.version>108.2</studio.version>
         <studio.data.version>108.2-m0</studio.data.version>
-        <stash.containerId>tomcat7x</stash.containerId>
-        <stash.version>2.0.3</stash.version>
-        <stash.data.version>2.0.3</stash.data.version>
+        <stash.version>2.2.0</stash.version>
+        <stash.data.version>2.2.0</stash.data.version>
         <skipCodegenTests>false</skipCodegenTests>
         <plugin.testrunner.version>1.1</plugin.testrunner.version>
     </properties>
