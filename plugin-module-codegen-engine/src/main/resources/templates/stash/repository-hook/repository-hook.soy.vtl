@@ -5,14 +5,13 @@
  * @param? errors
  */
 {template .view}
-    #foreach($FIELD in $FIELDS)
+#foreach($FIELD in $FIELDS)
     {call aui.form.textField}
         {param id: '${FIELD}' /}
         {param initialValue: $config['${FIELD}'] /}
         {param labelContent: '${FIELD}'  /}
         {param descriptionText: 'Some description for ${FIELD}' /}
-        {param errorTexts: $errors /}
+        {param errorTexts: $errors ? $errors.${FIELD} : null /}
     {/call}
-    #end
-
+#end
 {/template}
