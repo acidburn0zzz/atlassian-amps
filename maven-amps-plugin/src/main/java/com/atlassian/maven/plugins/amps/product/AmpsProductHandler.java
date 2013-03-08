@@ -14,16 +14,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.atlassian.maven.plugins.amps.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
@@ -40,7 +37,6 @@ import com.google.common.collect.Lists;
  */
 public abstract class AmpsProductHandler implements ProductHandler
 {
-
     protected final MavenGoals goals;
     protected final MavenProject project;
     protected final MavenContext context;
@@ -115,7 +111,7 @@ public abstract class AmpsProductHandler implements ProductHandler
      * <ul>
      * This is a reference implementation. It is probable that each application has a different set of directories to delete.
      * @param product the product details
-     * @param homeDirectory an image of the home which will be zipped. This is not the working home, so you're free to remove files and parametrise them.
+     * @param snapshotDir an image of the home which will be zipped. This is not the working home, so you're free to remove files and parametrise them.
      * @throws IOException
      */
     public void cleanupProductHomeForZip(Product product, File snapshotDir) throws MojoExecutionException, IOException
@@ -287,6 +283,12 @@ public abstract class AmpsProductHandler implements ProductHandler
     public File getSnapshotDirectory(Product product)
     {
         return getHomeDirectory(product);
+    }
+
+    @Override
+    public String getDefaultContainerId()
+    {
+        return AmpsDefaults.DEFAULT_CONTAINER;
     }
 
     protected File createHomeDirectory(Product ctx)

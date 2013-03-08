@@ -161,7 +161,7 @@ public abstract class AbstractTabPanelTest extends AbstractModuleCreatorTestCase
         props.setLabel(label);
         props.setUseCustomClass(true);
         
-        Document viewDoc = DocumentHelper.parseText(getChangesetForModule(ResourceFile.class).get(0).getContent());
+        Document viewDoc = DocumentHelper.parseText(new String(getChangesetForModule(ResourceFile.class).get(0).getContent(), "UTF-8"));
         assertNotNull(viewDoc.selectSingleNode("/div/h3[text() = \"$i18n.getText('" + label.getKey() + "')\"]"));
     }
 }

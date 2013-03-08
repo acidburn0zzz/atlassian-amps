@@ -52,7 +52,7 @@ public class ProjectFilesRewriter implements ProjectRewriter
             }
             File newFile = new File(resourceDir, resourceFile.getName());
             Files.createParentDirs(newFile);
-            FileUtils.writeStringToFile(newFile, resourceFile.getContent());
+            FileUtils.writeByteArrayToFile(newFile, resourceFile.getContent());
         }
         if (changes.hasItems(I18nString.class))
         {

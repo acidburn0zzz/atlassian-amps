@@ -19,23 +19,37 @@
     <description>This is the \${groupId}:\${artifactId} plugin for Atlassian Stash.</description>
     <packaging>atlassian-plugin</packaging>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.atlassian.stash</groupId>
+                <artifactId>stash-parent</artifactId>
+                <version>\${dollar}{stash.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.atlassian.stash</groupId>
             <artifactId>stash-api</artifactId>
-            <version>\${dollar}{stash.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.stash</groupId>
+            <artifactId>stash-spi</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.stash</groupId>
             <artifactId>stash-page-objects</artifactId>
-            <version>\${dollar}{stash.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -82,7 +96,6 @@
                         <product>
                             <id>stash</id>
                             <instanceId>stash</instanceId>
-                            <containerId>\${dollar}{stash.containerId}</containerId>
                             <version>\${dollar}{stash.version}</version>
                             <dataVersion>\${dollar}{stash.data.version}</dataVersion>
                         </product>  
@@ -102,7 +115,6 @@
     <properties>
         <stash.version>${stash.version}</stash.version>
         <stash.data.version>${stash.version}</stash.data.version>
-        <stash.containerId>${stash.containerId}</stash.containerId>
         <amps.version>${project.version}</amps.version>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
     </properties>

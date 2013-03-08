@@ -1,7 +1,8 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
-
+import com.atlassian.plugins.codegen.modules.jira.keyboard.JiraKeyboardShortcutModuleCreator;
+import com.atlassian.plugins.codegen.modules.jira.keyboard.JiraKeyboardShortcutProperties;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,17 +11,17 @@ import static org.junit.Assert.assertEquals;
 /**
  * @since 3.6
  */
-public class KeyboardShortcutTest extends AbstractModuleCreatorTestCase<KeyboardShortcutProperties>
+public class KeyboardShortcutTest extends AbstractModuleCreatorTestCase<JiraKeyboardShortcutProperties>
 {
     public KeyboardShortcutTest()
     {
-        super("keyboard-shortcut", new KeyboardShortcutModuleCreator());
+        super("keyboard-shortcut", new JiraKeyboardShortcutModuleCreator());
     }
 
     @Before
     public void setupProps() throws Exception
     {
-        setProps(new KeyboardShortcutProperties("My Keyboard Shortcut"));
+        setProps(new JiraKeyboardShortcutProperties("My Keyboard Shortcut"));
         props.setIncludeExamples(false);
         props.setOperationType("click");
         props.setOperationValue("do:something");

@@ -8,7 +8,7 @@
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>4.1.5-SNAPSHOT</version>
+    <version>4.1.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
@@ -353,7 +353,6 @@
         <clover.version>3.1.7</clover.version>
         <studio.version>108.2</studio.version>
         <studio.data.version>108.2-m0</studio.data.version>
-        <stash.containerId>tomcat7x</stash.containerId>
         <stash.version>2.2.0</stash.version>
         <stash.data.version>2.2.0</stash.data.version>
         <skipCodegenTests>false</skipCodegenTests>

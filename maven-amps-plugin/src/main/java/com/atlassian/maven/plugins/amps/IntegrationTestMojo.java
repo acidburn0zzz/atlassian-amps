@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps;
 import java.io.File;
 import java.util.*;
 
+import com.atlassian.maven.plugins.amps.product.AmpsDefaults;
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
 
 import org.apache.commons.lang.StringUtils;
@@ -275,11 +276,11 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                 }
                 else
                 {
-                    return DEFAULT_CONTAINER;
+                    return AmpsDefaults.DEFAULT_CONTAINER;
                 }
             }
         }
-        return DEFAULT_CONTAINER;
+        return AmpsDefaults.DEFAULT_CONTAINER;
     }
 
 
