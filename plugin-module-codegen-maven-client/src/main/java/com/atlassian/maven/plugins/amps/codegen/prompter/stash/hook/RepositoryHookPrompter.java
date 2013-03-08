@@ -20,9 +20,9 @@ public class RepositoryHookPrompter extends AbstractModulePrompter<RepositoryHoo
     @Override
     public RepositoryHookProperties promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException
     {
-        String className = promptJavaClassname("Enter New Classname", "MyRepositoryHook");
-        String packageName = promptJavaPackagename("Enter Package Name", getDefaultBasePackage() + ".hook");
         String type = prompt("Enter Hook Type", RepositoryHookModuleCreator.TYPES, RepositoryHookModuleCreator.TYPE_DEFAULT);
+        String className = promptJavaClassname("Enter New Classname", RepositoryHookModuleCreator.DEFAULT_CLASS_NAME_BY_TYPE.get(type));
+        String packageName = promptJavaPackagename("Enter Package Name", getDefaultBasePackage() + ".hook");
 
         String fqClass = ClassnameUtil.fullyQualifiedName(packageName, className);
 
