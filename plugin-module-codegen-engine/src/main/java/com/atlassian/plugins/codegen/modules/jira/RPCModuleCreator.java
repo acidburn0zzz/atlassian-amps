@@ -9,6 +9,7 @@ import static com.atlassian.fugue.Option.option;
 import static com.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.modules.Dependencies.HTTPCLIENT_TEST;
 import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
+import static com.atlassian.plugins.codegen.modules.Dependencies.SLF4J;
 
 /**
  * @since 3.6
@@ -40,6 +41,7 @@ public class RPCModuleCreator extends AbstractPluginModuleCreator<RPCProperties>
         
         PluginProjectChangeset ret = new PluginProjectChangeset()
             .with(HTTPCLIENT_TEST,
+                  SLF4J,
                   MOCKITO_TEST)
             .with(createModule(props, props.isSoap() ? SOAP_PLUGIN_MODULE_TEMPLATE : XML_PLUGIN_MODULE_TEMPLATE));
 

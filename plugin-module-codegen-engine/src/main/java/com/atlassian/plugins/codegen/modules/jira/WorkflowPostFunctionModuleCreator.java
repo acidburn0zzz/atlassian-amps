@@ -5,6 +5,7 @@ import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 
 import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
+import static com.atlassian.plugins.codegen.modules.Dependencies.SLF4J;
 
 /**
  *
@@ -27,7 +28,8 @@ public class WorkflowPostFunctionModuleCreator extends AbstractPluginModuleCreat
     public PluginProjectChangeset createModule(WorkflowPostFunctionProperties props) throws Exception
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .with(MOCKITO_TEST)
+            .with(SLF4J,
+                  MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 
         String moduleKey = props.getModuleKey();
