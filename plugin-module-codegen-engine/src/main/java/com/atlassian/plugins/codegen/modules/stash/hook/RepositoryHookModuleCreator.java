@@ -53,7 +53,7 @@ public class RepositoryHookModuleCreator extends AbstractPluginModuleCreator<Rep
         if (props.ifConfigured())
         {
             // Name of the file isn't referenced by atlassian-plugin.xml
-            changeset = changeset.with(createResource(props, "static", "repository-hook.soy", SOY_TEMPLATE));
+            changeset = changeset.with(createResource(props, "static", props.getSoyFile(), SOY_TEMPLATE));
         }
         return changeset;
     }
