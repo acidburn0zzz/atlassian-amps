@@ -21,6 +21,7 @@ public class ProductHandlerFactory
     public static final String FECRU = "fecru";
     public static final String CROWD = "crowd";
     public static final String STASH = "stash";
+    public static final String CTK_SERVER = "ctk-server";
 
     public static final String STUDIO = "studio";
     public static final String STUDIO_CONFLUENCE = "studio-confluence";
@@ -62,6 +63,10 @@ public class ProductHandlerFactory
         {
             return new StashProductHandler(context, goals);
         }
+        else if (CTK_SERVER.equals(id))
+        {
+            return new CtkServerProductHandler(context, goals);
+        }
 
         // The Studio product itself
         else if (STUDIO.equals(id))
@@ -98,7 +103,7 @@ public class ProductHandlerFactory
 
     public static Collection<String> getIds()
     {
-        return Arrays.asList(REFAPP, CONFLUENCE, JIRA, BAMBOO, FECRU, CROWD, STASH,
+        return Arrays.asList(REFAPP, CONFLUENCE, JIRA, BAMBOO, FECRU, CROWD, STASH, CTK_SERVER,
                 STUDIO, STUDIO_CONFLUENCE, STUDIO_JIRA, STUDIO_BAMBOO, STUDIO_FECRU, STUDIO_CROWD);
     }
 }
