@@ -722,24 +722,6 @@ public class MavenGoals
 
     private void unpackContainer(final Container container) throws MojoExecutionException
     {
-        final String outputDirectory = container.getRootDirectory(getBuildDirectory());
-        unpack(container, container.getClassifier(), "zip", outputDirectory);
-    }
-
-    /**
-     * Unpack the given {@link ProductArtifact} into the given output directory.
-     * @param productArtifact the artifact to be fetched and unpacked
-     * @param outputDirectory the output directory where to extract the given artifact
-     * @throws MojoExecutionException
-     */
-    public void unpackProductArtifact(final ProductArtifact productArtifact, final String outputDirectory) throws MojoExecutionException
-    {
-        final String defaultClassifier = "";
-        unpack(productArtifact, defaultClassifier, productArtifact.getType(), outputDirectory);
-    }
-
-    private void unpack(final ProductArtifact productArtifact, final String classifier, final String type, final String outputDirectory) throws MojoExecutionException
-    {
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -750,12 +732,12 @@ public class MavenGoals
                 configuration(
                         element(name("artifactItems"),
                                 element(name("artifactItem"),
-                                        element(name("groupId"), productArtifact.getGroupId()),
-                                        element(name("artifactId"), productArtifact.getArtifactId()),
-                                        element(name("version"), productArtifact.getVersion()),
-                                        element(name("classifier"), classifier),
-                                        element(name("type"), type))),
-                        element(name("outputDirectory"), outputDirectory)
+                                        element(name("groupId"), container.getGroupId()),
+                                        element(name("artifactId"), container.getArtifactId()),
+                                        element(name("version"), container.getVersion()),
+                                        element(name("classifier"), container.getClassifier()),
+                                        element(name("type"), "zip"))),
+                        element(name("outputDirectory"), container.getRootDirectory(getBuildDirectory()))
                 ),
                 executionEnvironment());
     }

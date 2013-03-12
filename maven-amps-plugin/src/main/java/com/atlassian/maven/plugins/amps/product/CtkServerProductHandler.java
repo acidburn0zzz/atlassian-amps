@@ -9,6 +9,7 @@ import com.atlassian.maven.plugins.amps.util.ProjectUtils;
 import com.atlassian.maven.plugins.amps.util.ant.AntJavaExecutorThread;
 import com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.tools.ant.taskdefs.Java;
 
 import java.io.File;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
 import static com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory.output;
 
 /**
@@ -32,12 +34,14 @@ public class CtkServerProductHandler implements ProductHandler
     private final MavenContext context;
     private final MavenGoals goals;
     private final JavaTaskFactory javaTaskFactory;
+    private final Log log;
 
     public CtkServerProductHandler(final MavenContext context, final MavenGoals goals)
     {
         this.context = context;
         this.goals = goals;
         this.javaTaskFactory = new JavaTaskFactory(context.getLog());
+        this.log = context.getLog();
     }
 
     public String getId()
@@ -85,52 +89,100 @@ public class CtkServerProductHandler implements ProductHandler
     }
 
     @Override
-    public File getSnapshotDirectory(Product product)
+    public File getSnapshotDirectory(final Product product)
     {
         return getBaseDirectory(product);
     }
 
+    /**
+     * @param product the current product configuration
+     * @return the server is stateless, so no separate home directory
+     */
     @Override
-    public File getHomeDirectory(Product product)
+    public File getHomeDirectory(final Product product)
     {
         return getBaseDirectory(product);
     }
 
+    /**
+     * The server itself is stateless, so multiple running instances of the same version share the same base directory.
+     * @param product the current product configuration
+     * @return the directory containing the CTK server jar files and its dependencies (for the configured product
+     * version).
+     */
     @Override
-    public File getBaseDirectory(Product product)
+    public File getBaseDirectory(final Product product)
     {
-        return ProjectUtils.createDirectory(new File(context.getProject().getBuild().getDirectory(), product.getInstanceId()));
+        return ProjectUtils.createDirectory(new File(context.getProject().getBuild().getDirectory(), "ctk-server-" + product.getVersion()));
     }
 
     @Override
-    public List<ConfigFileUtils.Replacement> getReplacements(Product product)
+    public List<ConfigFileUtils.Replacement> getReplacements(final Product product)
     {
         return Collections.emptyList();
     }
 
     @Override
-    public List<File> getConfigFiles(Product product, File snapshotCopyDir)
+    public List<File> getConfigFiles(final Product product, final File snapshotCopyDir)
     {
         return Collections.emptyList();
     }
 
     @Override
-    public void createHomeZip(File homeDirectory, File targetZip, Product product) throws MojoExecutionException
+    public void createHomeZip(final File homeDirectory, final File targetZip, final Product product) throws MojoExecutionException
     {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void cleanupProductHomeForZip(Product product, File homeDirectory) throws MojoExecutionException, IOException
+    public void cleanupProductHomeForZip(final Product product, final File homeDirectory) throws MojoExecutionException, IOException
     {
         throw new UnsupportedOperationException();
     }
 
     private void unpackContainer(final Product product) throws MojoExecutionException
     {
+        final File baseDirectory = getBaseDirectory(product);
+        final String[] directoryContents = baseDirectory.list();
+        if (directoryContents == null || directoryContents.length == 0)
+        {
+            final File serverDistributionArtifactFile = copyServerArtifactToOutputDirectory(product);
+            unpackServerArtifact(serverDistributionArtifactFile, baseDirectory);
+            deleteServerArtifact(serverDistributionArtifactFile);
+        }
+        else
+        {
+            log.debug("CTK Server " + product.getVersion() + " already unpacked.");
+        }
+    }
+
+    private File copyServerArtifactToOutputDirectory(final Product product) throws MojoExecutionException
+    {
+        final File buildDirectory = new File(context.getProject().getBuild().getDirectory());
         final ProductArtifact serverDistributionArtifact = getServerDistributionArtifact(product);
-        final String outputDirectory = getBaseDirectory(product).getAbsolutePath();
-        goals.unpackProductArtifact(serverDistributionArtifact, outputDirectory);
+        final String filename = String.format("%s-%s.%s", serverDistributionArtifact.getArtifactId(), serverDistributionArtifact.getVersion(), serverDistributionArtifact.getType());
+        return goals.copyZip(buildDirectory, serverDistributionArtifact, filename);
+    }
+
+    private void unpackServerArtifact(final File serverDistributionArtifactFile, final File serverDirectory) throws MojoExecutionException
+    {
+        try
+        {
+            unzip(serverDistributionArtifactFile, serverDirectory.getPath(), 0);
+        }
+        catch (final IOException ex)
+        {
+            throw new MojoExecutionException("Unable to extract CTK server distribution: "  + serverDistributionArtifactFile, ex);
+        }
+    }
+
+    private void deleteServerArtifact(final File serverDistributionArtifactFile)
+    {
+        log.debug("Deleting CTK server distribution artifact: " + serverDistributionArtifactFile.getPath());
+        if(!serverDistributionArtifactFile.delete())
+        {
+            log.warn("Failed to delete CTK server distribution artifact: " + serverDistributionArtifactFile.getPath());
+        }
     }
 
     private void startContainer(final Product product)
