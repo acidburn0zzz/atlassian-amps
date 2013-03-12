@@ -579,7 +579,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         if (product.getContextPath() == null)
         {
-            product.setContextPath("/" + handler.getId());
+            product.setContextPath(handler.getDefaultContextPath());
         }
         
         if (product.getDataSources() == null)

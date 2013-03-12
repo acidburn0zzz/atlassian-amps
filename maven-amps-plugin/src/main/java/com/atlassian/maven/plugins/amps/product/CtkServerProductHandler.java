@@ -52,6 +52,12 @@ public class CtkServerProductHandler implements ProductHandler
     }
 
     @Override
+    public String getDefaultContextPath()
+    {
+        return "/";
+    }
+
+    @Override
     public int start(final Product product) throws MojoExecutionException
     {
         unpackContainer(product);

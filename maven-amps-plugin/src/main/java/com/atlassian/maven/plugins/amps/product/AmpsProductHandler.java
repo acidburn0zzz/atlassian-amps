@@ -286,6 +286,12 @@ public abstract class AmpsProductHandler implements ProductHandler
     }
 
     @Override
+    public String getDefaultContextPath()
+    {
+        return "/" + getId();
+    }
+
+    @Override
     public String getDefaultContainerId()
     {
         return AmpsDefaults.DEFAULT_CONTAINER;
