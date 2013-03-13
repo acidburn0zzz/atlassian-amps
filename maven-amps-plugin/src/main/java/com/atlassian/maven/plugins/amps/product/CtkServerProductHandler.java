@@ -31,6 +31,8 @@ import static com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory.output;
  */
 public class CtkServerProductHandler implements ProductHandler
 {
+    private static final String CTK_SERVER_ARTIFACT_MATCHER = "federated-api-ctk-server-.*\\.jar";
+
     private final MavenContext context;
     private final MavenGoals goals;
     private final JavaTaskFactory javaTaskFactory;
@@ -223,12 +225,12 @@ public class CtkServerProductHandler implements ProductHandler
             @Override
             public boolean accept(final File dir, final String name)
             {
-                return name.matches("federated-api-ctk-server-.*\\.jar");
+                return name.matches(CTK_SERVER_ARTIFACT_MATCHER);
             }
         });
         if (files.length == 0)
         {
-            throw new IllegalStateException("Jar file containing the CTK server could not be found in: " + baseDirectory);
+            throw new IllegalStateException("CTK server jar file not found in: " + baseDirectory + " (expected file to match: " + CTK_SERVER_ARTIFACT_MATCHER + ")");
         }
         else if (files.length == 1)
         {
@@ -236,7 +238,7 @@ public class CtkServerProductHandler implements ProductHandler
         }
         else
         {
-            throw new IllegalStateException("Found more than one jar file name like the CTK server: " + Arrays.toString(files));
+            throw new IllegalStateException("Found too CTK server jar files, expected only one: " + Arrays.toString(files));
         }
     }
 
