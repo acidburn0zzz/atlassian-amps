@@ -86,6 +86,10 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
     @Override
     public void processHomeDirectory(final Product ctx, final File homeDir) throws MojoExecutionException
     {
+        /* Replace %TOKENS% */
+        super.processHomeDirectory(ctx, homeDir);
+
+        /* Now Crowd-specific config changes */
         String baseUrl = MavenGoals.getBaseUrl(ctx, ctx.getHttpPort());
 
         /* Crowd connects back to itself; use 'localhost' rather than the hostname an external client would see */
