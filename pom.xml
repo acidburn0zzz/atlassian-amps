@@ -346,6 +346,6 @@
         <studio.data.version>108.2-m0</studio.data.version>
         <stash.version>2.2.0</stash.version>
         <stash.data.version>2.2.0</stash.data.version>
-        <plugin.testrunner.version>1.1</plugin.testrunner.version>
+        <plugin.testrunner.version>1.1.1</plugin.testrunner.version>
     </properties>
 </project>
