@@ -6,6 +6,7 @@ import com.atlassian.plugins.codegen.annotations.StashPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 
 import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
+import static com.atlassian.plugins.codegen.modules.Dependencies.SLF4J;
 
 @StashPluginModuleCreator
 public class SshScmRequestHandlerModuleCreator extends AbstractPluginModuleCreator<SshScmRequestHandlerProperties>
@@ -26,6 +27,7 @@ public class SshScmRequestHandlerModuleCreator extends AbstractPluginModuleCreat
     {
         ClassId requestTestClass = testClassFor(props.getRequestClassId());
         return new PluginProjectChangeset()
+                .with(SLF4J)
                 .with(MOCKITO_TEST)
                 .with(createModule(props, PLUGIN_MODULE_TEMPLATE))
                 .with(createClass(props, props.getRequestClassId(), REQUEST_TEMPLATE))

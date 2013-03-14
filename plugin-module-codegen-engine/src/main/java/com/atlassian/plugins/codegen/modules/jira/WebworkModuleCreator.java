@@ -1,17 +1,14 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
-import java.util.Map;
-
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
-
 import com.google.common.collect.ImmutableMap;
-
 import org.apache.commons.io.FilenameUtils;
 
-import static com.atlassian.plugins.codegen.modules.Dependencies.HTTPCLIENT_TEST;
-import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
+import java.util.Map;
+
+import static com.atlassian.plugins.codegen.modules.Dependencies.*;
 
 /**
  * @since 3.6
@@ -39,7 +36,8 @@ public class WebworkModuleCreator extends AbstractPluginModuleCreator<WebworkPro
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
             .with(HTTPCLIENT_TEST,
-                              MOCKITO_TEST)
+                  SLF4J,
+                  MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 
         if (props.includeExamples())

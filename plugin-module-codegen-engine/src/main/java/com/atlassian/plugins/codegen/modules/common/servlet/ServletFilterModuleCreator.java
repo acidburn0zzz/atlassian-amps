@@ -4,9 +4,7 @@ import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.*;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 
-import static com.atlassian.plugins.codegen.modules.Dependencies.HTTPCLIENT_TEST;
-import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
-import static com.atlassian.plugins.codegen.modules.Dependencies.SERVLET_API;
+import static com.atlassian.plugins.codegen.modules.Dependencies.*;
 
 /**
  * @since 3.6
@@ -37,6 +35,7 @@ public class ServletFilterModuleCreator extends AbstractPluginModuleCreator<Serv
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
             .with(SERVLET_API,
+                  SLF4J,
                   HTTPCLIENT_TEST,
                   MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
