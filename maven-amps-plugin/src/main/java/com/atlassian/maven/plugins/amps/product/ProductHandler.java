@@ -27,6 +27,8 @@ public interface ProductHandler
 
     int getDefaultHttpPort();
 
+    String getDefaultContextPath();
+
     String getDefaultContainerId();
 
     /**
