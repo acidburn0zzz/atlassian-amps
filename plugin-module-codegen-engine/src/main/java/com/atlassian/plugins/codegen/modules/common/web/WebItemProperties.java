@@ -117,7 +117,16 @@ public class WebItemProperties extends AbstractWebFragmentProperties
 
     public void addParam(String name, String value)
     {
-        ((Map<String, String>) get(PARAMS)).put(name, value);
+        getParams().put(name, value);
     }
 
+    public String getParam(String name)
+    {
+        return getParams().get(name);
+    }
+
+    private Map<String, String> getParams()
+    {
+        return ((Map<String, String>) get(PARAMS));
+    }
 }
