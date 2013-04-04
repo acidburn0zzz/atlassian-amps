@@ -22,7 +22,7 @@ import static org.junit.Assert.assertThat;
 /**
  * @since 4.1.7
  */
-public class BlueprintCreatorTest extends AbstractModuleCreatorTestCase<BlueprintProperties>
+public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<BlueprintProperties>
 {
     // The Properties under test
     private BlueprintProperties blueprintProps;
@@ -51,7 +51,7 @@ public class BlueprintCreatorTest extends AbstractModuleCreatorTestCase<Blueprin
     private String webItemResourceLocation;
     private String webItemSection;
 
-    public BlueprintCreatorTest()
+    public BlueprintModuleCreatorTest()
     {
         super("blueprint", new BlueprintModuleCreator());
     }
