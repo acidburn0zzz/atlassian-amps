@@ -81,8 +81,8 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
 
         // Template(s)
         prompter.showMessage(
-            "\nBlueprints Templates are in Confluence XHTML Storage format. A single Blueprint may create Pages based" +
-            "on multiple templates, so you may specify more than one template key."
+            "\nBlueprints Templates are in Confluence XHTML Storage format. A single Blueprint may create " +
+                "Confluence Pages based on multiple templates, so you may specify more than one template key."
         );
         int templateCounter = 0;
         do
