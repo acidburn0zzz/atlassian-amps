@@ -15,6 +15,7 @@ import java.util.List;
 
 import static com.atlassian.maven.plugins.amps.codegen.prompter.confluence.blueprint.BlueprintPrompter.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.WEB_ITEM_BLUEPRINT_KEY;
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -65,12 +66,13 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         assertEquals("Wrong number of content templates", expectedTemplates.size(), actualTemplates.size());
         for (int i = 0; i < expectedTemplates.size(); i++)
         {
-            ContentTemplateProperties expectedTemplate = expectedTemplates.get(i);
-            ContentTemplateProperties actualTemplate = actualTemplates.get(i);
+            ContentTemplateProperties expected = expectedTemplates.get(i);
+            ContentTemplateProperties actual = actualTemplates.get(i);
 
-            assertNameBasedModulesEqual(expectedTemplate, actualTemplate);
+            assertNameBasedModulesEqual(expected, actual);
+            assertEquals(expected.getContentText(), actual.getContentText());
 
-            assertResourcesEqual(expectedTemplate.getResources(), actualTemplate.getResources());
+            assertResourcesEqual(expected.getResources(), actual.getResources());
         }
     }
 
@@ -145,6 +147,7 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         template.setModuleName("FooPrint Content Template 0");
         template.setDescriptionI18nKey("foo-plate.desc");
         template.setDescription("Contains Storage-format XML used by the FooPrint Blueprint");
+        template.setContentText(templateModuleKey + ".content.text", CONTENT_I18N_DEFAULT_VALUE);
 
         Resource templateResource = new Resource();
         templateResource.setName("template");

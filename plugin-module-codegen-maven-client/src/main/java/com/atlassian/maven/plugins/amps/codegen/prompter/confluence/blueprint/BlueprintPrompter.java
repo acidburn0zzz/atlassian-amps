@@ -15,6 +15,7 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 import java.util.List;
 
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
 
 /**
  * Prompts for creation of Confluence Blueprint-related modules.
@@ -45,11 +46,11 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
     {
         showMessage(
             "Confluence Blueprints help users create, organise and share Confluence content.\n" +
-            "A basic Blueprint consists of 3 plugin modules:\n" +
-            "\t<blueprint> - for general Blueprint configuration\n" +
-            "\t<content-template> - (one or more) provides content XML for the Blueprint\n" +
-            "\t<web-item> - displays the Blueprint in the Create dialog\n" +
-            "For further details on Blueprints, see https://developer.atlassian.com/display/CONFDEV/Writing+a+Blueprint"
+                "A basic Blueprint consists of 3 plugin modules:\n" +
+                "\t<blueprint> - for general Blueprint configuration\n" +
+                "\t<content-template> - (one or more) provides content XML for the Blueprint\n" +
+                "\t<web-item> - displays the Blueprint in the Create dialog\n" +
+                "For further details on Blueprints, see https://developer.atlassian.com/display/CONFDEV/Writing+a+Blueprint"
         );
 
         BlueprintProperties props = new BlueprintProperties();
@@ -58,7 +59,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         // Index key
         showMessage(
             "Blueprints are grouped by an Index Key that will determine the keys of the Blueprint plugin modules,\n" +
-            "and appear as a Label on each created Blueprint page."
+                "and appear as a Label on each created Blueprint page."
         );
         // TODO - make sure the key is a valid *label* and also prefix for module keys.
         String indexKey = promptNotBlank(INDEX_KEY_PROMPT, INDEX_KEY_DEFAULT);
@@ -71,8 +72,8 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         // Name and Description
         showMessage(
             "The Blueprints will be displayed in the Create dialog via a web-item with a name, description and icon.\n" +
-            "The i18n keys for the name and description will be automatically generated for your Blueprint but can be\n" +
-            "changed later."
+                "The i18n keys for the name and description will be automatically generated for your Blueprint but can be\n" +
+                "changed later."
         );
 
         String webItemName = promptNotBlank(WEB_ITEM_NAME_PROMPT, WEB_ITEM_NAME_DEFAULT);
@@ -84,7 +85,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         // Template(s)
         showMessage(
             "Blueprints Templates are in Confluence XHTML Storage format. A single Blueprint may create " +
-            "Confluence Pages based on multiple templates, so you may specify more than one template key."
+                "Confluence Pages based on multiple templates, so you may specify more than one template key."
         );
         int templateCounter = 0;
         do
@@ -106,7 +107,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
             // TODO - have a separate prompter to just add one content-template later????
             showMessage(
                 "If you added more than one Template, you'll need to provide a way for users to choose between them.\n" +
-                "See the documentation on developer.atlassian.com for details on how to do this.");
+                    "See the documentation on developer.atlassian.com for details on how to do this.");
         }
 
         return props;
@@ -126,6 +127,8 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         template.setDescription("Contains Storage-format XML used by the " + webItemName + " Blueprint");
         template.setNameI18nKey(contentTemplateKey + ".name");
         template.setDescriptionI18nKey(contentTemplateKey + ".desc");
+        template.setContentText(contentTemplateKey + ".content.text", CONTENT_I18N_DEFAULT_VALUE);
+
         Resource templateResource = new Resource();
         templateResource.setName("template");
         templateResource.setType("download");

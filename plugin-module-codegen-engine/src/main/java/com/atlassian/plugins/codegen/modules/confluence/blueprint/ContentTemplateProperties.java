@@ -1,5 +1,6 @@
 package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
+import com.atlassian.fugue.Pair;
 import com.atlassian.plugins.codegen.modules.AbstractNameBasedModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.ContextProvider;
 import com.atlassian.plugins.codegen.modules.common.Resource;
@@ -20,6 +21,7 @@ public class ContentTemplateProperties extends AbstractNameBasedModuleProperties
     public static final String CONTEXT_PROVIDER = "CONTEXT_PROVIDER";
     public static final String CONTENT_I18N_KEY = "CONTENT_I18N_KEY";
     public static final String CONTENT_I18N_VALUE = "CONTENT_I18N_VALUE";
+    public static final String CONTENT_I18N_DEFAULT_VALUE = "This text will replace the at:i18n placeholder in the content template XML.";
 
     public ContentTemplateProperties(String moduleKey)
     {
@@ -69,5 +71,10 @@ public class ContentTemplateProperties extends AbstractNameBasedModuleProperties
             .putAll(super.getI18nProperties())
             .put(getProperty(CONTENT_I18N_KEY), getProperty(CONTENT_I18N_VALUE))
             .build();
+    }
+
+    public Pair getContentText()
+    {
+        return new Pair(getProperty(CONTENT_I18N_KEY), getProperty(CONTENT_I18N_VALUE));
     }
 }
