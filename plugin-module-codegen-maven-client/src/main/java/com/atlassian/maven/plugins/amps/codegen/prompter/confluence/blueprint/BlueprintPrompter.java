@@ -24,7 +24,8 @@ import static com.atlassian.plugins.codegen.modules.confluence.blueprint.Bluepri
 @ModuleCreatorClass(BlueprintModuleCreator.class)
 public class BlueprintPrompter extends AbstractModulePrompter<BlueprintProperties>
 {
-    public static final String INDEX_KEY_PROMPT = "Enter Index Key (e.g. file-list, meeting-note)";
+    // TODO - remove publics
+    static final String INDEX_KEY_PROMPT = "Enter Index Key (e.g. file-list, meeting-note)";
     public static final String WEB_ITEM_NAME_PROMPT = "Enter Blueprint name (e.g. File List, Meeting Note)";
     public static final String WEB_ITEM_DESC_PROMPT = "Enter Blueprint description";
     public static final String CONTENT_TEMPLATE_KEY_PROMPT = "Enter Content Template key";
@@ -59,6 +60,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
             "\nBlueprints are grouped by an Index Key that will determine the keys of the Blueprint plugin modules,\n" +
                 "and appear as a Label on each created Blueprint page."
         );
+        // TODO - make sure the key is a valid *label* and also prefix for module keys.
         String indexKey = promptNotBlank(INDEX_KEY_PROMPT, INDEX_KEY_DEFAULT);
         props.setProperty(INDEX_KEY, indexKey);
 
@@ -101,6 +103,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         while(promptForBoolean(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT, "N"));
         if (templateCounter > 1)
         {
+            // TODO - have a separate prompter to just add one content-template later????
             prompter.showMessage(
                 "If you added more than one Template, you'll need to provide a way for users to choose between them.\n" +
                 "See the documentation on developer.atlassian.com for details on how to do this.\n");
@@ -128,6 +131,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         return template;
     }
 
+    // TODO - this stuff in a separate class with tests?? dT
     private String makeBlueprintModuleKey(String indexKey)
     {
         return indexKey + "-blueprint";
@@ -137,6 +141,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
     {
         WebItemProperties webItem = new WebItemProperties();
 
+        // TODO - i18n key should be prefixed with the plugin key for uniqueness.
         webItem.setModuleKey(blueprintModuleKey + "-web-item");
         webItem.setModuleName(webItemName);
         webItem.setDescription(webItemDesc);
