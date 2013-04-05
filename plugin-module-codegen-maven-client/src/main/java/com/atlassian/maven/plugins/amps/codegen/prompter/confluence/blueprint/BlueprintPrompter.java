@@ -43,22 +43,22 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
     @Override
     public BlueprintProperties promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException
     {
-        prompter.showMessage(
-            "\nConfluence Blueprints help users create, organise and share Confluence content\n" +
+        showMessage(
+            "Confluence Blueprints help users create, organise and share Confluence content.\n" +
             "A basic Blueprint consists of 3 plugin modules:\n" +
             "\t<blueprint> - for general Blueprint configuration\n" +
             "\t<content-template> - (one or more) provides content XML for the Blueprint\n" +
             "\t<web-item> - displays the Blueprint in the Create dialog\n" +
             "For further details on Blueprints, see https://developer.atlassian.com/display/CONFDEV/Writing+a+Blueprint"
-            );
+        );
 
         BlueprintProperties props = new BlueprintProperties();
 
 
         // Index key
-        prompter.showMessage(
-            "\nBlueprints are grouped by an Index Key that will determine the keys of the Blueprint plugin modules,\n" +
-                "and appear as a Label on each created Blueprint page."
+        showMessage(
+            "Blueprints are grouped by an Index Key that will determine the keys of the Blueprint plugin modules,\n" +
+            "and appear as a Label on each created Blueprint page."
         );
         // TODO - make sure the key is a valid *label* and also prefix for module keys.
         String indexKey = promptNotBlank(INDEX_KEY_PROMPT, INDEX_KEY_DEFAULT);
@@ -69,10 +69,10 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
 
 
         // Name and Description
-        prompter.showMessage(
-            "\nThe Blueprints will be displayed in the Create dialog via a web-item with a name, description and icon.\n" +
-                "The i18n keys for the name and description will be automatically generated for your Blueprint but can be\n" +
-                "changed later."
+        showMessage(
+            "The Blueprints will be displayed in the Create dialog via a web-item with a name, description and icon.\n" +
+            "The i18n keys for the name and description will be automatically generated for your Blueprint but can be\n" +
+            "changed later."
         );
 
         String webItemName = promptNotBlank(WEB_ITEM_NAME_PROMPT, WEB_ITEM_NAME_DEFAULT);
@@ -82,9 +82,9 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
 
 
         // Template(s)
-        prompter.showMessage(
-            "\nBlueprints Templates are in Confluence XHTML Storage format. A single Blueprint may create " +
-                "Confluence Pages based on multiple templates, so you may specify more than one template key."
+        showMessage(
+            "Blueprints Templates are in Confluence XHTML Storage format. A single Blueprint may create " +
+            "Confluence Pages based on multiple templates, so you may specify more than one template key."
         );
         int templateCounter = 0;
         do
@@ -104,12 +104,18 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         if (templateCounter > 1)
         {
             // TODO - have a separate prompter to just add one content-template later????
-            prompter.showMessage(
+            showMessage(
                 "If you added more than one Template, you'll need to provide a way for users to choose between them.\n" +
-                "See the documentation on developer.atlassian.com for details on how to do this.\n");
+                "See the documentation on developer.atlassian.com for details on how to do this.");
         }
 
         return props;
+    }
+
+    // Shows a message, padded at top and bottom.
+    private void showMessage(String message) throws PrompterException
+    {
+        prompter.showMessage("\n" + message + "\n");
     }
 
     private ContentTemplateProperties makeContentTemplate(String contentTemplateKey, String webItemName, int counter)
