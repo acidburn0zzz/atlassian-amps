@@ -18,6 +18,7 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public static final String WEB_ITEM = "WEB_ITEM";
     public static final String WEB_ITEM_BLUEPRINT_KEY = "blueprintKey";
     public static final String CONTENT_TEMPLATES = "CONTENT_TEMPLATES";
+    private static final String HOW_TO_USE_TEMPLATE = "HOW_TO_USE_TEMPLATE";
 
     public BlueprintProperties()
     {
@@ -53,5 +54,15 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public String getIndexKey()
     {
         return getProperty(INDEX_KEY);
+    }
+
+    public void setHowToUseTemplate(String howToUseTemplate)
+    {
+        setProperty(HOW_TO_USE_TEMPLATE, howToUseTemplate);
+    }
+
+    public String getHowToUseTemplate()
+    {
+        return getProperty(HOW_TO_USE_TEMPLATE);
     }
 }

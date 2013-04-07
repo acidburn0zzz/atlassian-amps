@@ -34,6 +34,8 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
     public static final String INDEX_KEY_DEFAULT = "my-blueprint";
     public static final String WEB_ITEM_NAME_DEFAULT = "My Blueprint";
     public static final String WEB_ITEM_DESC_DEFAULT = "Creates pages based on my Blueprint.";
+    public static final String HOW_TO_USE_PROMPT = "Add a How-to-Use page to your Blueprint?";
+    public static final String ADVANCED_BLUEPRINT_PROMPT = "Add advanced Blueprint features?";
 
     public BlueprintPrompter(Prompter prompter)
     {
@@ -46,12 +48,12 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
     {
         showMessage(
             "Confluence Blueprints help users create, organise and share Confluence content.\n" +
-                "A basic Blueprint consists of 3 plugin modules:\n" +
-                "\t<blueprint> - for general Blueprint configuration\n" +
-                "\t<content-template> - (one or more) provides content XML for the Blueprint\n" +
-                "\t<web-item> - displays the Blueprint in the Create dialog\n" +
-                "For further details on Blueprints, see https://developer.atlassian.com/display/CONFDEV/Writing+a+Blueprint"
-        );
+            "A basic Blueprint consists of 3 plugin modules:\n" +
+            "\t<blueprint> - for general Blueprint configuration\n" +
+            "\t<content-template> - (one or more) provides content XML for the Blueprint\n" +
+            "\t<web-item> - displays the Blueprint in the Create dialog\n" +
+            "For further details on Blueprints, see https://developer.atlassian.com/display/CONFDEV/Writing+a+Blueprint"
+            );
 
         BlueprintProperties props = new BlueprintProperties();
 
@@ -76,10 +78,10 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                 "changed later."
         );
 
-        String webItemName = promptNotBlank(WEB_ITEM_NAME_PROMPT, WEB_ITEM_NAME_DEFAULT);
-        String webItemDesc = promptNotBlank(WEB_ITEM_DESC_PROMPT, WEB_ITEM_DESC_DEFAULT);
-        props.setWebItem(makeWebItem(indexKey, blueprintModuleKey, webItemName, webItemDesc));
-        props.setModuleName(webItemName + " Blueprint");    // TODO - stuff like this needs its own class and unit test?
+        String blueprintName = promptNotBlank(WEB_ITEM_NAME_PROMPT, WEB_ITEM_NAME_DEFAULT);
+        String blueprintDesc = promptNotBlank(WEB_ITEM_DESC_PROMPT, WEB_ITEM_DESC_DEFAULT);
+        props.setWebItem(makeWebItem(indexKey, blueprintModuleKey, blueprintName, blueprintDesc));
+        props.setModuleName(blueprintName + " Blueprint");    // TODO - stuff like this needs its own class and unit test?
 
 
         // Template(s)
@@ -97,7 +99,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
             }
             String contentTemplateKey = promptNotBlank(CONTENT_TEMPLATE_KEY_PROMPT, defaultValue);
 
-            ContentTemplateProperties contentTemplate = makeContentTemplate(contentTemplateKey, webItemName, templateCounter);
+            ContentTemplateProperties contentTemplate = makeContentTemplate(contentTemplateKey, blueprintName, templateCounter);
             props.addContentTemplate(contentTemplate);
             templateCounter++;
         }
@@ -110,7 +112,33 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                     "See the documentation on developer.atlassian.com for details on how to do this.");
         }
 
+        // Advanced
+        showMessage(
+            "That's all you need to enter to create a working Blueprint! However, this SDK can create richer Blueprints\n" +
+            "with How-to-Use pages, JavaScript wizards and custom Index page."
+        );
+        if (promptForBoolean(ADVANCED_BLUEPRINT_PROMPT, "N"))
+        {
+            showAdvancedBlueprintPrompts(props, blueprintName);
+        }
+
         return props;
+    }
+
+    private void showAdvancedBlueprintPrompts(BlueprintProperties props, String blueprintName) throws PrompterException
+    {
+        // How-to-use
+        showMessage(
+            "How-to-Use pages are shown in the Create dialog when a user selects your Blueprint, and can be used to\n" +
+            "familiarise the user with what your Blueprint does and how it works. All Blueprints shipped with\n" +
+            "Confluence include a How-to-use page and recommend them for most Blueprints."
+        );
+        if (promptForBoolean(HOW_TO_USE_PROMPT, "N"));
+        {
+            // TODO - better util for cleaning up user-entered data. dT
+            String howToUseTemplate = "Confluence.Blueprints.Plugin." + blueprintName.replaceAll("\\W", "") + ".howToUse";
+            props.setHowToUseTemplate(howToUseTemplate);
+        }
     }
 
     // Shows a message, padded at top and bottom.

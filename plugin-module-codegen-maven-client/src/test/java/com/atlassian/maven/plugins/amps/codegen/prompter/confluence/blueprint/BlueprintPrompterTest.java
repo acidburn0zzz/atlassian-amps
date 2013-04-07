@@ -45,11 +45,7 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         expectedProps.addContentTemplate(makeExpectedContentTemplateProperties());
 
         // Fake the User input at the prompt.
-        when(prompter.prompt(INDEX_KEY_PROMPT, INDEX_KEY_DEFAULT)).thenReturn(blueprintIndexKey);
-        when(prompter.prompt(WEB_ITEM_NAME_PROMPT, WEB_ITEM_NAME_DEFAULT)).thenReturn(webItemName);
-        when(prompter.prompt(WEB_ITEM_DESC_PROMPT, WEB_ITEM_DESC_DEFAULT)).thenReturn(webItemDesc);
-        when(prompter.prompt(CONTENT_TEMPLATE_KEY_PROMPT, blueprintIndexKey + "-template")).thenReturn(templateModuleKey);
-        when(prompter.prompt(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
+        mockPromptResponses();
 
         // The magic happens here!
         BlueprintProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
@@ -58,6 +54,34 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         assertBlueprintProperties(expectedProps, props);
         assertWebItemProperties(expectedProps.getWebItem(), props.getWebItem());
         assertContentTemplatePropertiesEqual(expectedProps.getContentTemplates(), props.getContentTemplates());
+    }
+
+    @Test
+    public void howToUseTemplateAdded() throws PrompterException
+    {
+        BlueprintPrompter modulePrompter = new BlueprintPrompter(prompter);
+        modulePrompter.setUseAnsiColor(false);
+
+        // Fake the User input at the prompt.
+        mockPromptResponses();
+        when(prompter.prompt(ADVANCED_BLUEPRINT_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
+        when(prompter.prompt(HOW_TO_USE_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
+
+        // The magic happens here!
+        BlueprintProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
+
+        String expectedHowToUse = "Confluence.Blueprints.Plugin.FooPrint.howToUse";
+        assertEquals(expectedHowToUse, props.getHowToUseTemplate());
+    }
+
+    private void mockPromptResponses() throws PrompterException
+    {
+        when(prompter.prompt(INDEX_KEY_PROMPT, INDEX_KEY_DEFAULT)).thenReturn(blueprintIndexKey);
+        when(prompter.prompt(WEB_ITEM_NAME_PROMPT, WEB_ITEM_NAME_DEFAULT)).thenReturn(webItemName);
+        when(prompter.prompt(WEB_ITEM_DESC_PROMPT, WEB_ITEM_DESC_DEFAULT)).thenReturn(webItemDesc);
+        when(prompter.prompt(CONTENT_TEMPLATE_KEY_PROMPT, blueprintIndexKey + "-template")).thenReturn(templateModuleKey);
+        when(prompter.prompt(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
+        when(prompter.prompt(ADVANCED_BLUEPRINT_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
     }
 
     private void assertContentTemplatePropertiesEqual(List<ContentTemplateProperties> expectedTemplates,
@@ -113,6 +137,7 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         assertEquals("Wrong module key", expected.getModuleKey(), actual.getModuleKey());
         assertEquals("Wrong module name", expected.getModuleName(), actual.getModuleName());
         assertEquals("Wrong index key", expected.getIndexKey(), actual.getIndexKey());
+        assertEquals("Wrong how-to-use template", expected.getHowToUseTemplate(), actual.getHowToUseTemplate());
 
         assertNameBasedModulesEqual(expected, actual);
     }
@@ -152,7 +177,7 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         Resource templateResource = new Resource();
         templateResource.setName("template");
         templateResource.setType("download");
-        templateResource.setLocation("xml/"+templateModuleKey+".xml");
+        templateResource.setLocation("xml/" + templateModuleKey + ".xml");
         template.addResource(templateResource);
         return template;
     }
