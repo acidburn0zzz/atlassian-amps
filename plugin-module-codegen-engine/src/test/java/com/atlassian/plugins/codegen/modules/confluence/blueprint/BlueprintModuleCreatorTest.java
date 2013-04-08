@@ -3,9 +3,14 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.ResourceFile;
+import com.atlassian.plugins.codegen.modules.AbstractNameBasedModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformation;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformerProperties;
 import com.google.common.collect.Lists;
+import org.dom4j.Element;
 import org.dom4j.Element;
 import org.junit.After;
 import org.junit.Before;
@@ -16,8 +21,7 @@ import java.util.List;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.INDEX_KEY;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.WEB_ITEM_BLUEPRINT_KEY;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * @since 4.1.7
@@ -149,17 +153,18 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     @Test
     public void webItemModuleBasicSettings() throws Exception
     {
-        Element webItemModule = getGeneratedModule("web-item");
-        assertNodeText(webItemModule, "@key", webItemModuleKey);
-        assertNodeText(webItemModule, "@i18n-name-key", webItemNameI18nKey);
-        assertNodeText(webItemModule, "@section", webItemSection);
-        assertNodeText(webItemModule, "description/@key", webItemDescI18nKey);
-        assertNodeText(webItemModule, "param/@name", WEB_ITEM_BLUEPRINT_KEY);
-        assertNodeText(webItemModule, "param/@value", blueprintModuleKey);
+        Element module = getGeneratedModule("web-item");
+        assertNameBasedModuleProperties(module, blueprintProps.getWebItem());
+        assertNodeText(module, "@key", webItemModuleKey);
+        assertNodeText(module, "@i18n-name-key", webItemNameI18nKey);
+        assertNodeText(module, "@section", webItemSection);
+        assertNodeText(module, "description/@key", webItemDescI18nKey);
+        assertNodeText(module, "param/@name", WEB_ITEM_BLUEPRINT_KEY);
+        assertNodeText(module, "param/@value", blueprintModuleKey);
 
-        assertNodeText(webItemModule, "resource/@name", webItemResourceName);
-        assertNodeText(webItemModule, "resource/@type", webItemResourceType);
-        assertNodeText(webItemModule, "resource/@location", webItemResourceLocation);
+        assertNodeText(module, "resource/@name", webItemResourceName);
+        assertNodeText(module, "resource/@type", webItemResourceType);
+        assertNodeText(module, "resource/@location", webItemResourceLocation);
 
         assertI18nString(webItemNameI18nKey, webItemName);
         assertI18nString(webItemDescI18nKey, webItemDesc);
@@ -171,6 +176,91 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         // Check the content of the generated icon file
         // TODO - BAD! The icon should be specified in a CSS resource file! We should generate a stub for the CSS
         // selector that allows a) the default icon to be used if not specified b) the plugin dev to add a data-url.
+    }
+
+    @Test
+    public void howToUseTemplateIsAdded() throws Exception
+    {
+        // TODO - still need a tested util class to generate these strings! dT
+        String soyNamespace = "Confluence.Blueprints.Plugin." + webItemName.replaceAll("\\W", "");
+        String template = soyNamespace + ".howToUse";
+        blueprintProps.setHowToUseTemplate(template);
+
+        WebResourceProperties webResource = makeWebResourceProperties();
+        blueprintProps.setWebResource(webResource);
+
+        // 1. The blueprint element should have a new attribute with the how-to-use template reference
+        Element blueprintModule = getGeneratedModule();
+        assertNodeText(blueprintModule, "@how-to-use-template", template);
+
+        // 2. There should be a Soy file containing the referenced template
+        String soy = new String(getResourceFile("soy", "my-templates.soy").getContent());
+        assertThat(soy, containsString("{namespace " + soyNamespace + "}"));
+        assertThat(soy, containsString("{template .howToUse}"));
+
+        // 3. There should be a web-resource pointing to the new file
+        Element webResourceModule = getGeneratedModule("web-resource");
+        assertWebResource(webResourceModule, webResource);
+
+        // 4. There should new entries in the i18n file for the template
+        assertI18nString(howToUseContentI18nKey, howToUseContentValue);
+
+        // TODO - 5. There should (?) be CSS rules for the template
+    }
+
+    private void assertWebResource(Element element, WebResourceProperties resourceProperties)
+    {
+        assertNameBasedModuleProperties(element, resourceProperties);
+
+        // TODO - not sure how best to test here. There should be a unit test confirming that transformations get
+        // rendered to XML correctly, but other than that THIS test just needs to confirm that our BlueprintCreator is
+        // in fact adding WebResources that do have the correct transformation. Hmm, that's more of a test for the
+        // Prompter? Or the generator?
+        assertNotNull(element.selectSingleNode("transformation"));
+    }
+
+    private void assertNameBasedModuleProperties(Element element, AbstractNameBasedModuleProperties props)
+    {
+        assertNodeText(element, "@key", props.getModuleKey());
+        assertNodeText(element, "@name", props.getModuleName());
+        assertNodeText(element, "@i18n-name-key", props.getNameI18nKey());
+        assertNodeText(element, "description/@key", props.getDescriptionI18nKey());
+        assertNodeText(element, "description/@key", props.getDescription());
+    }
+
+    private WebResourceProperties makeWebResourceProperties()
+    {
+        WebResourceProperties properties = new WebResourceProperties();
+
+        // Basic module properties
+        properties.setModuleKey("foo-print-resource");
+        properties.setModuleName("FooPrint Web Resources");
+        properties.setNameI18nKey("foo-print.web-resources.name");
+        properties.setDescription("Provides JS, CSS and Soy resources for the FooPrint Blueprint");
+        properties.setDescriptionI18nKey("foo-print.web-resources.desc");
+
+        // Soy transformer
+        WebResourceTransformation transformation = new WebResourceTransformation("soy");
+        WebResourceTransformerProperties transformer = new WebResourceTransformerProperties();
+        transformer.setModuleKey("soyTransformer");
+        transformer.addFunctions("com.atlassian.confluence.plugins.soy:soy-core-functions");
+        transformation.addTransformer(transformer);
+        properties.addTransformation(transformation);
+
+        // TODO - this property generation should be done by that BlueprintPropertiesGenerator util class. dT
+        Resource soyResource = new Resource();
+        // <resource type="download" name="templates-soy.js" location="com/atlassian/confluence/plugins/hello_blueprint/soy/templates.soy" />
+        soyResource.setType("download");
+        soyResource.setName("templates-soy.js");
+        soyResource.setLocation("soy/templates.soy");
+        properties.addResource(soyResource);
+        
+        properties.addDependency("com.atlassian.confluence.plugins.confluence-create-content-plugin:resources");
+        
+        properties.addContext("atl.general");
+        properties.addContext("atl.admin");
+
+        return properties;
     }
 
     // Not sure why the changeset isn't always being cached during the test? Pull request comment please :) dT

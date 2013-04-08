@@ -46,6 +46,11 @@ public class WebResourceProperties extends AbstractConditionsProperties
         put(RESOURCES, resources);
     }
 
+    public void addResource(Resource resource)
+    {
+        getResources().add(resource);
+    }
+
     public List<Resource> getResources()
     {
         return (List<Resource>) get(RESOURCES);

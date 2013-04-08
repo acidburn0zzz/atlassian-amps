@@ -51,6 +51,8 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
             changeset = changeset.with(createModule(webItem, WebItemModuleCreator.PLUGIN_MODULE_TEMPLATE));
         }
 
+        // TODO - soy template file
+
         return changeset;
     }
 

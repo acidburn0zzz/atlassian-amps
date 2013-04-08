@@ -2,6 +2,7 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
 import com.atlassian.plugins.codegen.modules.BasicNameModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class BlueprintProperties extends BasicNameModuleProperties
 {
     public static final String INDEX_KEY = "INDEX_KEY";
     public static final String WEB_ITEM = "WEB_ITEM";
+    private static final String WEB_RESOURCE = "WEB_RESOURCE";
     public static final String WEB_ITEM_BLUEPRINT_KEY = "blueprintKey";
     public static final String CONTENT_TEMPLATES = "CONTENT_TEMPLATES";
     private static final String HOW_TO_USE_TEMPLATE = "HOW_TO_USE_TEMPLATE";
@@ -38,12 +40,22 @@ public class BlueprintProperties extends BasicNameModuleProperties
 
     public void setWebItem(WebItemProperties webItem)
     {
-        put(WEB_ITEM,  webItem);
+        put(WEB_ITEM, webItem);
     }
 
     public WebItemProperties getWebItem()
     {
         return (WebItemProperties) get(WEB_ITEM);
+    }
+
+    public void setWebResource(WebResourceProperties webResource)
+    {
+        put(WEB_RESOURCE, webResource);
+    }
+
+    public WebResourceProperties getWebResource()
+    {
+        return (WebResourceProperties) get(WEB_RESOURCE);
     }
 
     public void setIndexKey(String indexKey)
