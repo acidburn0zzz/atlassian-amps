@@ -186,6 +186,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         blueprintProps.setHowToUseTemplate(template);
 
         WebResourceProperties webResource = makeWebResourceProperties();
+        addSoyTemplateToWebResource(webResource);
         blueprintProps.setWebResource(webResource);
 
         // 1. The blueprint element should have a new attribute with the how-to-use template reference
@@ -224,7 +225,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertNodeText(element, "@name", props.getModuleName());
         assertNodeText(element, "@i18n-name-key", props.getNameI18nKey());
         assertNodeText(element, "description/@key", props.getDescriptionI18nKey());
-        assertNodeText(element, "description/@key", props.getDescription());
+        assertNodeText(element, "description", props.getDescription());
     }
 
     private WebResourceProperties makeWebResourceProperties()
@@ -238,6 +239,16 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         properties.setDescription("Provides JS, CSS and Soy resources for the FooPrint Blueprint");
         properties.setDescriptionI18nKey("foo-print.web-resources.desc");
 
+        properties.addDependency("com.atlassian.confluence.plugins.confluence-create-content-plugin:resources");
+        
+        properties.addContext("atl.general");
+        properties.addContext("atl.admin");
+
+        return properties;
+    }
+
+    private void addSoyTemplateToWebResource(WebResourceProperties properties)
+    {
         // Soy transformer
         WebResourceTransformation transformation = new WebResourceTransformation("soy");
         WebResourceTransformerProperties transformer = new WebResourceTransformerProperties();
@@ -253,13 +264,6 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         soyResource.setName("templates-soy.js");
         soyResource.setLocation("soy/templates.soy");
         properties.addResource(soyResource);
-        
-        properties.addDependency("com.atlassian.confluence.plugins.confluence-create-content-plugin:resources");
-        
-        properties.addContext("atl.general");
-        properties.addContext("atl.admin");
-
-        return properties;
     }
 
     // Not sure why the changeset isn't always being cached during the test? Pull request comment please :) dT

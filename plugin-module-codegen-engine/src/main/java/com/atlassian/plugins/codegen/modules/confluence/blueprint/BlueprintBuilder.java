@@ -2,6 +2,9 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
 import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformation;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformerProperties;
 import com.google.common.collect.Lists;
 
 import java.util.Collections;
@@ -56,13 +59,36 @@ public class BlueprintBuilder
             props.addContentTemplate(contentTemplate);
         }
 
+        // Reused for icon CSS, how-to-use and dialog-wizard.
+        WebResourceProperties webResource = new WebResourceProperties();
+        props.setWebResource(webResource);
+
         if ((Boolean)promptProps.get(HOW_TO_USE))
         {
             String howToUseTemplate = stringer.makeHowToUseTemplateRef(blueprintName);
             props.setHowToUseTemplate(howToUseTemplate);
+
+            addSoyTemplateToWebResource(webResource);
         }
 
         return props;
+    }
+
+    private void addSoyTemplateToWebResource(WebResourceProperties properties)
+    {
+        // Soy transformer
+        WebResourceTransformation transformation = new WebResourceTransformation("soy");
+        WebResourceTransformerProperties transformer = new WebResourceTransformerProperties();
+        transformer.setModuleKey("soyTransformer");
+        transformer.addFunctions("com.atlassian.confluence.plugins.soy:soy-core-functions");
+        transformation.addTransformer(transformer);
+        properties.addTransformation(transformation);
+
+        Resource soyResource = new Resource();
+        soyResource.setType("download");
+        soyResource.setName("templates-soy.js");
+        soyResource.setLocation("soy/templates.soy");
+        properties.addResource(soyResource);
     }
 
     private ContentTemplateProperties makeContentTemplate(String contentTemplateKey, String webItemName, int counter)

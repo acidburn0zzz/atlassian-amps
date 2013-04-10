@@ -3,8 +3,12 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 import com.atlassian.plugins.codegen.modules.AbstractNameBasedModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformation;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformerProperties;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,6 +18,9 @@ import java.util.Map;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.WEB_ITEM_BLUEPRINT_KEY;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -54,6 +61,8 @@ public class BlueprintBuilderTest
     @Test
     public void basicPropertiesAreValid()
     {
+        BlueprintProperties props = builder.build();
+
         // Create expected Properties objects that the prompter should return.
         BlueprintProperties expectedProps = new BlueprintProperties();
         expectedProps.setModuleKey(blueprintModuleKey);
@@ -61,8 +70,6 @@ public class BlueprintBuilderTest
         expectedProps.setIndexKey(blueprintIndexKey);
         expectedProps.setWebItem(makeExpectedWebItemProperties());
         expectedProps.addContentTemplate(makeExpectedContentTemplateProperties());
-
-        BlueprintProperties props = builder.build();
 
         // Assert that all of the things are good things.
         assertBlueprintProperties(expectedProps, props);
@@ -74,11 +81,50 @@ public class BlueprintBuilderTest
     public void howToUseTemplateAdded()
     {
         promptProps.put(HOW_TO_USE, true);
-
         BlueprintProperties props = builder.build();
+
+        BlueprintProperties expectedProps = new BlueprintProperties();
+        WebResourceProperties expectedWebResource = new WebResourceProperties();
+        addSoyTemplateToWebResource(expectedWebResource);
+        expectedProps.setWebResource(expectedWebResource);
 
         String expectedHowToUse = "Confluence.Blueprints.Plugin.FooPrint.howToUse";
         assertEquals(expectedHowToUse, props.getHowToUseTemplate());
+
+        assertWebResourceProperties(expectedWebResource, props.getWebResource());
+    }
+
+    private void assertWebResourceProperties(WebResourceProperties expected, WebResourceProperties actual)
+    {
+        assertTransformationsEqual(expected.getTransformations().get(0), actual.getTransformations().get(0));
+        assertResourcesEqual(expected.getResources(), actual.getResources());
+    }
+
+    private void assertTransformationsEqual(WebResourceTransformation expected, WebResourceTransformation actual)
+    {
+        assertThat(actual.getExtension(), is(expected.getExtension()));
+
+        // TODO - should use hamcrest matchers. later. dT
+//        assertThat(expected.getTransformers(), Matchers. contains(actual.getTransformers()));
+    }
+
+    private void addSoyTemplateToWebResource(WebResourceProperties properties)
+    {
+        // Soy transformer
+        WebResourceTransformation transformation = new WebResourceTransformation("soy");
+        WebResourceTransformerProperties transformer = new WebResourceTransformerProperties();
+        transformer.setModuleKey("soyTransformer");
+        transformer.addFunctions("com.atlassian.confluence.plugins.soy:soy-core-functions");
+        transformation.addTransformer(transformer);
+        properties.addTransformation(transformation);
+
+        // TODO - this property generation should be done by that BlueprintPropertiesGenerator util class. dT
+        Resource soyResource = new Resource();
+        // <resource type="download" name="templates-soy.js" location="com/atlassian/confluence/plugins/hello_blueprint/soy/templates.soy" />
+        soyResource.setType("download");
+        soyResource.setName("templates-soy.js");
+        soyResource.setLocation("soy/templates.soy");
+        properties.addResource(soyResource);
     }
 
     private void assertContentTemplatePropertiesEqual(List<ContentTemplateProperties> expectedTemplates,
