@@ -3,19 +3,20 @@ package com.atlassian.maven.plugins.amps.codegen.prompter.confluence.blueprint;
 import com.atlassian.maven.plugins.amps.codegen.annotations.ModuleCreatorClass;
 import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter;
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-import com.atlassian.plugins.codegen.modules.common.Resource;
-import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
+import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintBuilder;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintModuleCreator;
+import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties;
-import com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties;
-import com.google.common.collect.Lists;
+import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintStringer;
+import com.google.common.collect.Maps;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 
 import java.util.List;
+import java.util.Map;
 
-import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
-import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Prompts for creation of Confluence Blueprint-related modules.
@@ -25,16 +26,7 @@ import static com.atlassian.plugins.codegen.modules.confluence.blueprint.Content
 @ModuleCreatorClass(BlueprintModuleCreator.class)
 public class BlueprintPrompter extends AbstractModulePrompter<BlueprintProperties>
 {
-    // TODO - remove publics
-    static final String INDEX_KEY_PROMPT = "Enter Index Key (e.g. file-list, meeting-note)";
-    public static final String WEB_ITEM_NAME_PROMPT = "Enter Blueprint name (e.g. File List, Meeting Note)";
-    public static final String WEB_ITEM_DESC_PROMPT = "Enter Blueprint description";
-    public static final String CONTENT_TEMPLATE_KEY_PROMPT = "Enter Content Template key";
     public static final String ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT = "Add another Content Template key?";
-    public static final String INDEX_KEY_DEFAULT = "my-blueprint";
-    public static final String WEB_ITEM_NAME_DEFAULT = "My Blueprint";
-    public static final String WEB_ITEM_DESC_DEFAULT = "Creates pages based on my Blueprint.";
-    public static final String HOW_TO_USE_PROMPT = "Add a How-to-Use page to your Blueprint?";
     public static final String ADVANCED_BLUEPRINT_PROMPT = "Add advanced Blueprint features?";
 
     public BlueprintPrompter(Prompter prompter)
@@ -55,21 +47,29 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
             "For further details on Blueprints, see https://developer.atlassian.com/display/CONFDEV/Writing+a+Blueprint"
             );
 
-        BlueprintProperties props = new BlueprintProperties();
+        Map<BlueprintPromptEntry, Object> props = promptForProps();
 
+        return new BlueprintBuilder(props).build();
+    }
+
+    /*
+        Package-level for unit testing... don't look at me like that. The promptForBasicProperties method includes the
+        BlueprintBuilder call, so to test the main logic of this class (i.e. the interaction of the user with the
+        prompts) we need to isolate the 'Properties' from the 'BlueprintProperties'.
+     */
+    Map<BlueprintPromptEntry, Object> promptForProps() throws PrompterException
+    {
+        Map<BlueprintPromptEntry, Object> props = Maps.newHashMap();
+        props.put(HOW_TO_USE, false);
 
         // Index key
         showMessage(
             "Blueprints are grouped by an Index Key that will determine the keys of the Blueprint plugin modules,\n" +
                 "and appear as a Label on each created Blueprint page."
         );
-        // TODO - make sure the key is a valid *label* and also prefix for module keys.
-        String indexKey = promptNotBlank(INDEX_KEY_PROMPT, INDEX_KEY_DEFAULT);
-        props.setProperty(INDEX_KEY, indexKey);
-
-        String blueprintModuleKey = makeBlueprintModuleKey(indexKey);
-        props.setModuleKey(blueprintModuleKey);
-
+        // TODO - make sure the key is a valid *label* and also a valid prefix for module keys.
+        String indexKey = promptNotBlank(INDEX_KEY, props);
+        BlueprintStringer stringer = new BlueprintStringer(indexKey);
 
         // Name and Description
         showMessage(
@@ -77,124 +77,67 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                 "The i18n keys for the name and description will be automatically generated for your Blueprint but can be\n" +
                 "changed later."
         );
-
-        String blueprintName = promptNotBlank(WEB_ITEM_NAME_PROMPT, WEB_ITEM_NAME_DEFAULT);
-        String blueprintDesc = promptNotBlank(WEB_ITEM_DESC_PROMPT, WEB_ITEM_DESC_DEFAULT);
-        props.setWebItem(makeWebItem(indexKey, blueprintModuleKey, blueprintName, blueprintDesc));
-        props.setModuleName(blueprintName + " Blueprint");    // TODO - stuff like this needs its own class and unit test?
-
+        promptNotBlank(WEB_ITEM_NAME, props);
+        promptNotBlank(BlueprintPromptEntry.WEB_ITEM_DESC, props);
 
         // Template(s)
         showMessage(
             "Blueprints Templates are in Confluence XHTML Storage format. A single Blueprint may create " +
                 "Confluence Pages based on multiple templates, so you may specify more than one template key."
         );
-        int templateCounter = 0;
+        int templateIndex = 0;
+        List<String> templateKeys = newArrayList();
         do
         {
-            String defaultValue = indexKey + "-template";
-            if (templateCounter > 0)
-            {
-                defaultValue += "-" + templateCounter;
-            }
-            String contentTemplateKey = promptNotBlank(CONTENT_TEMPLATE_KEY_PROMPT, defaultValue);
-
-            ContentTemplateProperties contentTemplate = makeContentTemplate(contentTemplateKey, blueprintName, templateCounter);
-            props.addContentTemplate(contentTemplate);
-            templateCounter++;
+            String defaultValue = stringer.makeContentTemplateKey(templateIndex);
+            templateKeys.add(promptNotBlank(CONTENT_TEMPLATE_KEYS.message(), defaultValue));
+            templateIndex++;
         }
         while(promptForBoolean(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT, "N"));
-        if (templateCounter > 1)
+        if (templateIndex > 1)
         {
             // TODO - have a separate prompter to just add one content-template later????
             showMessage(
                 "If you added more than one Template, you'll need to provide a way for users to choose between them.\n" +
                     "See the documentation on developer.atlassian.com for details on how to do this.");
         }
+        props.put(CONTENT_TEMPLATE_KEYS, templateKeys);
 
         // Advanced
         showMessage(
             "That's all you need to enter to create a working Blueprint! However, this SDK can create richer Blueprints\n" +
-            "with How-to-Use pages, JavaScript wizards and custom Index page."
+                "with How-to-Use pages, JavaScript wizards and custom Index page."
         );
         if (promptForBoolean(ADVANCED_BLUEPRINT_PROMPT, "N"))
         {
-            showAdvancedBlueprintPrompts(props, blueprintName);
+            // How-to-use
+            showMessage(
+                "How-to-Use pages are shown in the Create dialog when a user selects your Blueprint, and can be used to\n" +
+                    "familiarise the user with what your Blueprint does and how it works. All Blueprints shipped with\n" +
+                    "Confluence include a How-to-use page and recommend them for most Blueprints."
+            );
+            promptForBoolean(HOW_TO_USE, props);
         }
-
         return props;
     }
 
-    private void showAdvancedBlueprintPrompts(BlueprintProperties props, String blueprintName) throws PrompterException
+    private String promptNotBlank(BlueprintPromptEntry promptEntry, Map<BlueprintPromptEntry, Object> props) throws PrompterException
     {
-        // How-to-use
-        showMessage(
-            "How-to-Use pages are shown in the Create dialog when a user selects your Blueprint, and can be used to\n" +
-            "familiarise the user with what your Blueprint does and how it works. All Blueprints shipped with\n" +
-            "Confluence include a How-to-use page and recommend them for most Blueprints."
-        );
-        if (promptForBoolean(HOW_TO_USE_PROMPT, "N"));
-        {
-            // TODO - better util for cleaning up user-entered data. dT
-            String howToUseTemplate = "Confluence.Blueprints.Plugin." + blueprintName.replaceAll("\\W", "") + ".howToUse";
-            props.setHowToUseTemplate(howToUseTemplate);
-        }
+        String input = promptNotBlank(promptEntry.message(), promptEntry.defaultValue());
+        props.put(promptEntry, input);
+        return input;
+    }
+
+    private boolean promptForBoolean(BlueprintPromptEntry promptEntry, Map<BlueprintPromptEntry, Object> props) throws PrompterException
+    {
+        boolean input = promptForBoolean(promptEntry.message(), promptEntry.defaultValue());
+        props.put(promptEntry, input);
+        return input;
     }
 
     // Shows a message, padded at top and bottom.
     private void showMessage(String message) throws PrompterException
     {
         prompter.showMessage("\n" + message + "\n");
-    }
-
-    private ContentTemplateProperties makeContentTemplate(String contentTemplateKey, String webItemName, int counter)
-    {
-        ContentTemplateProperties template = new ContentTemplateProperties(contentTemplateKey);
-
-        template.setModuleName(webItemName + " Content Template " + counter);
-        template.setDescription("Contains Storage-format XML used by the " + webItemName + " Blueprint");
-        template.setNameI18nKey(contentTemplateKey + ".name");
-        template.setDescriptionI18nKey(contentTemplateKey + ".desc");
-        template.setContentText(contentTemplateKey + ".content.text", CONTENT_I18N_DEFAULT_VALUE);
-
-        Resource templateResource = new Resource();
-        templateResource.setName("template");
-        templateResource.setType("download");
-
-        // TODO - should allow base path to be set (so xml dir can be relative)
-        templateResource.setLocation("xml/" + contentTemplateKey + ".xml");
-        template.addResource(templateResource);
-
-        return template;
-    }
-
-    // TODO - this stuff in a separate class with tests?? dT
-    private String makeBlueprintModuleKey(String indexKey)
-    {
-        return indexKey + "-blueprint";
-    }
-
-    private WebItemProperties makeWebItem(String indexKey, String blueprintModuleKey, String webItemName, String webItemDesc)
-    {
-        WebItemProperties webItem = new WebItemProperties();
-
-        // TODO - i18n key should be prefixed with the plugin key for uniqueness.
-        webItem.setModuleKey(blueprintModuleKey + "-web-item");
-        webItem.setModuleName(webItemName);
-        webItem.setDescription(webItemDesc);
-        webItem.setNameI18nKey(indexKey + "-blueprint.display.name");
-        webItem.setDescriptionI18nKey(indexKey + "-blueprint.display.desc");
-        webItem.setSection("system.create.dialog/content");
-        webItem.addParam(WEB_ITEM_BLUEPRINT_KEY, blueprintModuleKey);
-
-        // TODO - REAALLY shouldn't be like this. data-uri CSS not resource!
-        Resource webItemResource = new Resource();
-        webItemResource.setName("icon");
-        webItemResource.setType("download");
-        webItemResource.setLocation("images/" + blueprintModuleKey + "-icon.png");
-        List<Resource> resources = Lists.newArrayList(webItemResource);
-        webItem.setResources(resources);
-
-        return webItem;
     }
 }
