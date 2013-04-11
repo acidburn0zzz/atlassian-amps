@@ -413,16 +413,24 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             String[] dirs = StringUtils.split(additionalResourceFolders,",");
             for(String rDir : dirs)
             {
-                resourceProp.append(StringUtils.trim(rDir)).append(",");
+                File af = new File(rDir);
+                if(af.exists())
+                {
+                    resourceProp.append(StringUtils.trim(rDir)).append(",");
+                }
             }
         }
         
         MavenProject mavenProject = getMavenContext().getProject();
         @SuppressWarnings("unchecked") List<Resource> resList = mavenProject.getResources();
         for (int i = 0; i < resList.size(); i++) {
-            resourceProp.append(resList.get(i).getDirectory());
-            if (i + 1 != resList.size()) {
-                resourceProp.append(",");
+            File rd = new File(resList.get(i).getDirectory());
+            if(rd.exists())
+            {
+                resourceProp.append(resList.get(i).getDirectory());
+                if (i + 1 != resList.size()) {
+                    resourceProp.append(",");
+                }
             }
         }
 
