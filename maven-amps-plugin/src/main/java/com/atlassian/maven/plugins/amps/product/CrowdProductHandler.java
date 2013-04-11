@@ -57,6 +57,7 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
         ImmutableMap.Builder<String, String> systemProperties = ImmutableMap.<String, String>builder();
         systemProperties.putAll(super.getSystemProperties(ctx));
         systemProperties.put("crowd.home", getHomeDirectory(ctx).getPath());
+        systemProperties.put("cargo.servlet.uriencoding", "UTF-8");
         return systemProperties.build();
     }
 

@@ -65,6 +65,7 @@ public class RefappProductHandler extends AbstractWebappProductHandler
         properties.put("refapp.home", getHomeDirectory(ctx).getPath());
         properties.put("osgi.cache", getHomeDirectory(ctx).getPath()+ "/osgi-cache");
         properties.put("bundledplugins.cache", getHomeDirectory(ctx).getPath()+ "/bundled-plugins");
+        properties.put("cargo.servlet.uriencoding", "UTF-8");
         return properties.build();
     }
 

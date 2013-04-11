@@ -60,7 +60,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         ImmutableMap.Builder<String, String> properties = ImmutableMap.<String, String>builder();
         properties.putAll(super.getSystemProperties(ctx));
         properties.put("jira.home", fixWindowsSlashes(getHomeDirectory(ctx).getPath()));
-        properties.put("catalina.servlet.uriencoding", "UTF-8");
+        properties.put("cargo.servlet.uriencoding", "UTF-8");
         return properties.build();
     }
     

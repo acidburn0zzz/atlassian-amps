@@ -103,6 +103,7 @@ public class StashProductHandler extends AbstractWebappProductHandler
         String baseUrl = MavenGoals.getBaseUrl(ctx, ctx.getHttpPort());
         properties.put("baseurl", baseUrl);
         properties.put("baseurl.display", baseUrl);
+        properties.put("cargo.servlet.uriencoding", "UTF-8");
         return properties.build();
     }
 

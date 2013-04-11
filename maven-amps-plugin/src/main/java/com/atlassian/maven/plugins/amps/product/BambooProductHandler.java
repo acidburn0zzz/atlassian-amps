@@ -54,6 +54,8 @@ public class BambooProductHandler extends AbstractWebappProductHandler
         properties.putAll(super.getSystemProperties(ctx));
         properties.put("bamboo.home", getHomeDirectory(ctx).getPath());
         properties.put("org.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES", "false");
+        properties.put("cargo.servlet.uriencoding", "UTF-8");
+        properties.put("file.encoding", "UTF-8");
         return properties.build();
     }
 
