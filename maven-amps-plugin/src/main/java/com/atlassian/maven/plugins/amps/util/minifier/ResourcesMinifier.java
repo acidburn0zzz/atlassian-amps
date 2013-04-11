@@ -26,7 +26,7 @@ public class ResourcesMinifier
     {
     }
 
-    public static void minify(List<Resource> resources, File outputDir, boolean useClosureForJs, Log log)
+    public static void minify(List<Resource> resources, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Log log)
     {
         if(null == INSTANCE)
         {
@@ -35,11 +35,11 @@ public class ResourcesMinifier
         
         for(Resource resource : resources)
         {
-            INSTANCE.processResource(resource,outputDir,useClosureForJs,log);
+            INSTANCE.processResource(resource,outputDir,compressJs, compressCss, useClosureForJs,log);
         }
     }
     
-    public void processResource(Resource resource, File outputDir, boolean useClosureForJs, Log log)
+    public void processResource(Resource resource, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Log log)
     {
         File destDir = outputDir;
         if(StringUtils.isNotBlank(resource.getTargetPath()))
@@ -54,8 +54,15 @@ public class ResourcesMinifier
             return;
         }
 
-        processJs(resourceDir,destDir,resource.getExcludes(),useClosureForJs,log);
-        processCss(resourceDir,destDir,resource.getExcludes(), log);
+        if(compressJs)
+        {
+            processJs(resourceDir,destDir,resource.getExcludes(),useClosureForJs,log);
+        }
+        
+        if(compressCss)
+        {
+            processCss(resourceDir,destDir,resource.getExcludes(), log);
+        }
     }
     
     public void processJs(File resourceDir, File destDir, List<String> excludes, boolean useClosure, Log log)

@@ -491,10 +491,10 @@ public class MavenGoals
         }
     }
 
-    public void compressResources(boolean useClosureForJs) throws MojoExecutionException
+    public void compressResources(boolean compressJs, boolean compressCss, boolean useClosureForJs) throws MojoExecutionException
     {
 
-        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), new File(ctx.getProject().getBuild().getOutputDirectory()), useClosureForJs, log);
+        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), new File(ctx.getProject().getBuild().getOutputDirectory()), compressJs, compressCss, useClosureForJs, log);
         /*
         executeMojo(
                 plugin(
