@@ -70,6 +70,8 @@ set M2_HOME=%ATLAS_HOME%\apache-maven
 set MAVEN_EXECUTABLE="%M2_HOME%\bin\mvn.bat"
 set ATLAS_VERSION="${version}"
 
+if not "%ATLAS_MVN%"=="" set MAVEN_EXECUTABLE="%ATLAS_MVN%"
+
 #if( $echoPaths )
 echo.
 echo ATLAS Version:    ${version}
@@ -97,7 +99,7 @@ rem line as the closing bracket for the 'if' statement.
 rem ---------------------------------------------------------------
 
 set MAVEN_OPTS=-Xmx768M -XX:MaxPermSize=256M %ATLAS_OPTS%
-set MVN_PARAMS=
+set MVN_PARAMS="-gs %M2_HOME%/conf/settings.xml"
 #set ( $elseCount = 0 )
 :loopstart
 if "%1"=="" goto loopend
