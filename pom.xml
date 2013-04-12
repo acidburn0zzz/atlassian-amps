@@ -329,10 +329,10 @@
         <jdkLevel>1.6</jdkLevel>
         <maven.version>2.1.0</maven.version>
         <refapp.version>2.20.0-m2</refapp.version>
-        <confluence.version>4.3.7</confluence.version>
-        <confluence.data.version>4.3.7</confluence.data.version>
-        <jira.version>5.2.5</jira.version>
-        <jira.data.version>5.2.5</jira.data.version>
+        <confluence.version>5.1.1</confluence.version>
+        <confluence.data.version>5.1.1</confluence.data.version>
+        <jira.version>5.2.10</jira.version>
+        <jira.data.version>5.2.10</jira.data.version>
         <fugue.version>1.0</fugue.version>
         <guava.osgi.version>10.0.1</guava.osgi.version>
         <bamboo.version>4.4.0</bamboo.version>
@@ -344,8 +344,8 @@
         <clover.version>3.1.7</clover.version>
         <studio.version>108.2</studio.version>
         <studio.data.version>108.2-m0</studio.data.version>
-        <stash.version>2.3.0</stash.version>
-        <stash.data.version>2.3.0</stash.data.version>
+        <stash.version>2.3.1</stash.version>
+        <stash.data.version>2.3.1</stash.data.version>
         <plugin.testrunner.version>1.1.1</plugin.testrunner.version>
     </properties>
 </project>
