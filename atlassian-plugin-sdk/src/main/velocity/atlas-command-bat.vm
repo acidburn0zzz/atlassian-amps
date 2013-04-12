@@ -66,8 +66,8 @@ rem ---------------------------------------------------------------
 rem Identify Maven location relative to script
 rem ---------------------------------------------------------------
 
-set M2_HOME=%ATLAS_HOME%\apache-maven
-set MAVEN_EXECUTABLE="%M2_HOME%\bin\mvn.bat"
+set MVN2_HOME=%ATLAS_HOME%\apache-maven
+set MAVEN_EXECUTABLE="%MVN2_HOME%\bin\mvn.bat"
 set ATLAS_VERSION="${version}"
 
 if not "%ATLAS_MVN%"=="" set MAVEN_EXECUTABLE="%ATLAS_MVN%"
@@ -77,7 +77,7 @@ echo.
 echo ATLAS Version:    ${version}
 echo ATLAS Home:       %ATLAS_HOME%
 echo ATLAS Scripts:    %ATLAS_HOME%\bin
-echo ATLAS Maven Home: %M2_HOME%
+echo ATLAS Maven Home: %MVN2_HOME%
 echo --------
 #end
 
@@ -99,7 +99,7 @@ rem line as the closing bracket for the 'if' statement.
 rem ---------------------------------------------------------------
 
 set MAVEN_OPTS=-Xmx768M -XX:MaxPermSize=256M %ATLAS_OPTS%
-set MVN_PARAMS="-gs %M2_HOME%/conf/settings.xml"
+set MVN_PARAMS=-gs %MVN2_HOME%/conf/settings.xml
 #set ( $elseCount = 0 )
 :loopstart
 if "%1"=="" goto loopend
