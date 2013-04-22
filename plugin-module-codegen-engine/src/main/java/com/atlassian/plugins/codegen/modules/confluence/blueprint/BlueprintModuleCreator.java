@@ -4,8 +4,12 @@ import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.Resource;
+import com.atlassian.plugins.codegen.modules.common.ResourcedProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceModuleCreator;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Creates a Confluence Blueprint module and any dependent modules.
@@ -18,9 +22,10 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
     private static final String MODULE_NAME = "Blueprint";
     private static final String TEMPLATE_PREFIX = "templates/confluence/blueprint/";
 
-    private static final String BLUEPRINT_MODULE_TEMPLATE = TEMPLATE_PREFIX + "blueprint-plugin.xml.vtl";
-    private static final String CONTENT_TEMPLATE_MODULE_TEMPLATE = TEMPLATE_PREFIX + "content-template-plugin.xml.vtl";
-    private static final String CONTENT_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "content-template-file.xml.vtl";
+    private static final String BLUEPRINT_MODULE_TEMPLATE = TEMPLATE_PREFIX + "plugin-module-blueprint.xml.vtl";
+    private static final String CONTENT_TEMPLATE_MODULE_TEMPLATE = TEMPLATE_PREFIX + "plugin-module-content-template.xml.vtl";
+    private static final String CONTENT_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-content-template.xml.vtl";
+    private static final String SOY_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-soy-template.soy.vtl";
 
     @Override
     public PluginProjectChangeset createModule(BlueprintProperties props) throws Exception
@@ -34,15 +39,7 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
         {
             changeset = changeset.with(createModule(contentTemplateProperties, CONTENT_TEMPLATE_MODULE_TEMPLATE));
 
-            // TODO - this feels like common code... dT
-            for (Resource resource : contentTemplateProperties.getResources())
-            {
-                String filePath = resource.getLocation();
-                int lastSlash = filePath.lastIndexOf('/');
-                String path = filePath.substring(0, lastSlash);
-                String filename = filePath.substring(lastSlash + 1);
-                changeset = changeset.with(createResource(contentTemplateProperties, path, filename, CONTENT_TEMPLATE_FILE_TEMPLATE));
-            }
+            changeset = addResourceFiles(changeset, contentTemplateProperties, CONTENT_TEMPLATE_FILE_TEMPLATE);
         }
 
         WebItemProperties webItem = props.getWebItem();
@@ -51,8 +48,24 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
             changeset = changeset.with(createModule(webItem, WebItemModuleCreator.PLUGIN_MODULE_TEMPLATE));
         }
 
-        // TODO - soy template file
+        WebResourceProperties webResource = props.getWebResource();
+        changeset = changeset.with(createModule(webResource, WebResourceModuleCreator.PLUGIN_MODULE_TEMPLATE));
+        changeset = addResourceFiles(changeset, webResource, SOY_TEMPLATE_FILE_TEMPLATE);
 
+        return changeset;
+    }
+
+    private PluginProjectChangeset addResourceFiles(PluginProjectChangeset changeset,
+        ResourcedProperties properties, String resourceFileTemplate) throws Exception
+    {
+        for (Resource resource : properties.getResources())
+        {
+            String filePath = resource.getLocation();
+            int lastSlash = filePath.lastIndexOf('/');
+            String path = filePath.substring(0, lastSlash);
+            String filename = filePath.substring(lastSlash + 1);
+            changeset = changeset.with(createResource(properties, path, filename, resourceFileTemplate));
+        }
         return changeset;
     }
 

@@ -21,6 +21,12 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public static final String WEB_ITEM_BLUEPRINT_KEY = "blueprintKey";
     public static final String CONTENT_TEMPLATES = "CONTENT_TEMPLATES";
     private static final String HOW_TO_USE_TEMPLATE = "HOW_TO_USE_TEMPLATE";
+    public static final String SOY_PACKAGE = "SOY_PACKAGE";
+    public static final String SOY_HEADING_I18N_KEY = "HEADING_I18N_KEY";
+    public static final String SOY_CONTENT_I18N_KEY = "CONTENT_I18N_KEY";
+    public static final String SOY_HEADING_VALUE = "Welcome to my Blueprint";
+    public static final String SOY_CONTENT_VALUE = "This blueprint can be used to create a special page.";
+
 
     public BlueprintProperties()
     {

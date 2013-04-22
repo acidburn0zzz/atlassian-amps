@@ -35,10 +35,10 @@ public class BlueprintStringer
         return blueprintName + " Blueprint";
     }
 
-    public String makeHowToUseTemplateRef(String blueprintName)
+    public String makeSoyTemplatePackage(String blueprintName)
     {
         // TODO - better util for cleaning up user-entered data. dT
-        return "Confluence.Blueprints.Plugin." + blueprintName.replaceAll("\\W", "") + ".howToUse";
+        return "Confluence.Blueprints.Plugin." + blueprintName.replaceAll("\\W", "");
     }
 
     public String makeContentTemplateName(String webItemName, int counter)

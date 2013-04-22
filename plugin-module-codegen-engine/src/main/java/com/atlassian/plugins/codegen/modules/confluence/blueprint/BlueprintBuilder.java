@@ -65,16 +65,15 @@ public class BlueprintBuilder
 
         if ((Boolean)promptProps.get(HOW_TO_USE))
         {
-            String howToUseTemplate = stringer.makeHowToUseTemplateRef(blueprintName);
-            props.setHowToUseTemplate(howToUseTemplate);
-
-            addSoyTemplateToWebResource(webResource);
+            String soyPackage = stringer.makeSoyTemplatePackage(blueprintName);
+            addSoyTemplateToWebResource(webResource, indexKey, soyPackage);
+            props.setHowToUseTemplate(soyPackage  + ".howToUse");
         }
 
         return props;
     }
 
-    private void addSoyTemplateToWebResource(WebResourceProperties properties)
+    private void addSoyTemplateToWebResource(WebResourceProperties properties, String indexKey, String soyPackage)
     {
         // Soy transformer
         WebResourceTransformation transformation = new WebResourceTransformation("soy");
@@ -87,8 +86,17 @@ public class BlueprintBuilder
         Resource soyResource = new Resource();
         soyResource.setType("download");
         soyResource.setName("templates-soy.js");
-        soyResource.setLocation("soy/templates.soy");
+        soyResource.setLocation("soy/my-templates.soy");
         properties.addResource(soyResource);
+
+        String soyHeadingI18nKey = indexKey + "-blueprint.soy.template.heading";
+        String soyContentI18nKey = indexKey + "-blueprint.soy.template.content";
+        properties.setProperty(BlueprintProperties.SOY_HEADING_I18N_KEY, soyHeadingI18nKey);
+        properties.setProperty(BlueprintProperties.SOY_CONTENT_I18N_KEY, soyContentI18nKey);
+        properties.setProperty(BlueprintProperties.SOY_PACKAGE, soyPackage);
+
+        properties.addI18nProperty(soyHeadingI18nKey, BlueprintProperties.SOY_HEADING_VALUE);
+        properties.addI18nProperty(soyContentI18nKey, BlueprintProperties.SOY_CONTENT_VALUE);
     }
 
     private ContentTemplateProperties makeContentTemplate(String contentTemplateKey, String webItemName, int counter)

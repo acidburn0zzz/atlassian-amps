@@ -5,11 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 import com.atlassian.plugins.codegen.modules.common.Resource;
+import com.atlassian.plugins.codegen.modules.common.ResourcedProperties;
 
 /**
  * @since 3.6
  */
-public class WebResourceProperties extends AbstractConditionsProperties
+public class WebResourceProperties extends AbstractConditionsProperties implements ResourcedProperties
 {
     public static final String RESOURCES = "RESOURCES";
     public static final String DEPENDENCIES = "DEPENDENCIES";

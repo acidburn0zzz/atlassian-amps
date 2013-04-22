@@ -8,7 +8,6 @@ import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformatio
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformerProperties;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,7 +18,6 @@ import static com.atlassian.plugins.codegen.modules.confluence.blueprint.Bluepri
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.WEB_ITEM_BLUEPRINT_KEY;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 
@@ -85,7 +83,7 @@ public class BlueprintBuilderTest
 
         BlueprintProperties expectedProps = new BlueprintProperties();
         WebResourceProperties expectedWebResource = new WebResourceProperties();
-        addSoyTemplateToWebResource(expectedWebResource);
+        addSoyTemplateToExpectedWebResource(expectedWebResource);
         expectedProps.setWebResource(expectedWebResource);
 
         String expectedHowToUse = "Confluence.Blueprints.Plugin.FooPrint.howToUse";
@@ -98,6 +96,9 @@ public class BlueprintBuilderTest
     {
         assertTransformationsEqual(expected.getTransformations().get(0), actual.getTransformations().get(0));
         assertResourcesEqual(expected.getResources(), actual.getResources());
+
+        // TODO - can we just test the resource in the ModuleCreator test? dT
+        assertEquals(expected.getI18nProperties(), actual.getI18nProperties());
     }
 
     private void assertTransformationsEqual(WebResourceTransformation expected, WebResourceTransformation actual)
@@ -108,7 +109,7 @@ public class BlueprintBuilderTest
 //        assertThat(expected.getTransformers(), Matchers. contains(actual.getTransformers()));
     }
 
-    private void addSoyTemplateToWebResource(WebResourceProperties properties)
+    private void addSoyTemplateToExpectedWebResource(WebResourceProperties properties)
     {
         // Soy transformer
         WebResourceTransformation transformation = new WebResourceTransformation("soy");
@@ -120,11 +121,20 @@ public class BlueprintBuilderTest
 
         // TODO - this property generation should be done by that BlueprintPropertiesGenerator util class. dT
         Resource soyResource = new Resource();
-        // <resource type="download" name="templates-soy.js" location="com/atlassian/confluence/plugins/hello_blueprint/soy/templates.soy" />
         soyResource.setType("download");
         soyResource.setName("templates-soy.js");
-        soyResource.setLocation("soy/templates.soy");
+        soyResource.setLocation("soy/my-templates.soy");
         properties.addResource(soyResource);
+
+        properties.setProperty(BlueprintProperties.SOY_PACKAGE, "Confluence.Blueprints.Plugin.FooPrint");
+        String soyHeadingI18nKey = "foo-print-blueprint.soy.template.heading";
+        String soyContentI18nKey = "foo-print-blueprint.soy.template.content";
+
+        properties.setProperty(BlueprintProperties.SOY_HEADING_I18N_KEY, soyHeadingI18nKey);
+        properties.setProperty(BlueprintProperties.SOY_CONTENT_I18N_KEY, soyContentI18nKey);
+
+        properties.addI18nProperty(soyHeadingI18nKey, BlueprintProperties.SOY_HEADING_VALUE);
+        properties.addI18nProperty(soyContentI18nKey, BlueprintProperties.SOY_CONTENT_VALUE);
     }
 
     private void assertContentTemplatePropertiesEqual(List<ContentTemplateProperties> expectedTemplates,

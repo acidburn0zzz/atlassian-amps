@@ -4,6 +4,7 @@ import com.atlassian.fugue.Pair;
 import com.atlassian.plugins.codegen.modules.AbstractNameBasedModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.ContextProvider;
 import com.atlassian.plugins.codegen.modules.common.Resource;
+import com.atlassian.plugins.codegen.modules.common.ResourcedProperties;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
@@ -14,7 +15,7 @@ import java.util.List;
  *
  * @since 4.1.7
  */
-public class ContentTemplateProperties extends AbstractNameBasedModuleProperties
+public class ContentTemplateProperties extends AbstractNameBasedModuleProperties implements ResourcedProperties
 {
     public static final String LOCATION = "LOCATION";
     public static final String RESOURCES = "RESOURCES";

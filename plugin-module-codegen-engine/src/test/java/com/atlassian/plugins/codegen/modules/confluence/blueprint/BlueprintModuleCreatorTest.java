@@ -17,8 +17,8 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.INDEX_KEY;
-import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.WEB_ITEM_BLUEPRINT_KEY;
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 
@@ -180,13 +180,12 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     @Test
     public void howToUseTemplateIsAdded() throws Exception
     {
-        // TODO - still need a tested util class to generate these strings! dT
-        String soyNamespace = "Confluence.Blueprints.Plugin." + webItemName.replaceAll("\\W", "");
+        String soyNamespace = "Confluence.Blueprints.Plugin.FooPrint";
         String template = soyNamespace + ".howToUse";
         blueprintProps.setHowToUseTemplate(template);
 
         WebResourceProperties webResource = makeWebResourceProperties();
-        addSoyTemplateToWebResource(webResource);
+        addSoyTemplateToWebResource(webResource, soyNamespace);
         blueprintProps.setWebResource(webResource);
 
         // 1. The blueprint element should have a new attribute with the how-to-use template reference
@@ -194,16 +193,21 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertNodeText(blueprintModule, "@how-to-use-template", template);
 
         // 2. There should be a Soy file containing the referenced template
+        String soyHeadingI18nKey = webResource.getProperty(SOY_HEADING_I18N_KEY);
+        String soyContentI18nKey = webResource.getProperty(SOY_CONTENT_I18N_KEY);
         String soy = new String(getResourceFile("soy", "my-templates.soy").getContent());
-        assertThat(soy, containsString("{namespace " + soyNamespace + "}"));
+        assertThat(soy, containsString(format("{namespace %s}", soyNamespace)));
         assertThat(soy, containsString("{template .howToUse}"));
+        assertThat(soy, containsString(format("{getText('%s')}", soyHeadingI18nKey)));
+        assertThat(soy, containsString(format("{getText('%s')}", soyContentI18nKey)));
 
         // 3. There should be a web-resource pointing to the new file
         Element webResourceModule = getGeneratedModule("web-resource");
         assertWebResource(webResourceModule, webResource);
 
         // 4. There should new entries in the i18n file for the template
-//        assertI18nString(howToUseContentI18nKey, howToUseContentValue);
+        assertI18nString(soyHeadingI18nKey, SOY_HEADING_VALUE);
+        assertI18nString(soyContentI18nKey, SOY_CONTENT_VALUE);
 
         // TODO - 5. There should (?) be CSS rules for the template
     }
@@ -216,6 +220,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         // rendered to XML correctly, but other than that THIS test just needs to confirm that our BlueprintCreator is
         // in fact adding WebResources that do have the correct transformation. Hmm, that's more of a test for the
         // Prompter? Or the generator?
+        // TODO - assert dependencies, contexts added?
         assertNotNull(element.selectSingleNode("transformation"));
     }
 
@@ -247,7 +252,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         return properties;
     }
 
-    private void addSoyTemplateToWebResource(WebResourceProperties properties)
+    private void addSoyTemplateToWebResource(WebResourceProperties properties, String soyNamespace)
     {
         // Soy transformer
         WebResourceTransformation transformation = new WebResourceTransformation("soy");
@@ -262,8 +267,18 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         // <resource type="download" name="templates-soy.js" location="com/atlassian/confluence/plugins/hello_blueprint/soy/templates.soy" />
         soyResource.setType("download");
         soyResource.setName("templates-soy.js");
-        soyResource.setLocation("soy/templates.soy");
+        soyResource.setLocation("soy/my-templates.soy");
         properties.addResource(soyResource);
+
+        properties.setProperty(SOY_PACKAGE, soyNamespace);
+        String soyHeadingI18nKey = "soy.template.heading";
+        String soyContentI18nKey = "soy.template.content";
+
+        properties.setProperty(SOY_HEADING_I18N_KEY, soyHeadingI18nKey);
+        properties.setProperty(SOY_CONTENT_I18N_KEY, soyContentI18nKey);
+
+        properties.addI18nProperty(soyHeadingI18nKey, SOY_HEADING_VALUE);
+        properties.addI18nProperty(soyContentI18nKey, SOY_CONTENT_VALUE);
     }
 
     // Not sure why the changeset isn't always being cached during the test? Pull request comment please :) dT
