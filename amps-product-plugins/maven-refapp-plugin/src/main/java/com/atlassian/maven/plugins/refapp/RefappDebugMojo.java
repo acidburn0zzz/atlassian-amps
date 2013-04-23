@@ -11,7 +11,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 /**
  * Debug the webapp
  */
-@Mojo(name = "debug", requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(name = "debug", requiresDependencyResolution = ResolutionScope.TEST)
 @Execute(phase = LifecyclePhase.PACKAGE)
 public class RefappDebugMojo extends DebugMojo
 {

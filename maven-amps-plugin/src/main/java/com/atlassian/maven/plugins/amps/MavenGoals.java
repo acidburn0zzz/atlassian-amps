@@ -73,7 +73,7 @@ public class MavenGoals
 
     private final Map<String, String> defaultArtifactIdToVersionMap = new HashMap<String, String>()
     {{
-            put("maven-cli-plugin", "0.7");
+            put("maven-cli-plugin", "1.0.9");
             put("org.codehaus.cargo:cargo-maven2-plugin", "1.2.3");
             put("atlassian-pdk", "2.3.1");
             put("maven-archetype-plugin", "2.0-alpha-4");
@@ -162,12 +162,14 @@ public class MavenGoals
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-install"),
                 element(name("package"),
-                        "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
-                        + "compile" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " ")));
+                        "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
+                                + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
+                                + "compile" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " ")));
         if (port > 0)
         {
             configs.add(element(name("port"), String.valueOf(port)));

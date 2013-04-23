@@ -84,7 +84,7 @@
         <dependency>
             <groupId>org.twdata.maven</groupId>
             <artifactId>mojo-executor</artifactId>
-            <version>1.5</version>
+            <version>1.5.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -347,5 +347,6 @@
         <stash.version>2.3.1</stash.version>
         <stash.data.version>2.3.1</stash.data.version>
         <plugin.testrunner.version>1.1.1</plugin.testrunner.version>
+        <maven.cli.version>1.0.9</maven.cli.version>
     </properties>
 </project>

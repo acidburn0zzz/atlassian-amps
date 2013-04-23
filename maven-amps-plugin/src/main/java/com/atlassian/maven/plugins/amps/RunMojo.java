@@ -30,7 +30,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 /**
  * Run the webapp
  */
-@Mojo(name = "run", requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(name = "run", requiresDependencyResolution = ResolutionScope.TEST)
 @Execute(phase = LifecyclePhase.PACKAGE)
 public class RunMojo extends AbstractTestGroupsHandlerMojo
 {

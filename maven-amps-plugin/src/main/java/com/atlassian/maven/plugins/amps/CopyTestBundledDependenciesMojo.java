@@ -11,7 +11,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 /**
  * Copies bundled dependencies into META-INF/lib for test plugin
  */
-@Mojo(name = "copy-test-bundled-dependencies", requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(name = "copy-test-bundled-dependencies", requiresDependencyResolution = ResolutionScope.TEST)
 public class CopyTestBundledDependenciesMojo extends AbstractProductAwareMojo
 {
     @Parameter(property = "extractTestDependencies", defaultValue = "false")

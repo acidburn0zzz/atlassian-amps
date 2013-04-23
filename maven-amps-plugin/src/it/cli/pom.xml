@@ -34,7 +34,7 @@
             <plugin>
                 <groupId>org.twdata.maven</groupId>
                 <artifactId>maven-cli-plugin</artifactId>
-                <version>0.7</version>
+                <version>${maven.cli.version}</version>
             </plugin>
 
             <!-- this is used to run some tests against the running application -->

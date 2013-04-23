@@ -5,8 +5,9 @@ import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
-@Mojo(name = "cli")
+@Mojo(name = "cli", requiresDependencyResolution = ResolutionScope.TEST)
 public class FeCruCliMojo extends CliMojo
 {
     @Override
