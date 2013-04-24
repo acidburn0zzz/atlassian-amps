@@ -49,6 +49,8 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
 
         WebResourceProperties webResource = props.getWebResource();
         changeset = changeset.with(createModule(webResource, WebResourceModuleCreator.PLUGIN_MODULE_TEMPLATE));
+
+        // TODO - only needs creating if the props specify it.
         changeset = addResourceFiles(changeset, webResource, SOY_TEMPLATE_FILE_TEMPLATE);
 
         return changeset;

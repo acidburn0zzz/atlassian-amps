@@ -209,6 +209,19 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         Element wizardElement = blueprintModule.element("dialog-wizard");
         assertNotNull("dialog-wizard element should be created", wizardElement);
         assertNodeText(wizardElement, "@key", "foo-print-wizard");
+
+        Element pageElement = wizardElement.element("dialog-page");
+        assertNotNull("dialog-page element should be created", pageElement);
+        assertNodeText(pageElement, "@id", "page-0");
+        assertNodeText(pageElement, "@template-key", "Confluence.Blueprints.Plugin.FooPrint.wizardPage0");
+        assertNodeText(pageElement, "@title-key", "foo-print.page-0.title");
+        assertNodeText(pageElement, "@description-header-key", "foo-print.page-0.desc.header");
+        assertNodeText(pageElement, "@description-content-key", "foo-print.page-0.desc.content");
+
+        // TODO - assert Soy template content
+        // TODO - assert I18n values
+        // TODO - assert JS file
+        // TODO - assert CSS content?
     }
 
     private void assertWebResource(Element element, WebResourceProperties resourceProperties)

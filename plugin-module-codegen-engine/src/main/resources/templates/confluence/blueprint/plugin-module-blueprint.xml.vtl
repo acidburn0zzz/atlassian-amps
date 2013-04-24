@@ -37,36 +37,36 @@
     #end
 
     #if ($DIALOG_WIZARD)
-        <!--
+    <!--
             The dialog-wizard element defines a set of Wizard pages that will be shown when the User selects this
             Blueprint. Pages will be shown to the user in the order they are defined, but this can be changed in the
             Wizard JavaScript hooks (see hello-blueprint-wizard.js).
-        -->
-        <dialog-wizard key="$DIALOG_WIZARD.KEY">
-            <!--
-                dialog-page defines a single page of the Wizard. This page can contain a description that is displayed
-                 at the right-hand-side of it. This element contains the following attributes:
+    -->
+    <dialog-wizard key="$DIALOG_WIZARD.MODULE_KEY">
+        <!--
+            dialog-page defines a single page of the Wizard. This page can contain a description that is displayed
+             at the right-hand-side of it. This element contains the following attributes:
 
-                - id - the id of this page, used with JavaScript hooks
-                - template-key - the fully-qualified path to a Soy template provided by this plugin (see web-resource)
-                - title-key - the i18n key for the title that will be displayed at the top of the Wizard page
-                - description-header-key - (optional) if specified, the i18n key for the heading above the description
-                - description-content-key - (optional) if specified, the i18n key for the description content. This
-                                            is required for the Description panel to appear in the page.
-                - last - (optional) if set to "true", the Wizard will be complete when this page is submitted. This is
-                         useful if the Wizard can have multiple paths. The last defined dialog-page gets this value set
-                         to "true" by default.
-            -->
-            #foreach($page in $DIALOG_WIZARD.dialogPages)
-                <dialog-page id="$page.ID"
-                        template-key="$page.TEMPLATE_KEY"
-                        title-key="$page.TITLE_I18N_KEY"
-                        description-header-key="$page.DESC_HEADER_I18N_KEY"
-                        description-content-key="$page.DESC_CONTENT_I18N_KEY"
-                        #if ($page.LAST)last="true"#end
-                        />
-            #end
-        </dialog-wizard>
+            - id - the id of this page, used with JavaScript hooks
+            - template-key - the fully-qualified path to a Soy template provided by this plugin (see web-resource)
+            - title-key - the i18n key for the title that will be displayed at the top of the Wizard page
+            - description-header-key - (optional) if specified, the i18n key for the heading above the description
+            - description-content-key - (optional) if specified, the i18n key for the description content. This
+                                        is required for the Description panel to appear in the page.
+            - last - (optional) if set to "true", the Wizard will be complete when this page is submitted. This is
+                     useful if the Wizard can have multiple paths. The last defined dialog-page gets this value set
+                     to "true" by default.
+        -->
+        #foreach($page in $DIALOG_WIZARD.dialogPages)
+        <dialog-page id="$page.ID"
+            template-key="$page.TEMPLATE_KEY"
+            title-key="$page.TITLE_I18N_KEY"
+            description-header-key="$page.DESC_HEADER_I18N_KEY"
+            description-content-key="$page.DESC_CONTENT_I18N_KEY"
+            #if ($page.LAST)last="true"#end
+            />
+        #end
+    </dialog-wizard>
     #end
 
 </blueprint>

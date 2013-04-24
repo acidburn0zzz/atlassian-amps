@@ -76,6 +76,7 @@ public class BlueprintBuilder
         {
             soyTemplateRequired = true;
             DialogWizardProperties wizard = new DialogWizardProperties();
+            wizard.setModuleKey(indexKey + "-wizard");
             DialogPageProperties wizardPage = new DialogPageProperties(indexKey, 0, soyPackage);
             wizard.setDialogPages(Lists.newArrayList(wizardPage));
             props.setDialogWizard(wizard);
