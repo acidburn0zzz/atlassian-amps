@@ -9,7 +9,6 @@ import com.atlassian.plugins.codegen.modules.common.web.WebItemModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Creates a Confluence Blueprint module and any dependent modules.

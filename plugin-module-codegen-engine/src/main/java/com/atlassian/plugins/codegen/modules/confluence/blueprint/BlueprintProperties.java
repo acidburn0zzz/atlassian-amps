@@ -76,11 +76,11 @@ public class BlueprintProperties extends BasicNameModuleProperties
 
     public void setHowToUseTemplate(String howToUseTemplate)
     {
-        setProperty(HOW_TO_USE_TEMPLATE, howToUseTemplate);
+        put(HOW_TO_USE_TEMPLATE, howToUseTemplate);
     }
 
     public String getHowToUseTemplate()
     {
-        return getProperty(HOW_TO_USE_TEMPLATE);
+        return (String) get(HOW_TO_USE_TEMPLATE);
     }
 }
