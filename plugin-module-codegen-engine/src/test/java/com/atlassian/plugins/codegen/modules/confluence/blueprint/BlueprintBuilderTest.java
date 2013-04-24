@@ -19,6 +19,7 @@ import static com.atlassian.plugins.codegen.modules.confluence.blueprint.Bluepri
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -48,6 +49,7 @@ public class BlueprintBuilderTest
         promptProps.put(WEB_ITEM_NAME, webItemName);
         promptProps.put(WEB_ITEM_DESC, webItemDesc);
         promptProps.put(HOW_TO_USE, false);
+        promptProps.put(DIALOG_WIZARD, false);
 
         contentTemplateKeys = Lists.newArrayList();
         contentTemplateKeys.add(templateModuleKey);
@@ -81,15 +83,41 @@ public class BlueprintBuilderTest
         promptProps.put(HOW_TO_USE, true);
         BlueprintProperties props = builder.build();
 
-        BlueprintProperties expectedProps = new BlueprintProperties();
         WebResourceProperties expectedWebResource = new WebResourceProperties();
         addSoyTemplateToExpectedWebResource(expectedWebResource);
-        expectedProps.setWebResource(expectedWebResource);
 
-        String expectedHowToUse = "Confluence.Blueprints.Plugin.FooPrint.howToUse";
-        assertEquals(expectedHowToUse, props.getHowToUseTemplate());
-
+        assertEquals("Confluence.Blueprints.Plugin.FooPrint.howToUse", props.getHowToUseTemplate());
         assertWebResourceProperties(expectedWebResource, props.getWebResource());
+    }
+
+    @Test
+    public void dialogWizardAdded()
+    {
+        promptProps.put(DIALOG_WIZARD, true);
+        BlueprintProperties props = builder.build();
+
+        DialogWizardProperties expectedWizard = new DialogWizardProperties();
+        expectedWizard.setModuleKey("foo-print-wizard");
+        List<DialogPageProperties> pages = Lists.newArrayList();
+        DialogPageProperties page = new DialogPageProperties("foo-print", 0, "Confluence.Blueprints.Plugin.FooPrint");
+        pages.add(page);
+        expectedWizard.setDialogPages(pages);
+
+        assertDialogWizard(expectedWizard, props.getDialogWizard());
+    }
+
+    private void assertDialogWizard(DialogWizardProperties expectedWizard, DialogWizardProperties actualWizard)
+    {
+        assertThat(actualWizard, notNullValue());
+
+        List<DialogPageProperties> actualPages = actualWizard.getDialogPages();
+        List<DialogPageProperties> expectedPages = expectedWizard.getDialogPages();
+        assertThat(actualPages.size(), is(expectedPages.size()));
+
+        DialogPageProperties actualPage = actualPages.get(0);
+        DialogPageProperties expectedPage = expectedPages.get(0);
+
+        assertThat(actualPage, is(expectedPage));
     }
 
     private void assertWebResourceProperties(WebResourceProperties expected, WebResourceProperties actual)

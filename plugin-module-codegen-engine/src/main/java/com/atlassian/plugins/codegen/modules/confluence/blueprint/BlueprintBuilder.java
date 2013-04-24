@@ -63,11 +63,27 @@ public class BlueprintBuilder
         WebResourceProperties webResource = new WebResourceProperties();
         props.setWebResource(webResource);
 
+        boolean soyTemplateRequired = false;
+        String soyPackage = stringer.makeSoyTemplatePackage(blueprintName);
+
         if ((Boolean)promptProps.get(HOW_TO_USE))
         {
-            String soyPackage = stringer.makeSoyTemplatePackage(blueprintName);
+            soyTemplateRequired = true;
+            props.setHowToUseTemplate(soyPackage + ".howToUse");
+        }
+
+        if ((Boolean)promptProps.get(DIALOG_WIZARD))
+        {
+            soyTemplateRequired = true;
+            DialogWizardProperties wizard = new DialogWizardProperties();
+            DialogPageProperties wizardPage = new DialogPageProperties(indexKey, 0, soyPackage);
+            wizard.setDialogPages(Lists.newArrayList(wizardPage));
+            props.setDialogWizard(wizard);
+        }
+
+        if (soyTemplateRequired)
+        {
             addSoyTemplateToWebResource(webResource, indexKey, soyPackage);
-            props.setHowToUseTemplate(soyPackage  + ".howToUse");
         }
 
         return props;

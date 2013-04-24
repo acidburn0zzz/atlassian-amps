@@ -11,7 +11,8 @@ public enum BlueprintPromptEntry
     WEB_ITEM_NAME("Enter Blueprint name (e.g. File List, Meeting Note)", "My Blueprint"),
     WEB_ITEM_DESC("Enter Blueprint description", "Creates pages based on my Blueprint."),
     CONTENT_TEMPLATE_KEYS("Enter Content Template key", null),   // defaults are generated
-    HOW_TO_USE("Add a How-to-Use page to your Blueprint?", "N")
+    HOW_TO_USE("Add a How-to-Use page to your Blueprint?", "N"),
+    DIALOG_WIZARD("Add a Create dialog wizard to your Blueprint?", "N")
     ;
 
     private final String message;

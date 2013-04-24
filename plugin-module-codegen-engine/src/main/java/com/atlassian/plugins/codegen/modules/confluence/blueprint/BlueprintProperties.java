@@ -21,6 +21,7 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public static final String WEB_ITEM_BLUEPRINT_KEY = "blueprintKey";
     public static final String CONTENT_TEMPLATES = "CONTENT_TEMPLATES";
     private static final String HOW_TO_USE_TEMPLATE = "HOW_TO_USE_TEMPLATE";
+    public static final String DIALOG_WIZARD = "DIALOG_WIZARD";
     public static final String SOY_PACKAGE = "SOY_PACKAGE";
     public static final String SOY_HEADING_I18N_KEY = "HEADING_I18N_KEY";
     public static final String SOY_CONTENT_I18N_KEY = "CONTENT_I18N_KEY";
@@ -82,5 +83,15 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public String getHowToUseTemplate()
     {
         return (String) get(HOW_TO_USE_TEMPLATE);
+    }
+
+    public void setDialogWizard(DialogWizardProperties props)
+    {
+        put(DIALOG_WIZARD, props);
+    }
+
+    public DialogWizardProperties getDialogWizard()
+    {
+        return (DialogWizardProperties) get(DIALOG_WIZARD);
     }
 }

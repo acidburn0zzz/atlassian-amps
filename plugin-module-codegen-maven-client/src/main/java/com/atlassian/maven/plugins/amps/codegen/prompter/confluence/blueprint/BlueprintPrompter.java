@@ -61,6 +61,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
     {
         Map<BlueprintPromptEntry, Object> props = Maps.newHashMap();
         props.put(HOW_TO_USE, false);
+        props.put(DIALOG_WIZARD, false);
 
         // Index key
         showMessage(
@@ -117,6 +118,15 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                     "Confluence include a How-to-use page and recommend them for most Blueprints."
             );
             promptForBoolean(HOW_TO_USE, props);
+
+            // Dialog wizard
+            showMessage(
+                "If your Blueprint will require input from the user before creating the page or going to the Editor\n" +
+                    "you'll need a Dialog wizard. The Blueprints Dialog wizard config is simple to use, taking Soy\n" +
+                    "templates that you provide and connecting them into a multi-page wizard that you can configure\n" +
+                    "simply."
+            );
+            promptForBoolean(DIALOG_WIZARD, props);
         }
         return props;
     }

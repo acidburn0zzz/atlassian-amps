@@ -48,6 +48,8 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         when(prompter.prompt(CONTENT_TEMPLATE_KEYS.message(), stringer.makeContentTemplateKey(0))).thenReturn( templateModuleKey);
         when(prompter.prompt(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
         when(prompter.prompt(ADVANCED_BLUEPRINT_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
+        when(prompter.prompt(HOW_TO_USE.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
+        when(prompter.prompt(DIALOG_WIZARD.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
     }
 
     @SuppressWarnings("unchecked")
@@ -78,4 +80,14 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         assertTrue((Boolean) props.get(HOW_TO_USE));
     }
 
+    @Test
+    public void dialogWizardAdded() throws PrompterException
+    {
+        when(prompter.prompt(ADVANCED_BLUEPRINT_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
+        when(prompter.prompt(DIALOG_WIZARD.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
+
+        Map<BlueprintPromptEntry, Object> props = modulePrompter.promptForProps();
+
+        assertTrue((Boolean) props.get(DIALOG_WIZARD));
+    }
 }

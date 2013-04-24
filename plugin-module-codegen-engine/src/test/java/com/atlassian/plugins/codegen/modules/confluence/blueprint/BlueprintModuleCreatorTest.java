@@ -84,6 +84,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         promptProps.put(WEB_ITEM_NAME, webItemName);
         promptProps.put(WEB_ITEM_DESC, webItemDesc);
         promptProps.put(HOW_TO_USE, false);
+        promptProps.put(DIALOG_WIZARD, false);
 
         List<String> contentTemplateKeys = Lists.newArrayList();
         contentTemplateKeys.add(templateModuleKey);
@@ -196,6 +197,18 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertI18nString(soyContentI18nKey, BlueprintProperties.SOY_CONTENT_VALUE);
 
         // TODO - 5. There should (?) be CSS rules for the template
+    }
+
+    @Test
+    public void dialogWizardIsAdded() throws Exception
+    {
+        promptProps.put(DIALOG_WIZARD, true);
+        buildBlueprintProperties();
+
+        Element blueprintModule = getGeneratedModule();
+        Element wizardElement = blueprintModule.element("dialog-wizard");
+        assertNotNull("dialog-wizard element should be created", wizardElement);
+        assertNodeText(wizardElement, "@key", "foo-print-wizard");
     }
 
     private void assertWebResource(Element element, WebResourceProperties resourceProperties)

@@ -15,4 +15,9 @@ public class DialogWizardProperties extends AbstractNameBasedModuleProperties
     {
         return (List<DialogPageProperties>) get(DIALOG_PAGES);
     }
+
+    public void setDialogPages(List<DialogPageProperties> dialogPages)
+    {
+        put(DIALOG_PAGES, dialogPages);
+    }
 }
