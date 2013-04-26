@@ -6,7 +6,6 @@ import com.atlassian.plugins.codegen.ResourceFile;
 import com.atlassian.plugins.codegen.modules.AbstractNameBasedModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.junit.After;
@@ -14,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
@@ -34,12 +32,13 @@ import static org.junit.Assert.*;
  */
 public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<BlueprintProperties>
 {
+    public static final String PLUGIN_KEY = "com.atlassian.confluence.plugins.fooprint";
     /**
      *  We use the builder to turn simple prompt properties into complex BlueprintProperties objects and reduce
      *  duplication in the test. This means that we assume the Builder does its job correctly - this is the
      *  responsibility of the BlueprintBuilder unit test.
      */
-    private Map<BlueprintPromptEntry, Object> promptProps;
+    private BlueprintPromptEntries promptProps;
 
     private BlueprintProperties blueprintProps;
 
@@ -79,7 +78,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
      */
     private void createBasePromptProperties()
     {
-        promptProps = Maps.newHashMap();
+        promptProps = new BlueprintPromptEntries(PLUGIN_KEY);
 
         promptProps.put(INDEX_KEY_PROMPT, blueprintIndexKey);
         promptProps.put(WEB_ITEM_NAME_PROMPT, webItemName);
@@ -141,8 +140,8 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     @Test
     public void webItemModuleBasicSettings() throws Exception
     {
-        String webItemNameI18nKey = "foo-print-blueprint.display.name";
-        String webItemDescI18nKey = "foo-print-blueprint.display.desc";
+        String webItemNameI18nKey = PLUGIN_KEY + ".blueprint.display.name";
+        String webItemDescI18nKey = PLUGIN_KEY + ".blueprint.display.desc";
 
         Element module = getGeneratedModule("web-item");
         assertNameBasedModuleProperties(module, blueprintProps.getWebItem());
@@ -180,8 +179,8 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertNodeText(blueprintModule, "@how-to-use-template", blueprintProps.getHowToUseTemplate());
 
         // 2. There should be a Soy file containing the referenced template
-        String soyHeadingI18nKey = "foo-print-blueprint.wizard.how-to-use.heading";
-        String soyContentI18nKey = "foo-print-blueprint.wizard.how-to-use.content";
+        String soyHeadingI18nKey = PLUGIN_KEY + ".wizard.how-to-use.heading";
+        String soyContentI18nKey = PLUGIN_KEY + ".wizard.how-to-use.content";
         String soy = new String(getResourceFile("soy", "my-templates.soy").getContent());
         assertThat(soy, containsString(format("{namespace %s}", "Confluence.Blueprints.Plugin.FooPrint")));
         assertThat(soy, containsString("{template .howToUse}"));
@@ -213,31 +212,48 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
 
         Element pageElement = wizardElement.element("dialog-page");
         assertNotNull("dialog-page element should be created", pageElement);
-        assertNodeText(pageElement, "@id", "page-0");
+        assertNodeText(pageElement, "@id", "page0");
         assertNodeText(pageElement, "@template-key", "Confluence.Blueprints.Plugin.FooPrint.wizardPage0");
-        assertNodeText(pageElement, "@title-key", "foo-print.page-0.title");
-        assertNodeText(pageElement, "@description-header-key", "foo-print.page-0.desc.header");
-        assertNodeText(pageElement, "@description-content-key", "foo-print.page-0.desc.content");
+        assertNodeText(pageElement, "@title-key", "foo-print.page0.title");
+        assertNodeText(pageElement, "@description-header-key", "foo-print.page0.desc.header");
+        assertNodeText(pageElement, "@description-content-key", "foo-print.page0.desc.content");
 
         // 2. There should be a Soy file containing the referenced template
-        String fieldLabelI18nKey = "foo-print-blueprint.wizard.page0.title.label";
-        String fieldPlaceholderI18nKey = "foo-print-blueprint.wizard.page0.title.placeholder";
         String soy = new String(getResourceFile("soy", "my-templates.soy").getContent());
+        String fieldId = "foo-print-blueprint-page-title";
         assertThat(soy, containsString(format("{namespace %s}", "Confluence.Blueprints.Plugin.FooPrint")));
         assertThat(soy, containsString("{template .wizardPage0}"));
-        assertThat(soy, containsString(format("{getText('%s')}", fieldLabelI18nKey)));
-        assertThat(soy, containsString(format("{getText('%s')}", fieldPlaceholderI18nKey)));
+        assertThat(soy, containsString(fieldId));
 
-        // 3. There should be a web-resource pointing to the new file
+        // 3. There should be a JS file containing wizard callbacks
+        String js = new String(getResourceFile("js", "dialog-wizard.js").getContent());
+        assertThat(js, containsString("setWizard('com.atlassian.confluence.plugins.fooprint:foo-print-blueprint-web-item"));
+        assertThat(js, containsString(fieldId));
+        
+        // 4. There should be a web-resource pointing to the new files
         Element webResourceModule = getGeneratedModule("web-resource");
         assertWebResource(webResourceModule, blueprintProps.getWebResource());
 
-        // 4. There should be new entries in the i18n file for the template
-        assertI18nString(fieldLabelI18nKey, WIZARD_FORM_FIELD_LABEL_VALUE);
-        assertI18nString(fieldPlaceholderI18nKey, WIZARD_FORM_FIELD_PLACEHOLDER_VALUE);
+        // 5. There should be new entries in the i18n file for the JS, and matching references in the Soy and JS files
+        String titleLabel = PLUGIN_KEY + ".wizard.page0.title.label";
+        String titlePlace = PLUGIN_KEY + ".wizard.page0.title.placeholder";
+        String titleError = PLUGIN_KEY + ".wizard.page0.title.error";
+        String preRender  = PLUGIN_KEY + ".wizard.page0.pre-render";
+        String postRender = PLUGIN_KEY + ".wizard.page0.post-render";
 
-        // TODO - assert JS file
-        // TODO - assert CSS content?
+        assertThat(soy, containsString(format("{getText('%s')}", titleLabel)));
+        assertThat(soy, containsString(format("{getText('%s')}", titlePlace)));
+        assertThat(js, containsString(format("AJS.I18n.getText('%s')", preRender)));
+        assertThat(js, containsString(format("AJS.I18n.getText('%s')", postRender)));
+        assertThat(js, containsString(format("AJS.I18n.getText('%s')", titleError)));
+
+        assertI18nString(titleLabel, WIZARD_FORM_FIELD_LABEL_VALUE);
+        assertI18nString(titlePlace, WIZARD_FORM_FIELD_PLACEHOLDER_VALUE);
+        assertI18nString(preRender, WIZARD_FORM_FIELD_PRE_RENDER_TEXT_VALUE);
+        assertI18nString(postRender, WIZARD_FORM_FIELD_POST_RENDER_TEXT_VALUE);
+        assertI18nString(titleError, WIZARD_FORM_FIELD_VALIDATION_ERROR_VALUE);
+
+        // TODO - assert sidebar with description
     }
 
     private void assertWebResource(Element element, WebResourceProperties resourceProperties)

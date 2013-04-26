@@ -3,7 +3,7 @@ package com.atlassian.maven.plugins.amps.codegen.prompter.confluence.blueprint;
 import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractPrompterTest;
 import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompter;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintBuilder;
-import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry;
+import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntries;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintStringer;
 import org.codehaus.plexus.components.interactivity.PrompterException;
@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.atlassian.maven.plugins.amps.codegen.prompter.confluence.blueprint.BlueprintPrompter.ADVANCED_BLUEPRINT_PROMPT;
 import static com.atlassian.maven.plugins.amps.codegen.prompter.confluence.blueprint.BlueprintPrompter.ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT;
@@ -56,7 +55,7 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
     @Test
     public void basicPropertiesAreValid() throws PrompterException
     {
-        Map<BlueprintPromptEntry, Object> props = modulePrompter.promptForProps();
+        BlueprintPromptEntries props = modulePrompter.promptForProps();
 
         // Assert that all of the things are good things.
         assertEquals(blueprintIndexKey, props.get(INDEX_KEY_PROMPT));
@@ -67,6 +66,9 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         List<String> templateKeys = (List<String>) props.get(CONTENT_TEMPLATE_KEYS_PROMPT);
         assertEquals(1, templateKeys.size());
         assertEquals(templateModuleKey, templateKeys.get(0));
+
+        assertEquals("example", props.getPluginKey());
+        assertEquals("com.example", props.getDefaultBasePackage());
     }
 
     @Test
@@ -75,7 +77,7 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         when(prompter.prompt(ADVANCED_BLUEPRINT_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
         when(prompter.prompt(HOW_TO_USE_PROMPT.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
 
-        Map<BlueprintPromptEntry, Object> props = modulePrompter.promptForProps();
+        BlueprintPromptEntries props = modulePrompter.promptForProps();
 
         assertTrue((Boolean) props.get(HOW_TO_USE_PROMPT));
     }
@@ -86,7 +88,7 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         when(prompter.prompt(ADVANCED_BLUEPRINT_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
         when(prompter.prompt(DIALOG_WIZARD_PROMPT.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
 
-        Map<BlueprintPromptEntry, Object> props = modulePrompter.promptForProps();
+        BlueprintPromptEntries props = modulePrompter.promptForProps();
 
         assertTrue((Boolean) props.get(DIALOG_WIZARD_PROMPT));
     }

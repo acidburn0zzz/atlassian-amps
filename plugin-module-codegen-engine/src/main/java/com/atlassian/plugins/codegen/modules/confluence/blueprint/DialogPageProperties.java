@@ -11,7 +11,7 @@ public class DialogPageProperties extends Properties
 {
     public DialogPageProperties(String indexKey, int pageIndex, String soyPackage)
     {
-        String pageId = "page-" + pageIndex;
+        String pageId = "page" + pageIndex;
         setProperty("ID", pageId);
         setProperty("TEMPLATE_KEY", soyPackage + ".wizardPage" + pageIndex);
         setProperty("TITLE_I18N_KEY", indexKey + "." + pageId + ".title");

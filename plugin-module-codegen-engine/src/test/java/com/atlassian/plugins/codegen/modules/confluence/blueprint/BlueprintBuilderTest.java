@@ -16,6 +16,7 @@ import java.util.Map;
 
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.PLUGIN_KEY;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -30,6 +31,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class BlueprintBuilderTest
 {
+    public static final String PLUGIN_KEY = "com.atlassian.confluence.plugins.fooprint";
+
     private String webItemName = "FooPrint";
     private String webItemDesc = "There's no Blueprint like my FooPrint.";
     private String templateModuleKey = "foo-plate";
@@ -37,13 +40,13 @@ public class BlueprintBuilderTest
     private String blueprintModuleKey = blueprintIndexKey + "-blueprint";
 
     private BlueprintBuilder builder;
-    private Map<BlueprintPromptEntry, Object> promptProps;
+    private BlueprintPromptEntries promptProps;
     private List<String> contentTemplateKeys;
 
     @Before
     public void setup()
     {
-        promptProps = Maps.newHashMap();
+        promptProps = new BlueprintPromptEntries(PLUGIN_KEY);
 
         promptProps.put(INDEX_KEY_PROMPT, blueprintIndexKey);
         promptProps.put(WEB_ITEM_NAME_PROMPT, webItemName);
@@ -62,6 +65,8 @@ public class BlueprintBuilderTest
     public void basicPropertiesAreValid()
     {
         BlueprintProperties props = builder.build();
+
+        assertThat(props.getPluginKey(), is(PLUGIN_KEY));
 
         // Create expected Properties objects that the prompter should return.
         BlueprintProperties expectedProps = new BlueprintProperties();
@@ -85,6 +90,7 @@ public class BlueprintBuilderTest
 
         WebResourceProperties expectedWebResource = new WebResourceProperties();
         addSoyTemplateToExpectedWebResource(expectedWebResource);
+        addHowToUseToExpectedSoyResource(expectedWebResource);
 
         assertEquals("Confluence.Blueprints.Plugin.FooPrint.howToUse", props.getHowToUseTemplate());
         assertWebResourceProperties(expectedWebResource, props.getWebResource());
@@ -105,7 +111,50 @@ public class BlueprintBuilderTest
 
         assertDialogWizard(expectedWizard, props.getDialogWizard());
 
-        // NOTE - no more asserts on web-resource content here; it's tested under the respective BlueprintModuleCreatorTest
+        WebResourceProperties expectedWebResource = new WebResourceProperties();
+        addJsToExpectedWebResource(expectedWebResource);
+        addSoyTemplateToExpectedWebResource(expectedWebResource); // order of addition is important to assertions
+
+        assertWebResourceProperties(expectedWebResource, props.getWebResource());
+
+        assertThat(props.getWebResource().getProperty(BlueprintProperties.PLUGIN_KEY), is(PLUGIN_KEY));
+        assertThat(props.getWebResource().getProperty(BlueprintProperties.WEB_ITEM_KEY), is("foo-print-blueprint-web-item"));
+    }
+
+    private void addJsToExpectedWebResource(WebResourceProperties properties)
+    {
+        WebResourceTransformation transformation = new WebResourceTransformation("js");
+        WebResourceTransformerProperties transformer = new WebResourceTransformerProperties();
+        transformer.setModuleKey("jsI18n");
+        transformation.addTransformer(transformer);
+        properties.addTransformation(transformation);
+
+        Resource soyResource = new Resource();
+        soyResource.setType("download");
+        soyResource.setName("dialog-wizard.js");
+        soyResource.setLocation("js/dialog-wizard.js");
+        properties.addResource(soyResource);
+
+        String titleLabel = PLUGIN_KEY + ".wizard.page0.title.label";
+        String titlePlace = PLUGIN_KEY + ".wizard.page0.title.placeholder";
+        String titleError = PLUGIN_KEY + ".wizard.page0.title.error";
+        String preRender  = PLUGIN_KEY + ".wizard.page0.pre-render";
+        String postRender = PLUGIN_KEY + ".wizard.page0.post-render";
+
+        properties.setProperty(WIZARD_FORM_FIELD_LABEL_I18N_KEY, titleLabel);
+        properties.addI18nProperty(titleLabel, WIZARD_FORM_FIELD_LABEL_VALUE);
+
+        properties.setProperty(WIZARD_FORM_FIELD_PLACEHOLDER_I18N_KEY, titlePlace);
+        properties.addI18nProperty(titlePlace, WIZARD_FORM_FIELD_PLACEHOLDER_VALUE);
+
+        properties.setProperty(WIZARD_FORM_FIELD_VALIDATION_ERROR_I18N_KEY, titleError);
+        properties.addI18nProperty(titleError, WIZARD_FORM_FIELD_VALIDATION_ERROR_VALUE);
+
+        properties.setProperty(WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY, preRender);
+        properties.addI18nProperty(preRender, WIZARD_FORM_FIELD_PRE_RENDER_TEXT_VALUE);
+
+        properties.setProperty(WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY, postRender);
+        properties.addI18nProperty(postRender, WIZARD_FORM_FIELD_POST_RENDER_TEXT_VALUE);
     }
 
     private void assertDialogWizard(DialogWizardProperties expectedWizard, DialogWizardProperties actualWizard)
@@ -124,14 +173,47 @@ public class BlueprintBuilderTest
 
     private void assertWebResourceProperties(WebResourceProperties expected, WebResourceProperties actual)
     {
-        assertTransformationsEqual(expected.getTransformations().get(0), actual.getTransformations().get(0));
+        assertTransformationsEqual(expected.getTransformations(), actual.getTransformations());
         assertResourcesEqual(expected.getResources(), actual.getResources());
 
+        /*
+        <transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+        <transformation extension="soy">
+            <transformer key="soyTransformer">
+                <functions>com.atlassian.confluence.plugins.soy:soy-core-functions</functions>
+            </transformer>
+        </transformation>
+
+        <resource type="download" name="main.css" location="com/atlassian/confluence/plugins/hello_blueprint/css/main.css" />
+        <resource type="download" name="templates-soy.js" location="com/atlassian/confluence/plugins/hello_blueprint/soy/templates.soy" />
+        <resource type="download" name="hello-blueprint-wizard.js" location="com/atlassian/confluence/plugins/hello_blueprint/js/hello-blueprint-wizard.js" />
+
+        <dependency>com.atlassian.confluence.plugins.confluence-create-content-plugin:resources</dependency>
+        <dependency>com.atlassian.confluence.plugins.confluence-space-ia:spacesidebar</dependency>
+        <context>atl.general</context>
+        <context>atl.admin</context>
+         */
+
         // TODO - can we just test the resource in the ModuleCreator test? dT
+        // Answer - no.
         assertEquals(expected.getI18nProperties(), actual.getI18nProperties());
     }
 
-    private void assertTransformationsEqual(WebResourceTransformation expected, WebResourceTransformation actual)
+    private void assertTransformationsEqual(List<WebResourceTransformation> expectedTransformations,
+        List<WebResourceTransformation> actualTransformations)
+    {
+        assertThat(actualTransformations.size(), is(expectedTransformations.size()));
+        for (int i = 0; i < expectedTransformations.size(); i++)
+        {
+            WebResourceTransformation expected = expectedTransformations.get(i);
+            WebResourceTransformation actual = actualTransformations.get(i);
+            assertTransformationEqual(expected, actual);
+        }
+    }
+
+    private void assertTransformationEqual(WebResourceTransformation expected, WebResourceTransformation actual)
     {
         assertThat(actual.getExtension(), is(expected.getExtension()));
 
@@ -149,7 +231,6 @@ public class BlueprintBuilderTest
         transformation.addTransformer(transformer);
         properties.addTransformation(transformation);
 
-        // TODO - this property generation should be done by that BlueprintPropertiesGenerator util class. dT
         Resource soyResource = new Resource();
         soyResource.setType("download");
         soyResource.setName("templates-soy.js");
@@ -157,8 +238,12 @@ public class BlueprintBuilderTest
         properties.addResource(soyResource);
 
         properties.setProperty(BlueprintProperties.SOY_PACKAGE, "Confluence.Blueprints.Plugin.FooPrint");
-        String soyHeadingI18nKey = "foo-print-blueprint.wizard.how-to-use.heading";
-        String soyContentI18nKey = "foo-print-blueprint.wizard.how-to-use.content";
+    }
+
+    private void addHowToUseToExpectedSoyResource(WebResourceProperties properties)
+    {
+        String soyHeadingI18nKey = PLUGIN_KEY + ".wizard.how-to-use.heading";
+        String soyContentI18nKey = PLUGIN_KEY + ".wizard.how-to-use.content";
 
         properties.setProperty(HOW_TO_USE_HEADING_I18N_KEY, soyHeadingI18nKey);
         properties.setProperty(HOW_TO_USE_CONTENT_I18N_KEY, soyContentI18nKey);
@@ -229,9 +314,9 @@ public class BlueprintBuilderTest
     {
         WebItemProperties webItem = new WebItemProperties();
         webItem.setModuleKey("foo-print-blueprint-web-item");
-        webItem.setNameI18nKey("foo-print-blueprint.display.name");
+        webItem.setNameI18nKey(PLUGIN_KEY + ".blueprint.display.name");
         webItem.setModuleName(webItemName);
-        webItem.setDescriptionI18nKey("foo-print-blueprint.display.desc");
+        webItem.setDescriptionI18nKey(PLUGIN_KEY + ".blueprint.display.desc");
         webItem.setDescription(webItemDesc);
         webItem.setSection("system.create.dialog/content");
 

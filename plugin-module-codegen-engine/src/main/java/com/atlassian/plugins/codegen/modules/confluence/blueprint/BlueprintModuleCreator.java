@@ -25,6 +25,7 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
     private static final String CONTENT_TEMPLATE_MODULE_TEMPLATE = TEMPLATE_PREFIX + "plugin-module-content-template.xml.vtl";
     private static final String CONTENT_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-content-template.xml.vtl";
     private static final String SOY_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-soy-template.soy.vtl";
+    private static final String JS_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-dialog-wizard.js.vtl";
 
     @Override
     public PluginProjectChangeset createModule(BlueprintProperties props) throws Exception
@@ -49,15 +50,13 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
 
         WebResourceProperties webResource = props.getWebResource();
         changeset = changeset.with(createModule(webResource, WebResourceModuleCreator.PLUGIN_MODULE_TEMPLATE));
-
-        // TODO - only needs creating if the props specify it.
-        changeset = addResourceFiles(changeset, webResource, SOY_TEMPLATE_FILE_TEMPLATE);
+        changeset = addResourceFiles(changeset, webResource, null); // null means figure the template out...
 
         return changeset;
     }
 
     private PluginProjectChangeset addResourceFiles(PluginProjectChangeset changeset,
-        ResourcedProperties properties, String resourceFileTemplate) throws Exception
+        ResourcedProperties properties, String givenTemplate) throws Exception
     {
         for (Resource resource : properties.getResources())
         {
@@ -65,6 +64,14 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
             int lastSlash = filePath.lastIndexOf('/');
             String path = filePath.substring(0, lastSlash);
             String filename = filePath.substring(lastSlash + 1);
+
+            // TODO - this is crap. Very.
+            String resourceFileTemplate = givenTemplate;
+            if (resourceFileTemplate == null)
+            {
+                resourceFileTemplate = filename.endsWith("js") ? JS_TEMPLATE_FILE_TEMPLATE : SOY_TEMPLATE_FILE_TEMPLATE;
+            }
+
             changeset = changeset.with(createResource(properties, path, filename, resourceFileTemplate));
         }
         return changeset;

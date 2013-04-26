@@ -33,11 +33,30 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public static final String WIZARD_FORM_FIELD_LABEL_VALUE = "Page title";
     public static final String WIZARD_FORM_FIELD_PLACEHOLDER_VALUE = "Add a title for your new page";
 
+    public static final String PLUGIN_KEY = "PLUGIN_KEY";
+    public static final String WEB_ITEM_KEY = "WEB_ITEM_KEY";
+    public static final String WIZARD_FORM_FIELD_ID = "WIZARD_FORM_FIELD_ID";
+    public static final String WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY = "WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY";
+    public static final String WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY = "WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY";
+    public static final String WIZARD_FORM_FIELD_VALIDATION_ERROR_I18N_KEY = "WIZARD_FORM_FIELD_VALIDATION_ERROR_I18N_KEY";
+    public static final String WIZARD_FORM_FIELD_PRE_RENDER_TEXT_VALUE = "This text comes from the pre-render hook in the Wizard JavaScript";
+    public static final String WIZARD_FORM_FIELD_POST_RENDER_TEXT_VALUE = "This text comes from the post-render hook in the Wizard JavaScript";
+    public static final String WIZARD_FORM_FIELD_VALIDATION_ERROR_VALUE = "You must enter a title";
 
     public BlueprintProperties()
     {
         List<ContentTemplateProperties> contentTemplateKeys = newArrayList();
         put(CONTENT_TEMPLATES, contentTemplateKeys);
+    }
+
+    public void setPluginKey(String pluginKey)
+    {
+        setProperty(PLUGIN_KEY, pluginKey);
+    }
+
+    public String getPluginKey()
+    {
+        return getProperty(PLUGIN_KEY);
     }
 
     public void addContentTemplate(ContentTemplateProperties templateProps)

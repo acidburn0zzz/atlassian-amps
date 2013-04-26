@@ -5,6 +5,7 @@ import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter;
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintBuilder;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintModuleCreator;
+import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntries;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintStringer;
@@ -44,10 +45,11 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
             "\t<blueprint> - for general Blueprint configuration\n" +
             "\t<content-template> - (one or more) provides content XML for the Blueprint\n" +
             "\t<web-item> - displays the Blueprint in the Create dialog\n" +
-            "For further details on Blueprints, see https://developer.atlassian.com/display/CONFDEV/Writing+a+Blueprint"
+            "For a Blueprint tutorial, see https://developer.atlassian.com/display/CONFDEV/Writing+a+Blueprint\n" +
+            "For a Blueprint example, see https://bitbucket.org/atlassian/hello-blueprint"
             );
 
-        Map<BlueprintPromptEntry, Object> props = promptForProps();
+        BlueprintPromptEntries props = promptForProps();
 
         return new BlueprintBuilder(props).build();
     }
@@ -57,9 +59,9 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         BlueprintBuilder call, so to test the main logic of this class (i.e. the interaction of the user with the
         prompts) we need to isolate the 'Properties' from the 'BlueprintProperties'.
      */
-    Map<BlueprintPromptEntry, Object> promptForProps() throws PrompterException
+    BlueprintPromptEntries promptForProps() throws PrompterException
     {
-        Map<BlueprintPromptEntry, Object> props = Maps.newHashMap();
+        BlueprintPromptEntries props = new BlueprintPromptEntries(getPluginKey(), getDefaultBasePackage());
         props.put(HOW_TO_USE_PROMPT, false);
         props.put(DIALOG_WIZARD_PROMPT, false);
 
@@ -131,14 +133,14 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         return props;
     }
 
-    private String promptNotBlank(BlueprintPromptEntry promptEntry, Map<BlueprintPromptEntry, Object> props) throws PrompterException
+    private String promptNotBlank(BlueprintPromptEntry promptEntry, BlueprintPromptEntries props) throws PrompterException
     {
         String input = promptNotBlank(promptEntry.message(), promptEntry.defaultValue());
         props.put(promptEntry, input);
         return input;
     }
 
-    private boolean promptForBoolean(BlueprintPromptEntry promptEntry, Map<BlueprintPromptEntry, Object> props) throws PrompterException
+    private boolean promptForBoolean(BlueprintPromptEntry promptEntry, BlueprintPromptEntries props) throws PrompterException
     {
         boolean input = promptForBoolean(promptEntry.message(), promptEntry.defaultValue());
         props.put(promptEntry, input);
