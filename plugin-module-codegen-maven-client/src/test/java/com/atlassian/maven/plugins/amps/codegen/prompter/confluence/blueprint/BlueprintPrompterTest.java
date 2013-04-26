@@ -42,14 +42,14 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
 
         BlueprintStringer stringer = new BlueprintStringer(blueprintIndexKey);
 
-        when(prompter.prompt(INDEX_KEY.message(), INDEX_KEY.defaultValue())).thenReturn(blueprintIndexKey);
-        when(prompter.prompt(WEB_ITEM_NAME.message(), WEB_ITEM_NAME.defaultValue())).thenReturn(webItemName);
-        when(prompter.prompt(WEB_ITEM_DESC.message(), WEB_ITEM_DESC.defaultValue())).thenReturn(webItemDesc);
-        when(prompter.prompt(CONTENT_TEMPLATE_KEYS.message(), stringer.makeContentTemplateKey(0))).thenReturn( templateModuleKey);
+        when(prompter.prompt(INDEX_KEY_PROMPT.message(), INDEX_KEY_PROMPT.defaultValue())).thenReturn(blueprintIndexKey);
+        when(prompter.prompt(WEB_ITEM_NAME_PROMPT.message(), WEB_ITEM_NAME_PROMPT.defaultValue())).thenReturn(webItemName);
+        when(prompter.prompt(WEB_ITEM_DESC_PROMPT.message(), WEB_ITEM_DESC_PROMPT.defaultValue())).thenReturn(webItemDesc);
+        when(prompter.prompt(CONTENT_TEMPLATE_KEYS_PROMPT.message(), stringer.makeContentTemplateKey(0))).thenReturn( templateModuleKey);
         when(prompter.prompt(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
         when(prompter.prompt(ADVANCED_BLUEPRINT_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
-        when(prompter.prompt(HOW_TO_USE.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
-        when(prompter.prompt(DIALOG_WIZARD.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
+        when(prompter.prompt(HOW_TO_USE_PROMPT.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
+        when(prompter.prompt(DIALOG_WIZARD_PROMPT.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
     }
 
     @SuppressWarnings("unchecked")
@@ -59,12 +59,12 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         Map<BlueprintPromptEntry, Object> props = modulePrompter.promptForProps();
 
         // Assert that all of the things are good things.
-        assertEquals(blueprintIndexKey, props.get(INDEX_KEY));
-        assertEquals(webItemName, props.get(WEB_ITEM_NAME));
-        assertEquals(webItemDesc, props.get(WEB_ITEM_DESC));
-        assertFalse((Boolean) props.get(HOW_TO_USE));
+        assertEquals(blueprintIndexKey, props.get(INDEX_KEY_PROMPT));
+        assertEquals(webItemName, props.get(WEB_ITEM_NAME_PROMPT));
+        assertEquals(webItemDesc, props.get(WEB_ITEM_DESC_PROMPT));
+        assertFalse((Boolean) props.get(HOW_TO_USE_PROMPT));
 
-        List<String> templateKeys = (List<String>) props.get(CONTENT_TEMPLATE_KEYS);
+        List<String> templateKeys = (List<String>) props.get(CONTENT_TEMPLATE_KEYS_PROMPT);
         assertEquals(1, templateKeys.size());
         assertEquals(templateModuleKey, templateKeys.get(0));
     }
@@ -73,21 +73,21 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
     public void howToUseTemplateAdded() throws PrompterException
     {
         when(prompter.prompt(ADVANCED_BLUEPRINT_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
-        when(prompter.prompt(HOW_TO_USE.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
+        when(prompter.prompt(HOW_TO_USE_PROMPT.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
 
         Map<BlueprintPromptEntry, Object> props = modulePrompter.promptForProps();
 
-        assertTrue((Boolean) props.get(HOW_TO_USE));
+        assertTrue((Boolean) props.get(HOW_TO_USE_PROMPT));
     }
 
     @Test
     public void dialogWizardAdded() throws PrompterException
     {
         when(prompter.prompt(ADVANCED_BLUEPRINT_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
-        when(prompter.prompt(DIALOG_WIZARD.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
+        when(prompter.prompt(DIALOG_WIZARD_PROMPT.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
 
         Map<BlueprintPromptEntry, Object> props = modulePrompter.promptForProps();
 
-        assertTrue((Boolean) props.get(DIALOG_WIZARD));
+        assertTrue((Boolean) props.get(DIALOG_WIZARD_PROMPT));
     }
 }

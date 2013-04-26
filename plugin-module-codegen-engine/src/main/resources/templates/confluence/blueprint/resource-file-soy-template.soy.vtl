@@ -1,11 +1,44 @@
+#* @vtlvariable name="SOY_PACKAGE" type="java.lang.String" *#
+#* @vtlvariable name="HOW_TO_USE" type="boolean" *#
+#* @vtlvariable name="DIALOG_WIZARD" type="boolean" *#
+#* @vtlvariable name="HOW_TO_USE_HEADING_I18N_KEY" type="java.lang.String" *#
+#* @vtlvariable name="HOW_TO_USE_CONTENT_I18N_KEY" type="java.lang.String" *#
+#* @vtlvariable name="INDEX_KEY" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_FIELD_LABEL_I18N_KEY" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_FIELD_PLACEHOLDER_I18N_KEY" type="java.lang.String" *#
 {namespace $SOY_PACKAGE}
 
+#if ($HOW_TO_USE)
 /**
 * How-to-use page for the wizard.
 
 ## TODO - use the same layout as our bundled Blueprints. dT
 */
 {template .howToUse}
-<h2>{getText('$HEADING_I18N_KEY')}</h2>
-<p>{getText('$CONTENT_I18N_KEY')}</p>
+<h2>{getText('$HOW_TO_USE_HEADING_I18N_KEY')}</h2>
+<p>{getText('$HOW_TO_USE_CONTENT_I18N_KEY')}</p>
 {/template}
+#end
+
+#if ($DIALOG_WIZARD)
+/**
+* A form page for the Wizard. This form will be processed by the Blueprints Wizard JS automatically.
+
+## TODO - should include a passed parameter to demonstrate the pre-render JS hook.
+*/
+{template .wizardPage0}
+<form action="#" method="post" id="wizard-page-0-form" class="aui">
+    <fieldset>
+        <div class="field-group">
+            <label for="${INDEX_KEY}-blueprint-page-title}">
+                {getText('$WIZARD_FORM_FIELD_LABEL_I18N_KEY')}
+                <span class="aui-icon icon-required">required</span>
+            </label>
+            <input id="${INDEX_KEY}-blueprint-page-title}" class="text" type="text" name="title" title="title"
+                   placeholder="{getText('$WIZARD_FORM_FIELD_PLACEHOLDER_I18N_KEY')}" maxlength="255">
+            <div class="error"></div>
+        </div>
+    </fieldset>
+</form>
+{/template}
+#end

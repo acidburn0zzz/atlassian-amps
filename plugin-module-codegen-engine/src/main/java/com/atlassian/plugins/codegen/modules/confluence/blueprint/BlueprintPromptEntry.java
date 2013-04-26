@@ -7,12 +7,12 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
  */
 public enum BlueprintPromptEntry
 {
-    INDEX_KEY("Enter Index Key (e.g. file-list, meeting-note)", "my-blueprint"),
-    WEB_ITEM_NAME("Enter Blueprint name (e.g. File List, Meeting Note)", "My Blueprint"),
-    WEB_ITEM_DESC("Enter Blueprint description", "Creates pages based on my Blueprint."),
-    CONTENT_TEMPLATE_KEYS("Enter Content Template key", null),   // defaults are generated
-    HOW_TO_USE("Add a How-to-Use page to your Blueprint?", "N"),
-    DIALOG_WIZARD("Add a Create dialog wizard to your Blueprint?", "N")
+    INDEX_KEY_PROMPT("Enter Index Key (e.g. file-list, meeting-note)", "my-blueprint"),
+    WEB_ITEM_NAME_PROMPT("Enter Blueprint name (e.g. File List, Meeting Note)", "My Blueprint"),
+    WEB_ITEM_DESC_PROMPT("Enter Blueprint description", "Creates pages based on my Blueprint."),
+    CONTENT_TEMPLATE_KEYS_PROMPT("Enter Content Template key", null),   // defaults are generated
+    HOW_TO_USE_PROMPT("Add a How-to-Use page to your Blueprint?", "N"),
+    DIALOG_WIZARD_PROMPT("Add a Create dialog wizard to your Blueprint?", "N")
     ;
 
     private final String message;

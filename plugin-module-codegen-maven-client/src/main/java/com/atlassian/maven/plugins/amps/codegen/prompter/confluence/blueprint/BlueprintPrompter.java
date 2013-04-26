@@ -60,8 +60,8 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
     Map<BlueprintPromptEntry, Object> promptForProps() throws PrompterException
     {
         Map<BlueprintPromptEntry, Object> props = Maps.newHashMap();
-        props.put(HOW_TO_USE, false);
-        props.put(DIALOG_WIZARD, false);
+        props.put(HOW_TO_USE_PROMPT, false);
+        props.put(DIALOG_WIZARD_PROMPT, false);
 
         // Index key
         showMessage(
@@ -69,7 +69,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                 "and appear as a Label on each created Blueprint page."
         );
         // TODO - make sure the key is a valid *label* and also a valid prefix for module keys.
-        String indexKey = promptNotBlank(INDEX_KEY, props);
+        String indexKey = promptNotBlank(INDEX_KEY_PROMPT, props);
         BlueprintStringer stringer = new BlueprintStringer(indexKey);
 
         // Name and Description
@@ -78,8 +78,8 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                 "The i18n keys for the name and description will be automatically generated for your Blueprint but can be\n" +
                 "changed later."
         );
-        promptNotBlank(WEB_ITEM_NAME, props);
-        promptNotBlank(BlueprintPromptEntry.WEB_ITEM_DESC, props);
+        promptNotBlank(WEB_ITEM_NAME_PROMPT, props);
+        promptNotBlank(WEB_ITEM_DESC_PROMPT, props);
 
         // Template(s)
         showMessage(
@@ -91,7 +91,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         do
         {
             String defaultValue = stringer.makeContentTemplateKey(templateIndex);
-            templateKeys.add(promptNotBlank(CONTENT_TEMPLATE_KEYS.message(), defaultValue));
+            templateKeys.add(promptNotBlank(CONTENT_TEMPLATE_KEYS_PROMPT.message(), defaultValue));
             templateIndex++;
         }
         while(promptForBoolean(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT, "N"));
@@ -102,7 +102,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                 "If you added more than one Template, you'll need to provide a way for users to choose between them.\n" +
                     "See the documentation on developer.atlassian.com for details on how to do this.");
         }
-        props.put(CONTENT_TEMPLATE_KEYS, templateKeys);
+        props.put(CONTENT_TEMPLATE_KEYS_PROMPT, templateKeys);
 
         // Advanced
         showMessage(
@@ -117,7 +117,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                     "familiarise the user with what your Blueprint does and how it works. All Blueprints shipped with\n" +
                     "Confluence include a How-to-use page and recommend them for most Blueprints."
             );
-            promptForBoolean(HOW_TO_USE, props);
+            promptForBoolean(HOW_TO_USE_PROMPT, props);
 
             // Dialog wizard
             showMessage(
@@ -126,7 +126,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                     "templates that you provide and connecting them into a multi-page wizard that you can configure\n" +
                     "simply."
             );
-            promptForBoolean(DIALOG_WIZARD, props);
+            promptForBoolean(DIALOG_WIZARD_PROMPT, props);
         }
         return props;
     }

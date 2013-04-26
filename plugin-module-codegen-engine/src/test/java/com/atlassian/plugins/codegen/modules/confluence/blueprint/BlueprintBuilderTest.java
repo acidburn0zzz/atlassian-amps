@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
-import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.WEB_ITEM_BLUEPRINT_KEY;
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -45,15 +45,15 @@ public class BlueprintBuilderTest
     {
         promptProps = Maps.newHashMap();
 
-        promptProps.put(INDEX_KEY, blueprintIndexKey);
-        promptProps.put(WEB_ITEM_NAME, webItemName);
-        promptProps.put(WEB_ITEM_DESC, webItemDesc);
-        promptProps.put(HOW_TO_USE, false);
-        promptProps.put(DIALOG_WIZARD, false);
+        promptProps.put(INDEX_KEY_PROMPT, blueprintIndexKey);
+        promptProps.put(WEB_ITEM_NAME_PROMPT, webItemName);
+        promptProps.put(WEB_ITEM_DESC_PROMPT, webItemDesc);
+        promptProps.put(HOW_TO_USE_PROMPT, false);
+        promptProps.put(DIALOG_WIZARD_PROMPT, false);
 
         contentTemplateKeys = Lists.newArrayList();
         contentTemplateKeys.add(templateModuleKey);
-        promptProps.put(CONTENT_TEMPLATE_KEYS, contentTemplateKeys);
+        promptProps.put(CONTENT_TEMPLATE_KEYS_PROMPT, contentTemplateKeys);
 
         builder = new BlueprintBuilder(promptProps);
     }
@@ -80,7 +80,7 @@ public class BlueprintBuilderTest
     @Test
     public void howToUseTemplateAdded()
     {
-        promptProps.put(HOW_TO_USE, true);
+        promptProps.put(HOW_TO_USE_PROMPT, true);
         BlueprintProperties props = builder.build();
 
         WebResourceProperties expectedWebResource = new WebResourceProperties();
@@ -93,7 +93,7 @@ public class BlueprintBuilderTest
     @Test
     public void dialogWizardAdded()
     {
-        promptProps.put(DIALOG_WIZARD, true);
+        promptProps.put(DIALOG_WIZARD_PROMPT, true);
         BlueprintProperties props = builder.build();
 
         DialogWizardProperties expectedWizard = new DialogWizardProperties();
@@ -104,6 +104,8 @@ public class BlueprintBuilderTest
         expectedWizard.setDialogPages(pages);
 
         assertDialogWizard(expectedWizard, props.getDialogWizard());
+
+        // NOTE - no more asserts on web-resource content here; it's tested under the respective BlueprintModuleCreatorTest
     }
 
     private void assertDialogWizard(DialogWizardProperties expectedWizard, DialogWizardProperties actualWizard)
@@ -155,14 +157,14 @@ public class BlueprintBuilderTest
         properties.addResource(soyResource);
 
         properties.setProperty(BlueprintProperties.SOY_PACKAGE, "Confluence.Blueprints.Plugin.FooPrint");
-        String soyHeadingI18nKey = "foo-print-blueprint.soy.template.heading";
-        String soyContentI18nKey = "foo-print-blueprint.soy.template.content";
+        String soyHeadingI18nKey = "foo-print-blueprint.wizard.how-to-use.heading";
+        String soyContentI18nKey = "foo-print-blueprint.wizard.how-to-use.content";
 
-        properties.setProperty(BlueprintProperties.SOY_HEADING_I18N_KEY, soyHeadingI18nKey);
-        properties.setProperty(BlueprintProperties.SOY_CONTENT_I18N_KEY, soyContentI18nKey);
+        properties.setProperty(HOW_TO_USE_HEADING_I18N_KEY, soyHeadingI18nKey);
+        properties.setProperty(HOW_TO_USE_CONTENT_I18N_KEY, soyContentI18nKey);
 
-        properties.addI18nProperty(soyHeadingI18nKey, BlueprintProperties.SOY_HEADING_VALUE);
-        properties.addI18nProperty(soyContentI18nKey, BlueprintProperties.SOY_CONTENT_VALUE);
+        properties.addI18nProperty(soyHeadingI18nKey, HOW_TO_USE_HEADING_VALUE);
+        properties.addI18nProperty(soyContentI18nKey, HOW_TO_USE_CONTENT_VALUE);
     }
 
     private void assertContentTemplatePropertiesEqual(List<ContentTemplateProperties> expectedTemplates,

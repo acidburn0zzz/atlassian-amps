@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
@@ -80,15 +81,15 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     {
         promptProps = Maps.newHashMap();
 
-        promptProps.put(INDEX_KEY, blueprintIndexKey);
-        promptProps.put(WEB_ITEM_NAME, webItemName);
-        promptProps.put(WEB_ITEM_DESC, webItemDesc);
-        promptProps.put(HOW_TO_USE, false);
-        promptProps.put(DIALOG_WIZARD, false);
+        promptProps.put(INDEX_KEY_PROMPT, blueprintIndexKey);
+        promptProps.put(WEB_ITEM_NAME_PROMPT, webItemName);
+        promptProps.put(WEB_ITEM_DESC_PROMPT, webItemDesc);
+        promptProps.put(HOW_TO_USE_PROMPT, false);
+        promptProps.put(DIALOG_WIZARD_PROMPT, false);
 
         List<String> contentTemplateKeys = Lists.newArrayList();
         contentTemplateKeys.add(templateModuleKey);
-        promptProps.put(CONTENT_TEMPLATE_KEYS, contentTemplateKeys);
+        promptProps.put(CONTENT_TEMPLATE_KEYS_PROMPT, contentTemplateKeys);
     }
 
     @After
@@ -171,7 +172,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     @Test
     public void howToUseTemplateIsAdded() throws Exception
     {
-        promptProps.put(HOW_TO_USE, true);
+        promptProps.put(HOW_TO_USE_PROMPT, true);
         buildBlueprintProperties();
 
         // 1. The blueprint element should have a new attribute with the how-to-use template reference
@@ -179,9 +180,8 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertNodeText(blueprintModule, "@how-to-use-template", blueprintProps.getHowToUseTemplate());
 
         // 2. There should be a Soy file containing the referenced template
-        WebResourceProperties webResource = blueprintProps.getWebResource();
-        String soyHeadingI18nKey = webResource.getProperty(BlueprintProperties.SOY_HEADING_I18N_KEY);
-        String soyContentI18nKey = webResource.getProperty(BlueprintProperties.SOY_CONTENT_I18N_KEY);
+        String soyHeadingI18nKey = "foo-print-blueprint.wizard.how-to-use.heading";
+        String soyContentI18nKey = "foo-print-blueprint.wizard.how-to-use.content";
         String soy = new String(getResourceFile("soy", "my-templates.soy").getContent());
         assertThat(soy, containsString(format("{namespace %s}", "Confluence.Blueprints.Plugin.FooPrint")));
         assertThat(soy, containsString("{template .howToUse}"));
@@ -190,11 +190,11 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
 
         // 3. There should be a web-resource pointing to the new file
         Element webResourceModule = getGeneratedModule("web-resource");
-        assertWebResource(webResourceModule, webResource);
+        assertWebResource(webResourceModule, blueprintProps.getWebResource());
 
         // 4. There should new entries in the i18n file for the template
-        assertI18nString(soyHeadingI18nKey, BlueprintProperties.SOY_HEADING_VALUE);
-        assertI18nString(soyContentI18nKey, BlueprintProperties.SOY_CONTENT_VALUE);
+        assertI18nString(soyHeadingI18nKey, BlueprintProperties.HOW_TO_USE_HEADING_VALUE);
+        assertI18nString(soyContentI18nKey, BlueprintProperties.HOW_TO_USE_CONTENT_VALUE);
 
         // TODO - 5. There should (?) be CSS rules for the template
     }
@@ -202,9 +202,10 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     @Test
     public void dialogWizardIsAdded() throws Exception
     {
-        promptProps.put(DIALOG_WIZARD, true);
+        promptProps.put(DIALOG_WIZARD_PROMPT, true);
         buildBlueprintProperties();
 
+        // 1. The blueprint element should have a new dialog-wizard element and children
         Element blueprintModule = getGeneratedModule();
         Element wizardElement = blueprintModule.element("dialog-wizard");
         assertNotNull("dialog-wizard element should be created", wizardElement);
@@ -218,8 +219,23 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertNodeText(pageElement, "@description-header-key", "foo-print.page-0.desc.header");
         assertNodeText(pageElement, "@description-content-key", "foo-print.page-0.desc.content");
 
-        // TODO - assert Soy template content
-        // TODO - assert I18n values
+        // 2. There should be a Soy file containing the referenced template
+        String fieldLabelI18nKey = "foo-print-blueprint.wizard.page0.title.label";
+        String fieldPlaceholderI18nKey = "foo-print-blueprint.wizard.page0.title.placeholder";
+        String soy = new String(getResourceFile("soy", "my-templates.soy").getContent());
+        assertThat(soy, containsString(format("{namespace %s}", "Confluence.Blueprints.Plugin.FooPrint")));
+        assertThat(soy, containsString("{template .wizardPage0}"));
+        assertThat(soy, containsString(format("{getText('%s')}", fieldLabelI18nKey)));
+        assertThat(soy, containsString(format("{getText('%s')}", fieldPlaceholderI18nKey)));
+
+        // 3. There should be a web-resource pointing to the new file
+        Element webResourceModule = getGeneratedModule("web-resource");
+        assertWebResource(webResourceModule, blueprintProps.getWebResource());
+
+        // 4. There should be new entries in the i18n file for the template
+        assertI18nString(fieldLabelI18nKey, WIZARD_FORM_FIELD_LABEL_VALUE);
+        assertI18nString(fieldPlaceholderI18nKey, WIZARD_FORM_FIELD_PLACEHOLDER_VALUE);
+
         // TODO - assert JS file
         // TODO - assert CSS content?
     }

@@ -22,11 +22,16 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public static final String CONTENT_TEMPLATES = "CONTENT_TEMPLATES";
     private static final String HOW_TO_USE_TEMPLATE = "HOW_TO_USE_TEMPLATE";
     public static final String DIALOG_WIZARD = "DIALOG_WIZARD";
+
     public static final String SOY_PACKAGE = "SOY_PACKAGE";
-    public static final String SOY_HEADING_I18N_KEY = "HEADING_I18N_KEY";
-    public static final String SOY_CONTENT_I18N_KEY = "CONTENT_I18N_KEY";
-    public static final String SOY_HEADING_VALUE = "Welcome to my Blueprint";
-    public static final String SOY_CONTENT_VALUE = "This blueprint can be used to create a special page.";
+    public static final String HOW_TO_USE_HEADING_I18N_KEY = "HOW_TO_USE_HEADING_I18N_KEY";
+    public static final String HOW_TO_USE_CONTENT_I18N_KEY = "HOW_TO_USE_CONTENT_I18N_KEY";
+    public static final String WIZARD_FORM_FIELD_LABEL_I18N_KEY = "WIZARD_FORM_FIELD_LABEL_I18N_KEY";
+    public static final String WIZARD_FORM_FIELD_PLACEHOLDER_I18N_KEY = "WIZARD_FORM_FIELD_PLACEHOLDER_I18N_KEY";
+    public static final String HOW_TO_USE_HEADING_VALUE = "Welcome to my Blueprint";
+    public static final String HOW_TO_USE_CONTENT_VALUE = "This blueprint can be used to create a special page.";
+    public static final String WIZARD_FORM_FIELD_LABEL_VALUE = "Page title";
+    public static final String WIZARD_FORM_FIELD_PLACEHOLDER_VALUE = "Add a title for your new page";
 
 
     public BlueprintProperties()
