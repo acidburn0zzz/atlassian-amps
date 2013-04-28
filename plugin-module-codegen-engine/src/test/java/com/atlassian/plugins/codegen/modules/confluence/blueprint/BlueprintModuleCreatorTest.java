@@ -18,6 +18,7 @@ import static com.atlassian.plugins.codegen.modules.confluence.blueprint.Bluepri
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 
 /**
@@ -246,6 +247,13 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertThat(js, containsString(format("AJS.I18n.getText('%s')", preRender)));
         assertThat(js, containsString(format("AJS.I18n.getText('%s')", postRender)));
         assertThat(js, containsString(format("AJS.I18n.getText('%s')", titleError)));
+
+        // The combination of Velocity, JavaScript and jQuery can lead to problems if variable names start with "$".
+        // Using the correct escape characters in Velocity should fix this - test that the rendered JS is correct.
+        assertThat(js, containsString("state.$container;"));
+        assertThat(js, not(containsString("(.trim")));
+        assertThat(js, not(containsString("\\$")));
+        assertThat(js, not(containsString("${")));
 
         assertI18nString(titleLabel, WIZARD_FORM_FIELD_LABEL_VALUE);
         assertI18nString(titlePlace, WIZARD_FORM_FIELD_PLACEHOLDER_VALUE);

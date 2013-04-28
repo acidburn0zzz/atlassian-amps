@@ -28,7 +28,7 @@
      *        - wizardData - contains all data gathered by the Wizard pages, may be used to add data to the Soy context
      */
     function preRender(e, state) {
-        state.soyRenderContext['preRenderText'] = AJS.I18n.getText('$WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY');
+        state.soyRenderContext['preRenderText'] = AJS.I18n.getText('${WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY}');
     }
 
     /**
@@ -42,7 +42,8 @@
      *        - wizardData - contains all data gathered by the Wizard pages
      */
     function postRender(e, state) {
-        state.$container.append\(AJS.I18n.getText('$WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY'));
+        var wizardForm = state.$container;
+        wizardForm.append(AJS.I18n.getText('${WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY}'));
     }
 
     /**
@@ -65,20 +66,21 @@
      * @return boolean - true if validation passes, false if the submit should be aborted
      */
     function submit(e, state) {
-        var $container = state.$container,
-            $field = $container.find\('#$WIZARD_FORM_FIELD_ID');
+        var wizardForm = state.$container,
+            field = wizardForm.find('#${WIZARD_FORM_FIELD_ID}');
 
-        $container.find('.error').html(''); // clear all existing errors
+        wizardForm.find('.error').html(''); // clear all existing errors
 
-        if ($.trim($field.val()\) == '') {
-            $field.focus().siblings('.error').html\(AJS.I18n.getText('$WIZARD_FORM_FIELD_VALIDATION_ERROR_I18N_KEY'));
+## Use jQuery instead of $ for the trim to workaround Velocity variable escaping problems.
+        if (jQuery.trim(field.val()) == '') {
+            field.focus().siblings('.error').html(AJS.I18n.getText('${WIZARD_FORM_FIELD_VALIDATION_ERROR_I18N_KEY}'));
             return false;
         }
         return true;
     }
 
     // Register wizard hooks
-    Confluence.Blueprint.setWizard('$PLUGIN_KEY:$WEB_ITEM_KEY', function(wizard) {
+    Confluence.Blueprint.setWizard('${PLUGIN_KEY}:${WEB_ITEM_KEY}', function(wizard) {
         wizard.on('pre-render.page0', preRender);
         wizard.on('post-render.page0', postRender);
         wizard.on('submit.page0', submit);
