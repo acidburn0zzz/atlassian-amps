@@ -62,6 +62,10 @@ public class BlueprintBuilder
 
         // Reused for icon CSS, how-to-use and dialog-wizard.
         WebResourceProperties webResource = new WebResourceProperties();
+        webResource.addContext("atl.general");
+        webResource.addContext("atl.admin");
+        webResource.addDependency("com.atlassian.confluence.plugins.confluence-create-content-plugin:resources");
+
         props.setWebResource(webResource);
 
         boolean hasHowToUse = (Boolean)promptProps.get(HOW_TO_USE_PROMPT);

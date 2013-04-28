@@ -7,16 +7,13 @@ import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformation;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformerProperties;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
-import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.PLUGIN_KEY;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -88,12 +85,24 @@ public class BlueprintBuilderTest
         promptProps.put(HOW_TO_USE_PROMPT, true);
         BlueprintProperties props = builder.build();
 
-        WebResourceProperties expectedWebResource = new WebResourceProperties();
+        WebResourceProperties expectedWebResource = newExpectedWebResourceProperties();
         addSoyTemplateToExpectedWebResource(expectedWebResource);
         addHowToUseToExpectedSoyResource(expectedWebResource);
 
         assertEquals("Confluence.Blueprints.Plugin.FooPrint.howToUse", props.getHowToUseTemplate());
         assertWebResourceProperties(expectedWebResource, props.getWebResource());
+    }
+
+    private WebResourceProperties newExpectedWebResourceProperties()
+    {
+        WebResourceProperties properties = new WebResourceProperties();
+
+        properties.addContext("atl.general");
+        properties.addContext("atl.admin");
+
+        properties.addDependency("com.atlassian.confluence.plugins.confluence-create-content-plugin:resources");
+
+        return properties;
     }
 
     @Test
@@ -111,14 +120,15 @@ public class BlueprintBuilderTest
 
         assertDialogWizard(expectedWizard, props.getDialogWizard());
 
-        WebResourceProperties expectedWebResource = new WebResourceProperties();
+        WebResourceProperties expectedWebResource = newExpectedWebResourceProperties();
         addJsToExpectedWebResource(expectedWebResource);
         addSoyTemplateToExpectedWebResource(expectedWebResource); // order of addition is important to assertions
 
         assertWebResourceProperties(expectedWebResource, props.getWebResource());
 
         assertThat(props.getWebResource().getProperty(BlueprintProperties.PLUGIN_KEY), is(PLUGIN_KEY));
-        assertThat(props.getWebResource().getProperty(BlueprintProperties.WEB_ITEM_KEY), is("foo-print-blueprint-web-item"));
+        assertThat(props.getWebResource().getProperty(BlueprintProperties.WEB_ITEM_KEY), is(
+            "foo-print-blueprint-web-item"));
     }
 
     private void addJsToExpectedWebResource(WebResourceProperties properties)
@@ -175,26 +185,8 @@ public class BlueprintBuilderTest
     {
         assertTransformationsEqual(expected.getTransformations(), actual.getTransformations());
         assertResourcesEqual(expected.getResources(), actual.getResources());
-
-        /*
-        <transformation extension="js">
-            <transformer key="jsI18n"/>
-        </transformation>
-        <transformation extension="soy">
-            <transformer key="soyTransformer">
-                <functions>com.atlassian.confluence.plugins.soy:soy-core-functions</functions>
-            </transformer>
-        </transformation>
-
-        <resource type="download" name="main.css" location="com/atlassian/confluence/plugins/hello_blueprint/css/main.css" />
-        <resource type="download" name="templates-soy.js" location="com/atlassian/confluence/plugins/hello_blueprint/soy/templates.soy" />
-        <resource type="download" name="hello-blueprint-wizard.js" location="com/atlassian/confluence/plugins/hello_blueprint/js/hello-blueprint-wizard.js" />
-
-        <dependency>com.atlassian.confluence.plugins.confluence-create-content-plugin:resources</dependency>
-        <dependency>com.atlassian.confluence.plugins.confluence-space-ia:spacesidebar</dependency>
-        <context>atl.general</context>
-        <context>atl.admin</context>
-         */
+        assertEquals(expected.getContexts(), actual.getContexts());
+        assertEquals(expected.getDependencies(), actual.getDependencies());
 
         // TODO - can we just test the resource in the ModuleCreator test? dT
         // Answer - no.
@@ -216,9 +208,7 @@ public class BlueprintBuilderTest
     private void assertTransformationEqual(WebResourceTransformation expected, WebResourceTransformation actual)
     {
         assertThat(actual.getExtension(), is(expected.getExtension()));
-
-        // TODO - should use hamcrest matchers. later. dT
-//        assertThat(expected.getTransformers(), Matchers. contains(actual.getTransformers()));
+        assertThat(actual.getTransformers(), is(expected.getTransformers()));
     }
 
     private void addSoyTemplateToExpectedWebResource(WebResourceProperties properties)
