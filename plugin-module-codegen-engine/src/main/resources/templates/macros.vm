@@ -150,7 +150,7 @@
 
 #macro(transformer $transformer)
     #if($transformer)
-        #if($transformer.functions)
+        #if($transformer.functions && $transformer.functions.size() > 0)
             <transformer key="$transformer.moduleKey">
             #foreach($function in $transformer.functions)
 ##                TODO - check if this is the correct syntax. dT
