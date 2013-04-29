@@ -39,7 +39,7 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         modulePrompter = new BlueprintPrompter(prompter);
         modulePrompter.setUseAnsiColor(false);
 
-        BlueprintStringer stringer = new BlueprintStringer(blueprintIndexKey);
+        BlueprintStringer stringer = new BlueprintStringer(blueprintIndexKey, "com.foo.plugin");
 
         when(prompter.prompt(INDEX_KEY_PROMPT.message(), INDEX_KEY_PROMPT.defaultValue())).thenReturn(blueprintIndexKey);
         when(prompter.prompt(WEB_ITEM_NAME_PROMPT.message(), WEB_ITEM_NAME_PROMPT.defaultValue())).thenReturn(webItemName);

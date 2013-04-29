@@ -22,6 +22,7 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public static final String CONTENT_TEMPLATES = "CONTENT_TEMPLATES";
     private static final String HOW_TO_USE_TEMPLATE = "HOW_TO_USE_TEMPLATE";
     public static final String DIALOG_WIZARD = "DIALOG_WIZARD";
+    public static final String INDEX_TITLE_I18N_KEY = "INDEX_TITLE_I18N_KEY";
 
     public static final String SOY_PACKAGE = "SOY_PACKAGE";
     public static final String HOW_TO_USE_HEADING_I18N_KEY = "HOW_TO_USE_HEADING_I18N_KEY";
@@ -117,5 +118,15 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public DialogWizardProperties getDialogWizard()
     {
         return (DialogWizardProperties) get(DIALOG_WIZARD);
+    }
+
+    public void setIndexTitleI18nKey(String key)
+    {
+        setProperty(INDEX_TITLE_I18N_KEY, key);
+    }
+
+    public String getIndexTitleI18nKey()
+    {
+        return getProperty(INDEX_TITLE_I18N_KEY);
     }
 }

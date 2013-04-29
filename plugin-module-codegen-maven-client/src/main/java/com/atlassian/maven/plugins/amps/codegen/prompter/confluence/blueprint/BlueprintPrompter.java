@@ -9,12 +9,10 @@ import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromp
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintStringer;
-import com.google.common.collect.Maps;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 import static com.google.common.collect.Lists.newArrayList;
@@ -72,7 +70,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         );
         // TODO - make sure the key is a valid *label* and also a valid prefix for module keys.
         String indexKey = promptNotBlank(INDEX_KEY_PROMPT, props);
-        BlueprintStringer stringer = new BlueprintStringer(indexKey);
+        BlueprintStringer stringer = new BlueprintStringer(indexKey, getPluginKey());
 
         // Name and Description
         showMessage(

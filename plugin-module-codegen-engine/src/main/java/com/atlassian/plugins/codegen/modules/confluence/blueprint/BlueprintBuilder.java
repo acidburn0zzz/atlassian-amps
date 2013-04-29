@@ -43,7 +43,7 @@ public class BlueprintBuilder
         String indexKey = (String) promptProps.get(BlueprintPromptEntry.INDEX_KEY_PROMPT);
         props.setProperty(INDEX_KEY, indexKey);
 
-        stringer = new BlueprintStringer(indexKey);
+        stringer = new BlueprintStringer(indexKey, props.getPluginKey());
         String blueprintModuleKey = stringer.makeBlueprintModuleKey();
         props.setModuleKey(blueprintModuleKey);
 
@@ -51,6 +51,10 @@ public class BlueprintBuilder
         props.setWebItem(webItem);
         String blueprintName = (String) promptProps.get(WEB_ITEM_NAME_PROMPT);
         props.setModuleName(stringer.makeBlueprintModuleName(blueprintName));
+
+        String indexTitleI18nKey = stringer.makeI18nKey("index.page.title");
+        props.setIndexTitleI18nKey(indexTitleI18nKey);
+        props.addI18nProperty(indexTitleI18nKey, blueprintName + "s");  // THIS IS NOT OPTIMISED
 
         List<String> contentTemplateKeys = (List<String>) promptProps.get(CONTENT_TEMPLATE_KEYS_PROMPT);
         for (int i = 0; i < contentTemplateKeys.size(); i++)
@@ -85,7 +89,7 @@ public class BlueprintBuilder
             wizard.setDialogPages(Lists.newArrayList(wizardPage));
             props.setDialogWizard(wizard);
             addJsToWebResource(webResource);
-            addJsI18n(webResource, props.getPluginKey());
+            addJsI18n(webResource);
             webResource.setProperty(BlueprintProperties.PLUGIN_KEY, pluginKey);
             webResource.setProperty(BlueprintProperties.WEB_ITEM_KEY, webItem.getModuleKey());
             webResource.setProperty(BlueprintProperties.WIZARD_FORM_FIELD_ID, indexKey + "-blueprint-page-title");
@@ -98,13 +102,13 @@ public class BlueprintBuilder
         return props;
     }
 
-    private void addJsI18n(WebResourceProperties properties, String i18nPrefix)
+    private void addJsI18n(WebResourceProperties properties)
     {
-        String titleLabel = i18nPrefix + ".wizard.page0.title.label";
-        String titlePlace = i18nPrefix + ".wizard.page0.title.placeholder";
-        String titleError = i18nPrefix + ".wizard.page0.title.error";
-        String preRender  = i18nPrefix + ".wizard.page0.pre-render";
-        String postRender = i18nPrefix + ".wizard.page0.post-render";
+        String titleLabel = stringer.makeI18nKey("wizard.page0.title.label");
+        String titlePlace = stringer.makeI18nKey("wizard.page0.title.placeholder");
+        String titleError = stringer.makeI18nKey("wizard.page0.title.error");
+        String preRender  = stringer.makeI18nKey("wizard.page0.pre-render");
+        String postRender = stringer.makeI18nKey("wizard.page0.post-render");
 
         properties.setProperty(WIZARD_FORM_FIELD_LABEL_I18N_KEY, titleLabel);
         properties.addI18nProperty(titleLabel, WIZARD_FORM_FIELD_LABEL_VALUE);

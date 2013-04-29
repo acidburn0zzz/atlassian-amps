@@ -9,10 +9,12 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 public class BlueprintStringer
 {
     private final String indexKey;
+    private final String pluginKey;
 
-    public BlueprintStringer(String indexKey)
+    public BlueprintStringer(String indexKey, String pluginKey)
     {
         this.indexKey = indexKey;
+        this.pluginKey = pluginKey;
     }
 
     public String makeBlueprintModuleKey()
@@ -44,5 +46,10 @@ public class BlueprintStringer
     public String makeContentTemplateName(String webItemName, int counter)
     {
         return webItemName + " Content Template " + counter;
+    }
+
+    public String makeI18nKey(String suffix)
+    {
+        return pluginKey + "." + suffix;
     }
 }

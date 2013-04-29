@@ -108,7 +108,11 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertNodeText(blueprintModule, "@index-key", blueprintIndexKey);
         assertNodeText(blueprintModule, "content-template/@ref", templateModuleKey);
 
+        String indexPageI18nTitle = PLUGIN_KEY + ".index.page.title";
+        assertNodeText(blueprintModule, "@i18n-index-title-key", indexPageI18nTitle);
+
         // TODO - assert i18n name and desc
+        assertI18nString(indexPageI18nTitle, "FooPrints");
     }
 
     @Test
