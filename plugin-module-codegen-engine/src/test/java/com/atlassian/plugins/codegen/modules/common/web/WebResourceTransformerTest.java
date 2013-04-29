@@ -10,7 +10,7 @@ import static junit.framework.Assert.assertEquals;
 /**
  * @since 3.6
  */
-public class WebResourceTransformerTest extends AbstractModuleCreatorTestCase<WebResourceTransformerProperties>
+public class WebResourceTransformerTest extends AbstractModuleCreatorTestCase<WebResourceTransformer>
 {
     public static final String PACKAGE_NAME = "com.atlassian.plugin.webresource";
     public static final String TEST_PACKAGE_NAME = "ut.com.atlassian.plugin.webresource";
@@ -23,7 +23,7 @@ public class WebResourceTransformerTest extends AbstractModuleCreatorTestCase<We
     @Before
     public void setupProps() throws Exception
     {
-        setProps(new WebResourceTransformerProperties(PACKAGE_NAME + ".MyWebResourceTransformer"));
+        setProps(new WebResourceTransformer(PACKAGE_NAME + ".MyWebResourceTransformer"));
         props.setIncludeExamples(false);
     }
 

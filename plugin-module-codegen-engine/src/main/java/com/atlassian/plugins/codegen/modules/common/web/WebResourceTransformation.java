@@ -1,6 +1,5 @@
 package com.atlassian.plugins.codegen.modules.common.web;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,13 +11,11 @@ import static com.google.common.collect.Lists.newArrayList;
 public class WebResourceTransformation
 {
     private String extension;
-    private List<String> transformerKeys;
-    private List<WebResourceTransformerProperties> transformers;
+    private List<WebResourceTransformer> transformers;
 
     public WebResourceTransformation(String extension)
     {
         this.extension = extension;
-        this.transformerKeys = new ArrayList<String>();
         this.transformers = newArrayList();
     }
 
@@ -32,29 +29,18 @@ public class WebResourceTransformation
         this.extension = extension;
     }
 
-    // TODO - should be replace with transformers?
-    public void addTransformerKey(String key)
+    public void addTransformer(WebResourceTransformer transformer)
     {
-        transformerKeys.add(key);
+        transformers.add(transformer);
     }
 
-    public List<String> getTransformerKeys()
-    {
-        return Collections.unmodifiableList(transformerKeys);
-    }
-
-    public void addTransformer(WebResourceTransformerProperties props)
-    {
-        transformers.add(props);
-    }
-
-    public List<WebResourceTransformerProperties> getTransformers()
+    public List<WebResourceTransformer> getTransformers()
     {
         return Collections.unmodifiableList(transformers);
     }
 
-    public void setTransformerKeys(List<String> keys)
+    public void setTransformers(List<WebResourceTransformer> transformers)
     {
-        transformerKeys = keys;
+        this.transformers = transformers;
     }
 }

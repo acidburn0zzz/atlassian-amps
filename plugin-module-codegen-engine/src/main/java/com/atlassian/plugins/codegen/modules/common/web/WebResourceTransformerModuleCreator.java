@@ -21,7 +21,7 @@ import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 @BambooPluginModuleCreator
 @FeCruPluginModuleCreator
 @StashPluginModuleCreator
-public class WebResourceTransformerModuleCreator extends AbstractPluginModuleCreator<WebResourceTransformerProperties>
+public class WebResourceTransformerModuleCreator extends AbstractPluginModuleCreator<WebResourceTransformer>
 {
 
     public static final String MODULE_NAME = "Web Resource Transformer";
@@ -37,7 +37,7 @@ public class WebResourceTransformerModuleCreator extends AbstractPluginModuleCre
     private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "web-resource-transformer-plugin.xml.vtl";
 
     @Override
-    public PluginProjectChangeset createModule(WebResourceTransformerProperties props) throws Exception
+    public PluginProjectChangeset createModule(WebResourceTransformer props) throws Exception
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
             .with(HTTPCLIENT_TEST,

@@ -4,7 +4,7 @@ import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformation;
-import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformerProperties;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformer;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -126,7 +126,7 @@ public class BlueprintBuilder
     {
         // JS transformer
         WebResourceTransformation transformation = new WebResourceTransformation("js");
-        WebResourceTransformerProperties transformer = new WebResourceTransformerProperties();
+        WebResourceTransformer transformer = new WebResourceTransformer();
         transformer.setModuleKey("jsI18n");
         transformation.addTransformer(transformer);
         properties.addTransformation(transformation);
@@ -144,7 +144,7 @@ public class BlueprintBuilder
     {
         // Soy transformer
         WebResourceTransformation transformation = new WebResourceTransformation("soy");
-        WebResourceTransformerProperties transformer = new WebResourceTransformerProperties();
+        WebResourceTransformer transformer = new WebResourceTransformer();
         transformer.setModuleKey("soyTransformer");
         transformer.addFunctions("com.atlassian.confluence.plugins.soy:soy-core-functions");
         transformation.addTransformer(transformer);

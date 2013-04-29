@@ -264,9 +264,9 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         // TODO - assert sidebar with description
     }
 
-    private void assertWebResource(Element element, WebResourceProperties resourceProperties)
+    private void assertWebResource(Element element, WebResourceProperties expectedResource)
     {
-        assertNameBasedModuleProperties(element, resourceProperties);
+        assertNameBasedModuleProperties(element, expectedResource);
 
         // TODO - not sure how best to test here. There should be a unit test confirming that transformations get
         // rendered to XML correctly, but other than that THIS test just needs to confirm that our BlueprintCreator is
@@ -274,6 +274,21 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         // Prompter? Or the generator?
         // TODO - assert dependencies, contexts added?
         assertNotNull(element.selectSingleNode("transformation"));
+
+        assertNodeText(element, "context[1]", expectedResource.getContexts().get(0));
+        assertNodeText(element, "context[2]", expectedResource.getContexts().get(1));
+
+        assertNodeText(element, "dependency", expectedResource.getDependencies().get(0));
+
+        assertNodeText(element, "transformation[@extension='soy']/transformer/@key", "soyTransformer");
+        assertNodeText(element, "transformation[@extension='soy']/transformer/functions",
+            "com.atlassian.confluence.plugins.soy:soy-core-functions");
+
+        // Only check for JS if added to the expected web-resource
+        if (expectedResource.getTransformations().size() == 2)
+        {
+            assertNodeText(element, "transformation[@extension='js']/transformer/@key", "jsI18n");
+        }
     }
 
     private void assertNameBasedModuleProperties(Element element, AbstractNameBasedModuleProperties props)

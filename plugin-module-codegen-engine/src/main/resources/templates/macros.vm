@@ -141,10 +141,25 @@
 #macro(transformation $transformation)
     #if($transformation)
         <transformation extension="$transformation.extension">
-            #foreach($transformerKey in $transformation.transformerKeys)
-            <transformer key="$transformerKey" />
+            #foreach($transformer in $transformation.transformers)
+                #transformer($transformer)
             #end
         </transformation>
+    #end
+#end
+
+#macro(transformer $transformer)
+    #if($transformer)
+        #if($transformer.functions)
+            <transformer key="$transformer.moduleKey">
+            #foreach($function in $transformer.functions)
+##                TODO - check if this is the correct syntax. dT
+                <functions>$function</functions>
+            #end
+            </transformer>
+        #else
+            <transformer key="$transformer.moduleKey" />
+        #end
     #end
 #end
 
