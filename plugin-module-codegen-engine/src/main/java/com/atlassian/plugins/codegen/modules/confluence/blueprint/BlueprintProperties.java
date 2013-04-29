@@ -3,6 +3,7 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 import com.atlassian.plugins.codegen.modules.BasicNameModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
 
@@ -128,5 +129,17 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public String getIndexTitleI18nKey()
     {
         return getProperty(INDEX_TITLE_I18N_KEY);
+    }
+
+    @Override
+    public ImmutableMap<String, String> getI18nProperties()
+    {
+        ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
+        mapBuilder.putAll(super.getI18nProperties());
+        if (getDialogWizard() != null)
+        {
+            mapBuilder.putAll(getDialogWizard().getI18nProperties());
+        }
+        return mapBuilder.build();
     }
 }

@@ -85,7 +85,7 @@ public class BlueprintBuilder
         {
             DialogWizardProperties wizard = new DialogWizardProperties();
             wizard.setModuleKey(indexKey + "-wizard");
-            DialogPageProperties wizardPage = new DialogPageProperties(indexKey, 0, soyPackage);
+            DialogPageProperties wizardPage = new DialogPageProperties(0, soyPackage, stringer);
             wizard.setDialogPages(Lists.newArrayList(wizardPage));
             props.setDialogWizard(wizard);
             addJsToWebResource(webResource);

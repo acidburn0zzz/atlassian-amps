@@ -40,6 +40,8 @@ public class BlueprintBuilderTest
     private BlueprintPromptEntries promptProps;
     private List<String> contentTemplateKeys;
 
+    private BlueprintStringer stringer = new BlueprintStringer(blueprintIndexKey, PLUGIN_KEY);
+
     @Before
     public void setup()
     {
@@ -114,7 +116,7 @@ public class BlueprintBuilderTest
         DialogWizardProperties expectedWizard = new DialogWizardProperties();
         expectedWizard.setModuleKey("foo-print-wizard");
         List<DialogPageProperties> pages = Lists.newArrayList();
-        DialogPageProperties page = new DialogPageProperties("foo-print", 0, "Confluence.Blueprints.Plugin.FooPrint");
+        DialogPageProperties page = new DialogPageProperties(0, "Confluence.Blueprints.Plugin.FooPrint", stringer);
         pages.add(page);
         expectedWizard.setDialogPages(pages);
 

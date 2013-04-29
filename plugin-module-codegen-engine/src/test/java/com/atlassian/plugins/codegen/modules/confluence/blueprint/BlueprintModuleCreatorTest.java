@@ -219,9 +219,16 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertNotNull("dialog-page element should be created", pageElement);
         assertNodeText(pageElement, "@id", "page0");
         assertNodeText(pageElement, "@template-key", "Confluence.Blueprints.Plugin.FooPrint.wizardPage0");
-        assertNodeText(pageElement, "@title-key", "foo-print.page0.title");
-        assertNodeText(pageElement, "@description-header-key", "foo-print.page0.desc.header");
-        assertNodeText(pageElement, "@description-content-key", "foo-print.page0.desc.content");
+
+        String wizardPageTitle = PLUGIN_KEY + ".wizard.page0.title";
+        String wizardPageDescHeader = PLUGIN_KEY + ".wizard.page0.desc.header";
+        String wizardPageDescContent = PLUGIN_KEY + ".wizard.page0.desc.content";
+        assertNodeText(pageElement, "@title-key", wizardPageTitle);
+        assertNodeText(pageElement, "@description-header-key", wizardPageDescHeader);
+        assertNodeText(pageElement, "@description-content-key", wizardPageDescContent);
+        assertI18nString(wizardPageTitle, "Wizard Page 0 Title");
+        assertI18nString(wizardPageDescHeader, "Page 0 Description");
+        assertI18nString(wizardPageDescContent, "This wizard page does A, B and C");
 
         // 2. There should be a Soy file containing the referenced template
         String soy = new String(getResourceFile("soy", "my-templates.soy").getContent());
