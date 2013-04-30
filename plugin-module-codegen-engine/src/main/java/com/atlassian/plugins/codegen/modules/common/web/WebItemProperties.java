@@ -16,6 +16,7 @@ public class WebItemProperties extends AbstractWebFragmentProperties
 
     public static final String SECTION = "SECTION";
     public static final String ICON = "ICON";
+    public static final String STYLE_CLASS = "STYLE_CLASS";
     public static final String LINK = "LINK";
     public static final String LABEL = "LABEL";
     public static final String PARAMS = "PARAMS";
@@ -76,6 +77,16 @@ public class WebItemProperties extends AbstractWebFragmentProperties
             icon = (Icon) get(ICON);
         }
         return icon;
+    }
+
+    public void setStyleClass(String styleClass)
+    {
+        setProperty(STYLE_CLASS, styleClass);
+    }
+
+    public String getStyleClass()
+    {
+        return getProperty(STYLE_CLASS);
     }
 
     public void setLabel(Label label)

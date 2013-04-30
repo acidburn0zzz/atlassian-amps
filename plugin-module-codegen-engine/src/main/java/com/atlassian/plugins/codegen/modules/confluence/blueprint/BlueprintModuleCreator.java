@@ -26,6 +26,7 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
     private static final String CONTENT_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-content-template.xml.vtl";
     private static final String SOY_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-soy-template.soy.vtl";
     private static final String JS_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-dialog-wizard.js.vtl";
+    private static final String CSS_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-blueprints.css.vtl";
 
     @Override
     public PluginProjectChangeset createModule(BlueprintProperties props) throws Exception
@@ -65,16 +66,28 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
             String path = filePath.substring(0, lastSlash);
             String filename = filePath.substring(lastSlash + 1);
 
-            // TODO - this is crap. Very.
-            String resourceFileTemplate = givenTemplate;
-            if (resourceFileTemplate == null)
-            {
-                resourceFileTemplate = filename.endsWith("js") ? JS_TEMPLATE_FILE_TEMPLATE : SOY_TEMPLATE_FILE_TEMPLATE;
-            }
-
+            String resourceFileTemplate = getResourceTemplate(givenTemplate, filename);
             changeset = changeset.with(createResource(properties, path, filename, resourceFileTemplate));
         }
         return changeset;
+    }
+
+    // TODO - this is crap. Very.
+    private String getResourceTemplate(String givenTemplate, String filename)
+    {
+        if (givenTemplate != null)
+            return givenTemplate;
+
+        if (filename.endsWith(".js"))
+            return JS_TEMPLATE_FILE_TEMPLATE;
+
+        if (filename.endsWith(".css"))
+            return CSS_TEMPLATE_FILE_TEMPLATE;
+
+        if (filename.endsWith(".soy"))
+            return SOY_TEMPLATE_FILE_TEMPLATE;
+
+        throw new UnsupportedOperationException("Can't render resource template for filename: " + filename);
     }
 
     public String getModuleName()

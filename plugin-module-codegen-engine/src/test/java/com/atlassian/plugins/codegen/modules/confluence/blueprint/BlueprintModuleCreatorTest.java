@@ -168,9 +168,16 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     @Test
     public void webItemIconIsCreated() throws Exception
     {
-        // Check the content of the generated icon file
-        // TODO - BAD! The icon should be specified in a CSS resource file! We should generate a stub for the CSS
-        // selector that allows a) the default icon to be used if not specified b) the plugin dev to add a data-url.
+        Element webItem = getGeneratedModule("web-item");
+        assertNodeText(webItem, "styleClass", "icon-foo-print-blueprint large");
+
+        Element webResource = getGeneratedModule("web-resource");
+        assertNodeText(webResource, "resource[@name='blueprints.css']/@type", "download");
+        assertNodeText(webResource, "resource[@name='blueprints.css']/@location", "css/blueprints.css");
+
+        String css = new String(getResourceFile("css", "blueprints.css").getContent());
+        assertThat(css, containsString(".icon-foo-print-blueprint.large {"));
+        assertThat(css, containsString(".acs-nav-item.blueprint.foo-print .icon {"));
     }
 
     @Test

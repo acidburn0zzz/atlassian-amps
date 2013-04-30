@@ -47,7 +47,7 @@ public class BlueprintBuilder
         String blueprintModuleKey = stringer.makeBlueprintModuleKey();
         props.setModuleKey(blueprintModuleKey);
 
-        WebItemProperties webItem = makeWebItem(pluginKey, blueprintModuleKey, promptProps);
+        WebItemProperties webItem = makeWebItem(pluginKey, blueprintModuleKey, indexKey, promptProps);
         props.setWebItem(webItem);
         String blueprintName = (String) promptProps.get(WEB_ITEM_NAME_PROMPT);
         props.setModuleName(stringer.makeBlueprintModuleName(blueprintName));
@@ -69,6 +69,13 @@ public class BlueprintBuilder
         webResource.addContext("atl.general");
         webResource.addContext("atl.admin");
         webResource.addDependency("com.atlassian.confluence.plugins.confluence-create-content-plugin:resources");
+
+        Resource cssResource = new Resource();
+        cssResource.setType("download");
+        cssResource.setName("blueprints.css");
+        cssResource.setLocation("css/blueprints.css");
+        webResource.addResource(cssResource);
+        webResource.setProperty("INDEX_KEY", indexKey);
 
         props.setWebResource(webResource);
 
@@ -201,7 +208,7 @@ public class BlueprintBuilder
         return template;
     }
 
-    private WebItemProperties makeWebItem(String pluginKey, String blueprintModuleKey, BlueprintPromptEntries promptProps)
+    private WebItemProperties makeWebItem(String pluginKey, String blueprintModuleKey, String indexKey, BlueprintPromptEntries promptProps)
     {
         WebItemProperties webItem = new WebItemProperties();
 
@@ -213,14 +220,7 @@ public class BlueprintBuilder
         webItem.setDescriptionI18nKey(pluginKey + ".blueprint.display.desc");
         webItem.setSection("system.create.dialog/content");
         webItem.addParam(WEB_ITEM_BLUEPRINT_KEY, blueprintModuleKey);
-
-        // TODO - REAALLY shouldn't be like this. data-uri CSS not resource!
-        Resource webItemResource = new Resource();
-        webItemResource.setName("icon");
-        webItemResource.setType("download");
-        webItemResource.setLocation("images/" + blueprintModuleKey + "-icon.png");
-        List<Resource> resources = Lists.newArrayList(webItemResource);
-        webItem.setResources(resources);
+        webItem.setStyleClass("icon-" + indexKey + "-blueprint large");
 
         return webItem;
     }

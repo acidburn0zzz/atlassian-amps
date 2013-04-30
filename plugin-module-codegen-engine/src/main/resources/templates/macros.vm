@@ -80,6 +80,12 @@
     #end
 #end
 
+#macro(styleClass $styleClass)
+    #if($styleClass)
+        <styleClass>$styleClass</styleClass>
+    #end
+#end
+
 #macro(link $link)
     #if($link)
         <link
