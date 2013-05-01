@@ -2,6 +2,10 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
 import java.util.HashMap;
 
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.CONTEXT_PROVIDER_PROMPT;
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.DIALOG_WIZARD_PROMPT;
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.HOW_TO_USE_PROMPT;
+
 /**
  * Contains all of the data from the Prompter phase using for creation of Confluence Blueprint modules.
  *
@@ -16,6 +20,11 @@ public class BlueprintPromptEntries extends HashMap<BlueprintPromptEntry, Object
     {
         this.pluginKey = pluginKey;
         this.defaultBasePackage = defaultBasePackage;
+
+        // Adding these false values avoids a lot of null-checks later on.
+        put(HOW_TO_USE_PROMPT, false);
+        put(DIALOG_WIZARD_PROMPT, false);
+        put(CONTEXT_PROVIDER_PROMPT, false);
     }
 
     public BlueprintPromptEntries(String pluginKey)

@@ -1,5 +1,6 @@
 package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
+import com.atlassian.plugins.codegen.modules.common.ContextProviderProperties;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
@@ -57,10 +58,15 @@ public class BlueprintBuilder
         props.addI18nProperty(indexTitleI18nKey, blueprintName + "s");  // THIS IS NOT OPTIMISED
 
         List<String> contentTemplateKeys = (List<String>) promptProps.get(CONTENT_TEMPLATE_KEYS_PROMPT);
+        ContextProviderProperties contextProvider = null;
+        if ((Boolean) promptProps.get(CONTEXT_PROVIDER_PROMPT))
+        {
+            contextProvider = new ContextProviderProperties(pluginKey + ".ContentTemplateContextProvider");
+        }
         for (int i = 0; i < contentTemplateKeys.size(); i++)
         {
             String contentTemplateKey = contentTemplateKeys.get(i);
-            ContentTemplateProperties contentTemplate = makeContentTemplate(contentTemplateKey, blueprintName, i);
+            ContentTemplateProperties contentTemplate = makeContentTemplate(contentTemplateKey, blueprintName, i, contextProvider);
             props.addContentTemplate(contentTemplate);
         }
 
@@ -187,7 +193,7 @@ public class BlueprintBuilder
         }
     }
 
-    private ContentTemplateProperties makeContentTemplate(String contentTemplateKey, String webItemName, int counter)
+    private ContentTemplateProperties makeContentTemplate(String contentTemplateKey, String webItemName, int counter, final ContextProviderProperties contextProvider)
     {
         ContentTemplateProperties template = new ContentTemplateProperties(contentTemplateKey);
 
@@ -196,6 +202,10 @@ public class BlueprintBuilder
         template.setNameI18nKey(contentTemplateKey + ".name");
         template.setDescriptionI18nKey(contentTemplateKey + ".desc");
         template.setContentText(contentTemplateKey + ".content.text", CONTENT_I18N_DEFAULT_VALUE);
+        if (contextProvider != null)
+        {
+            template.setContextProvider(contextProvider);
+        }
 
         Resource templateResource = new Resource();
         templateResource.setName("template");

@@ -11,8 +11,11 @@ public enum BlueprintPromptEntry
     WEB_ITEM_NAME_PROMPT("Enter Blueprint name (e.g. File List, Meeting Note)", "My Blueprint"),
     WEB_ITEM_DESC_PROMPT("Enter Blueprint description", "Creates pages based on my Blueprint."),
     CONTENT_TEMPLATE_KEYS_PROMPT("Enter Content Template key", null),   // defaults are generated
-    HOW_TO_USE_PROMPT("Add a How-to-Use page to your Blueprint?", "N"),
-    DIALOG_WIZARD_PROMPT("Add a Create dialog wizard to your Blueprint?", "N")
+    ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT("Add another Content Template key?", "N"),
+    ADVANCED_BLUEPRINT_PROMPT ("Add advanced Blueprint features?", "Y"),
+    HOW_TO_USE_PROMPT("Add a How-to-Use page to your Blueprint?", "Y"),
+    DIALOG_WIZARD_PROMPT("Add a Create dialog wizard to your Blueprint?", "Y"),
+    CONTEXT_PROVIDER_PROMPT("Add a Context Provider to your Blueprint?", "Y")
     ;
 
     private final String message;

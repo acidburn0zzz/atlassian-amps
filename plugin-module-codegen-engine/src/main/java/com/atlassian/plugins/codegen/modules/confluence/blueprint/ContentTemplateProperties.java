@@ -2,7 +2,7 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
 import com.atlassian.fugue.Pair;
 import com.atlassian.plugins.codegen.modules.AbstractNameBasedModuleProperties;
-import com.atlassian.plugins.codegen.modules.common.ContextProvider;
+import com.atlassian.plugins.codegen.modules.common.ContextProviderProperties;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.ResourcedProperties;
 import com.google.common.collect.ImmutableMap;
@@ -51,9 +51,14 @@ public class ContentTemplateProperties extends AbstractNameBasedModuleProperties
         return (List<Resource>) get(RESOURCES);
     }
 
-    public void setContextProvider(ContextProvider provider)
+    public void setContextProvider(ContextProviderProperties provider)
     {
         put(CONTEXT_PROVIDER, provider);
+    }
+
+    public ContextProviderProperties getContextProvider()
+    {
+        return (ContextProviderProperties) get(CONTEXT_PROVIDER);
     }
 
     /**

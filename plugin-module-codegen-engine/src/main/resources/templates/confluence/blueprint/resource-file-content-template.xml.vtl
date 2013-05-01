@@ -1,4 +1,13 @@
+#* @vtlvariable name="CONTEXT_PROVIDER" type="com.atlassian.plugins.codegen.modules.common.ContextProviderProperties" *#
 #* @vtlvariable name="CONTENT_I18N_KEY" type="java.lang.String" *#
 <p>
     <at:i18n at:key="$CONTENT_I18N_KEY" />
 </p>
+#if ($CONTEXT_PROVIDER)
+<p>
+    <at:var at:name="variableA" />
+</p>
+<p>
+    <at:var at:name="variableB" at:rawXhtml="true" />
+</p>
+#end

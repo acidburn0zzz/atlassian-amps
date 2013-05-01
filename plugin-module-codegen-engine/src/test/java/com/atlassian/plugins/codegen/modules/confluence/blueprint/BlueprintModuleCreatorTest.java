@@ -3,6 +3,7 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.ResourceFile;
+import com.atlassian.plugins.codegen.SourceFile;
 import com.atlassian.plugins.codegen.modules.AbstractNameBasedModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
 import com.google.common.collect.Lists;
@@ -84,8 +85,6 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         promptProps.put(INDEX_KEY_PROMPT, blueprintIndexKey);
         promptProps.put(WEB_ITEM_NAME_PROMPT, webItemName);
         promptProps.put(WEB_ITEM_DESC_PROMPT, webItemDesc);
-        promptProps.put(HOW_TO_USE_PROMPT, false);
-        promptProps.put(DIALOG_WIZARD_PROMPT, false);
 
         List<String> contentTemplateKeys = Lists.newArrayList();
         contentTemplateKeys.add(templateModuleKey);
@@ -143,6 +142,32 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     }
 
     @Test
+    public void contextProviderIsAddedToContentTemplate() throws Exception
+    {
+        promptProps.put(CONTEXT_PROVIDER_PROMPT, true);
+        buildBlueprintProperties();
+
+        // 1. Context provider is added to content-template element
+        Element templateModule = getGeneratedModule("content-template");
+        String className = "ContentTemplateContextProvider";
+        String packageName = PLUGIN_KEY;
+        String fqClassName = packageName + "." + className;
+        assertNodeText(templateModule, "context-provider/@class", fqClassName);
+
+        // 2. ContextProviderProperties Java class is added.
+        SourceFile sourceFile = getSourceFile(packageName, className);
+        assertThat(sourceFile.getContent(), containsString("package " + packageName + ";"));
+        assertThat(sourceFile.getContent(), containsString("\"variableA\""));
+        assertThat(sourceFile.getContent(), containsString("\"variableB\""));
+
+        // 3. Context added by provider is referenced in the template.
+        ResourceFile file = getResourceFile("xml", templateModuleKey + ".xml");
+        String xml = new String(file.getContent());
+        assertThat(xml, containsString("<at:var at:name=\"variableA\" />"));
+        assertThat(xml, containsString("<at:var at:name=\"variableB\" at:rawXhtml=\"true\" />"));
+    }
+
+    @Test
     public void webItemModuleBasicSettings() throws Exception
     {
         String webItemNameI18nKey = PLUGIN_KEY + ".blueprint.display.name";
@@ -157,9 +182,6 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertNodeText(module, "description/@key", webItemDescI18nKey);
         assertNodeText(module, "param/@name", BlueprintProperties.WEB_ITEM_BLUEPRINT_KEY);
         assertNodeText(module, "param/@value", blueprintModuleKey);
-        assertNodeText(module, "resource/@name", "icon");
-        assertNodeText(module, "resource/@type", "download");
-        assertNodeText(module, "resource/@location", "images/foo-print-blueprint-icon.png");
 
         assertI18nString(webItemNameI18nKey, webItemName);
         assertI18nString(webItemDescI18nKey, webItemDesc);

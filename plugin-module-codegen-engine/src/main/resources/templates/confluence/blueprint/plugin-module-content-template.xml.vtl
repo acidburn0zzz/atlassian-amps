@@ -3,7 +3,7 @@
 #* @vtlvariable name="NAME_I18N_KEY" type="java.lang.String" *#
 #* @vtlvariable name="DESCRIPTION_I18N_KEY" type="java.lang.String" *#
 #* @vtlvariable name="RESOURCES" type="java.util.List<com.atlassian.plugins.codegen.modules.common.Resource>" *#
-#* @vtlvariable name="CONTEXT_PROVIDER" type="com.atlassian.plugins.codegen.modules.common.ContextProvider" *#
+#* @vtlvariable name="CONTEXT_PROVIDER" type="com.atlassian.plugins.codegen.modules.common.ContextProviderProperties" *#
 <content-template
         key="$MODULE_KEY"
         i18n-name-key="$NAME_I18N_KEY"
@@ -14,6 +14,6 @@
     <description key="${DESCRIPTION_I18N_KEY}">${DESCRIPTION}</description>
     #resources($RESOURCES)
     #if ($CONTEXT_PROVIDER)
-        #contextprovider($CONTEXT_PROVIDER.className)
+        #contextprovider($CONTEXT_PROVIDER.FQ_CLASSNAME)
     #end
 </content-template>

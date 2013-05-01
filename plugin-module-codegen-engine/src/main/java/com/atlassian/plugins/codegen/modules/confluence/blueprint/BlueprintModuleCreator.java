@@ -3,6 +3,7 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
+import com.atlassian.plugins.codegen.modules.common.ContextProviderProperties;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.ResourcedProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemModuleCreator;
@@ -27,6 +28,8 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
     private static final String SOY_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-soy-template.soy.vtl";
     private static final String JS_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-dialog-wizard.js.vtl";
     private static final String CSS_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-blueprints.css.vtl";
+    // Template name is jva not java only to avoid IDE headaches with imports.
+    private static final String CONTEXT_PROVIDER_CLASS_TEMPLATE = TEMPLATE_PREFIX + "ContentTemplateContextProvider.jva.vtl";
 
     @Override
     public PluginProjectChangeset createModule(BlueprintProperties props) throws Exception
@@ -41,6 +44,12 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
             changeset = changeset.with(createModule(contentTemplateProperties, CONTENT_TEMPLATE_MODULE_TEMPLATE));
 
             changeset = addResourceFiles(changeset, contentTemplateProperties, CONTENT_TEMPLATE_FILE_TEMPLATE);
+
+            ContextProviderProperties contextProviderProperties = contentTemplateProperties.getContextProvider();
+            if (contextProviderProperties != null)
+            {
+                changeset = changeset.with(createClass(contextProviderProperties, CONTEXT_PROVIDER_CLASS_TEMPLATE));
+            }
         }
 
         WebItemProperties webItem = props.getWebItem();

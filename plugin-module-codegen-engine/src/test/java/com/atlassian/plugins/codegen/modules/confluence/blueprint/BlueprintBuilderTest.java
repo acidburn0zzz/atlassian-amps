@@ -50,8 +50,6 @@ public class BlueprintBuilderTest
         promptProps.put(INDEX_KEY_PROMPT, blueprintIndexKey);
         promptProps.put(WEB_ITEM_NAME_PROMPT, webItemName);
         promptProps.put(WEB_ITEM_DESC_PROMPT, webItemDesc);
-        promptProps.put(HOW_TO_USE_PROMPT, false);
-        promptProps.put(DIALOG_WIZARD_PROMPT, false);
 
         contentTemplateKeys = Lists.newArrayList();
         contentTemplateKeys.add(templateModuleKey);
@@ -87,24 +85,12 @@ public class BlueprintBuilderTest
         promptProps.put(HOW_TO_USE_PROMPT, true);
         BlueprintProperties props = builder.build();
 
-        WebResourceProperties expectedWebResource = newExpectedWebResourceProperties();
+        WebResourceProperties expectedWebResource = newExpectedWebResourceProperties(blueprintIndexKey);
         addSoyTemplateToExpectedWebResource(expectedWebResource);
         addHowToUseToExpectedSoyResource(expectedWebResource);
 
         assertEquals("Confluence.Blueprints.Plugin.FooPrint.howToUse", props.getHowToUseTemplate());
         assertWebResourceProperties(expectedWebResource, props.getWebResource());
-    }
-
-    private WebResourceProperties newExpectedWebResourceProperties()
-    {
-        WebResourceProperties properties = new WebResourceProperties();
-
-        properties.addContext("atl.general");
-        properties.addContext("atl.admin");
-
-        properties.addDependency("com.atlassian.confluence.plugins.confluence-create-content-plugin:resources");
-
-        return properties;
     }
 
     @Test
@@ -122,7 +108,7 @@ public class BlueprintBuilderTest
 
         assertDialogWizard(expectedWizard, props.getDialogWizard());
 
-        WebResourceProperties expectedWebResource = newExpectedWebResourceProperties();
+        WebResourceProperties expectedWebResource = newExpectedWebResourceProperties(blueprintIndexKey);
         addJsToExpectedWebResource(expectedWebResource);
         addSoyTemplateToExpectedWebResource(expectedWebResource); // order of addition is important to assertions
 
@@ -211,6 +197,26 @@ public class BlueprintBuilderTest
     {
         assertThat(actual.getExtension(), is(expected.getExtension()));
         assertThat(actual.getTransformers(), is(expected.getTransformers()));
+    }
+
+    private WebResourceProperties newExpectedWebResourceProperties(String indexKey)
+    {
+        WebResourceProperties properties = new WebResourceProperties();
+
+        properties.addContext("atl.general");
+        properties.addContext("atl.admin");
+
+        properties.addDependency("com.atlassian.confluence.plugins.confluence-create-content-plugin:resources");
+
+        Resource soyResource = new Resource();
+        soyResource.setType("download");
+        soyResource.setName("blueprints.css");
+        soyResource.setLocation("css/blueprints.css");
+        properties.addResource(soyResource);
+
+        properties.setProperty("INDEX_KEY", indexKey);
+
+        return properties;
     }
 
     private void addSoyTemplateToExpectedWebResource(WebResourceProperties properties)
@@ -312,12 +318,6 @@ public class BlueprintBuilderTest
         webItem.setDescription(webItemDesc);
         webItem.setSection("system.create.dialog/content");
 
-        Resource webItemResource = new Resource();
-        webItemResource.setName("icon");
-        webItemResource.setType("download");
-        webItemResource.setLocation("images/foo-print-blueprint-icon.png");
-        List<Resource> resources = Lists.newArrayList(webItemResource);
-        webItem.setResources(resources);
         webItem.addParam(WEB_ITEM_BLUEPRINT_KEY, blueprintModuleKey);
         return webItem;
     }

@@ -25,9 +25,6 @@ import static com.google.common.collect.Lists.newArrayList;
 @ModuleCreatorClass(BlueprintModuleCreator.class)
 public class BlueprintPrompter extends AbstractModulePrompter<BlueprintProperties>
 {
-    public static final String ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT = "Add another Content Template key?";
-    public static final String ADVANCED_BLUEPRINT_PROMPT = "Add advanced Blueprint features?";
-
     public BlueprintPrompter(Prompter prompter)
     {
         super(prompter);
@@ -60,8 +57,6 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
     BlueprintPromptEntries promptForProps() throws PrompterException
     {
         BlueprintPromptEntries props = new BlueprintPromptEntries(getPluginKey(), getDefaultBasePackage());
-        props.put(HOW_TO_USE_PROMPT, false);
-        props.put(DIALOG_WIZARD_PROMPT, false);
 
         // Index key
         showMessage(
@@ -94,7 +89,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
             templateKeys.add(promptNotBlank(CONTENT_TEMPLATE_KEYS_PROMPT.message(), defaultValue));
             templateIndex++;
         }
-        while(promptForBoolean(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT, "N"));
+        while(promptForBoolean(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT));
         if (templateIndex > 1)
         {
             // TODO - have a separate prompter to just add one content-template later????
@@ -109,7 +104,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
             "That's all you need to enter to create a working Blueprint! However, this SDK can create richer Blueprints\n" +
                 "with How-to-Use pages, JavaScript wizards and custom Index page."
         );
-        if (promptForBoolean(ADVANCED_BLUEPRINT_PROMPT, "N"))
+        if (promptForBoolean(ADVANCED_BLUEPRINT_PROMPT))
         {
             // How-to-use
             showMessage(
@@ -127,6 +122,15 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                     "simply."
             );
             promptForBoolean(DIALOG_WIZARD_PROMPT, props);
+
+            // Context provider
+            showMessage(
+                "If your Blueprint will add data to the page that doesn't come from the user (e.g. it comes from a \n" +
+                "service that your plugin provides), you'll need to add a Context Provider to your Blueprint's template.\n" +
+                "Context providers allow you to add complex XHTML content to your templates, making pretty-much \n" +
+                "anything possible."
+            );
+            promptForBoolean(CONTEXT_PROVIDER_PROMPT, props);
         }
         return props;
     }
@@ -140,9 +144,14 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
 
     private boolean promptForBoolean(BlueprintPromptEntry promptEntry, BlueprintPromptEntries props) throws PrompterException
     {
-        boolean input = promptForBoolean(promptEntry.message(), promptEntry.defaultValue());
+        boolean input = promptForBoolean(promptEntry);
         props.put(promptEntry, input);
         return input;
+    }
+
+    private boolean promptForBoolean(BlueprintPromptEntry promptEntry) throws PrompterException
+    {
+        return promptForBoolean(promptEntry.message(), promptEntry.defaultValue());
     }
 
     // Shows a message, padded at top and bottom.

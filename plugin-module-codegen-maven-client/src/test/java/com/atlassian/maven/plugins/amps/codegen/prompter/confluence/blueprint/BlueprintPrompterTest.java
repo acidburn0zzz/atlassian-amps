@@ -4,6 +4,7 @@ import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractPrompterTest;
 import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompter;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintBuilder;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntries;
+import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties;
 import com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintStringer;
 import org.codehaus.plexus.components.interactivity.PrompterException;
@@ -12,8 +13,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static com.atlassian.maven.plugins.amps.codegen.prompter.confluence.blueprint.BlueprintPrompter.ADVANCED_BLUEPRINT_PROMPT;
-import static com.atlassian.maven.plugins.amps.codegen.prompter.confluence.blueprint.BlueprintPrompter.ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -44,11 +43,13 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         when(prompter.prompt(INDEX_KEY_PROMPT.message(), INDEX_KEY_PROMPT.defaultValue())).thenReturn(blueprintIndexKey);
         when(prompter.prompt(WEB_ITEM_NAME_PROMPT.message(), WEB_ITEM_NAME_PROMPT.defaultValue())).thenReturn(webItemName);
         when(prompter.prompt(WEB_ITEM_DESC_PROMPT.message(), WEB_ITEM_DESC_PROMPT.defaultValue())).thenReturn(webItemDesc);
-        when(prompter.prompt(CONTENT_TEMPLATE_KEYS_PROMPT.message(), stringer.makeContentTemplateKey(0))).thenReturn( templateModuleKey);
-        when(prompter.prompt(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
-        when(prompter.prompt(ADVANCED_BLUEPRINT_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
-        when(prompter.prompt(HOW_TO_USE_PROMPT.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
-        when(prompter.prompt(DIALOG_WIZARD_PROMPT.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
+        when(prompter.prompt(CONTENT_TEMPLATE_KEYS_PROMPT.message(), stringer.makeContentTemplateKey(0))).thenReturn(templateModuleKey);
+
+        mockBooleanPromptResponse(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT, "N");
+        mockBooleanPromptResponse(ADVANCED_BLUEPRINT_PROMPT, "N");
+        mockBooleanPromptResponse(HOW_TO_USE_PROMPT, "N");
+        mockBooleanPromptResponse(DIALOG_WIZARD_PROMPT, "N");
+        mockBooleanPromptResponse(CONTEXT_PROVIDER_PROMPT, "N");
     }
 
     @SuppressWarnings("unchecked")
@@ -74,8 +75,8 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
     @Test
     public void howToUseTemplateAdded() throws PrompterException
     {
-        when(prompter.prompt(ADVANCED_BLUEPRINT_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
-        when(prompter.prompt(HOW_TO_USE_PROMPT.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
+        mockBooleanPromptResponse(ADVANCED_BLUEPRINT_PROMPT, "Y");
+        mockBooleanPromptResponse(HOW_TO_USE_PROMPT, "Y");
 
         BlueprintPromptEntries props = modulePrompter.promptForProps();
 
@@ -85,11 +86,27 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
     @Test
     public void dialogWizardAdded() throws PrompterException
     {
-        when(prompter.prompt(ADVANCED_BLUEPRINT_PROMPT, PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
-        when(prompter.prompt(DIALOG_WIZARD_PROMPT.message(), PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("Y");
+        mockBooleanPromptResponse(ADVANCED_BLUEPRINT_PROMPT, "Y");
+        mockBooleanPromptResponse(DIALOG_WIZARD_PROMPT, "Y");
 
         BlueprintPromptEntries props = modulePrompter.promptForProps();
 
         assertTrue((Boolean) props.get(DIALOG_WIZARD_PROMPT));
+    }
+
+    @Test
+    public void contextProviderAdded() throws PrompterException
+    {
+        mockBooleanPromptResponse(ADVANCED_BLUEPRINT_PROMPT, "Y");
+        mockBooleanPromptResponse(CONTEXT_PROVIDER_PROMPT, "Y");
+
+        BlueprintPromptEntries props = modulePrompter.promptForProps();
+
+        assertTrue((Boolean) props.get(CONTEXT_PROVIDER_PROMPT));
+    }
+
+    private void mockBooleanPromptResponse(BlueprintPromptEntry prompt, String response) throws PrompterException
+    {
+        when(prompter.prompt(prompt.message(), PluginModulePrompter.YN_ANSWERS, prompt.defaultValue())).thenReturn(response);
     }
 }
