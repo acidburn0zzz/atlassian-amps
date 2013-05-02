@@ -61,7 +61,8 @@ public class BlueprintBuilder
         ContextProviderProperties contextProvider = null;
         if ((Boolean) promptProps.get(CONTEXT_PROVIDER_PROMPT))
         {
-            contextProvider = new ContextProviderProperties(pluginKey + ".ContentTemplateContextProvider");
+            String packageName = cleanupPackage(pluginKey);
+            contextProvider = new ContextProviderProperties(packageName + ".ContentTemplateContextProvider");
         }
         for (int i = 0; i < contentTemplateKeys.size(); i++)
         {
@@ -113,6 +114,11 @@ public class BlueprintBuilder
         }
 
         return props;
+    }
+
+    private String cleanupPackage(String pluginKey)
+    {
+        return pluginKey.replaceAll("[^a-z\\.]", "_");
     }
 
     private void addJsI18n(WebResourceProperties properties)

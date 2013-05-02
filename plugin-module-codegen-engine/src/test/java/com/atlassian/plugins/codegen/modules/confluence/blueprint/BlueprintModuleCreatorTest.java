@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
  */
 public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<BlueprintProperties>
 {
-    public static final String PLUGIN_KEY = "com.atlassian.confluence.plugins.fooprint";
+    public static final String PLUGIN_KEY = "com.atlassian.confluence.plugins.foo-print";
     /**
      *  We use the builder to turn simple prompt properties into complex BlueprintProperties objects and reduce
      *  duplication in the test. This means that we assume the Builder does its job correctly - this is the
@@ -150,7 +150,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         // 1. Context provider is added to content-template element
         Element templateModule = getGeneratedModule("content-template");
         String className = "ContentTemplateContextProvider";
-        String packageName = PLUGIN_KEY;
+        String packageName = "com.atlassian.confluence.plugins.foo_print";  // foo-print without the '-'
         String fqClassName = packageName + "." + className;
         assertNodeText(templateModule, "context-provider/@class", fqClassName);
 
@@ -268,7 +268,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
 
         // 3. There should be a JS file containing wizard callbacks
         String js = new String(getResourceFile("js", "dialog-wizard.js").getContent());
-        assertThat(js, containsString("setWizard('com.atlassian.confluence.plugins.fooprint:foo-print-blueprint-web-item"));
+        assertThat(js, containsString("setWizard('" + PLUGIN_KEY + ":foo-print-blueprint-web-item"));
         assertThat(js, containsString(fieldId));
         
         // 4. There should be a web-resource pointing to the new files
