@@ -131,6 +131,13 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                 "anything possible."
             );
             promptForBoolean(CONTEXT_PROVIDER_PROMPT, props);
+
+            // Event Listener
+            showMessage(
+                "If your Blueprint will perform actions after the Blueprint page is created, such as adding watches,\n" +
+                    "sending emails, etc, you'll need to add an event listener."
+            );
+            promptForBoolean(EVENT_LISTENER_PROMPT, props);
         }
         return props;
     }

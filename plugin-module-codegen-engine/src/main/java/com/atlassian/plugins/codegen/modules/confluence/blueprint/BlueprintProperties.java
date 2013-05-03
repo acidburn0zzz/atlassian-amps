@@ -1,5 +1,6 @@
 package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
+import com.atlassian.plugins.codegen.ComponentDeclaration;
 import com.atlassian.plugins.codegen.modules.BasicNameModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
@@ -37,6 +38,7 @@ public class BlueprintProperties extends BasicNameModuleProperties
 
     public static final String PLUGIN_KEY = "PLUGIN_KEY";
     public static final String WEB_ITEM_KEY = "WEB_ITEM_KEY";
+    public static final String EVENT_LISTENER = "EVENT_LISTENER";
     public static final String WIZARD_FORM_FIELD_ID = "WIZARD_FORM_FIELD_ID";
     public static final String WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY = "WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY";
     public static final String WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY = "WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY";
@@ -129,6 +131,16 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public String getIndexTitleI18nKey()
     {
         return getProperty(INDEX_TITLE_I18N_KEY);
+    }
+
+    public void setEventListener(ComponentDeclaration component)
+    {
+        put(EVENT_LISTENER, component);
+    }
+
+    public ComponentDeclaration getEventListener()
+    {
+        return (ComponentDeclaration) get(EVENT_LISTENER);
     }
 
     @Override

@@ -2,9 +2,7 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
 import java.util.HashMap;
 
-import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.CONTEXT_PROVIDER_PROMPT;
-import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.DIALOG_WIZARD_PROMPT;
-import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.HOW_TO_USE_PROMPT;
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 
 /**
  * Contains all of the data from the Prompter phase using for creation of Confluence Blueprint modules.
@@ -25,6 +23,7 @@ public class BlueprintPromptEntries extends HashMap<BlueprintPromptEntry, Object
         put(HOW_TO_USE_PROMPT, false);
         put(DIALOG_WIZARD_PROMPT, false);
         put(CONTEXT_PROVIDER_PROMPT, false);
+        put(EVENT_LISTENER_PROMPT, false);
     }
 
     public BlueprintPromptEntries(String pluginKey)

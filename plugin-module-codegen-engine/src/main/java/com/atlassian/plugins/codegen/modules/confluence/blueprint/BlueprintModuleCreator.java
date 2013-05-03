@@ -1,8 +1,11 @@
 package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
+import com.atlassian.plugins.codegen.ComponentDeclaration;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
+import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
+import com.atlassian.plugins.codegen.modules.ClassBasedModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.ContextProviderProperties;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.ResourcedProperties;
@@ -30,6 +33,7 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
     private static final String CSS_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-blueprints.css.vtl";
     // Template name is jva not java only to avoid IDE headaches with imports.
     private static final String CONTEXT_PROVIDER_CLASS_TEMPLATE = TEMPLATE_PREFIX + "ContentTemplateContextProvider.jva.vtl";
+    private static final String EVENT_LISTENER_CLASS_TEMPLATE = TEMPLATE_PREFIX + "BlueprintCreatedListener.jva.vtl";
 
     @Override
     public PluginProjectChangeset createModule(BlueprintProperties props) throws Exception
@@ -61,6 +65,16 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
         WebResourceProperties webResource = props.getWebResource();
         changeset = changeset.with(createModule(webResource, WebResourceModuleCreator.PLUGIN_MODULE_TEMPLATE));
         changeset = addResourceFiles(changeset, webResource, null); // null means figure the template out...
+
+        ComponentDeclaration eventListener = props.getEventListener();
+        if (eventListener != null)
+        {
+            changeset = changeset.with(eventListener);   // adds the <component> element
+
+            ClassBasedModuleProperties classProps = new BasicClassModuleProperties(eventListener.getClassId().getFullName());
+            classProps.setProperty("PLUGIN_KEY", props.getPluginKey());
+            changeset = changeset.with(createClass(classProps, EVENT_LISTENER_CLASS_TEMPLATE));
+        }
 
         return changeset;
     }

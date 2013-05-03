@@ -1,6 +1,8 @@
 package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
+import com.atlassian.plugins.codegen.ClassId;
+import com.atlassian.plugins.codegen.ComponentDeclaration;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.ResourceFile;
 import com.atlassian.plugins.codegen.SourceFile;
@@ -19,6 +21,7 @@ import static com.atlassian.plugins.codegen.modules.confluence.blueprint.Bluepri
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 
@@ -302,6 +305,26 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertI18nString(titleError, WIZARD_FORM_FIELD_VALIDATION_ERROR_VALUE);
 
         // TODO - assert sidebar with description
+    }
+
+    @Test
+    public void eventListenerIsAdded() throws Exception
+    {
+        promptProps.put(EVENT_LISTENER_PROMPT, true);
+        buildBlueprintProperties();
+
+        // 1. Listener Component should be added to plugin XML
+        String packageName = "com.atlassian.confluence.plugins.foo_print";
+        String className = "BlueprintCreatedListener";
+        ClassId classId = ClassId.packageAndClass(packageName, className);
+        ComponentDeclaration component = getComponentOfClass(classId);
+        assertThat(component.getKey(), is("blueprint-created-listener"));
+        assertThat(component.getName().get(), is("Blueprint Created Event Listener"));
+
+        // 2. Listener class should be added
+        SourceFile sourceFile = getSourceFile(packageName, className);
+        assertThat(sourceFile.getContent(), containsString("package " + packageName + ";"));
+        assertThat(sourceFile.getContent(), containsString(PLUGIN_KEY));
     }
 
     private void assertWebResource(Element element, WebResourceProperties expectedResource)

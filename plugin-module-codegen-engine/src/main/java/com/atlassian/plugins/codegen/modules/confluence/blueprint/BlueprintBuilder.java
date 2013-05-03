@@ -1,5 +1,7 @@
 package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
+import com.atlassian.plugins.codegen.ClassId;
+import com.atlassian.plugins.codegen.ComponentDeclaration;
 import com.atlassian.plugins.codegen.modules.common.ContextProviderProperties;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
@@ -10,6 +12,7 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
+import static com.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
@@ -59,9 +62,9 @@ public class BlueprintBuilder
 
         List<String> contentTemplateKeys = (List<String>) promptProps.get(CONTENT_TEMPLATE_KEYS_PROMPT);
         ContextProviderProperties contextProvider = null;
+        String packageName = cleanupPackage(pluginKey);
         if ((Boolean) promptProps.get(CONTEXT_PROVIDER_PROMPT))
         {
-            String packageName = cleanupPackage(pluginKey);
             contextProvider = new ContextProviderProperties(packageName + ".ContentTemplateContextProvider");
         }
         for (int i = 0; i < contentTemplateKeys.size(); i++)
@@ -111,6 +114,15 @@ public class BlueprintBuilder
         if (hasHowToUse || hasDialogWizard)
         {
             addSoyTemplateToWebResource(webResource, props.getPluginKey(), indexKey, soyPackage, hasHowToUse, hasDialogWizard);
+        }
+
+        if ((Boolean)promptProps.get(EVENT_LISTENER_PROMPT))
+        {
+            ClassId classId = ClassId.packageAndClass(packageName, "BlueprintCreatedListener");
+            ComponentDeclaration component = ComponentDeclaration.builder(classId, "blueprint-created-listener")
+                .name(some("Blueprint Created Event Listener"))
+                .build();
+            props.setEventListener(component);
         }
 
         return props;

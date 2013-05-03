@@ -50,6 +50,7 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         mockBooleanPromptResponse(HOW_TO_USE_PROMPT, "N");
         mockBooleanPromptResponse(DIALOG_WIZARD_PROMPT, "N");
         mockBooleanPromptResponse(CONTEXT_PROVIDER_PROMPT, "N");
+        mockBooleanPromptResponse(EVENT_LISTENER_PROMPT, "N");
     }
 
     @SuppressWarnings("unchecked")
@@ -103,6 +104,17 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         BlueprintPromptEntries props = modulePrompter.promptForProps();
 
         assertTrue((Boolean) props.get(CONTEXT_PROVIDER_PROMPT));
+    }
+
+    @Test
+    public void eventListenerAdded() throws PrompterException
+    {
+        mockBooleanPromptResponse(ADVANCED_BLUEPRINT_PROMPT, "Y");
+        mockBooleanPromptResponse(EVENT_LISTENER_PROMPT, "Y");
+
+        BlueprintPromptEntries props = modulePrompter.promptForProps();
+
+        assertTrue((Boolean) props.get(EVENT_LISTENER_PROMPT));
     }
 
     private void mockBooleanPromptResponse(BlueprintPromptEntry prompt, String response) throws PrompterException
