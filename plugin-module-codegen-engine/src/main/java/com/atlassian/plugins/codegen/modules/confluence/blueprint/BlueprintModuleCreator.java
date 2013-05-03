@@ -1,5 +1,6 @@
 package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
+import com.atlassian.plugins.codegen.ArtifactDependency;
 import com.atlassian.plugins.codegen.ComponentDeclaration;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
@@ -13,6 +14,8 @@ import com.atlassian.plugins.codegen.modules.common.web.WebItemModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.web.WebItemProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
+
+import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
 
 /**
  * Creates a Confluence Blueprint module and any dependent modules.
@@ -42,6 +45,10 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
 
         // pull in CC maven dependency
 //        .with(MOCKITO_TEST)
+
+        ArtifactDependency
+            createContent = dependency("com.atlassian.confluence.plugins", "confluence-create-content-plugin", "1.5.18-SNAPSHOT", ArtifactDependency.Scope.PROVIDED);
+        changeset = changeset.with(createContent);
 
         for (ContentTemplateProperties contentTemplateProperties : props.getContentTemplates())
         {

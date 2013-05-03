@@ -21,6 +21,7 @@ public class BlueprintCreatedListener
     public BlueprintCreatedListener(EventPublisher eventPublisher)
     {
         this.eventPublisher = eventPublisher;
+        eventPublisher.register(this);
     }
 
     @EventListener
@@ -32,10 +33,10 @@ public class BlueprintCreatedListener
         if (!blueprintKey.getPluginKey().equals("$PLUGIN_KEY"))
             return;
 
-        log.info("Page created with title : " + event.getPage().getTitle());
-        log.info("-- by our Blueprint with key: " + blueprintKey.getModuleKey());
-        log.info("-- by user: " + event.getUser().getUsername()));
-        log.info("-- from class: " + event.getSource().getClass());
-        log.info("-- with context size: " + event.getContext().size());
+        log.warn("Page created with title : " + event.getPage().getTitle());
+        log.warn("-- by our Blueprint with key: " + blueprintKey.getModuleKey());
+        log.warn("-- by user: " + event.getUser().getName());
+        log.warn("-- from class: " + event.getSource().getClass());
+        log.warn("-- with context size: " + event.getContext().size());
     }
 }
