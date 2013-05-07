@@ -128,6 +128,16 @@ public class BlueprintBuilderTest
             "foo-print-blueprint-web-item"));
     }
 
+    @Test
+    public void indexPageTemplateAdded() throws Exception
+    {
+        promptProps.put(INDEX_PAGE_TEMPLATE_PROMPT, true);
+        BlueprintProperties props = builder.build();
+
+        ContentTemplateProperties expected = makeExpectedIndexPageContentTemplateProperties();
+        assertContentTemplatePropertiesEqual(expected, props.getIndexPageContentTemplate());
+    }
+
     private void addJsToExpectedWebResource(WebResourceProperties properties)
     {
         WebResourceTransformation transformation = new WebResourceTransformation("js");
@@ -268,11 +278,17 @@ public class BlueprintBuilderTest
             ContentTemplateProperties expected = expectedTemplates.get(i);
             ContentTemplateProperties actual = actualTemplates.get(i);
 
-            assertNameBasedModulesEqual(expected, actual);
-            assertEquals(expected.getContentText(), actual.getContentText());
-
-            assertResourcesEqual(expected.getResources(), actual.getResources());
+            assertContentTemplatePropertiesEqual(expected, actual);
         }
+    }
+
+    private void assertContentTemplatePropertiesEqual(ContentTemplateProperties expected,
+        ContentTemplateProperties actual)
+    {
+        assertNameBasedModulesEqual(expected, actual);
+        assertEquals(expected.getContentText(), actual.getContentText());
+
+        assertResourcesEqual(expected.getResources(), actual.getResources());
     }
 
     private void assertNameBasedModulesEqual(AbstractNameBasedModuleProperties expected,
@@ -337,16 +353,34 @@ public class BlueprintBuilderTest
         // i18n keys itself? If so, thta logic would be tested in the Properties object (or a "generator" helper for it).
         // TODO - should probably contact Jonathan Dok for this.
         ContentTemplateProperties template = new ContentTemplateProperties(templateModuleKey);
-        template.setNameI18nKey("foo-plate.name");
+        template.setNameI18nKey(PLUGIN_KEY + ".foo-plate.name");
         template.setModuleName("FooPrint Content Template 0");
-        template.setDescriptionI18nKey("foo-plate.desc");
+        template.setDescriptionI18nKey(PLUGIN_KEY + ".foo-plate.desc");
         template.setDescription("Contains Storage-format XML used by the FooPrint Blueprint");
-        template.setContentText(templateModuleKey + ".content.text", CONTENT_I18N_DEFAULT_VALUE);
+        template.setContentText(PLUGIN_KEY + "." + templateModuleKey + ".content.text", CONTENT_I18N_DEFAULT_VALUE);
 
         Resource templateResource = new Resource();
         templateResource.setName("template");
         templateResource.setType("download");
         templateResource.setLocation("xml/" + templateModuleKey + ".xml");
+        template.addResource(templateResource);
+        return template;
+    }
+
+    private ContentTemplateProperties makeExpectedIndexPageContentTemplateProperties()
+    {
+        String moduleKey = BlueprintProperties.INDEX_TEMPLATE_DEFAULT_KEY;
+        ContentTemplateProperties template = new ContentTemplateProperties(moduleKey);
+        template.setNameI18nKey(PLUGIN_KEY + ".custom-index-page-template.name");
+        template.setDescriptionI18nKey(PLUGIN_KEY + ".custom-index-page-template.desc");
+        template.setModuleName("Custom Index Page Content Template");
+        template.setDescription("Contains Storage-format XML used by the FooPrint Blueprint's Index page");
+        template.setContentText(PLUGIN_KEY + ".custom-index-page-template.content.text", ContentTemplateProperties.INDEX_TEMPLATE_CONTENT_VALUE);
+
+        Resource templateResource = new Resource();
+        templateResource.setName("template");
+        templateResource.setType("download");
+        templateResource.setLocation("xml/" + moduleKey + ".xml");
         template.addResource(templateResource);
         return template;
     }

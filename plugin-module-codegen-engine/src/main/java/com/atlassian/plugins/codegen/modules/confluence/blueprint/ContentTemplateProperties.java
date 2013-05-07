@@ -23,6 +23,8 @@ public class ContentTemplateProperties extends AbstractNameBasedModuleProperties
     public static final String CONTENT_I18N_KEY = "CONTENT_I18N_KEY";
     public static final String CONTENT_I18N_VALUE = "CONTENT_I18N_VALUE";
     public static final String CONTENT_I18N_DEFAULT_VALUE = "This text will replace the at:i18n placeholder in the content template XML.";
+    public static final String INDEX_TEMPLATE_CONTENT_VALUE =
+        "This index page has used instead of the default one, by setting the index-template-key attribute of the blueprint config element.";
 
     public ContentTemplateProperties(String moduleKey)
     {

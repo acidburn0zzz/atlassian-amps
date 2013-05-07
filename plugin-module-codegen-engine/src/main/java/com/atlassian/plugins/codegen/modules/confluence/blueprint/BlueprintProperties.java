@@ -24,6 +24,7 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public static final String CONTENT_TEMPLATES = "CONTENT_TEMPLATES";
     private static final String HOW_TO_USE_TEMPLATE = "HOW_TO_USE_TEMPLATE";
     private static final String CREATE_RESULT = "CREATE_RESULT";
+    private static final String INDEX_PAGE_TEMPLATE = "INDEX_PAGE_TEMPLATE";
     public static final String DIALOG_WIZARD = "DIALOG_WIZARD";
     public static final String INDEX_TITLE_I18N_KEY = "INDEX_TITLE_I18N_KEY";
 
@@ -48,6 +49,7 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public static final String WIZARD_FORM_FIELD_POST_RENDER_TEXT_VALUE = "This text comes from the post-render hook in the Wizard JavaScript";
     public static final String WIZARD_FORM_FIELD_VALIDATION_ERROR_VALUE = "You must enter a title";
     public static final String CREATE_RESULT_VIEW = "view";
+    public static final String INDEX_TEMPLATE_DEFAULT_KEY = "custom-index-page-template";
 
     public BlueprintProperties()
     {
@@ -165,5 +167,15 @@ public class BlueprintProperties extends BasicNameModuleProperties
             mapBuilder.putAll(getDialogWizard().getI18nProperties());
         }
         return mapBuilder.build();
+    }
+
+    public ContentTemplateProperties getIndexPageContentTemplate()
+    {
+        return (ContentTemplateProperties) get(INDEX_PAGE_TEMPLATE);
+    }
+
+    public void setIndexPageContentTemplate(ContentTemplateProperties indexPageTemplate)
+    {
+        put(INDEX_PAGE_TEMPLATE, indexPageTemplate);
     }
 }

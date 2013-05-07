@@ -70,7 +70,10 @@ public class BlueprintBuilder
         for (int i = 0; i < contentTemplateKeys.size(); i++)
         {
             String contentTemplateKey = contentTemplateKeys.get(i);
-            ContentTemplateProperties contentTemplate = makeContentTemplate(contentTemplateKey, blueprintName, i, contextProvider);
+            String moduleName = stringer.makeContentTemplateName(blueprintName, i);
+            String description = "Contains Storage-format XML used by the " + blueprintName + " Blueprint";
+            ContentTemplateProperties contentTemplate = makeContentTemplate(contentTemplateKey, moduleName, contextProvider,
+                pluginKey, CONTENT_I18N_DEFAULT_VALUE, description);
             props.addContentTemplate(contentTemplate);
         }
 
@@ -128,6 +131,16 @@ public class BlueprintBuilder
         if ((Boolean)promptProps.get(SKIP_PAGE_EDITOR_PROMPT))
         {
             props.setCreateResult(BlueprintProperties.CREATE_RESULT_VIEW);
+        }
+
+        if ((Boolean)promptProps.get(INDEX_PAGE_TEMPLATE_PROMPT))
+        {
+            String contentTemplateKey = INDEX_TEMPLATE_DEFAULT_KEY;
+            String moduleName = "Custom Index Page Content Template";
+            String description = "Contains Storage-format XML used by the " + blueprintName + " Blueprint's Index page";
+            ContentTemplateProperties contentTemplate = makeContentTemplate(contentTemplateKey, moduleName, contextProvider,
+                pluginKey, ContentTemplateProperties.INDEX_TEMPLATE_CONTENT_VALUE, description);
+            props.setIndexPageContentTemplate(contentTemplate);
         }
 
         return props;
@@ -216,15 +229,17 @@ public class BlueprintBuilder
         }
     }
 
-    private ContentTemplateProperties makeContentTemplate(String contentTemplateKey, String webItemName, int counter, final ContextProviderProperties contextProvider)
+    private ContentTemplateProperties makeContentTemplate(String contentTemplateKey,
+        String moduleName, final ContextProviderProperties contextProvider, String pluginKey,
+        final String contentTextValue, final String description)
     {
         ContentTemplateProperties template = new ContentTemplateProperties(contentTemplateKey);
 
-        template.setModuleName(stringer.makeContentTemplateName(webItemName, counter));
-        template.setDescription("Contains Storage-format XML used by the " + webItemName + " Blueprint");
-        template.setNameI18nKey(contentTemplateKey + ".name");
-        template.setDescriptionI18nKey(contentTemplateKey + ".desc");
-        template.setContentText(contentTemplateKey + ".content.text", CONTENT_I18N_DEFAULT_VALUE);
+        template.setModuleName(moduleName);
+        template.setDescription(description);
+        template.setNameI18nKey(pluginKey + "." + contentTemplateKey + ".name");
+        template.setDescriptionI18nKey(pluginKey + "." + contentTemplateKey + ".desc");
+        template.setContentText(pluginKey + "." + contentTemplateKey + ".content.text", contentTextValue);
         if (contextProvider != null)
         {
             template.setContextProvider(contextProvider);

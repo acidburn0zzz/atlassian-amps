@@ -135,9 +135,9 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
             // Create result
             showMessage(
                 "If your Blueprint will add enough content from the Wizard and/or Context Provider that the new page\n" +
-                "can be saved without the user needing to use the Editor, you can specify that the Editor be skipped\n" +
-                "and the user taken directly to the page View screen. This will add an attribute:\n" +
-                " create-result='view' to the Blueprint's config XML."
+                "can be saved (with a title) without the user needing to use the Editor, you can specify that \n" +
+                "the Editor be skipped and the user taken directly to the page View screen. \n" +
+                "This will add an attribute: create-result='view' to the Blueprint's config XML."
             );
             promptForBoolean(SKIP_PAGE_EDITOR_PROMPT, props);
 
@@ -147,6 +147,13 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                     "sending emails, etc, you'll need to add an event listener."
             );
             promptForBoolean(EVENT_LISTENER_PROMPT, props);
+
+            // Index Page template
+            showMessage(
+                "A Blueprint Index page displays a listing of all pages in the current space that were created by that Blueprint.\n" +
+                "You can override the default index page to list the Blueprint pages in any way you choose."
+            );
+            promptForBoolean(INDEX_PAGE_TEMPLATE_PROMPT, props);
         }
         return props;
     }

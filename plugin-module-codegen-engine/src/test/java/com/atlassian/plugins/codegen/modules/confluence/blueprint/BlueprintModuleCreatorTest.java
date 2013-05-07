@@ -9,6 +9,7 @@ import com.atlassian.plugins.codegen.SourceFile;
 import com.atlassian.plugins.codegen.modules.AbstractNameBasedModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
 import com.google.common.collect.Lists;
+import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.junit.After;
@@ -122,16 +123,16 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     {
         Element templateModule = getGeneratedModule("content-template");
         assertNodeText(templateModule, "@key", templateModuleKey);
-        assertNodeText(templateModule, "@i18n-name-key", "foo-plate.name");
-        assertNodeText(templateModule, "description/@key", "foo-plate.desc");
+        assertNodeText(templateModule, "@i18n-name-key", PLUGIN_KEY + "." + "foo-plate.name");
+        assertNodeText(templateModule, "description/@key", PLUGIN_KEY + "." + "foo-plate.desc");
 
         assertNodeText(templateModule, "resource/@name", "template");
         assertNodeText(templateModule, "resource/@type", "download");
         assertNodeText(templateModule, "resource/@location", "xml/" + templateModuleKey + ".xml");
 
-        assertI18nString(templateModuleKey + ".name", "FooPrint Content Template 0");
+        assertI18nString(PLUGIN_KEY + "." + templateModuleKey + ".name", "FooPrint Content Template 0");
         String templateDesc = "Contains Storage-format XML used by the FooPrint Blueprint";
-        assertI18nString(templateModuleKey + ".desc", templateDesc);
+        assertI18nString(PLUGIN_KEY + "." + templateModuleKey + ".desc", templateDesc);
     }
 
     @Test
@@ -139,9 +140,40 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     {
         ResourceFile file = getResourceFile("xml", templateModuleKey + ".xml");
         String xml = new String(file.getContent());
-        String templateContentI18nKey = templateModuleKey + ".content.text";
+        String templateContentI18nKey = PLUGIN_KEY + "." + templateModuleKey + ".content.text";
         assertThat(xml, containsString(templateContentI18nKey));
         assertI18nString(templateContentI18nKey, ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE);
+    }
+
+    @Test
+    public void indexPageTemplateFileIsCreated() throws Exception
+    {
+        promptProps.put(INDEX_PAGE_TEMPLATE_PROMPT, true);
+        buildBlueprintProperties();
+
+        Element blueprintModule = getGeneratedModule();
+        String templateModuleKey = BlueprintProperties.INDEX_TEMPLATE_DEFAULT_KEY;
+        assertNodeText(blueprintModule, "@index-template-key", templateModuleKey);
+
+        Document templateModules = getAllGeneratedModulesOfType("content-template");
+        Element templateModule = (Element)templateModules.selectSingleNode("//content-template[@key='custom-index-page-template']");
+        assertNodeText(templateModule, "@key", templateModuleKey);
+        assertNodeText(templateModule, "@i18n-name-key", "com.atlassian.confluence.plugins.foo-print.custom-index-page-template.name");
+        assertNodeText(templateModule, "description/@key", "com.atlassian.confluence.plugins.foo-print.custom-index-page-template.desc");
+
+        assertNodeText(templateModule, "resource/@name", "template");
+        assertNodeText(templateModule, "resource/@type", "download");
+        assertNodeText(templateModule, "resource/@location", "xml/" + templateModuleKey + ".xml");
+
+        assertI18nString("com.atlassian.confluence.plugins.foo-print.custom-index-page-template.name", "Custom Index Page Content Template");
+        String templateDesc = "Contains Storage-format XML used by the FooPrint Blueprint's Index page";
+        assertI18nString("com.atlassian.confluence.plugins.foo-print.custom-index-page-template.desc", templateDesc);
+
+        ResourceFile file = getResourceFile("xml", templateModuleKey + ".xml");
+        String xml = new String(file.getContent());
+        String templateContentI18nKey = PLUGIN_KEY + "." + templateModuleKey + ".content.text";
+        assertThat(xml, containsString(templateContentI18nKey));
+        assertI18nString(templateContentI18nKey, ContentTemplateProperties.INDEX_TEMPLATE_CONTENT_VALUE);
     }
 
     @Test

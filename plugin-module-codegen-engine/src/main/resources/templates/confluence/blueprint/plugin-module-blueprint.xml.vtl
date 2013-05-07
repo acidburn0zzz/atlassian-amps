@@ -3,7 +3,7 @@
 #* @vtlvariable name="CONTENT_TEMPLATES" type="java.util.List<com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties>" *#
 #* @vtlvariable name="INDEX_KEY" type="java.lang.String" *#
 #* @vtlvariable name="CREATE_RESULT" type="java.lang.String" *#
-#* @vtlvariable name="INDEX_TEMPLATE_KEY" type="java.lang.String" *#
+#* @vtlvariable name="INDEX_PAGE_TEMPLATE" type="com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties" *#
 #* @vtlvariable name="INDEX_TITLE_I18N_KEY" type="java.lang.String" *#
 #* @vtlvariable name="HOW_TO_USE_TEMPLATE" type="java.lang.String" *#
 #* @vtlvariable name="DESCRIPTION_I18N_KEY" type="java.lang.String" *#
@@ -19,7 +19,7 @@
     i18n-name-key="$NAME_I18N_KEY"
     index-key="$INDEX_KEY"
     #if ($CREATE_RESULT)create-result="$CREATE_RESULT"#end
-    #if ($INDEX_TEMPLATE_KEY)index-template-key="$INDEX_TEMPLATE_KEY"#end
+    #if ($INDEX_PAGE_TEMPLATE)index-template-key="${INDEX_PAGE_TEMPLATE.moduleKey}"#end
     #if ($INDEX_TITLE_I18N_KEY)i18n-index-title-key="$INDEX_TITLE_I18N_KEY"#end
     #if ($HOW_TO_USE_TEMPLATE)how-to-use-template="$HOW_TO_USE_TEMPLATE"#end
     >

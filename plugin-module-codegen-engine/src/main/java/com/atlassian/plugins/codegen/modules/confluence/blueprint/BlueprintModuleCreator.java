@@ -31,6 +31,7 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
     private static final String BLUEPRINT_MODULE_TEMPLATE = TEMPLATE_PREFIX + "plugin-module-blueprint.xml.vtl";
     private static final String CONTENT_TEMPLATE_MODULE_TEMPLATE = TEMPLATE_PREFIX + "plugin-module-content-template.xml.vtl";
     private static final String CONTENT_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-content-template.xml.vtl";
+    private static final String INDEX_PAGE_CONTENT_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-index-page-content-template.xml.vtl";
     private static final String SOY_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-soy-template.soy.vtl";
     private static final String JS_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-dialog-wizard.js.vtl";
     private static final String CSS_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-blueprints.css.vtl";
@@ -81,6 +82,13 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
             ClassBasedModuleProperties classProps = new BasicClassModuleProperties(eventListener.getClassId().getFullName());
             classProps.setProperty("PLUGIN_KEY", props.getPluginKey());
             changeset = changeset.with(createClass(classProps, EVENT_LISTENER_CLASS_TEMPLATE));
+        }
+
+        ContentTemplateProperties indexPageContentTemplate = props.getIndexPageContentTemplate();
+        if (indexPageContentTemplate != null)
+        {
+            changeset = changeset.with(createModule(indexPageContentTemplate, CONTENT_TEMPLATE_MODULE_TEMPLATE));
+            changeset = addResourceFiles(changeset, indexPageContentTemplate, INDEX_PAGE_CONTENT_TEMPLATE_FILE_TEMPLATE);
         }
 
         return changeset;

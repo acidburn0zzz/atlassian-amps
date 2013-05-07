@@ -25,6 +25,7 @@ public class BlueprintPromptEntries extends HashMap<BlueprintPromptEntry, Object
         put(DIALOG_WIZARD_PROMPT, false);
         put(CONTEXT_PROVIDER_PROMPT, false);
         put(EVENT_LISTENER_PROMPT, false);
+        put(INDEX_PAGE_TEMPLATE_PROMPT, false);
     }
 
     public BlueprintPromptEntries(String pluginKey)

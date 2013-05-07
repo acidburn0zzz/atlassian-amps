@@ -17,7 +17,8 @@ public enum BlueprintPromptEntry
     HOW_TO_USE_PROMPT("Add a How-to-Use page to your Blueprint?", "Y"),
     DIALOG_WIZARD_PROMPT("Add a Create dialog wizard to your Blueprint?", "Y"),
     CONTEXT_PROVIDER_PROMPT("Add a Context Provider to your Blueprint?", "Y"),
-    EVENT_LISTENER_PROMPT("Add an Event Listener to your Blueprint?", "Y")
+    EVENT_LISTENER_PROMPT("Add an Event Listener to your Blueprint?", "Y"),
+    INDEX_PAGE_TEMPLATE_PROMPT("Add a custom Index page to your Blueprint?", "Y")
     ;
 
     private final String message;

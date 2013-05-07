@@ -52,6 +52,7 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         mockBooleanPromptResponse(CONTEXT_PROVIDER_PROMPT, "N");
         mockBooleanPromptResponse(SKIP_PAGE_EDITOR_PROMPT, "N");
         mockBooleanPromptResponse(EVENT_LISTENER_PROMPT, "N");
+        mockBooleanPromptResponse(INDEX_PAGE_TEMPLATE_PROMPT, "N");
     }
 
     @SuppressWarnings("unchecked")
@@ -116,6 +117,16 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         BlueprintPromptEntries props = modulePrompter.promptForProps();
 
         assertTrue((Boolean) props.get(CONTEXT_PROVIDER_PROMPT));
+    }
+    @Test
+    public void customIndexPageTemplateAdded() throws PrompterException
+    {
+        mockBooleanPromptResponse(ADVANCED_BLUEPRINT_PROMPT, "Y");
+        mockBooleanPromptResponse(INDEX_PAGE_TEMPLATE_PROMPT, "Y");
+
+        BlueprintPromptEntries props = modulePrompter.promptForProps();
+
+        assertTrue((Boolean) props.get(INDEX_PAGE_TEMPLATE_PROMPT));
     }
 
     @Test
