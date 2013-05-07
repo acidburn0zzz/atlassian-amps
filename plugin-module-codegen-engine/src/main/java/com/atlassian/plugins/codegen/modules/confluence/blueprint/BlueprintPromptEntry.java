@@ -13,6 +13,7 @@ public enum BlueprintPromptEntry
     CONTENT_TEMPLATE_KEYS_PROMPT("Enter Content Template key", null),   // defaults are generated
     ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT("Add another Content Template key?", "N"),
     ADVANCED_BLUEPRINT_PROMPT ("Add advanced Blueprint features?", "Y"),
+    SKIP_PAGE_EDITOR_PROMPT("Skip the Editor?", "N"),
     HOW_TO_USE_PROMPT("Add a How-to-Use page to your Blueprint?", "Y"),
     DIALOG_WIZARD_PROMPT("Add a Create dialog wizard to your Blueprint?", "Y"),
     CONTEXT_PROVIDER_PROMPT("Add a Context Provider to your Blueprint?", "Y"),

@@ -94,6 +94,15 @@ public class BlueprintBuilderTest
     }
 
     @Test
+    public void editorIsSkipped() throws Exception
+    {
+        promptProps.put(SKIP_PAGE_EDITOR_PROMPT, true);
+        BlueprintProperties props = builder.build();
+
+        assertThat(props.getCreateResult(), is(BlueprintProperties.CREATE_RESULT_VIEW));
+    }
+
+    @Test
     public void dialogWizardAdded()
     {
         promptProps.put(DIALOG_WIZARD_PROMPT, true);

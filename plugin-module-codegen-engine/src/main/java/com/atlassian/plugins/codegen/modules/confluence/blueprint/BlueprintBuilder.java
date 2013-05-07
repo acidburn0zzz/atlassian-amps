@@ -125,6 +125,11 @@ public class BlueprintBuilder
             props.setEventListener(component);
         }
 
+        if ((Boolean)promptProps.get(SKIP_PAGE_EDITOR_PROMPT))
+        {
+            props.setCreateResult(BlueprintProperties.CREATE_RESULT_VIEW);
+        }
+
         return props;
     }
 

@@ -236,6 +236,16 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     }
 
     @Test
+    public void editorIsSkipped() throws Exception
+    {
+        promptProps.put(SKIP_PAGE_EDITOR_PROMPT, true);
+        buildBlueprintProperties();
+
+        Element blueprintModule = getGeneratedModule();
+        assertNodeText(blueprintModule, "@create-result", BlueprintProperties.CREATE_RESULT_VIEW);
+    }
+
+    @Test
     public void dialogWizardIsAdded() throws Exception
     {
         promptProps.put(DIALOG_WIZARD_PROMPT, true);

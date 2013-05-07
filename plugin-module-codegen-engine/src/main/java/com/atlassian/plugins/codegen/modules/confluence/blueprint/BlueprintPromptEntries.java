@@ -20,6 +20,7 @@ public class BlueprintPromptEntries extends HashMap<BlueprintPromptEntry, Object
         this.defaultBasePackage = defaultBasePackage;
 
         // Adding these false values avoids a lot of null-checks later on.
+        put(SKIP_PAGE_EDITOR_PROMPT, false);
         put(HOW_TO_USE_PROMPT, false);
         put(DIALOG_WIZARD_PROMPT, false);
         put(CONTEXT_PROVIDER_PROMPT, false);

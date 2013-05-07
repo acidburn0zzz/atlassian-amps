@@ -23,6 +23,7 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public static final String WEB_ITEM_BLUEPRINT_KEY = "blueprintKey";
     public static final String CONTENT_TEMPLATES = "CONTENT_TEMPLATES";
     private static final String HOW_TO_USE_TEMPLATE = "HOW_TO_USE_TEMPLATE";
+    private static final String CREATE_RESULT = "CREATE_RESULT";
     public static final String DIALOG_WIZARD = "DIALOG_WIZARD";
     public static final String INDEX_TITLE_I18N_KEY = "INDEX_TITLE_I18N_KEY";
 
@@ -46,6 +47,7 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public static final String WIZARD_FORM_FIELD_PRE_RENDER_TEXT_VALUE = "This text comes from the pre-render hook in the Wizard JavaScript";
     public static final String WIZARD_FORM_FIELD_POST_RENDER_TEXT_VALUE = "This text comes from the post-render hook in the Wizard JavaScript";
     public static final String WIZARD_FORM_FIELD_VALIDATION_ERROR_VALUE = "You must enter a title";
+    public static final String CREATE_RESULT_VIEW = "view";
 
     public BlueprintProperties()
     {
@@ -111,6 +113,16 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public String getHowToUseTemplate()
     {
         return (String) get(HOW_TO_USE_TEMPLATE);
+    }
+
+    public void setCreateResult(String createResult)
+    {
+        setProperty(CREATE_RESULT, createResult);
+    }
+
+    public String getCreateResult()
+    {
+        return getProperty(CREATE_RESULT);
     }
 
     public void setDialogWizard(DialogWizardProperties props)

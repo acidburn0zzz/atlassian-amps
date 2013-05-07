@@ -50,6 +50,7 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         mockBooleanPromptResponse(HOW_TO_USE_PROMPT, "N");
         mockBooleanPromptResponse(DIALOG_WIZARD_PROMPT, "N");
         mockBooleanPromptResponse(CONTEXT_PROVIDER_PROMPT, "N");
+        mockBooleanPromptResponse(SKIP_PAGE_EDITOR_PROMPT, "N");
         mockBooleanPromptResponse(EVENT_LISTENER_PROMPT, "N");
     }
 
@@ -82,6 +83,17 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
         BlueprintPromptEntries props = modulePrompter.promptForProps();
 
         assertTrue((Boolean) props.get(HOW_TO_USE_PROMPT));
+    }
+
+    @Test
+    public void pageEditorSkipped() throws PrompterException
+    {
+        mockBooleanPromptResponse(ADVANCED_BLUEPRINT_PROMPT, "Y");
+        mockBooleanPromptResponse(SKIP_PAGE_EDITOR_PROMPT, "Y");
+
+        BlueprintPromptEntries props = modulePrompter.promptForProps();
+
+        assertTrue((Boolean) props.get(SKIP_PAGE_EDITOR_PROMPT));
     }
 
     @Test
