@@ -64,6 +64,13 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
             }
         }
 
+        ContentTemplateProperties indexPageContentTemplate = props.getIndexPageContentTemplate();
+        if (indexPageContentTemplate != null)
+        {
+            changeset = changeset.with(createModule(indexPageContentTemplate, CONTENT_TEMPLATE_MODULE_TEMPLATE));
+            changeset = addResourceFiles(changeset, indexPageContentTemplate, INDEX_PAGE_CONTENT_TEMPLATE_FILE_TEMPLATE);
+        }
+
         WebItemProperties webItem = props.getWebItem();
         if (webItem != null)  // Only ever expected to be null for testing.
         {
@@ -82,13 +89,6 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
             ClassBasedModuleProperties classProps = new BasicClassModuleProperties(eventListener.getClassId().getFullName());
             classProps.setProperty("PLUGIN_KEY", props.getPluginKey());
             changeset = changeset.with(createClass(classProps, EVENT_LISTENER_CLASS_TEMPLATE));
-        }
-
-        ContentTemplateProperties indexPageContentTemplate = props.getIndexPageContentTemplate();
-        if (indexPageContentTemplate != null)
-        {
-            changeset = changeset.with(createModule(indexPageContentTemplate, CONTENT_TEMPLATE_MODULE_TEMPLATE));
-            changeset = addResourceFiles(changeset, indexPageContentTemplate, INDEX_PAGE_CONTENT_TEMPLATE_FILE_TEMPLATE);
         }
 
         return changeset;

@@ -15,6 +15,8 @@ import java.util.List;
 
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
@@ -40,9 +42,9 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
 
         BlueprintStringer stringer = new BlueprintStringer(blueprintIndexKey, "com.foo.plugin");
 
-        when(prompter.prompt(INDEX_KEY_PROMPT.message(), INDEX_KEY_PROMPT.defaultValue())).thenReturn(blueprintIndexKey);
         when(prompter.prompt(WEB_ITEM_NAME_PROMPT.message(), WEB_ITEM_NAME_PROMPT.defaultValue())).thenReturn(webItemName);
-        when(prompter.prompt(WEB_ITEM_DESC_PROMPT.message(), WEB_ITEM_DESC_PROMPT.defaultValue())).thenReturn(webItemDesc);
+        when(prompter.prompt(eq(WEB_ITEM_DESC_PROMPT.message()), anyString())).thenReturn(webItemDesc);
+        when(prompter.prompt(eq(INDEX_KEY_PROMPT.message()), anyString())).thenReturn(blueprintIndexKey);
         when(prompter.prompt(CONTENT_TEMPLATE_KEYS_PROMPT.message(), stringer.makeContentTemplateKey(0))).thenReturn(templateModuleKey);
 
         mockBooleanPromptResponse(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT, "N");

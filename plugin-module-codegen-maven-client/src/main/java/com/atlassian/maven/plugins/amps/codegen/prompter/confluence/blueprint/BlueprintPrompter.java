@@ -58,27 +58,29 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
     {
         BlueprintPromptEntries props = new BlueprintPromptEntries(getPluginKey(), getDefaultBasePackage());
 
-        // Index key
-        showMessage(
-            "Blueprints are grouped by an Index Key that will determine the keys of the Blueprint plugin modules,\n" +
-                "and appear as a Label on each created Blueprint page."
-        );
-        // TODO - make sure the key is a valid *label* and also a valid prefix for module keys.
-        String indexKey = promptNotBlank(INDEX_KEY_PROMPT, props);
-        BlueprintStringer stringer = new BlueprintStringer(indexKey, getPluginKey());
-
         // Name and Description
         showMessage(
             "The Blueprints will be displayed in the Create dialog via a web-item with a name, description and icon.\n" +
                 "The i18n keys for the name and description will be automatically generated for your Blueprint but can be\n" +
                 "changed later."
         );
-        promptNotBlank(WEB_ITEM_NAME_PROMPT, props);
-        promptNotBlank(WEB_ITEM_DESC_PROMPT, props);
+        String blueprintName = promptNotBlankAndFill(WEB_ITEM_NAME_PROMPT, props);
+        String defaultBlueprintDesc = "Creates pages from the " + blueprintName + " blueprint.";
+        promptNotBlankAndFill(WEB_ITEM_DESC_PROMPT, defaultBlueprintDesc, props);
+
+        // Index key
+        showMessage(
+            "Blueprints are grouped by an Index Key that will determine the keys of the Blueprint plugin modules,\n" +
+                "and appear as a Label on each created Blueprint page."
+        );
+        // TODO - make sure the key is a valid *label* and also a valid prefix for module keys.
+        String defaultIndexKey = blueprintName.toLowerCase().replaceAll("\\s+", "-");
+        String indexKey = promptNotBlankAndFill(INDEX_KEY_PROMPT, defaultIndexKey, props);
+        BlueprintStringer stringer = new BlueprintStringer(indexKey, getPluginKey());
 
         // Template(s)
         showMessage(
-            "Blueprints Templates are in Confluence XHTML Storage format. A single Blueprint may create " +
+            "Blueprints Templates are in Confluence XHTML Storage format. A single Blueprint may create \n" +
                 "Confluence Pages based on multiple templates, so you may specify more than one template key."
         );
         int templateIndex = 0;
@@ -102,7 +104,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         // Advanced
         showMessage(
             "That's all you need to enter to create a working Blueprint! However, this SDK can create richer Blueprints\n" +
-                "with How-to-Use pages, JavaScript wizards and custom Index page."
+                "with How-to-Use pages, JavaScript wizards, context providers, event listeners and custom Index pages."
         );
         if (promptForBoolean(ADVANCED_BLUEPRINT_PROMPT))
         {
@@ -158,9 +160,17 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         return props;
     }
 
-    private String promptNotBlank(BlueprintPromptEntry promptEntry, BlueprintPromptEntries props) throws PrompterException
+    private String promptNotBlankAndFill(BlueprintPromptEntry promptEntry, BlueprintPromptEntries props) throws PrompterException
     {
-        String input = promptNotBlank(promptEntry.message(), promptEntry.defaultValue());
+        return promptNotBlankAndFill(promptEntry, null, props);
+    }
+
+    private String promptNotBlankAndFill(BlueprintPromptEntry promptEntry, String defaultValue, BlueprintPromptEntries props) throws PrompterException
+    {
+        if (defaultValue == null)
+            defaultValue = promptEntry.defaultValue();
+
+        String input = promptNotBlank(promptEntry.message(), defaultValue);
         props.put(promptEntry, input);
         return input;
     }
