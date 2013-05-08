@@ -24,7 +24,7 @@ import static com.atlassian.plugins.codegen.modules.confluence.blueprint.Content
  * This class is needed for Confluence Blueprints because unlike other SDK module-creators, the Blueprint creator
  * adds multiple modules and converts a small amount of user input into a large data structure.
  *
- * @since 4.1.7
+ * @since 4.1.8
  */
 public class BlueprintBuilder
 {
@@ -249,7 +249,6 @@ public class BlueprintBuilder
         templateResource.setName("template");
         templateResource.setType("download");
 
-        // TODO - should allow base path to be set (so xml dir can be relative)
         templateResource.setLocation("xml/" + contentTemplateKey + ".xml");
         template.addResource(templateResource);
 
@@ -260,7 +259,6 @@ public class BlueprintBuilder
     {
         WebItemProperties webItem = new WebItemProperties();
 
-        // TODO - i18n key should be prefixed with the plugin key for uniqueness.
         webItem.setModuleKey(blueprintModuleKey + "-web-item");
         webItem.setModuleName((String) promptProps.get(WEB_ITEM_NAME_PROMPT));
         webItem.setDescription((String) promptProps.get(WEB_ITEM_DESC_PROMPT));

@@ -6,12 +6,13 @@ import com.google.common.collect.ImmutableMap;
 import java.util.List;
 
 /**
- * @since 4.1.7
+ * Properties for Confluence Blueprint wizards.
  */
 public class DialogWizardProperties extends AbstractNameBasedModuleProperties
 {
     public static final String DIALOG_PAGES = "DIALOG_PAGES";
 
+    @SuppressWarnings("unchecked")
     public List<DialogPageProperties> getDialogPages()
     {
         return (List<DialogPageProperties>) get(DIALOG_PAGES);

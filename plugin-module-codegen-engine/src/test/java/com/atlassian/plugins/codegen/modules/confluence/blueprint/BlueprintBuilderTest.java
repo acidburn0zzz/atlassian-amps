@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
  * Tests that the builder converts a simple Properties object returned by the Prompter into a complete
  * BlueprintProperties object.
  *
- * @since 4.1.7
+ * @since 4.1.8
  */
 public class BlueprintBuilderTest
 {
@@ -38,7 +38,6 @@ public class BlueprintBuilderTest
 
     private BlueprintBuilder builder;
     private BlueprintPromptEntries promptProps;
-    private List<String> contentTemplateKeys;
 
     private BlueprintStringer stringer = new BlueprintStringer(blueprintIndexKey, PLUGIN_KEY);
 
@@ -51,7 +50,7 @@ public class BlueprintBuilderTest
         promptProps.put(WEB_ITEM_NAME_PROMPT, webItemName);
         promptProps.put(WEB_ITEM_DESC_PROMPT, webItemDesc);
 
-        contentTemplateKeys = Lists.newArrayList();
+        List<String> contentTemplateKeys = Lists.newArrayList();
         contentTemplateKeys.add(templateModuleKey);
         promptProps.put(CONTENT_TEMPLATE_KEYS_PROMPT, contentTemplateKeys);
 
@@ -72,6 +71,7 @@ public class BlueprintBuilderTest
         expectedProps.setIndexKey(blueprintIndexKey);
         expectedProps.setWebItem(makeExpectedWebItemProperties());
         expectedProps.addContentTemplate(makeExpectedContentTemplateProperties());
+        expectedProps.setIndexTitleI18nKey("com.atlassian.confluence.plugins.fooprint.index.page.title");
 
         // Assert that all of the things are good things.
         assertBlueprintProperties(expectedProps, props);
@@ -194,9 +194,6 @@ public class BlueprintBuilderTest
         assertResourcesEqual(expected.getResources(), actual.getResources());
         assertEquals(expected.getContexts(), actual.getContexts());
         assertEquals(expected.getDependencies(), actual.getDependencies());
-
-        // TODO - can we just test the resource in the ModuleCreator test? dT
-        // Answer - no.
         assertEquals(expected.getI18nProperties(), actual.getI18nProperties());
     }
 
@@ -329,6 +326,7 @@ public class BlueprintBuilderTest
         assertEquals("Wrong module name", expected.getModuleName(), actual.getModuleName());
         assertEquals("Wrong index key", expected.getIndexKey(), actual.getIndexKey());
         assertEquals("Wrong how-to-use template", expected.getHowToUseTemplate(), actual.getHowToUseTemplate());
+        assertEquals("Wrong index page title i18n", expected.getIndexTitleI18nKey(), actual.getIndexTitleI18nKey());
 
         assertNameBasedModulesEqual(expected, actual);
     }
@@ -349,9 +347,6 @@ public class BlueprintBuilderTest
 
     private ContentTemplateProperties makeExpectedContentTemplateProperties()
     {
-        // TODO - should the ContentTemplateProperties accept the plugin/package and attempt to generate the
-        // i18n keys itself? If so, thta logic would be tested in the Properties object (or a "generator" helper for it).
-        // TODO - should probably contact Jonathan Dok for this.
         ContentTemplateProperties template = new ContentTemplateProperties(templateModuleKey);
         template.setNameI18nKey(PLUGIN_KEY + ".foo-plate.name");
         template.setModuleName("FooPrint Content Template 0");

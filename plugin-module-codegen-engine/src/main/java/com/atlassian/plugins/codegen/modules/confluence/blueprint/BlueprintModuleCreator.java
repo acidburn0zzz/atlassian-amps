@@ -20,7 +20,7 @@ import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
 /**
  * Creates a Confluence Blueprint module and any dependent modules.
  *
- * @since 4.1.7
+ * @since 4.1.8
  */
 @ConfluencePluginModuleCreator
 public class BlueprintModuleCreator extends AbstractPluginModuleCreator<BlueprintProperties>
@@ -35,7 +35,7 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
     private static final String SOY_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-soy-template.soy.vtl";
     private static final String JS_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-dialog-wizard.js.vtl";
     private static final String CSS_TEMPLATE_FILE_TEMPLATE = TEMPLATE_PREFIX + "resource-file-blueprints.css.vtl";
-    // Template name is jva not java only to avoid IDE headaches with imports.
+    // Template name is "jva" not "java" only to avoid IDE headaches with imports.
     private static final String CONTEXT_PROVIDER_CLASS_TEMPLATE = TEMPLATE_PREFIX + "ContentTemplateContextProvider.jva.vtl";
     private static final String EVENT_LISTENER_CLASS_TEMPLATE = TEMPLATE_PREFIX + "BlueprintCreatedListener.jva.vtl";
 
@@ -44,11 +44,7 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
     {
         PluginProjectChangeset changeset = new PluginProjectChangeset().with(createModule(props, BLUEPRINT_MODULE_TEMPLATE));
 
-        // pull in CC maven dependency
-//        .with(MOCKITO_TEST)
-
-        ArtifactDependency
-            createContent = dependency("com.atlassian.confluence.plugins", "confluence-create-content-plugin", "1.5.18-SNAPSHOT", ArtifactDependency.Scope.PROVIDED);
+        ArtifactDependency createContent = dependency("com.atlassian.confluence.plugins", "confluence-create-content-plugin", "1.5.23", ArtifactDependency.Scope.PROVIDED);
         changeset = changeset.with(createContent);
 
         for (ContentTemplateProperties contentTemplateProperties : props.getContentTemplates())
@@ -110,7 +106,7 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
         return changeset;
     }
 
-    // TODO - this is crap. Very.
+    // This method is pretty rough. Where are my String switches?!
     private String getResourceTemplate(String givenTemplate, String filename)
     {
         if (givenTemplate != null)

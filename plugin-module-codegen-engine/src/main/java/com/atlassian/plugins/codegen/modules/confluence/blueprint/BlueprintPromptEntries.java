@@ -5,7 +5,7 @@ import java.util.HashMap;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 
 /**
- * Contains all of the data from the Prompter phase using for creation of Confluence Blueprint modules.
+ * Contains all of the data from the Prompter phase used for creation of Confluence Blueprint modules.
  *
  * @since 1.6
  */

@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * For {@link PluginModuleProperties} that contain an ordered collection of {@link Resource}s.
  *
- * @since 4.1.7
+ * @since 4.1.8
  */
 public interface ResourcedProperties extends PluginModuleProperties
 {

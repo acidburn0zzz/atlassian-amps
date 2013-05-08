@@ -6,7 +6,7 @@ import com.atlassian.plugins.codegen.modules.AbstractPluginModuleProperties;
  * Properties for Dialog Wizard Pages in Confluence Blueprints. Extends plugin-module properties to pick up i18n
  * abilities.
  *
- * @since 4.1.7
+ * @since 4.1.8
  */
 public class DialogPageProperties extends AbstractPluginModuleProperties
 {

@@ -20,7 +20,7 @@ import static com.google.common.collect.Lists.newArrayList;
 /**
  * Prompts for creation of Confluence Blueprint-related modules.
  *
- * @since 4.1.7
+ * @since 4.1.8
  */
 @ModuleCreatorClass(BlueprintModuleCreator.class)
 public class BlueprintPrompter extends AbstractModulePrompter<BlueprintProperties>
@@ -73,8 +73,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
             "Blueprints are grouped by an Index Key that will determine the keys of the Blueprint plugin modules,\n" +
                 "and appear as a Label on each created Blueprint page."
         );
-        // TODO - make sure the key is a valid *label* and also a valid prefix for module keys.
-        String defaultIndexKey = blueprintName.toLowerCase().replaceAll("\\s+", "-");
+        String defaultIndexKey = blueprintName.toLowerCase().replaceAll("\\s+", "-").replaceAll("[^a-z]", "-");;
         String indexKey = promptNotBlankAndFill(INDEX_KEY_PROMPT, defaultIndexKey, props);
         BlueprintStringer stringer = new BlueprintStringer(indexKey, getPluginKey());
 
@@ -94,7 +93,6 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
         while(promptForBoolean(ANOTHER_CONTENT_TEMPLATE_KEY_PROMPT));
         if (templateIndex > 1)
         {
-            // TODO - have a separate prompter to just add one content-template later????
             showMessage(
                 "If you added more than one Template, you'll need to provide a way for users to choose between them.\n" +
                     "See the documentation on developer.atlassian.com for details on how to do this.");

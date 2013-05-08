@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
  * {@link BlueprintModuleCreator}, which makes this test somewhat of an Integration test. If tests in this class start
  * failing, check for unit-test failures in the BlueprintBuilderTest.
  *
- * @since 4.1.7
+ * @since 4.1.8
  */
 public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<BlueprintProperties>
 {
@@ -54,7 +54,6 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     private String webItemName = "FooPrint";
     private String webItemDesc = "There's no Blueprint like my FooPrint.";
     private String templateModuleKey = "foo-plate";
-    private String templateContentValue = "Template Content Here";
 
     public BlueprintModuleCreatorTest()
     {
@@ -71,8 +70,9 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
 
     private void buildBlueprintProperties()
     {
-        // TODO - this is lame. For the inherited tests we assume that we have BlueprintProperties so the object has
-        // to exist before our tests can update the promptProps and build a new one.
+        // The inherited tests assume that we have a BlueprintProperties in setup, so the object has
+        // to exist before our tests can update the promptProps and build a new one. The workaround is to recreate
+        // the properties in the tests that need them.
         changeset = null;
         blueprintProps = new BlueprintBuilder(promptProps).build();
         setProps(blueprintProps);
@@ -114,7 +114,6 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         String indexPageI18nTitle = PLUGIN_KEY + ".index.page.title";
         assertNodeText(blueprintModule, "@i18n-index-title-key", indexPageI18nTitle);
 
-        // TODO - assert i18n name and desc
         assertI18nString(indexPageI18nTitle, "FooPrints");
     }
 
@@ -263,8 +262,6 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         // 4. There should new entries in the i18n file for the template
         assertI18nString(soyHeadingI18nKey, BlueprintProperties.HOW_TO_USE_HEADING_VALUE);
         assertI18nString(soyContentI18nKey, BlueprintProperties.HOW_TO_USE_CONTENT_VALUE);
-
-        // TODO - 5. There should (?) be CSS rules for the template
     }
 
     @Test
@@ -345,8 +342,6 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertI18nString(preRender, WIZARD_FORM_FIELD_PRE_RENDER_TEXT_VALUE);
         assertI18nString(postRender, WIZARD_FORM_FIELD_POST_RENDER_TEXT_VALUE);
         assertI18nString(titleError, WIZARD_FORM_FIELD_VALIDATION_ERROR_VALUE);
-
-        // TODO - assert sidebar with description
     }
 
     @Test
@@ -373,18 +368,12 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
     {
         assertNameBasedModuleProperties(element, expectedResource);
 
-        // TODO - not sure how best to test here. There should be a unit test confirming that transformations get
-        // rendered to XML correctly, but other than that THIS test just needs to confirm that our BlueprintCreator is
-        // in fact adding WebResources that do have the correct transformation. Hmm, that's more of a test for the
-        // Prompter? Or the generator?
-        // TODO - assert dependencies, contexts added?
-        assertNotNull(element.selectSingleNode("transformation"));
-
         assertNodeText(element, "context[1]", expectedResource.getContexts().get(0));
         assertNodeText(element, "context[2]", expectedResource.getContexts().get(1));
 
         assertNodeText(element, "dependency", expectedResource.getDependencies().get(0));
 
+        assertNotNull(element.selectSingleNode("transformation"));
         assertNodeText(element, "transformation[@extension='soy']/transformer/@key", "soyTransformer");
         assertNodeText(element, "transformation[@extension='soy']/transformer/functions",
             "com.atlassian.confluence.plugins.soy:soy-core-functions");
@@ -405,7 +394,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertNodeText(element, "description", props.getDescription());
     }
 
-    // Not sure why the changeset isn't always being cached during the test? Pull request comment please :) dT
+    // Cache the changeset during each test.
     @Override
     protected PluginProjectChangeset getChangesetForModule() throws Exception
     {

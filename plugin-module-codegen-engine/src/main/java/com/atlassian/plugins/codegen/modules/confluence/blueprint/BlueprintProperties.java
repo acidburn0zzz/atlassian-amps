@@ -13,7 +13,7 @@ import static com.google.common.collect.Lists.newArrayList;
 /**
  * Holds properties for a Confluence Blueprint.
  *
- * @since 4.1.7
+ * @since 4.1.8
  */
 public class BlueprintProperties extends BasicNameModuleProperties
 {
@@ -72,6 +72,7 @@ public class BlueprintProperties extends BasicNameModuleProperties
         getContentTemplates().add(templateProps);
     }
 
+    @SuppressWarnings("unchecked")
     public List<ContentTemplateProperties> getContentTemplates()
     {
         return (List<ContentTemplateProperties>) get(CONTENT_TEMPLATES);

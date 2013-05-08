@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Holds properties for the <content-template> module descriptor used in Blueprint creation.
  *
- * @since 4.1.7
+ * @since 4.1.8
  */
 public class ContentTemplateProperties extends AbstractNameBasedModuleProperties implements ResourcedProperties
 {
@@ -48,6 +48,7 @@ public class ContentTemplateProperties extends AbstractNameBasedModuleProperties
         put(RESOURCES, resources);
     }
 
+    @SuppressWarnings("unchecked")
     public List<Resource> getResources()
     {
         return (List<Resource>) get(RESOURCES);
@@ -81,6 +82,7 @@ public class ContentTemplateProperties extends AbstractNameBasedModuleProperties
             .build();
     }
 
+    @SuppressWarnings("unchecked")
     public Pair getContentText()
     {
         return new Pair(getProperty(CONTENT_I18N_KEY), getProperty(CONTENT_I18N_VALUE));

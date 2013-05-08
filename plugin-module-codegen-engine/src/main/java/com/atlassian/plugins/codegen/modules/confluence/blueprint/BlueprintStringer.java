@@ -4,7 +4,7 @@ package com.atlassian.plugins.codegen.modules.confluence.blueprint;
  * Creates strings for the {@link BlueprintBuilder} by convention. This class is separate to the generator class to
  * provide a single point of change if we alter the naming conventions.
  *
- * @since 4.1.7
+ * @since 4.1.8
  */
 public class BlueprintStringer
 {
@@ -39,7 +39,6 @@ public class BlueprintStringer
 
     public String makeSoyTemplatePackage(String blueprintName)
     {
-        // TODO - better util for cleaning up user-entered data. dT
         return "Confluence.Blueprints.Plugin." + blueprintName.replaceAll("\\W", "");
     }
 

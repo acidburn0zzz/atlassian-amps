@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
  * The logic for creating the {@link BlueprintProperties} object is in the {@link BlueprintBuilder} class, so this
  * test class only checks that the correct prompts exists and that the simple Properties object is filled correctly.
  *
- * @since 4.1.7
+ * @since 4.1.8
  */
 public class BlueprintPrompterTest extends AbstractPrompterTest
 {
