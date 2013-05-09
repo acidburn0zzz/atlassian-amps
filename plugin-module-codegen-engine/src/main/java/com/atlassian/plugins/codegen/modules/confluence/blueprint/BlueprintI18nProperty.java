@@ -16,7 +16,8 @@ public enum BlueprintI18nProperty
     WIZARD_FORM_POST_RENDER_TEXT("WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY", "wizard.page0.post-render", "This text comes from the post-render hook in the Wizard JavaScript"),
     WIZARD_FORM_FIELD_REQUIRED("WIZARD_FORM_FIELD_REQUIRED", "wizard.required", "required"),
     HOW_TO_USE_HEADING("HOW_TO_USE_HEADING_I18N_KEY", "wizard.how-to-use.heading", "Welcome to my Blueprint"),
-    HOW_TO_USE_CONTENT("HOW_TO_USE_CONTENT_I18N_KEY", "wizard.how-to-use.content", "This blueprint can be used to create a special page.")
+    HOW_TO_USE_CONTENT("HOW_TO_USE_CONTENT_I18N_KEY", "wizard.how-to-use.content", "This blueprint can be used to create a special page."),
+    CONTENT_TEMPLATE_PLACEHOLDER("CONTENT_TEMPLATE_PLACEHOLDER", "template.placeholder", "Type here to replace this text")
     ;
 
     private String placeholder;

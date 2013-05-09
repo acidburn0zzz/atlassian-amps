@@ -70,13 +70,28 @@ public class BlueprintBuilder
         }
 
         boolean hasDialogWizard = (Boolean)promptProps.get(DIALOG_WIZARD_PROMPT);
+        boolean skipEditor = (Boolean) promptProps.get(SKIP_PAGE_EDITOR_PROMPT);
+        String placeholderI18nKey = null;
+        if (!skipEditor)
+        {
+            placeholderI18nKey = CONTENT_TEMPLATE_PLACEHOLDER.getI18nKey(stringer);
+            props.addI18nProperty(placeholderI18nKey, CONTENT_TEMPLATE_PLACEHOLDER.getI18nValue());
+        }
+
         for (int i = 0; i < contentTemplateKeys.size(); i++)
         {
             String contentTemplateKey = contentTemplateKeys.get(i);
             String moduleName = stringer.makeContentTemplateName(blueprintName, i);
             String description = "Contains Storage-format XML used by the " + blueprintName + " Blueprint";
             ContentTemplateProperties contentTemplate = makeContentTemplate(contentTemplateKey, moduleName, contextProvider,
-                pluginKey, CONTENT_I18N_DEFAULT_VALUE, description, hasDialogWizard);
+                pluginKey, CONTENT_I18N_DEFAULT_VALUE, description);
+
+            contentTemplate.setProperty(DIALOG_WIZARD, String.valueOf(hasDialogWizard));
+            if (placeholderI18nKey != null)
+            {
+                contentTemplate.setProperty(CONTENT_TEMPLATE_PLACEHOLDER.getPropertyKey(), placeholderI18nKey);
+            }
+
             props.addContentTemplate(contentTemplate);
         }
 
@@ -130,7 +145,7 @@ public class BlueprintBuilder
             props.setEventListener(component);
         }
 
-        if ((Boolean)promptProps.get(SKIP_PAGE_EDITOR_PROMPT))
+        if (skipEditor)
         {
             props.setCreateResult(BlueprintProperties.CREATE_RESULT_VIEW);
         }
@@ -141,7 +156,7 @@ public class BlueprintBuilder
             String moduleName = "Custom Index Page Content Template";
             String description = "Contains Storage-format XML used by the " + blueprintName + " Blueprint's Index page";
             ContentTemplateProperties contentTemplate = makeContentTemplate(contentTemplateKey, moduleName, contextProvider,
-                pluginKey, ContentTemplateProperties.INDEX_TEMPLATE_CONTENT_VALUE, description, false);
+                pluginKey, ContentTemplateProperties.INDEX_TEMPLATE_CONTENT_VALUE, description);
             props.setIndexPageContentTemplate(contentTemplate);
         }
 
@@ -217,14 +232,14 @@ public class BlueprintBuilder
 
         if (hasDialogWizard)
         {
-            properties.put("DIALOG_WIZARD", true);
+            properties.put(DIALOG_WIZARD, true);
             properties.setProperty(INDEX_KEY, indexKey);
         }
     }
 
     private ContentTemplateProperties makeContentTemplate(String contentTemplateKey,
         String moduleName, final ContextProviderProperties contextProvider, String pluginKey,
-        final String contentTextValue, final String description, boolean hasDialogWizard)
+        final String contentTextValue, final String description)
     {
         ContentTemplateProperties template = new ContentTemplateProperties(contentTemplateKey);
 
@@ -233,10 +248,7 @@ public class BlueprintBuilder
         template.setNameI18nKey(pluginKey + "." + contentTemplateKey + ".name");
         template.setDescriptionI18nKey(pluginKey + "." + contentTemplateKey + ".desc");
         template.setContentText(pluginKey + "." + contentTemplateKey + ".content.text", contentTextValue);
-        if (hasDialogWizard)
-        {
-            template.setProperty("DIALOG_WIZARD", "true");
-        }
+
         if (contextProvider != null)
         {
             template.setContextProvider(contextProvider);

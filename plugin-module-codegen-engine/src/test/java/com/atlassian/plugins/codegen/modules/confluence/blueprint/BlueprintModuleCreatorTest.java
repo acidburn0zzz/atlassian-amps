@@ -139,6 +139,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         String xml = new String(file.getContent());
         String templateContentI18nKey = PLUGIN_KEY + "." + templateModuleKey + ".content.text";
         assertThat(xml, containsString(templateContentI18nKey));
+        assertThat(xml, containsString("ac:placeholder"));
         assertI18nString(templateContentI18nKey, ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE);
     }
 
@@ -270,6 +271,10 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
 
         Element blueprintModule = getGeneratedModule();
         assertNodeText(blueprintModule, "@create-result", BlueprintProperties.CREATE_RESULT_VIEW);
+
+        // If the edior is skipped there should be no placeholders in the generated template XML file
+        String xml = new String(getResourceFile("xml", templateModuleKey + ".xml").getContent());
+        assertThat(xml, not(containsString("ac:placeholder")));
     }
 
     @Test
