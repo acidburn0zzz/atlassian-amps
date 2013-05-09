@@ -44,7 +44,7 @@ public class BlueprintModuleCreator extends AbstractPluginModuleCreator<Blueprin
     {
         PluginProjectChangeset changeset = new PluginProjectChangeset().with(createModule(props, BLUEPRINT_MODULE_TEMPLATE));
 
-        ArtifactDependency createContent = dependency("com.atlassian.confluence.plugins", "confluence-create-content-plugin", "1.5.23", ArtifactDependency.Scope.PROVIDED);
+        ArtifactDependency createContent = dependency("com.atlassian.confluence.plugins", "confluence-create-content-plugin", "1.5.17", ArtifactDependency.Scope.PROVIDED);
         changeset = changeset.with(createContent);
 
         for (ContentTemplateProperties contentTemplateProperties : props.getContentTemplates())

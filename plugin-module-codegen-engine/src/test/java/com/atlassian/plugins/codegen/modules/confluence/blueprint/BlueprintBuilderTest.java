@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintI18nProperty.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
@@ -152,26 +153,21 @@ public class BlueprintBuilderTest
         soyResource.setLocation("js/dialog-wizard.js");
         properties.addResource(soyResource);
 
-        String titleLabel = PLUGIN_KEY + ".wizard.page0.title.label";
-        String titlePlace = PLUGIN_KEY + ".wizard.page0.title.placeholder";
-        String titleError = PLUGIN_KEY + ".wizard.page0.title.error";
-        String preRender  = PLUGIN_KEY + ".wizard.page0.pre-render";
-        String postRender = PLUGIN_KEY + ".wizard.page0.post-render";
+        addI18n(properties, WIZARD_FORM_TITLE_FIELD_LABEL);
+        addI18n(properties, WIZARD_FORM_TITLE_FIELD_PLACEHOLDER);
+        addI18n(properties, WIZARD_FORM_TITLE_FIELD_ERROR);
+        addI18n(properties, WIZARD_FORM_JSVAR_FIELD_LABEL);
+        addI18n(properties, WIZARD_FORM_JSVAR_FIELD_PLACEHOLDER);
+        addI18n(properties, WIZARD_FORM_PRE_RENDER_TEXT);
+        addI18n(properties, WIZARD_FORM_POST_RENDER_TEXT);
+        addI18n(properties, WIZARD_FORM_FIELD_REQUIRED);
+    }
 
-        properties.setProperty(WIZARD_FORM_FIELD_LABEL_I18N_KEY, titleLabel);
-        properties.addI18nProperty(titleLabel, WIZARD_FORM_FIELD_LABEL_VALUE);
-
-        properties.setProperty(WIZARD_FORM_FIELD_PLACEHOLDER_I18N_KEY, titlePlace);
-        properties.addI18nProperty(titlePlace, WIZARD_FORM_FIELD_PLACEHOLDER_VALUE);
-
-        properties.setProperty(WIZARD_FORM_FIELD_VALIDATION_ERROR_I18N_KEY, titleError);
-        properties.addI18nProperty(titleError, WIZARD_FORM_FIELD_VALIDATION_ERROR_VALUE);
-
-        properties.setProperty(WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY, preRender);
-        properties.addI18nProperty(preRender, WIZARD_FORM_FIELD_PRE_RENDER_TEXT_VALUE);
-
-        properties.setProperty(WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY, postRender);
-        properties.addI18nProperty(postRender, WIZARD_FORM_FIELD_POST_RENDER_TEXT_VALUE);
+    private void addI18n(WebResourceProperties properties, BlueprintI18nProperty i18n)
+    {
+        String i18nKey = i18n.getI18nKey(stringer);
+        properties.setProperty(i18n.getPropertyKey(), i18nKey);
+        properties.addI18nProperty(i18nKey, i18n.getI18nValue());
     }
 
     private void assertDialogWizard(DialogWizardProperties expectedWizard, DialogWizardProperties actualWizard)
@@ -256,14 +252,8 @@ public class BlueprintBuilderTest
 
     private void addHowToUseToExpectedSoyResource(WebResourceProperties properties)
     {
-        String soyHeadingI18nKey = PLUGIN_KEY + ".wizard.how-to-use.heading";
-        String soyContentI18nKey = PLUGIN_KEY + ".wizard.how-to-use.content";
-
-        properties.setProperty(HOW_TO_USE_HEADING_I18N_KEY, soyHeadingI18nKey);
-        properties.setProperty(HOW_TO_USE_CONTENT_I18N_KEY, soyContentI18nKey);
-
-        properties.addI18nProperty(soyHeadingI18nKey, HOW_TO_USE_HEADING_VALUE);
-        properties.addI18nProperty(soyContentI18nKey, HOW_TO_USE_CONTENT_VALUE);
+        addI18n(properties, HOW_TO_USE_HEADING);
+        addI18n(properties, HOW_TO_USE_CONTENT);
     }
 
     private void assertContentTemplatePropertiesEqual(List<ContentTemplateProperties> expectedTemplates,

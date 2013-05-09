@@ -1,8 +1,14 @@
 #* @vtlvariable name="CONTEXT_PROVIDER" type="com.atlassian.plugins.codegen.modules.common.ContextProviderProperties" *#
+#* @vtlvariable name="DIALOG_WIZARD" type="java.lang.String" *#
 #* @vtlvariable name="CONTENT_I18N_KEY" type="java.lang.String" *#
 <p>
     <at:i18n at:key="$CONTENT_I18N_KEY" />
 </p>
+#if ($DIALOG_WIZARD)
+<p>
+    <at:var at:name="wizardVariable" />
+</p>
+#end
 #if ($CONTEXT_PROVIDER)
 <p>
     <at:var at:name="variableA" />

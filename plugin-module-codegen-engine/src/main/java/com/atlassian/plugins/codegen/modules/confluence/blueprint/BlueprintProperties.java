@@ -29,25 +29,11 @@ public class BlueprintProperties extends BasicNameModuleProperties
     public static final String INDEX_TITLE_I18N_KEY = "INDEX_TITLE_I18N_KEY";
 
     public static final String SOY_PACKAGE = "SOY_PACKAGE";
-    public static final String HOW_TO_USE_HEADING_I18N_KEY = "HOW_TO_USE_HEADING_I18N_KEY";
-    public static final String HOW_TO_USE_CONTENT_I18N_KEY = "HOW_TO_USE_CONTENT_I18N_KEY";
-    public static final String WIZARD_FORM_FIELD_LABEL_I18N_KEY = "WIZARD_FORM_FIELD_LABEL_I18N_KEY";
-    public static final String WIZARD_FORM_FIELD_PLACEHOLDER_I18N_KEY = "WIZARD_FORM_FIELD_PLACEHOLDER_I18N_KEY";
-    public static final String HOW_TO_USE_HEADING_VALUE = "Welcome to my Blueprint";
-    public static final String HOW_TO_USE_CONTENT_VALUE = "This blueprint can be used to create a special page.";
-    public static final String WIZARD_FORM_FIELD_LABEL_VALUE = "Page title";
-    public static final String WIZARD_FORM_FIELD_PLACEHOLDER_VALUE = "Add a title for your new page";
 
     public static final String PLUGIN_KEY = "PLUGIN_KEY";
     public static final String WEB_ITEM_KEY = "WEB_ITEM_KEY";
     public static final String EVENT_LISTENER = "EVENT_LISTENER";
-    public static final String WIZARD_FORM_FIELD_ID = "WIZARD_FORM_FIELD_ID";
-    public static final String WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY = "WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY";
-    public static final String WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY = "WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY";
-    public static final String WIZARD_FORM_FIELD_VALIDATION_ERROR_I18N_KEY = "WIZARD_FORM_FIELD_VALIDATION_ERROR_I18N_KEY";
-    public static final String WIZARD_FORM_FIELD_PRE_RENDER_TEXT_VALUE = "This text comes from the pre-render hook in the Wizard JavaScript";
-    public static final String WIZARD_FORM_FIELD_POST_RENDER_TEXT_VALUE = "This text comes from the post-render hook in the Wizard JavaScript";
-    public static final String WIZARD_FORM_FIELD_VALIDATION_ERROR_VALUE = "You must enter a title";
+    public static final String WIZARD_FORM_TITLE_FIELD_ID = "WIZARD_FORM_TITLE_FIELD_ID";
     public static final String CREATE_RESULT_VIEW = "view";
     public static final String INDEX_TEMPLATE_DEFAULT_KEY = "custom-index-page-template";
 

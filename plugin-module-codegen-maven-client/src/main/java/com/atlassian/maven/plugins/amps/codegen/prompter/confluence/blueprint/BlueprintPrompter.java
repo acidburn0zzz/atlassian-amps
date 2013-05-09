@@ -73,7 +73,7 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
             "Blueprints are grouped by an Index Key that will determine the keys of the Blueprint plugin modules,\n" +
                 "and appear as a Label on each created Blueprint page."
         );
-        String defaultIndexKey = blueprintName.toLowerCase().replaceAll("\\s+", "-").replaceAll("[^a-z]", "-");;
+        String defaultIndexKey = blueprintName.toLowerCase().replaceAll("\\s+", "-").replaceAll("[^a-z0-9\\-]", "");;
         String indexKey = promptNotBlankAndFill(INDEX_KEY_PROMPT, defaultIndexKey, props);
         BlueprintStringer stringer = new BlueprintStringer(indexKey, getPluginKey());
 

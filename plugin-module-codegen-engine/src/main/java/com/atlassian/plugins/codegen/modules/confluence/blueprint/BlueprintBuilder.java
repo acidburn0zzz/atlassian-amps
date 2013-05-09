@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 import static com.atlassian.fugue.Option.some;
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintI18nProperty.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
@@ -67,13 +68,15 @@ public class BlueprintBuilder
         {
             contextProvider = new ContextProviderProperties(packageName + ".ContentTemplateContextProvider");
         }
+
+        boolean hasDialogWizard = (Boolean)promptProps.get(DIALOG_WIZARD_PROMPT);
         for (int i = 0; i < contentTemplateKeys.size(); i++)
         {
             String contentTemplateKey = contentTemplateKeys.get(i);
             String moduleName = stringer.makeContentTemplateName(blueprintName, i);
             String description = "Contains Storage-format XML used by the " + blueprintName + " Blueprint";
             ContentTemplateProperties contentTemplate = makeContentTemplate(contentTemplateKey, moduleName, contextProvider,
-                pluginKey, CONTENT_I18N_DEFAULT_VALUE, description);
+                pluginKey, CONTENT_I18N_DEFAULT_VALUE, description, hasDialogWizard);
             props.addContentTemplate(contentTemplate);
         }
 
@@ -93,7 +96,6 @@ public class BlueprintBuilder
         props.setWebResource(webResource);
 
         boolean hasHowToUse = (Boolean)promptProps.get(HOW_TO_USE_PROMPT);
-        boolean hasDialogWizard = (Boolean)promptProps.get(DIALOG_WIZARD_PROMPT);
 
         String soyPackage = stringer.makeSoyTemplatePackage(blueprintName);
 
@@ -112,7 +114,7 @@ public class BlueprintBuilder
             addJsI18n(webResource);
             webResource.setProperty(BlueprintProperties.PLUGIN_KEY, pluginKey);
             webResource.setProperty(BlueprintProperties.WEB_ITEM_KEY, webItem.getModuleKey());
-            webResource.setProperty(BlueprintProperties.WIZARD_FORM_FIELD_ID, indexKey + "-blueprint-page-title");
+            webResource.setProperty(BlueprintProperties.WIZARD_FORM_TITLE_FIELD_ID, indexKey + "-blueprint-page-title");
         }
         if (hasHowToUse || hasDialogWizard)
         {
@@ -139,7 +141,7 @@ public class BlueprintBuilder
             String moduleName = "Custom Index Page Content Template";
             String description = "Contains Storage-format XML used by the " + blueprintName + " Blueprint's Index page";
             ContentTemplateProperties contentTemplate = makeContentTemplate(contentTemplateKey, moduleName, contextProvider,
-                pluginKey, ContentTemplateProperties.INDEX_TEMPLATE_CONTENT_VALUE, description);
+                pluginKey, ContentTemplateProperties.INDEX_TEMPLATE_CONTENT_VALUE, description, false);
             props.setIndexPageContentTemplate(contentTemplate);
         }
 
@@ -153,26 +155,21 @@ public class BlueprintBuilder
 
     private void addJsI18n(WebResourceProperties properties)
     {
-        String titleLabel = stringer.makeI18nKey("wizard.page0.title.label");
-        String titlePlace = stringer.makeI18nKey("wizard.page0.title.placeholder");
-        String titleError = stringer.makeI18nKey("wizard.page0.title.error");
-        String preRender  = stringer.makeI18nKey("wizard.page0.pre-render");
-        String postRender = stringer.makeI18nKey("wizard.page0.post-render");
+        addI18n(properties, WIZARD_FORM_TITLE_FIELD_LABEL);
+        addI18n(properties, WIZARD_FORM_TITLE_FIELD_PLACEHOLDER);
+        addI18n(properties, WIZARD_FORM_TITLE_FIELD_ERROR);
+        addI18n(properties, WIZARD_FORM_JSVAR_FIELD_LABEL);
+        addI18n(properties, WIZARD_FORM_JSVAR_FIELD_PLACEHOLDER);
+        addI18n(properties, WIZARD_FORM_PRE_RENDER_TEXT);
+        addI18n(properties, WIZARD_FORM_POST_RENDER_TEXT);
+        addI18n(properties, WIZARD_FORM_FIELD_REQUIRED);
+    }
 
-        properties.setProperty(WIZARD_FORM_FIELD_LABEL_I18N_KEY, titleLabel);
-        properties.addI18nProperty(titleLabel, WIZARD_FORM_FIELD_LABEL_VALUE);
-
-        properties.setProperty(WIZARD_FORM_FIELD_PLACEHOLDER_I18N_KEY, titlePlace);
-        properties.addI18nProperty(titlePlace, WIZARD_FORM_FIELD_PLACEHOLDER_VALUE);
-
-        properties.setProperty(WIZARD_FORM_FIELD_VALIDATION_ERROR_I18N_KEY, titleError);
-        properties.addI18nProperty(titleError, WIZARD_FORM_FIELD_VALIDATION_ERROR_VALUE);
-
-        properties.setProperty(WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY, preRender);
-        properties.addI18nProperty(preRender, WIZARD_FORM_FIELD_PRE_RENDER_TEXT_VALUE);
-
-        properties.setProperty(WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY, postRender);
-        properties.addI18nProperty(postRender, WIZARD_FORM_FIELD_POST_RENDER_TEXT_VALUE);
+    private void addI18n(WebResourceProperties properties, BlueprintI18nProperty i18n)
+    {
+        String i18nKey = i18n.getI18nKey(stringer);
+        properties.setProperty(i18n.getPropertyKey(), i18nKey);
+        properties.addI18nProperty(i18nKey, i18n.getI18nValue());
     }
 
     private void addJsToWebResource(WebResourceProperties properties)
@@ -213,13 +210,9 @@ public class BlueprintBuilder
 
         if (hasHowToUse)
         {
-            String howToUseHeadingI18nKey = pluginKey + ".wizard.how-to-use.heading";
-            String howToUseContentI18nKey = pluginKey + ".wizard.how-to-use.content";
             properties.put("HOW_TO_USE", true);
-            properties.setProperty(HOW_TO_USE_HEADING_I18N_KEY, howToUseHeadingI18nKey);
-            properties.setProperty(HOW_TO_USE_CONTENT_I18N_KEY, howToUseContentI18nKey);
-            properties.addI18nProperty(howToUseHeadingI18nKey, HOW_TO_USE_HEADING_VALUE);
-            properties.addI18nProperty(howToUseContentI18nKey, HOW_TO_USE_CONTENT_VALUE);
+            addI18n(properties, HOW_TO_USE_HEADING);
+            addI18n(properties, HOW_TO_USE_CONTENT);
         }
 
         if (hasDialogWizard)
@@ -231,7 +224,7 @@ public class BlueprintBuilder
 
     private ContentTemplateProperties makeContentTemplate(String contentTemplateKey,
         String moduleName, final ContextProviderProperties contextProvider, String pluginKey,
-        final String contentTextValue, final String description)
+        final String contentTextValue, final String description, boolean hasDialogWizard)
     {
         ContentTemplateProperties template = new ContentTemplateProperties(contentTemplateKey);
 
@@ -240,6 +233,10 @@ public class BlueprintBuilder
         template.setNameI18nKey(pluginKey + "." + contentTemplateKey + ".name");
         template.setDescriptionI18nKey(pluginKey + "." + contentTemplateKey + ".desc");
         template.setContentText(pluginKey + "." + contentTemplateKey + ".content.text", contentTextValue);
+        if (hasDialogWizard)
+        {
+            template.setProperty("DIALOG_WIZARD", "true");
+        }
         if (contextProvider != null)
         {
             template.setContextProvider(contextProvider);

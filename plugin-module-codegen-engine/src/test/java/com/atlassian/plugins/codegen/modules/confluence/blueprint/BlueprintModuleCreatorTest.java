@@ -18,12 +18,10 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintI18nProperty.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
-import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
 import static java.lang.String.format;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 /**
@@ -260,8 +258,8 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertWebResource(webResourceModule, blueprintProps.getWebResource());
 
         // 4. There should new entries in the i18n file for the template
-        assertI18nString(soyHeadingI18nKey, BlueprintProperties.HOW_TO_USE_HEADING_VALUE);
-        assertI18nString(soyContentI18nKey, BlueprintProperties.HOW_TO_USE_CONTENT_VALUE);
+        assertI18nString(soyHeadingI18nKey, HOW_TO_USE_HEADING.getI18nValue());
+        assertI18nString(soyContentI18nKey, HOW_TO_USE_CONTENT.getI18nValue());
     }
 
     @Test
@@ -330,6 +328,10 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertThat(js, containsString(format("AJS.I18n.getText('%s')", postRender)));
         assertThat(js, containsString(format("AJS.I18n.getText('%s')", titleError)));
 
+        // 6. There should be an at:var for the wizardVariable field in the wizard
+        String xml = new String(getResourceFile("xml", templateModuleKey + ".xml").getContent());
+        assertThat(xml, containsString("wizardVariable"));
+
         // The combination of Velocity, JavaScript and jQuery can lead to problems if variable names start with "$".
         // Using the correct escape characters in Velocity should fix this - test that the rendered JS is correct.
         assertThat(js, containsString("state.$container;"));
@@ -337,11 +339,11 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         assertThat(js, not(containsString("\\$")));
         assertThat(js, not(containsString("${")));
 
-        assertI18nString(titleLabel, WIZARD_FORM_FIELD_LABEL_VALUE);
-        assertI18nString(titlePlace, WIZARD_FORM_FIELD_PLACEHOLDER_VALUE);
-        assertI18nString(preRender, WIZARD_FORM_FIELD_PRE_RENDER_TEXT_VALUE);
-        assertI18nString(postRender, WIZARD_FORM_FIELD_POST_RENDER_TEXT_VALUE);
-        assertI18nString(titleError, WIZARD_FORM_FIELD_VALIDATION_ERROR_VALUE);
+        assertI18nString(titleLabel, WIZARD_FORM_TITLE_FIELD_LABEL.getI18nValue());
+        assertI18nString(titlePlace, WIZARD_FORM_TITLE_FIELD_PLACEHOLDER.getI18nValue());
+        assertI18nString(preRender, WIZARD_FORM_PRE_RENDER_TEXT.getI18nValue());
+        assertI18nString(postRender, WIZARD_FORM_POST_RENDER_TEXT.getI18nValue());
+        assertI18nString(titleError, WIZARD_FORM_TITLE_FIELD_ERROR.getI18nValue());
     }
 
     @Test

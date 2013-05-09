@@ -1,6 +1,6 @@
 #* @vtlvariable name="PLUGIN_KEY" type="java.lang.String" *#
 #* @vtlvariable name="WEB_ITEM_KEY" type="java.lang.String" *#
-#* @vtlvariable name="WIZARD_FORM_FIELD_ID" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_TITLE_FIELD_ID" type="java.lang.String" *#
 #* @vtlvariable name="WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY" type="java.lang.String" *#
 #* @vtlvariable name="WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY" type="java.lang.String" *#
 #* @vtlvariable name="WIZARD_FORM_FIELD_VALIDATION_ERROR_I18N_KEY" type="java.lang.String" *#
@@ -67,7 +67,7 @@
      */
     function submit(e, state) {
         var wizardForm = state.$container,
-            field = wizardForm.find('#${WIZARD_FORM_FIELD_ID}');
+            field = wizardForm.find('#${WIZARD_FORM_TITLE_FIELD_ID}');
 
         wizardForm.find('.error').html(''); // clear all existing errors
 

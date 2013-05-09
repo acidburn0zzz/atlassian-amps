@@ -4,9 +4,12 @@
 #* @vtlvariable name="HOW_TO_USE_HEADING_I18N_KEY" type="java.lang.String" *#
 #* @vtlvariable name="HOW_TO_USE_CONTENT_I18N_KEY" type="java.lang.String" *#
 #* @vtlvariable name="INDEX_KEY" type="java.lang.String" *#
-#* @vtlvariable name="WIZARD_FORM_FIELD_ID" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_TITLE_FIELD_ID" type="java.lang.String" *#
 #* @vtlvariable name="WIZARD_FORM_FIELD_LABEL_I18N_KEY" type="java.lang.String" *#
 #* @vtlvariable name="WIZARD_FORM_FIELD_PLACEHOLDER_I18N_KEY" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_FIELD_REQUIRED_I18N" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_FIELD_JSVAR_LABEL" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_FIELD_JSVAR_PLACEHOLDER" type="java.lang.String" *#
 {namespace $SOY_PACKAGE}
 
 #if ($HOW_TO_USE)
@@ -29,12 +32,20 @@
 <form action="#" method="post" id="wizard-page0-form" class="aui">
     <fieldset>
         <div class="field-group">
-            <label for="${INDEX_KEY}-blueprint-page-title">
+            <label for="$WIZARD_FORM_TITLE_FIELD_ID">
                 {getText('$WIZARD_FORM_FIELD_LABEL_I18N_KEY')}
-                <span class="aui-icon icon-required">required</span>
+                <span class="aui-icon icon-required">{getText('$WIZARD_FORM_FIELD_REQUIRED_I18N')}</span>
             </label>
-            <input id="$WIZARD_FORM_FIELD_ID" class="text" type="text" name="title" title="title"
+            <input id="$WIZARD_FORM_TITLE_FIELD_ID" class="text" type="text" name="title" title="title"
                    placeholder="{getText('$WIZARD_FORM_FIELD_PLACEHOLDER_I18N_KEY')}" maxlength="255">
+            <div class="error"></div>
+        </div>
+        <div class="field-group">
+            <label>
+                {getText('$WIZARD_FORM_FIELD_JSVAR_LABEL')}
+            </label>
+            <input class="text" type="text" name="wizardVariable" title="title"
+                   placeholder="{getText('$WIZARD_FORM_FIELD_JSVAR_PLACEHOLDER')}" maxlength="255">
             <div class="error"></div>
         </div>
     </fieldset>
