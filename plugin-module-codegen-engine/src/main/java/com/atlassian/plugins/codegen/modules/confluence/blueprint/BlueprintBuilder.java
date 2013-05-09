@@ -72,10 +72,13 @@ public class BlueprintBuilder
         boolean hasDialogWizard = (Boolean)promptProps.get(DIALOG_WIZARD_PROMPT);
         boolean skipEditor = (Boolean) promptProps.get(SKIP_PAGE_EDITOR_PROMPT);
         String placeholderI18nKey = null;
+        String mentionPlaceholderI18nKey = null;
         if (!skipEditor)
         {
             placeholderI18nKey = CONTENT_TEMPLATE_PLACEHOLDER.getI18nKey(stringer);
+            mentionPlaceholderI18nKey = CONTENT_TEMPLATE_MENTION_PLACEHOLDER.getI18nKey(stringer);
             props.addI18nProperty(placeholderI18nKey, CONTENT_TEMPLATE_PLACEHOLDER.getI18nValue());
+            props.addI18nProperty(mentionPlaceholderI18nKey, CONTENT_TEMPLATE_MENTION_PLACEHOLDER.getI18nValue());
         }
 
         for (int i = 0; i < contentTemplateKeys.size(); i++)
@@ -87,9 +90,10 @@ public class BlueprintBuilder
                 pluginKey, CONTENT_I18N_DEFAULT_VALUE, description);
 
             contentTemplate.setProperty(DIALOG_WIZARD, String.valueOf(hasDialogWizard));
-            if (placeholderI18nKey != null)
+            if (!skipEditor)
             {
                 contentTemplate.setProperty(CONTENT_TEMPLATE_PLACEHOLDER.getPropertyKey(), placeholderI18nKey);
+                contentTemplate.setProperty(CONTENT_TEMPLATE_MENTION_PLACEHOLDER.getPropertyKey(), mentionPlaceholderI18nKey);
             }
 
             props.addContentTemplate(contentTemplate);

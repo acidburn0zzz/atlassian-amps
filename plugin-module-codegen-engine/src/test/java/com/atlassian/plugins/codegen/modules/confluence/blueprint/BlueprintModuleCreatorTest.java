@@ -140,6 +140,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         String templateContentI18nKey = PLUGIN_KEY + "." + templateModuleKey + ".content.text";
         assertThat(xml, containsString(templateContentI18nKey));
         assertThat(xml, containsString("ac:placeholder"));
+        assertThat(xml, containsString("ac:type=\"mention\""));
         assertI18nString(templateContentI18nKey, ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE);
     }
 
