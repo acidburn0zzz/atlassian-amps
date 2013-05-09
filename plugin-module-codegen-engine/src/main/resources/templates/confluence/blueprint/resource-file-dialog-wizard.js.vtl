@@ -1,9 +1,9 @@
 #* @vtlvariable name="PLUGIN_KEY" type="java.lang.String" *#
 #* @vtlvariable name="WEB_ITEM_KEY" type="java.lang.String" *#
 #* @vtlvariable name="WIZARD_FORM_TITLE_FIELD_ID" type="java.lang.String" *#
-#* @vtlvariable name="WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY" type="java.lang.String" *#
-#* @vtlvariable name="WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY" type="java.lang.String" *#
-#* @vtlvariable name="WIZARD_FORM_FIELD_VALIDATION_ERROR_I18N_KEY" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_PRE_RENDER_TEXT" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_POST_RENDER_TEXT" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_TITLE_FIELD_ERROR" type="java.lang.String" *#
 /**
  * The JavaScript in this file determines how the Wizard for your blueprint will run.
  *
@@ -28,7 +28,7 @@
      *        - wizardData - contains all data gathered by the Wizard pages, may be used to add data to the Soy context
      */
     function preRender(e, state) {
-        state.soyRenderContext['preRenderText'] = AJS.I18n.getText('${WIZARD_FORM_FIELD_PRE_RENDER_TEXT_I18N_KEY}');
+        state.soyRenderContext['preRenderText'] = AJS.I18n.getText('${WIZARD_FORM_PRE_RENDER_TEXT}');
     }
 
     /**
@@ -43,7 +43,7 @@
      */
     function postRender(e, state) {
         var wizardForm = state.$container;
-        wizardForm.append(AJS.I18n.getText('${WIZARD_FORM_FIELD_POST_RENDER_TEXT_I18N_KEY}'));
+        wizardForm.append(AJS.I18n.getText('${WIZARD_FORM_POST_RENDER_TEXT}'));
     }
 
     /**
@@ -73,7 +73,7 @@
 
 ## Use jQuery instead of $ for the trim to workaround Velocity variable escaping problems.
         if (jQuery.trim(field.val()) == '') {
-            field.focus().siblings('.error').html(AJS.I18n.getText('${WIZARD_FORM_FIELD_VALIDATION_ERROR_I18N_KEY}'));
+            field.focus().siblings('.error').html(AJS.I18n.getText('${WIZARD_FORM_TITLE_FIELD_ERROR}'));
             return false;
         }
         return true;
