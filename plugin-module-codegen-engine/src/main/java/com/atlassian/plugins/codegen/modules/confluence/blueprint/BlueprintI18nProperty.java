@@ -18,7 +18,7 @@ public enum BlueprintI18nProperty
     HOW_TO_USE_HEADING("wizard.how-to-use.heading", "Welcome to my Blueprint"),
     HOW_TO_USE_CONTENT("wizard.how-to-use.content", "This blueprint can be used to create a special page."),
     CONTENT_TEMPLATE_PLACEHOLDER("template.placeholder", "Type here to replace this text"),
-    CONTENT_TEMPLATE_MENTION_PLACEHOLDER("template.placeholder", "Type here to replace this text")
+    CONTENT_TEMPLATE_MENTION_PLACEHOLDER("template.mention.placeholder", "Type here to mention a user")
     ;
 
     private final String placeholder;
