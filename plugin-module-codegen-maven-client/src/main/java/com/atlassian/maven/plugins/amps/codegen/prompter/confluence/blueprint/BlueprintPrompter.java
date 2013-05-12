@@ -123,6 +123,15 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
             );
             promptForBoolean(DIALOG_WIZARD_PROMPT, props);
 
+            // Create result
+            showMessage(
+                "If your Blueprint will add enough content from the Wizard and/or Context Provider that the new page\n" +
+                    "can be saved (with a title) without the user needing to use the Editor, you can specify that \n" +
+                    "the Editor be skipped and the user taken directly to the page View screen. \n" +
+                    "This will add an attribute: create-result='view' to the Blueprint's config XML."
+            );
+            promptForBoolean(SKIP_PAGE_EDITOR_PROMPT, props);
+
             // Context provider
             showMessage(
                 "If your Blueprint will add data to the page that doesn't come from the user (e.g. it comes from a \n" +
@@ -131,15 +140,6 @@ public class BlueprintPrompter extends AbstractModulePrompter<BlueprintPropertie
                 "anything possible."
             );
             promptForBoolean(CONTEXT_PROVIDER_PROMPT, props);
-
-            // Create result
-            showMessage(
-                "If your Blueprint will add enough content from the Wizard and/or Context Provider that the new page\n" +
-                "can be saved (with a title) without the user needing to use the Editor, you can specify that \n" +
-                "the Editor be skipped and the user taken directly to the page View screen. \n" +
-                "This will add an attribute: create-result='view' to the Blueprint's config XML."
-            );
-            promptForBoolean(SKIP_PAGE_EDITOR_PROMPT, props);
 
             // Event Listener
             showMessage(
