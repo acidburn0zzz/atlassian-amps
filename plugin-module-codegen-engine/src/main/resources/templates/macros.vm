@@ -80,6 +80,12 @@
     #end
 #end
 
+#macro(styleClass $styleClass)
+    #if($styleClass)
+        <styleClass>$styleClass</styleClass>
+    #end
+#end
+
 #macro(link $link)
     #if($link)
         <link
@@ -141,10 +147,24 @@
 #macro(transformation $transformation)
     #if($transformation)
         <transformation extension="$transformation.extension">
-            #foreach($transformerKey in $transformation.transformerKeys)
-            <transformer key="$transformerKey" />
+            #foreach($transformer in $transformation.transformers)
+                #transformer($transformer)
             #end
         </transformation>
+    #end
+#end
+
+#macro(transformer $transformer)
+    #if($transformer)
+        #if($transformer.functions && $transformer.functions.size() > 0)
+            <transformer key="$transformer.moduleKey">
+            #foreach($function in $transformer.functions)
+                <functions>$function</functions>
+            #end
+            </transformer>
+        #else
+            <transformer key="$transformer.moduleKey" />
+        #end
     #end
 #end
 

@@ -13,6 +13,7 @@ import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformation;
 
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformer;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
@@ -212,9 +213,9 @@ public class WebResourcePrompterTest extends AbstractPrompterTest
         WebResourceTransformation transformation = transformations.get(0);
         assertEquals("wrong transformation extension", TRANS_EXTENSION, transformation.getExtension());
 
-        List<String> keys = transformation.getTransformerKeys();
-        assertEquals("wrong number of transfromer keys", 1, keys.size());
-        assertEquals("worng transformer key", TRANS_KEY, keys.get(0));
+        List<WebResourceTransformer> transformers = transformation.getTransformers();
+        assertEquals("wrong number of transformers", 1, transformers.size());
+        assertEquals("wrong transformer key", TRANS_KEY, transformers.get(0).getModuleKey());
 
         //conditions
         List<Conditional> conditionals = props.getConditions();

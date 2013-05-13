@@ -355,18 +355,18 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.getResources().add(cssResource);
 
         WebResourceTransformation transformation = new WebResourceTransformation("txt");
-        transformation.addTransformerKey("template");
+        addTransformerWithKey(transformation, "template");
 
         props.addTransformation(transformation);
     }
-    
+
     protected void createMultipleTransformers()
     {
         props.getResources().add(cssResource);
 
         WebResourceTransformation transformation = new WebResourceTransformation("txt");
-        transformation.addTransformerKey("template");
-        transformation.addTransformerKey("prefix");
+        addTransformerWithKey(transformation, "template");
+        addTransformerWithKey(transformation, "prefix");
 
         props.addTransformation(transformation);
     }
@@ -376,12 +376,19 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.getResources().add(cssResource);
 
         WebResourceTransformation txtTrans = new WebResourceTransformation("txt");
-        txtTrans.addTransformerKey("template");
+        addTransformerWithKey(txtTrans, "template");
 
         WebResourceTransformation cssTrans = new WebResourceTransformation("css");
-        cssTrans.addTransformerKey("prefix");
+        addTransformerWithKey(cssTrans, "prefix");
 
         props.addTransformation(txtTrans);
         props.addTransformation(cssTrans);
+    }
+
+    private void addTransformerWithKey(WebResourceTransformation transformation, String transformerKey)
+    {
+        WebResourceTransformer transformer = new WebResourceTransformer();
+        transformer.setModuleKey(transformerKey);
+        transformation.addTransformer(transformer);
     }
 }

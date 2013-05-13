@@ -10,6 +10,8 @@ import com.atlassian.plugins.codegen.modules.common.web.WebResourceModuleCreator
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformation;
 
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformer;
+import com.google.common.collect.Lists;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 
@@ -123,12 +125,12 @@ public class WebResourcePrompter extends AbstractWebFragmentPrompter<WebResource
             String extension = promptNotBlank("File Extension");
             WebResourceTransformation transformation = new WebResourceTransformation(extension);
 
-            List<String> transformers = new ArrayList<String>();
+            List<WebResourceTransformer> transformers = Lists.newArrayList();
             transformers.add(promptForTransformerKey());
 
             promptForTransformers(transformers);
 
-            transformation.setTransformerKeys(transformers);
+            transformation.setTransformers(transformers);
 
             transformations.add(transformation);
 
@@ -136,7 +138,7 @@ public class WebResourcePrompter extends AbstractWebFragmentPrompter<WebResource
         }
     }
 
-    private void promptForTransformers(List<String> transformers) throws PrompterException
+    private void promptForTransformers(List<WebResourceTransformer> transformers) throws PrompterException
     {
         if (promptForBoolean("Add Transformer Key?", "N"))
         {
@@ -144,8 +146,10 @@ public class WebResourcePrompter extends AbstractWebFragmentPrompter<WebResource
         }
     }
 
-    private String promptForTransformerKey() throws PrompterException
+    private WebResourceTransformer promptForTransformerKey() throws PrompterException
     {
-        return promptNotBlank("Transformer Key");
+        WebResourceTransformer transformer = new WebResourceTransformer();
+        transformer.setModuleKey(promptNotBlank("Transformer Key"));
+        return transformer;
     }
 }

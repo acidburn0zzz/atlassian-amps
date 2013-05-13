@@ -1,0 +1,71 @@
+## These variable names correspond to keys in the BlueprintProperties object.
+#* @vtlvariable name="DIALOG_WIZARD" type="com.atlassian.plugins.codegen.modules.confluence.blueprint.DialogWizardProperties" *#
+#* @vtlvariable name="CONTENT_TEMPLATES" type="java.util.List<com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties>" *#
+#* @vtlvariable name="INDEX_KEY" type="java.lang.String" *#
+#* @vtlvariable name="CREATE_RESULT" type="java.lang.String" *#
+#* @vtlvariable name="INDEX_PAGE_TEMPLATE" type="com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties" *#
+#* @vtlvariable name="INDEX_TITLE_I18N_KEY" type="java.lang.String" *#
+#* @vtlvariable name="HOW_TO_USE_TEMPLATE" type="java.lang.String" *#
+#* @vtlvariable name="DESCRIPTION_I18N_KEY" type="java.lang.String" *#
+#* @vtlvariable name="DESCRIPTION" type="java.lang.String" *#
+#* @vtlvariable name="MODULE_KEY" type="java.lang.String" *#
+#* @vtlvariable name="MODULE_NAME" type="java.lang.String" *#
+#* @vtlvariable name="NAME_I18N_KEY" type="java.lang.String" *#
+<blueprint
+    key="$MODULE_KEY"
+    name="$MODULE_NAME"
+    i18n-name-key="$NAME_I18N_KEY"
+    index-key="$INDEX_KEY"
+    #if ($CREATE_RESULT)create-result="$CREATE_RESULT"#end
+    #if ($INDEX_PAGE_TEMPLATE)index-template-key="${INDEX_PAGE_TEMPLATE.moduleKey}"#end
+    #if ($INDEX_TITLE_I18N_KEY)i18n-index-title-key="$INDEX_TITLE_I18N_KEY"#end
+    #if ($HOW_TO_USE_TEMPLATE)how-to-use-template="$HOW_TO_USE_TEMPLATE"#end
+    >
+    <!--
+        This Blueprint module and the two modules following it will display a web-item in the Create dialog that can be used
+        to generate new Confluence content from the specified content-template.
+    -->
+    <description key="${DESCRIPTION_I18N_KEY}">${DESCRIPTION}</description>
+    <!--
+        The content-template-key element(s) are the moduleKey(s) of the <content-template>(s) that will be used to
+        create a page / content from. These elements are required so that the templates can be edited from the
+        Space/Site Templates-admin screens.
+        -->
+    #foreach($contentTemplate in $CONTENT_TEMPLATES)
+        <content-template ref="$contentTemplate.MODULE_KEY"/>
+    #end
+
+    #if ($DIALOG_WIZARD)
+    <!--
+            The dialog-wizard element defines a set of Wizard pages that will be shown when the User selects this
+            Blueprint. Pages will be shown to the user in the order they are defined, but this can be changed in the
+            Wizard JavaScript hooks (see hello-blueprint-wizard.js).
+    -->
+    <dialog-wizard key="$DIALOG_WIZARD.MODULE_KEY">
+        <!--
+            dialog-page defines a single page of the Wizard. This page can contain a description that is displayed
+             at the right-hand-side of it. This element contains the following attributes:
+
+            - id - the id of this page, used with JavaScript hooks
+            - template-key - the fully-qualified path to a Soy template provided by this plugin (see web-resource)
+            - title-key - the i18n key for the title that will be displayed at the top of the Wizard page
+            - description-header-key - (optional) if specified, the i18n key for the heading above the description
+            - description-content-key - (optional) if specified, the i18n key for the description content. This
+                                        is required for the Description panel to appear in the page.
+            - last - (optional) if set to "true", the Wizard will be complete when this page is submitted. This is
+                     useful if the Wizard can have multiple paths. The last defined dialog-page gets this value set
+                     to "true" by default.
+        -->
+        #foreach($page in $DIALOG_WIZARD.dialogPages)
+        <dialog-page id="$page.ID"
+            template-key="$page.TEMPLATE_KEY"
+            title-key="$page.TITLE_I18N_KEY"
+            description-header-key="$page.DESC_HEADER_I18N_KEY"
+            description-content-key="$page.DESC_CONTENT_I18N_KEY"
+            #if ($page.LAST)last="true"#end
+            />
+        #end
+    </dialog-wizard>
+    #end
+
+</blueprint>

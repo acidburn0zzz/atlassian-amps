@@ -24,7 +24,9 @@ public class WebResourceModuleCreator extends AbstractPluginModuleCreator<WebRes
 {
     public static final String MODULE_NAME = "Web Resource";
     private static final String TEMPLATE_PREFIX = "templates/common/web/webresource/";
-    private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "web-resource-plugin.xml.vtl";
+
+    // public for use in other creators needing web-resource modules
+    public static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "web-resource-plugin.xml.vtl";
 
     @Override
     public PluginProjectChangeset createModule(WebResourceProperties props) throws Exception
