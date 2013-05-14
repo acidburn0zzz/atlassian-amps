@@ -24,8 +24,8 @@
                         <products>
                             <product>
                                 <id>refapp</id>
-                                <version>LATEST</version>
-                                <output>${project.build.directory}/refapp-LATEST.log</output>
+                                <version>${refapp.version}</version>
+                                <output>${project.build.directory}/refapp-${refapp.version}.log</output>
                             </product>
                             <product>
                                 <id>confluence</id>
