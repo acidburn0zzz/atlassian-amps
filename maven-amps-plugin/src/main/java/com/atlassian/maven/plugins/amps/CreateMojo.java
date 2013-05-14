@@ -57,6 +57,12 @@ public class CreateMojo extends AbstractProductHandlerMojo
     protected String getStableProductVersion(AbstractProductHandler handler, Product ctx) throws MojoExecutionException
     {
         ProductArtifact artifact = handler.getArtifact();
+        
+        if(null == artifact)
+        {
+            return "";    
+        }
+        
         Artifact warArtifact = artifactFactory.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(), "LATEST");
         
         return ctx.getArtifactRetriever().getLatestStableVersion(warArtifact);
@@ -65,6 +71,12 @@ public class CreateMojo extends AbstractProductHandlerMojo
     protected String getStableDataVersion(AbstractProductHandler handler, Product ctx) throws MojoExecutionException
     {
         ProductArtifact artifact = handler.getTestResourcesArtifact();
+
+        if(null == artifact)
+        {
+            return "";
+        }
+        
         Artifact warArtifact = artifactFactory.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(), "LATEST");
 
         return ctx.getArtifactRetriever().getLatestStableVersion(warArtifact);
