@@ -53,15 +53,15 @@
                             </product>
                             <product>
                                 <id>fecru</id>
-                                <version>${fecru.version}</version>
-                                <dataVersion>${fecru.data.version}</dataVersion>
-                                <output>${project.build.directory}/fecru-${fecru.version}.log</output>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/fecru-LATEST.log</output>
                             </product>
                             <product>
                                 <id>crowd</id>
-                                <version>${crowd.version}</version>
-                                <dataVersion>${crowd.data.version}</dataVersion>
-                                <output>${project.build.directory}/crowd-${crowd.version}.log</output>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/crowd-LATEST.log</output>
                             </product>
                         </products>
                     </configuration>
