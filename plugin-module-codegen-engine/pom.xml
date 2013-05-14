@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>4.1.8-SNAPSHOT</version>
+        <version>4.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
