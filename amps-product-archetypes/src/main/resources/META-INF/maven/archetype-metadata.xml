@@ -2,6 +2,57 @@
                       xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd"
                       name="${artifactId}">
 
+    <requiredProperties>
+        <requiredProperty key="jiraVersion">
+            <defaultValue>${jira.version}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="jiraDataVersion">
+            <defaultValue>${jira.data.version}</defaultValue>
+        </requiredProperty>
+
+        <requiredProperty key="confluenceVersion">
+            <defaultValue>${confluence.version}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="confluenceDataVersion">
+            <defaultValue>${confluence.data.version}</defaultValue>
+        </requiredProperty>
+
+        <requiredProperty key="bambooVersion">
+            <defaultValue>${bamboo.version}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="bambooDataVersion">
+            <defaultValue>${bamboo.data.version}</defaultValue>
+        </requiredProperty>
+
+        <requiredProperty key="stashVersion">
+            <defaultValue>${stash.version}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="stashDataVersion">
+            <defaultValue>${stash.data.version}</defaultValue>
+        </requiredProperty>
+
+        <requiredProperty key="crowdVersion">
+            <defaultValue>${crowd.version}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="crowdDataVersion">
+            <defaultValue>${crowd.data.version}</defaultValue>
+        </requiredProperty>
+
+        <requiredProperty key="fecruVersion">
+            <defaultValue>${fecru.version}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="fecruDataVersion">
+            <defaultValue>${fecru.data.version}</defaultValue>
+        </requiredProperty>
+
+        <requiredProperty key="refappVersion">
+            <defaultValue>${refapp.version}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="refappDataVersion">
+            <defaultValue>${refapp.data.version}</defaultValue>
+        </requiredProperty>
+    </requiredProperties>
+    
 <fileSets>
     <fileSet filtered="true" packaged="true" encoding="UTF-8">
         <directory>src/main/java</directory>

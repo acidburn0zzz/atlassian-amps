@@ -24,26 +24,32 @@
                         <products>
                             <product>
                                 <id>refapp</id>
-                                <version>${refapp.version}</version>
-                                <output>${project.build.directory}/refapp-${refapp.version}.log</output>
+                                <version>LATEST</version>
+                                <output>${project.build.directory}/refapp-LATEST.log</output>
                             </product>
                             <product>
                                 <id>confluence</id>
-                                <version>${confluence.version}</version>
-                                <dataVersion>${confluence.data.version}</dataVersion>
-                                <output>${project.build.directory}/confluence-${confluence.version}.log</output>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/confluence-LATEST.log</output>
                             </product>
                             <product>
                                 <id>jira</id>
-                                <version>${jira.version}</version>
-                                <dataVersion>${jira.data.version}</dataVersion>
-                                <output>${project.build.directory}/jira-${jira.version}.log</output>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/jira-LATEST.log</output>
+                            </product>
+                            <product>
+                                <id>stash</id>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/stash-LATEST.log</output>
                             </product>
                             <product>
                                 <id>bamboo</id>
-                                <version>${bamboo.version}</version>
-                                <dataVersion>${bamboo.data.version}</dataVersion>
-                                <output>${project.build.directory}/bamboo-${bamboo.version}.log</output>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/bamboo-LATEST.log</output>
                             </product>
                             <product>
                                 <id>fecru</id>

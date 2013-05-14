@@ -25,6 +25,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.doesFileNameMatchArtifact;
@@ -39,9 +40,9 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
 {
     private final PluginProvider pluginProvider;
 
-    protected AbstractProductHandler(MavenContext context, MavenGoals goals, PluginProvider pluginProvider)
+    protected AbstractProductHandler(MavenContext context, MavenGoals goals, PluginProvider pluginProvider, ArtifactFactory artifactFactory)
     {
-        super(context, goals);
+        super(context, goals, artifactFactory);
         this.pluginProvider = pluginProvider;
     }
 
@@ -445,7 +446,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     /**
      * The artifact of the product (a war, a jar, a binary...)
      */
-    protected abstract ProductArtifact getArtifact();
+    public abstract ProductArtifact getArtifact();
     
     /**
      * Returns the directory where jars listed in  <libArtifacts> are

@@ -178,7 +178,7 @@ public class TestStudioProductHandler
 
         public TestedStudioProductHandler(MavenContext context, MavenGoals goals, Model onDemandModelMock)
         {
-            super(context, goals);
+            super(context, goals, null);
             this.onDemandModelMock = onDemandModelMock;
         }
 

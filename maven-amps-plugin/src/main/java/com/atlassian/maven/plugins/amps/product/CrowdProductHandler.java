@@ -20,13 +20,14 @@ import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 
 public class CrowdProductHandler extends AbstractWebappProductHandler
 {
-    public CrowdProductHandler(final MavenContext context, final MavenGoals goals)
+    public CrowdProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new CrowdPluginProvider());
+        super(context, goals, new CrowdPluginProvider(),artifactFactory);
     }
 
     public String getId()

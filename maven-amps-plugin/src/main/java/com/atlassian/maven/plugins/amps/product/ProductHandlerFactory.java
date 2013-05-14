@@ -12,6 +12,8 @@ import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.maven.artifact.factory.ArtifactFactory;
+
 public class ProductHandlerFactory
 {
     public static final String REFAPP = "refapp";
@@ -32,36 +34,36 @@ public class ProductHandlerFactory
 
 
 
-    public static ProductHandler create(String id, MavenContext context, MavenGoals goals)
+    public static ProductHandler create(String id, MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
         if (REFAPP.equals(id))
         {
-            return new RefappProductHandler(context, goals);
+            return new RefappProductHandler(context, goals,artifactFactory);
         }
         else if (CONFLUENCE.equals(id))
         {
-            return new ConfluenceProductHandler(context, goals);
+            return new ConfluenceProductHandler(context, goals,artifactFactory);
         }
         else if (JIRA.equals(id))
         {
-            return new JiraProductHandler(context, goals);
+            return new JiraProductHandler(context, goals,artifactFactory);
         }
         else if (BAMBOO.equals(id))
         {
-            return new BambooProductHandler(context, goals);
+            return new BambooProductHandler(context, goals,artifactFactory);
         }
         else if (FECRU.equals(id))
         {
-            return new FeCruProductHandler(context, goals);
+            return new FeCruProductHandler(context, goals, artifactFactory);
         }
         else if (CROWD.equals(id))
         {
-            return new CrowdProductHandler(context, goals);
+            return new CrowdProductHandler(context, goals,artifactFactory);
         }
 
         else if (STASH.equals(id))
         {
-            return new StashProductHandler(context, goals);
+            return new StashProductHandler(context, goals,artifactFactory);
         }
         else if (CTK_SERVER.equals(id))
         {
@@ -71,29 +73,29 @@ public class ProductHandlerFactory
         // The Studio product itself
         else if (STUDIO.equals(id))
         {
-            return new StudioProductHandler(context, goals);
+            return new StudioProductHandler(context, goals, artifactFactory);
         }
 
         // The Studio products (products which are part of)
         else if (STUDIO_CONFLUENCE.equals(id))
         {
-            return new StudioConfluenceProductHandler(context, goals);
+            return new StudioConfluenceProductHandler(context, goals,artifactFactory);
         }
         else if (STUDIO_JIRA.equals(id))
         {
-            return new StudioJiraProductHandler(context, goals);
+            return new StudioJiraProductHandler(context, goals,artifactFactory);
         }
         else if (STUDIO_BAMBOO.equals(id))
         {
-            return new StudioBambooProductHandler(context, goals);
+            return new StudioBambooProductHandler(context, goals,artifactFactory);
         }
         else if (STUDIO_FECRU.equals(id))
         {
-            return new StudioFeCruProductHandler(context, goals);
+            return new StudioFeCruProductHandler(context, goals, artifactFactory);
         }
         else if (STUDIO_CROWD.equals(id))
         {
-            return new StudioCrowdProductHandler(context, goals);
+            return new StudioCrowdProductHandler(context, goals,artifactFactory);
         }
 
 

@@ -8,8 +8,14 @@ import java.util.Map;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.google.common.collect.ImmutableMap;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.factory.DefaultArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.StringUtils;
 
 import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenGoals;
@@ -24,9 +30,9 @@ import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory
 
 public abstract class AbstractWebappProductHandler extends AbstractProductHandler
 {
-    public AbstractWebappProductHandler(final MavenContext context, final MavenGoals goals, PluginProvider pluginProvider)
+    public AbstractWebappProductHandler(final MavenContext context, final MavenGoals goals, PluginProvider pluginProvider, ArtifactFactory artifactFactory)
     {
-        super(context, goals, pluginProvider);
+        super(context, goals, pluginProvider, artifactFactory);
     }
 
     public final void stop(final Product ctx) throws MojoExecutionException
@@ -43,6 +49,18 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
             firstNotNull(ctx.getArtifactId(), defaults.getArtifactId()),
             firstNotNull(ctx.getVersion(), defaults.getVersion()));
 
+        //check for a stable version if needed
+        if(Artifact.RELEASE_VERSION.equals(artifact.getVersion()) || Artifact.LATEST_VERSION.equals(artifact.getVersion()))
+        {
+            log.info("determining latest stable product version...");
+            Artifact warArtifact = artifactFactory.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
+            String stableVersion = ctx.getArtifactRetriever().getLatestStableVersion(warArtifact);
+
+            log.info("using latest stable product version: " + stableVersion);
+            artifact.setVersion(stableVersion);
+            ctx.setVersion(stableVersion);
+        }
+        
         // Copy the webapp war to target
         return goals.copyWebappWar(ctx.getId(), getBaseDirectory(ctx), artifact);
     }

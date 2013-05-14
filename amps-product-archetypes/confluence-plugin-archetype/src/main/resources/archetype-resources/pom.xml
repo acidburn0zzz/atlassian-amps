@@ -76,8 +76,8 @@
     </build>
 
     <properties>
-        <confluence.version>${confluence.version}</confluence.version>
-        <confluence.data.version>${confluence.data.version}</confluence.data.version>
+        <confluence.version>${confluenceVersion}</confluence.version>
+        <confluence.data.version>${confluenceDataVersion}</confluence.data.version>
         <amps.version>${project.version}</amps.version>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
     </properties>

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.tools.ant.taskdefs.Java;
 
@@ -27,9 +28,9 @@ import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 public class StudioFeCruProductHandler extends FeCruProductHandler implements StudioComponentProductHandler
 {
 
-    public StudioFeCruProductHandler(MavenContext context, MavenGoals goals)
+    public StudioFeCruProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals);
+        super(context, goals, artifactFactory);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class StudioFeCruProductHandler extends FeCruProductHandler implements St
     }
 
     @Override
-    protected ProductArtifact getArtifact()
+    public ProductArtifact getArtifact()
     {
         return new ProductArtifact("com.atlassian.studio", "studio-fisheye", "RELEASE");
     }

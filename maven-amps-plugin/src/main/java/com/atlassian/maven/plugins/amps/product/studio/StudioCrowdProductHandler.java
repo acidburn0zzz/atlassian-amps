@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import com.atlassian.maven.plugins.amps.DataSource;
@@ -24,9 +25,9 @@ import com.atlassian.maven.plugins.amps.product.CrowdProductHandler;
  */
 public class StudioCrowdProductHandler extends CrowdProductHandler implements StudioComponentProductHandler
 {
-    public StudioCrowdProductHandler(final MavenContext context, final MavenGoals goals)
+    public StudioCrowdProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals);
+        super(context, goals,artifactFactory);
     }
 
     @Override

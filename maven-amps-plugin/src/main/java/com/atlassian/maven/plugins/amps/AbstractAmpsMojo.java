@@ -6,6 +6,8 @@ import java.util.List;
 import com.atlassian.maven.plugins.amps.util.*;
 import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkResource;
+
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;

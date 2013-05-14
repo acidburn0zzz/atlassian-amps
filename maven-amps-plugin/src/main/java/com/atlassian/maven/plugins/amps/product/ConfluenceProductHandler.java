@@ -8,6 +8,7 @@ import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 import java.io.IOException;
@@ -16,9 +17,9 @@ import java.util.*;
 public class ConfluenceProductHandler extends AbstractWebappProductHandler
 {
 
-    public ConfluenceProductHandler(MavenContext context, MavenGoals goals)
+    public ConfluenceProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new ConfluencePluginProvider());
+        super(context, goals, new ConfluencePluginProvider(),artifactFactory);
     }
 
     public String getId()

@@ -7,6 +7,8 @@ import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.google.common.collect.ImmutableMap;
+
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 import java.io.IOException;
@@ -16,9 +18,9 @@ import static com.atlassian.maven.plugins.amps.util.FileUtils.deleteDir;
 
 public class BambooProductHandler extends AbstractWebappProductHandler
 {
-    public BambooProductHandler(MavenContext context, MavenGoals goals)
+    public BambooProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new BambooPluginProvider());
+        super(context, goals, new BambooPluginProvider(),artifactFactory);
     }
 
     public String getId()

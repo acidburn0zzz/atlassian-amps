@@ -20,6 +20,7 @@ import com.atlassian.maven.plugins.amps.util.ant.AntJavaExecutorThread;
 import com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Path;
@@ -36,9 +37,9 @@ public class FeCruProductHandler extends AbstractProductHandler
 
     private final JavaTaskFactory javaTaskFactory;
 
-    public FeCruProductHandler(MavenContext context, MavenGoals goals)
+    public FeCruProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new FeCruPluginProvider());
+        super(context, goals, new FeCruPluginProvider(), artifactFactory);
         this.javaTaskFactory = new JavaTaskFactory(log);
     }
 
@@ -47,7 +48,7 @@ public class FeCruProductHandler extends AbstractProductHandler
         return ProductHandlerFactory.FECRU;
     }
 
-    protected ProductArtifact getArtifact()
+    public ProductArtifact getArtifact()
     {
         return new ProductArtifact("com.atlassian.crucible", "atlassian-crucible", "RELEASE");
     }
@@ -128,7 +129,7 @@ public class FeCruProductHandler extends AbstractProductHandler
     }
 
     @Override
-    protected final ProductArtifact getTestResourcesArtifact()
+    public final ProductArtifact getTestResourcesArtifact()
     {
           return new ProductArtifact("com.atlassian.fecru", "amps-fecru");
     }

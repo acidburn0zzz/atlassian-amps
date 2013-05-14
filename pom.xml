@@ -347,5 +347,6 @@
         <stash.version>2.4.1</stash.version>
         <stash.data.version>2.4.1</stash.data.version>
         <plugin.testrunner.version>1.1.1</plugin.testrunner.version>
+        <maven.cli.version>1.0.9</maven.cli.version>
     </properties>
 </project>

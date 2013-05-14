@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -90,15 +91,15 @@ public class StudioProductHandler extends AmpsProductHandler
         }
     };
 
-    public StudioProductHandler(MavenContext context, MavenGoals goals)
+    public StudioProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals);
+        super(context, goals, artifactFactory);
     }
 
 
 
     @Override
-    protected ProductArtifact getTestResourcesArtifact()
+    public ProductArtifact getTestResourcesArtifact()
     {
         return new ProductArtifact("com.atlassian.studio", "studio-test-resources");
     }
@@ -855,7 +856,7 @@ public class StudioProductHandler extends AmpsProductHandler
                 if (product != null)
                 {
                     File productDestinationDirectory = new File(studioHome, productHomeName);
-                    ProductHandler handler = ProductHandlerFactory.create(product.getId(), context, goals);
+                    ProductHandler handler = ProductHandlerFactory.create(product.getId(), context, goals,artifactFactory);
                     handler.cleanupProductHomeForZip(product, productDestinationDirectory);
                 }
             }

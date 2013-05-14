@@ -11,6 +11,7 @@ import com.google.common.collect.Maps;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 import java.io.IOException;
@@ -22,9 +23,9 @@ import static java.lang.String.format;
 
 public class JiraProductHandler extends AbstractWebappProductHandler
 {
-    public JiraProductHandler(final MavenContext context, final MavenGoals goals)
+    public JiraProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new JiraPluginProvider());
+        super(context, goals, new JiraPluginProvider(),artifactFactory);
     }
 
     public String getId()

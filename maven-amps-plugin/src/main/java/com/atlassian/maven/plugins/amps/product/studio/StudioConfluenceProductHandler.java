@@ -6,6 +6,8 @@ import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.product.ConfluenceProductHandler;
+
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
@@ -25,9 +27,9 @@ import static java.lang.String.format;
 public class StudioConfluenceProductHandler extends ConfluenceProductHandler implements StudioComponentProductHandler
 {
 
-    public StudioConfluenceProductHandler(MavenContext context, MavenGoals goals)
+    public StudioConfluenceProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals);
+        super(context, goals,artifactFactory);
     }
 
     @Override

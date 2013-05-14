@@ -10,11 +10,13 @@ import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.util.*;
 
+import org.apache.maven.artifact.factory.ArtifactFactory;
+
 public class RefappProductHandler extends AbstractWebappProductHandler
 {
-    public RefappProductHandler(MavenContext context, MavenGoals goals)
+    public RefappProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new RefappPluginProvider());
+        super(context, goals, new RefappPluginProvider(),artifactFactory);
     }
 
     public String getId()
@@ -70,13 +72,13 @@ public class RefappProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    protected ProductArtifact getArtifact()
+    public ProductArtifact getArtifact()
     {
         return new ProductArtifact("com.atlassian.refapp", "atlassian-refapp", VersionUtils.getVersion());
     }
 
     @Override
-    protected ProductArtifact getTestResourcesArtifact()
+    public ProductArtifact getTestResourcesArtifact()
     {
         return null;
     }

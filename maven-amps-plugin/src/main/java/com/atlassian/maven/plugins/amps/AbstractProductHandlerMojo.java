@@ -30,6 +30,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -292,6 +293,9 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     @Component
     protected ArtifactResolver artifactResolver;
 
+    @Component
+    protected RepositoryMetadataManager repositoryMetadataManager;
+
     /**
      * The local Maven repository. This is used by the artifact resolver to download resolved
      * JARs and put them in the local repository so that they won't have to be fetched again next
@@ -313,8 +317,8 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * the artifact resolver so that it can download the required JARs to put in the embedded
      * container's classpaths.
      */
-    @Component
-    protected ArtifactFactory artifactFactory;
+    //@Component
+    //protected ArtifactFactory artifactFactory;
 
     /**
      * A list of product-specific configurations (as literally provided in the pom.xml)
@@ -459,7 +463,15 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     private String buildRootProperty()
     {
         MavenProject mavenProject = getMavenContext().getProject();
-        return mavenProject.getBasedir().getPath();
+        
+        if(null != mavenProject && null != mavenProject.getBasedir())
+        {
+            return mavenProject.getBasedir().getPath();
+        }
+        else
+        {
+            return "";
+        }
     }
 
     private static void setDefaultSystemProperty(final Map<String,Object> props, final String key, final String value)
@@ -498,7 +510,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             }
         }
 
-        product.setArtifactRetriever(new ArtifactRetriever(artifactResolver, artifactFactory, localRepository, repositories));
+        product.setArtifactRetriever(new ArtifactRetriever(artifactResolver, artifactFactory, localRepository, repositories, repositoryMetadataManager));
 
         if (product.getContainerId() == null)
         {
@@ -662,7 +674,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         for (Product ctx : Lists.newArrayList(productMap.values()))
         {
-            ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals);
+            ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals,artifactFactory);
             setDefaultValues(ctx, handler);
 
             // If it's a Studio product, check dependent instance are present
@@ -677,7 +689,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         }
 
         // Submit the Studio products for configuration
-        StudioProductHandler studioProductHandler = (StudioProductHandler) ProductHandlerFactory.create(ProductHandlerFactory.STUDIO, mavenContext, goals);
+        StudioProductHandler studioProductHandler = (StudioProductHandler) ProductHandlerFactory.create(ProductHandlerFactory.STUDIO, mavenContext, goals,artifactFactory);
         studioProductHandler.configureStudioProducts(productMap);
 
         return productMap;

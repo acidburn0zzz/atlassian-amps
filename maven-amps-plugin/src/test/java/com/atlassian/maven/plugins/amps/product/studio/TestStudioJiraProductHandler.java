@@ -12,7 +12,7 @@ public class TestStudioJiraProductHandler
     public void testFixMemorySettingsWithEmptyArgs() throws Exception
     {
         Product product = new Product();
-        StudioJiraProductHandler handler = new StudioJiraProductHandler(Mockito.mock(MavenContext.class), Mockito.mock(MavenGoals.class));
+        StudioJiraProductHandler handler = new StudioJiraProductHandler(Mockito.mock(MavenContext.class), Mockito.mock(MavenGoals.class),null);
 
         product.setJvmArgs(null);
         handler.fixJvmArgs(product);
@@ -24,7 +24,7 @@ public class TestStudioJiraProductHandler
     public void testFixMemorySettingsWithMs() throws Exception
     {
         Product product = new Product();
-        StudioJiraProductHandler handler = new StudioJiraProductHandler(Mockito.mock(MavenContext.class), Mockito.mock(MavenGoals.class));
+        StudioJiraProductHandler handler = new StudioJiraProductHandler(Mockito.mock(MavenContext.class), Mockito.mock(MavenGoals.class),null);
 
         product.setJvmArgs("-Xms1024m");
         handler.fixJvmArgs(product);
@@ -36,7 +36,7 @@ public class TestStudioJiraProductHandler
     public void testFixMemorySettingsWithMx() throws Exception
     {
         Product product = new Product();
-        StudioJiraProductHandler handler = new StudioJiraProductHandler(Mockito.mock(MavenContext.class), Mockito.mock(MavenGoals.class));
+        StudioJiraProductHandler handler = new StudioJiraProductHandler(Mockito.mock(MavenContext.class), Mockito.mock(MavenGoals.class),null);
 
         product.setJvmArgs("-Xmx1024m");
         handler.fixJvmArgs(product);
@@ -48,7 +48,7 @@ public class TestStudioJiraProductHandler
     public void testFixMemorySettingsWithPermgenMxAndOther() throws Exception
     {
         Product product = new Product();
-        StudioJiraProductHandler handler = new StudioJiraProductHandler(Mockito.mock(MavenContext.class), Mockito.mock(MavenGoals.class));
+        StudioJiraProductHandler handler = new StudioJiraProductHandler(Mockito.mock(MavenContext.class), Mockito.mock(MavenGoals.class),null);
 
         product.setJvmArgs("-XX:MaxPermSize=512m -Xmx1024m -Dother=val");
         handler.fixJvmArgs(product);

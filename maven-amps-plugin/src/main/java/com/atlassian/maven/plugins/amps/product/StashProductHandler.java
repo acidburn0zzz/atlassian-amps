@@ -7,6 +7,7 @@ import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
@@ -15,9 +16,9 @@ import java.util.*;
 
 public class StashProductHandler extends AbstractWebappProductHandler
 {
-    public StashProductHandler(final MavenContext context, final MavenGoals goals)
+    public StashProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new StashPluginProvider());
+        super(context, goals, new StashPluginProvider(),artifactFactory);
     }
 
     @Override

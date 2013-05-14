@@ -99,8 +99,8 @@
     </build>
 
     <properties>
-        <fecru.version>${fecru.version}</fecru.version>
-        <fecru.data.version>${fecru.data.version}</fecru.data.version>
+        <fecru.version>${fecruVersion}</fecru.version>
+        <fecru.data.version>${fecruDataVersion}</fecru.data.version>
         <amps.version>${project.version}</amps.version>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
     </properties>

@@ -7,6 +7,8 @@ import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.product.BambooProductHandler;
+
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
@@ -26,9 +28,9 @@ import static java.lang.String.format;
 public class StudioBambooProductHandler extends BambooProductHandler
 {
 
-    public StudioBambooProductHandler(MavenContext context, MavenGoals goals)
+    public StudioBambooProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals);
+        super(context, goals,artifactFactory);
     }
 
     @Override
