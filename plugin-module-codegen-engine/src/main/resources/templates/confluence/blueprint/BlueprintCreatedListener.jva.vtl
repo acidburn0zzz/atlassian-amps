@@ -2,10 +2,9 @@
 #* @vtlvariable name="PLUGIN_KEY" type="java.lang.String" *#
 package $PACKAGE;
 
-import com.atlassian.confluence.plugins.createcontent.BlueprintPageCreateEvent;
+import com.atlassian.confluence.plugins.createcontent.events.BlueprintPageCreateEvent;
 import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
-import com.atlassian.plugin.ModuleCompleteKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,12 +27,11 @@ public class BlueprintCreatedListener
     public void onPageCreateEvent(BlueprintPageCreateEvent event)
     {
         // Ignore Blueprints created by other plugins
-        ModuleCompleteKey blueprintKey = event.getBlueprintKey();
-        if (!blueprintKey.getPluginKey().equals("$PLUGIN_KEY"))
+        if (!event.getBlueprintKey().getPluginKey().equals("$PLUGIN_KEY"))
             return;
 
         log.warn("Page created with title : " + event.getPage().getTitle());
-        log.warn("-- by our Blueprint with key: " + blueprintKey.getModuleKey());
+        log.warn("-- by our Blueprint with key: " + event.getBlueprintKey().getModuleKey());
         //log.warn("-- by user: " + event.getUser().getName());
         log.warn("-- from class: " + event.getSource().getClass());
         //log.warn("-- with context size: " + event.getContext().size());
