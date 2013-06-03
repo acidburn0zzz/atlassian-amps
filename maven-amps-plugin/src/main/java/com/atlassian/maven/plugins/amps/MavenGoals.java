@@ -73,7 +73,7 @@ public class MavenGoals
 
     private final Map<String, String> defaultArtifactIdToVersionMap = new HashMap<String, String>()
     {{
-            put("maven-cli-plugin", "1.0.9");
+            put("maven-cli-plugin", "1.0.10");
             put("org.codehaus.cargo:cargo-maven2-plugin", "1.2.3");
             put("atlassian-pdk", "2.3.1");
             put("maven-archetype-plugin", "2.0-alpha-4");

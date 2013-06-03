@@ -9,7 +9,7 @@ public class AmpsDefaults
     public static final String DEFAULT_SERVER;
     public static final String DEFAULT_PDK_VERSION = "0.4";
     public static final String DEFAULT_WEB_CONSOLE_VERSION = "1.2.8";
-    public static final String DEFAULT_FASTDEV_VERSION = "2.0";
+    public static final String DEFAULT_FASTDEV_VERSION = "2.1";
     public static final String DEFAULT_DEV_TOOLBOX_VERSION = "2.0.5";
     public static final String DEFAULT_PDE_VERSION = "1.2";
 
