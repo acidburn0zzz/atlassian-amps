@@ -56,6 +56,12 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
+    public String getDefaultContainerId()
+    {
+        return "tomcat7x";
+    }
+
+    @Override
     public Map<String, String> getSystemProperties(final Product ctx)
     {
         ImmutableMap.Builder<String, String> properties = ImmutableMap.<String, String>builder();
