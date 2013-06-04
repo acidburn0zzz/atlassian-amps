@@ -100,44 +100,8 @@ rem ---------------------------------------------------------------
 
 set MAVEN_OPTS=-Xmx768M -XX:MaxPermSize=256M %ATLAS_OPTS%
 set MVN_PARAMS=-gs %MVN2_HOME%/conf/settings.xml
-#set ( $elseCount = 0 )
-:loopstart
-if "%1"=="" goto loopend
-#foreach($o in $opts)
-    if /I "%1"=="--$o.name" (
-        #if( $o.flag )
-            set MVN_PARAMS=%MVN_PARAMS% -D$o.maven
-            shift
-        #else
-            set MVN_PARAMS=%MVN_PARAMS% -D$o.maven=%2
-            shift
-            shift
-        #end
-        goto loopstart
-    ) #if ($o.short) #set ( $elseCount = $elseCount + 1 ) else (
-            if /I "%1"=="-$o.short" (
-                #if( $o.flag )
-                    set MVN_PARAMS=%MVN_PARAMS% -D$o.maven
-                    shift
-                #else
-                    set MVN_PARAMS=%MVN_PARAMS% -D$o.maven=%2
-                    shift
-                    shift
-                #end
-                goto loopstart
-            ) #end #set ( $elseCount = $elseCount + 1 ) else (
-#end
+set MVN_PARAMS=%MVN_PARAMS% %*
 
-set MVN_PARAMS=%MVN_PARAMS% %1
-shift
-goto loopstart
-
-#if ( $elseCount > 0 )
-    #foreach($endelse in [1..$elseCount])
-    )
-    #end
-#end
-:loopend
 
 
 rem ---------------------------------------------------------------
