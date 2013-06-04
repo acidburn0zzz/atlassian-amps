@@ -17,7 +17,7 @@
 >        <repositories>
 >          <repository>
 >            <id>atlassian-public</id>
->            <url>https://m2proxy.atlassian.com/repository/public</url>
+>            <url>https://maven.atlassian.com/repository/public</url>
 >            <snapshots>
 >              <enabled>true</enabled>
 >              <updatePolicy>never</updatePolicy>
@@ -32,7 +32,7 @@
 >  	        <id>atlassian-plugin-sdk</id>
 >            <url>file://${env.ATLAS_HOME}/repository</url>
 >            <snapshots>
->              <enabled>false</enabled>
+>              <enabled>true</enabled>
 >            </snapshots>
 >            <releases>
 >              <enabled>true</enabled>
@@ -44,7 +44,7 @@
 >        <pluginRepositories>
 >          <pluginRepository>
 >            <id>atlassian-public</id>
->            <url>https://m2proxy.atlassian.com/repository/public</url>
+>            <url>https://maven.atlassian.com/repository/public</url>
 >            <releases>
 >              <enabled>true</enabled>
 >              <checksumPolicy>warn</checksumPolicy>
@@ -62,7 +62,7 @@
 >              <checksumPolicy>warn</checksumPolicy>
 >            </releases>
 >            <snapshots>
->              <enabled>false</enabled>
+>              <enabled>true</enabled>
 >            </snapshots>
 >          </pluginRepository>
 >        </pluginRepositories>
