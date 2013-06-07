@@ -906,9 +906,12 @@ public class MavenGoals
              ),
              element(name("configuration"),
                      // org.twdata.maven
-                     element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId))/*,
+                     element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId)),
+                     /*,
                      // we don't need that atm. since timeout is 0 for org.codehaus.cargo
-                     element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext)) */
+                      */
+                     //hoping this will fix AMPS-987
+                     element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext))
              )
         ),
         executionEnvironment()
