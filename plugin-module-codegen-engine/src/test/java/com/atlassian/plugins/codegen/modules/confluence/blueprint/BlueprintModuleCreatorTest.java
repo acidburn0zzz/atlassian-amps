@@ -200,7 +200,7 @@ public class BlueprintModuleCreatorTest extends AbstractModuleCreatorTestCase<Bl
         ResourceFile file = getResourceFile("xml", templateModuleKey + ".xml");
         String xml = new String(file.getContent());
         assertThat(xml, containsString("<at:var at:name=\"variableA\" />"));
-        assertThat(xml, containsString("<at:var at:name=\"variableB\" at:rawXhtml=\"true\" />"));
+        assertThat(xml, containsString("<at:var at:name=\"variableB\" at:rawxhtml=\"true\" />"));
     }
 
     @Test
