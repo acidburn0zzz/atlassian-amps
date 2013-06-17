@@ -35,9 +35,9 @@ public class BlueprintCreatedListener implements DisposableBean
 
         log.warn("Page created with title : " + event.getPage().getTitle());
         log.warn("-- by our Blueprint with key: " + blueprintKey.getModuleKey());
-        //log.warn("-- by user: " + event.getUser().getName());
+        log.warn("-- by user: " + event.getCreator().getName());
         log.warn("-- from class: " + event.getSource().getClass());
-        //log.warn("-- with context size: " + event.getContext().size());
+        log.warn("-- with context size: " + event.getContext().size());
     }
 
     @Override
