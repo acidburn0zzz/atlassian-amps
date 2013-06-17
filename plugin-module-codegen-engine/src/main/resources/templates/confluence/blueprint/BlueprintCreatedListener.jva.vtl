@@ -2,17 +2,18 @@
 #* @vtlvariable name="PLUGIN_KEY" type="java.lang.String" *#
 package $PACKAGE;
 
-import com.atlassian.confluence.plugins.createcontent.BlueprintPageCreateEvent;
+import com.atlassian.confluence.plugins.createcontent.events.BlueprintPageCreateEvent;
 import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.plugin.ModuleCompleteKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 
 /**
 * This listener simply logs when a Blueprint is created.
 */
-public class BlueprintCreatedListener
+public class BlueprintCreatedListener implements DisposableBean
 {
     private static final Logger log = LoggerFactory.getLogger(BlueprintCreatedListener.class);
 
@@ -37,5 +38,11 @@ public class BlueprintCreatedListener
         //log.warn("-- by user: " + event.getUser().getName());
         log.warn("-- from class: " + event.getSource().getClass());
         //log.warn("-- with context size: " + event.getContext().size());
+    }
+
+    @Override
+    public void destroy() throws Exception
+    {
+        eventPublisher.unregister(this);
     }
 }
