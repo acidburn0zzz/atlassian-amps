@@ -307,6 +307,7 @@
                 <configuration>
                     <releaseProfiles>release,installer-win,installer-linux,installer-osx</releaseProfiles>
                     <arguments>-Pinstaller-win,installer-osx,installer-linux</arguments>
+                    <goals>deploy</goals>
                 </configuration>
             </plugin>
         </plugins>
