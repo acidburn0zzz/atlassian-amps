@@ -23,6 +23,6 @@ echo "running pkgbuild..."
 pkgbuild --identifier com.atlassian.atlassian-plugin-sdk --install-location /usr/share/atlassian-plugin-sdk-$1 --ownership preserve --scripts ./target/osx-work/scripts/ --version "$VERSION" --root ./target/osx-unzip/atlassian-plugin-sdk-$1 ./target/atlassian-sdk.pkg
 
 echo "running productbuild..."
-productbuild --sign "Mac Developer: Rich Manalang (3U78U4KMEF)" --distribution ./target/osx-work/distribution.xml --package-path ./target/ --resources ./target/osx-work/resources ./target/atlassian-plugin-sdk-$1.pkg
+productbuild --sign "3rd Party Mac Developer Installer" --distribution ./target/osx-work/distribution.xml --package-path ./target/ --resources ./target/osx-work/resources ./target/atlassian-plugin-sdk-$1.pkg
 
 exit 0
