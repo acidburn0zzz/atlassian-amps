@@ -16,6 +16,7 @@ import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
 
 import org.apache.commons.io.FileUtils;
@@ -537,6 +538,20 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
+
+        XmlCompressor compressor = new XmlCompressor();
+        File pluginXmlFile = new File(ctx.getProject().getBuild().getOutputDirectory(), "atlassian-plugin.xml");
+        try
+        {
+            String source = FileUtils.readFileToString(pluginXmlFile);
+            String min = compressor.compress(source);
+            FileUtils.writeStringToFile(pluginXmlFile,min);
+        }
+        catch (IOException e)
+        {
+            throw new MojoExecutionException("IOException while minifying plugin XML file");
+        }
+
     }
 
     public void filterTestPluginDescriptor() throws MojoExecutionException

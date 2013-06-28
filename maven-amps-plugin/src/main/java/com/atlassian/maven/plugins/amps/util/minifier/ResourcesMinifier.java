@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps.util.minifier;
 import java.io.*;
 import java.util.List;
 
+import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import com.yahoo.platform.yui.compressor.CssCompressor;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
@@ -63,8 +64,58 @@ public class ResourcesMinifier
         {
             processCss(resourceDir,destDir,resource.getExcludes(), log);
         }
+
+        processXml(resourceDir, destDir, resource.getExcludes(), log);
     }
-    
+
+    public void processXml(final File resourceDir, final File destDir, final List<String> excludes, final Log log)
+    {
+        log.info("Compressing XML files");
+
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir(resourceDir);
+        scanner.setIncludes(new String[]{"**/*.xml"});
+
+        if(null != excludes && !excludes.isEmpty())
+        {
+            scanner.setExcludes(excludes.toArray(new String[0]));
+        }
+
+        scanner.addDefaultExcludes();
+        scanner.scan();
+
+        XmlCompressor compressor = new XmlCompressor();
+
+        for (String name : scanner.getIncludedFiles())
+        {
+            File sourceFile = new File(resourceDir,name);
+            File destFile = new File(destDir,name);
+
+            if(sourceFile.exists() && sourceFile.canRead())
+            {
+                if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
+                {
+                    log.info("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
+                    continue;
+                }
+
+                log.info("compressing to " + destFile.getAbsolutePath());
+
+                try
+                {
+                    FileUtils.forceMkdir(destFile.getParentFile());
+                    String source = FileUtils.readFileToString(sourceFile);
+                    String min = compressor.compress(source);
+                    FileUtils.writeStringToFile(destFile,min);
+                }
+                catch (IOException e)
+                {
+                    // ignore
+                }
+            }
+        }
+    }
+
     public void processJs(File resourceDir, File destDir, List<String> excludes, boolean useClosure, Log log)
     {
         if(useClosure)
