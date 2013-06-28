@@ -58,6 +58,7 @@
                 <include>**/*.bat</include>
             </includes>
             <filtered>true</filtered>
+            <lineEnding>crlf</lineEnding>
         </fileSet>
 
         <!-- the install type for auto-update -->
