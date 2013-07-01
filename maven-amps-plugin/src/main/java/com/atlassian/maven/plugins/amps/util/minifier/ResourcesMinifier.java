@@ -12,6 +12,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Resource;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.DirectoryScanner;
 
@@ -27,7 +28,7 @@ public class ResourcesMinifier
     {
     }
 
-    public static void minify(List<Resource> resources, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Log log)
+    public static void minify(List<Resource> resources, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Log log) throws MojoExecutionException
     {
         if(null == INSTANCE)
         {
@@ -40,7 +41,7 @@ public class ResourcesMinifier
         }
     }
     
-    public void processResource(Resource resource, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Log log)
+    public void processResource(Resource resource, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Log log) throws MojoExecutionException
     {
         File destDir = outputDir;
         if(StringUtils.isNotBlank(resource.getTargetPath()))
@@ -68,7 +69,7 @@ public class ResourcesMinifier
         processXml(resourceDir, destDir, resource.getExcludes(), log);
     }
 
-    public void processXml(final File resourceDir, final File destDir, final List<String> excludes, final Log log)
+    public void processXml(final File resourceDir, final File destDir, final List<String> excludes, final Log log) throws MojoExecutionException
     {
         log.info("Compressing XML files");
 
@@ -110,13 +111,13 @@ public class ResourcesMinifier
                 }
                 catch (IOException e)
                 {
-                    // ignore
+                    throw new MojoExecutionException("IOException when compiling JS", e);
                 }
             }
         }
     }
 
-    public void processJs(File resourceDir, File destDir, List<String> excludes, boolean useClosure, Log log)
+    public void processJs(File resourceDir, File destDir, List<String> excludes, boolean useClosure, Log log) throws MojoExecutionException
     {
         if(useClosure)
         {
@@ -166,7 +167,7 @@ public class ResourcesMinifier
         }
     }
 
-    public void processCss(File resourceDir, File destDir, List<String> excludes, Log log)
+    public void processCss(File resourceDir, File destDir, List<String> excludes, Log log) throws MojoExecutionException
     {
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(resourceDir);
@@ -199,7 +200,7 @@ public class ResourcesMinifier
         }
     }
 
-    private void closureJsCompile(File sourceFile, File destFile)
+    private void closureJsCompile(File sourceFile, File destFile) throws MojoExecutionException
     {
         try
         {
@@ -210,11 +211,11 @@ public class ResourcesMinifier
         }
         catch (IOException e)
         {
-            //ignore
+            throw new MojoExecutionException("IOException when compiling JS", e);
         }
     }
     
-    private void yuiJsCompile(File sourceFile, File destFile, Log log)
+    private void yuiJsCompile(File sourceFile, File destFile, Log log) throws MojoExecutionException
     {
         InputStreamReader in = null;
         OutputStreamWriter out = null;
@@ -229,7 +230,7 @@ public class ResourcesMinifier
         }
         catch (IOException e)
         {
-            //ignore
+            throw new MojoExecutionException("IOException when compiling JS", e);
         }
         finally {
             IOUtils.closeQuietly(in);
@@ -237,7 +238,7 @@ public class ResourcesMinifier
         }
     }
 
-    private void yuiCssCompile(File sourceFile, File destFile)
+    private void yuiCssCompile(File sourceFile, File destFile) throws MojoExecutionException
     {
         InputStreamReader in = null;
         OutputStreamWriter out = null;
@@ -252,7 +253,7 @@ public class ResourcesMinifier
         }
         catch (IOException e)
         {
-            //ignore
+            throw new MojoExecutionException("IOException when compiling JS", e);
         }
         finally {
             IOUtils.closeQuietly(in);
