@@ -539,19 +539,23 @@ public class MavenGoals
                 executionEnvironment()
         );
 
+
         XmlCompressor compressor = new XmlCompressor();
         File pluginXmlFile = new File(ctx.getProject().getBuild().getOutputDirectory(), "atlassian-plugin.xml");
-        try
+        
+        if (pluginXmlFile.exists())
         {
-            String source = FileUtils.readFileToString(pluginXmlFile);
-            String min = compressor.compress(source);
-            FileUtils.writeStringToFile(pluginXmlFile,min);
+            try
+            {
+                String source = FileUtils.readFileToString(pluginXmlFile);
+                String min = compressor.compress(source);
+                FileUtils.writeStringToFile(pluginXmlFile,min);
+            }
+            catch (IOException e)
+            {
+                throw new MojoExecutionException("IOException while minifying plugin XML file", e);
+            }
         }
-        catch (IOException e)
-        {
-            throw new MojoExecutionException("IOException while minifying plugin XML file", e);
-        }
-
     }
 
     public void filterTestPluginDescriptor() throws MojoExecutionException
