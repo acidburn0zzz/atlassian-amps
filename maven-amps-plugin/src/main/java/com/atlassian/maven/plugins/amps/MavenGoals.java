@@ -549,7 +549,7 @@ public class MavenGoals
         }
         catch (IOException e)
         {
-            throw new MojoExecutionException("IOException while minifying plugin XML file");
+            throw new MojoExecutionException("IOException while minifying plugin XML file", e);
         }
 
     }
