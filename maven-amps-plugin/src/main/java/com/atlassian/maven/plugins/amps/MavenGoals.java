@@ -1401,6 +1401,15 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
+
+        // Attach a jar artifact to the project. This helps when resolving dependencies in
+        // multi-module maven projects. Otherwise maven will incorrectly try and download
+        // the artifact from the remote repository instead of using the one in the reactor
+        String packaging = getContextProject().getPackaging();
+        if ("atlassian-plugin".equals(packaging) || "bundle".equals(packaging))
+        {
+            attachArtifact(getContextProject().getFile(), "jar");
+        }
     }
 
     public void jarTests(String finalName) throws MojoExecutionException
