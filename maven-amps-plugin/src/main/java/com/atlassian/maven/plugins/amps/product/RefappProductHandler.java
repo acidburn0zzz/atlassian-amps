@@ -6,11 +6,14 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 import com.google.common.collect.ImmutableMap;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 
 import java.io.File;
-import java.util.*;
-
-import org.apache.maven.artifact.factory.ArtifactFactory;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class RefappProductHandler extends AbstractWebappProductHandler
 {
@@ -30,7 +33,7 @@ public class RefappProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    protected File getUserInstalledPluginsDirectory(final File webappDir, File homeDir)
+    protected File getUserInstalledPluginsDirectory(final Product product, final File webappDir, File homeDir)
     {
         return null;
     }

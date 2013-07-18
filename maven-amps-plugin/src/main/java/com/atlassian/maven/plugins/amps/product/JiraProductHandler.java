@@ -6,23 +6,55 @@ import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class JiraProductHandler extends AbstractWebappProductHandler
 {
+    @VisibleForTesting
+    static final String INSTALLED_PLUGINS_DIR = "installed-plugins";
+
+    @VisibleForTesting
+    static final String PLUGINS_DIR = "plugins";
+
+    private static void checkNotFile(final File sharedHomeDir)
+    {
+        if (sharedHomeDir.isFile())
+        {
+            final String error =
+                    String.format("The specified shared home '%s' is a file, not a directory", sharedHomeDir);
+            throw new IllegalArgumentException(error);
+        }
+    }
+
+    private static void createIfNotExists(final File sharedHome)
+    {
+        sharedHome.mkdirs();
+        if (!sharedHome.isDirectory())
+        {
+            final String error = String.format("The specified shared home '%s' cannot be created", sharedHome);
+            throw new IllegalStateException(error);
+        }
+    }
+
     public JiraProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
     {
         super(context, goals, new JiraPluginProvider(),artifactFactory);
@@ -64,7 +96,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     @Override
     public Map<String, String> getSystemProperties(final Product ctx)
     {
-        ImmutableMap.Builder<String, String> properties = ImmutableMap.<String, String>builder();
+        final ImmutableMap.Builder<String, String> properties = ImmutableMap.builder();
         properties.putAll(super.getSystemProperties(ctx));
         properties.put("jira.home", fixWindowsSlashes(getHomeDirectory(ctx).getPath()));
         properties.put("cargo.servlet.uriencoding", "UTF-8");
@@ -85,9 +117,24 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    public File getUserInstalledPluginsDirectory(final File webappDir, final File homeDir)
+    public File getUserInstalledPluginsDirectory(final Product product, final File webappDir, final File homeDir)
     {
-        return new File(new File(homeDir, "plugins"), "installed-plugins");
+        final File pluginHomeDirectory = getPluginHomeDirectory(product.getSharedHome(), homeDir);
+        return new File(new File(pluginHomeDirectory, PLUGINS_DIR), INSTALLED_PLUGINS_DIR);
+    }
+
+    private File getPluginHomeDirectory(final String sharedHomePath, final File homeDir)
+    {
+        if (isBlank(sharedHomePath))
+        {
+            return homeDir;
+        }
+
+        // A shared home was specified
+        final File sharedHomeDir = new File(sharedHomePath);
+        checkNotFile(sharedHomeDir);
+        createIfNotExists(sharedHomeDir);
+        return sharedHomeDir;
     }
 
     @Override

@@ -62,7 +62,7 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    public File getUserInstalledPluginsDirectory(final File webappDir, File homeDir)
+    public File getUserInstalledPluginsDirectory(final Product product, final File webappDir, File homeDir)
     {
         // indicates plugins should be bundled
         return null;

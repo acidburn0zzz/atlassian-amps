@@ -1,7 +1,21 @@
 package com.atlassian.maven.plugins.amps.product;
 
-import java.io.File;
+import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
+import com.atlassian.maven.plugins.amps.util.FileUtils;
+import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.plugin.MojoExecutionException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,30 +25,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
-
-import com.atlassian.maven.plugins.amps.util.FileUtils;
-import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.plugin.MojoExecutionException;
-
 import static com.atlassian.maven.plugins.amps.util.FileUtils.doesFileNameMatchArtifact;
+import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
 import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.iterateFiles;
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.apache.commons.io.FileUtils.readFileToString;
-import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
 
 public abstract class AbstractProductHandler extends AmpsProductHandler
 {
@@ -230,7 +227,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     private void addArtifacts(final Product ctx, final File homeDir, final File appDir)
             throws IOException, MojoExecutionException, Exception
     {
-        File pluginsDir = getUserInstalledPluginsDirectory(appDir, homeDir);
+        File pluginsDir = getUserInstalledPluginsDirectory(ctx, appDir, homeDir);
         File bundledPluginsDir = new File(getBaseDirectory(ctx), "bundled-plugins");
 
         bundledPluginsDir.mkdir();
@@ -319,7 +316,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     abstract protected Collection<? extends ProductArtifact> getDefaultBundledPlugins();
     abstract protected Collection<? extends ProductArtifact> getDefaultLibPlugins();
     abstract protected File getBundledPluginPath(Product ctx, File appDir);
-    abstract protected File getUserInstalledPluginsDirectory(File webappDir, File homeDir);
+    abstract protected File getUserInstalledPluginsDirectory(Product product, File webappDir, File homeDir);
 
     protected String getLog4jPropertiesPath()
     {
