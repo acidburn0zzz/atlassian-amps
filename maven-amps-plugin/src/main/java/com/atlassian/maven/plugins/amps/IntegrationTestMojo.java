@@ -198,12 +198,12 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                     String debugArgs = " -Xdebug -Xrunjdwp:transport=dt_socket,address=" +
                             String.valueOf(debugPort) + ",suspend=" + (jvmDebugSuspend ? "y" : "n") + ",server=y ";
     
-                    if (product.getJvmArgs() == null)
+                    if (StringUtils.stripToNull(product.getJvmArgs()) == null)
                     {
                         product.setJvmArgs(StringUtils.defaultString(jvmArgs));
                     }
     
-                    product.setJvmArgs(product.getJvmArgs() + debugArgs);
+                    product.setDebugArgs(debugArgs);
                 }
                 
                 actualHttpPort = productHandler.start(product);

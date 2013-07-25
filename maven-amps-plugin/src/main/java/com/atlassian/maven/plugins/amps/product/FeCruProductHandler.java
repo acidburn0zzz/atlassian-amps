@@ -20,6 +20,7 @@ import com.atlassian.maven.plugins.amps.util.ant.AntJavaExecutorThread;
 import com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.tools.ant.taskdefs.Java;
@@ -64,7 +65,7 @@ public class FeCruProductHandler extends AbstractProductHandler
                 + ctx.getHttpPort() + " (http) and " + controlPort(ctx.getHttpPort()) + " (control)");
         try
         {
-            execFishEyeCmd("stop", ctx);
+            execFishEyeCmd("stop", ctx, false);
         }
         catch (Exception e)
         {
@@ -182,7 +183,7 @@ public class FeCruProductHandler extends AbstractProductHandler
         AntJavaExecutorThread thread;
         try
         {
-            thread = execFishEyeCmd("run", ctx);
+            thread = execFishEyeCmd("run", ctx, true);
         }
         catch (Exception e)
         {
@@ -260,14 +261,14 @@ public class FeCruProductHandler extends AbstractProductHandler
         }
     }
 
-    private AntJavaExecutorThread execFishEyeCmd(String bootCommand, final Product ctx) throws MojoExecutionException
+    private AntJavaExecutorThread execFishEyeCmd(String bootCommand, final Product ctx, boolean useDebugArgs) throws MojoExecutionException
     {
         final Map<String, String> properties = mergeSystemProperties(ctx);
 
         Java java = javaTaskFactory.newJavaTask(
                 output(ctx.getOutput()).
                 systemProperties(properties).
-                jvmArgs(ctx.getJvmArgs()));
+                jvmArgs(ctx.getJvmArgs() + (useDebugArgs ? ctx.getDebugArgs() : "")));
 
         addOverridesToJavaTask(ctx, java);
 

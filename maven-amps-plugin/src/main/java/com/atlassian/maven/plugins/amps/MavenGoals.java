@@ -859,7 +859,7 @@ public class MavenGoals
         }
 
         props.add(element(name("cargo.rmi.port"), String.valueOf(rmiPort)));
-        props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs()));
+        props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs() + webappContext.getDebugArgs()));
 
         int startupTimeout = webappContext.getStartupTimeout();
         if (Boolean.FALSE.equals(webappContext.getSynchronousStartup()))
