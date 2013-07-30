@@ -48,7 +48,12 @@ public class Product
     /**
      * JVM arguments to pass to cargo
      */
-    protected String jvmArgs = null;
+    protected String jvmArgs = "";
+
+    /**
+     * Debug arguments to pass to cargo as JVM arguments
+     */
+    protected String debugArgs = "";
 
     /**
      * A log4j properties file
@@ -318,7 +323,8 @@ public class Product
         prod.setDataVersion(productDataVersion == null ? product.getDataVersion() : productDataVersion);
         prod.setDataHome(dataHome == null ? product.getDataHome() : dataHome);
         prod.setLog4jProperties(log4jProperties == null ? product.getLog4jProperties() : log4jProperties);
-        prod.setJvmArgs(jvmArgs == null ? product.getJvmArgs() : jvmArgs);
+        prod.setJvmArgs(StringUtils.stripToNull(jvmArgs) == null ? product.getJvmArgs() : jvmArgs);
+        prod.setDebugArgs(StringUtils.stripToNull(debugArgs) == null ? product.getDebugArgs() : debugArgs);
         prod.setDataSources(dataSources == null ? product.getDataSources() : dataSources);
         prod.setGroupId(groupId == null ? product.getGroupId() : groupId);
         prod.setArtifactId(artifactId == null ? product.getArtifactId() : artifactId);
@@ -400,7 +406,17 @@ public class Product
 
     public void setJvmArgs(String jvmArgs)
     {
-        this.jvmArgs = jvmArgs;
+        this.jvmArgs = jvmArgs == null ? "" : jvmArgs;
+    }
+
+    public String getDebugArgs()
+    {
+        return debugArgs;
+    }
+
+    public void setDebugArgs(String debugArgs)
+    {
+        this.debugArgs = debugArgs == null ? "" :debugArgs;
     }
 
     public ArtifactRetriever getArtifactRetriever()
