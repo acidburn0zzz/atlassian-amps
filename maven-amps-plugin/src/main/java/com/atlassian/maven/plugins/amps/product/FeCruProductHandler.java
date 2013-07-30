@@ -1,5 +1,20 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.atlassian.maven.plugins.amps.util.ZipUtils;
+import com.atlassian.maven.plugins.amps.util.ant.AntJavaExecutorThread;
+import com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.tools.ant.taskdefs.Java;
+import org.apache.tools.ant.types.Path;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
@@ -9,22 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
-import com.atlassian.maven.plugins.amps.util.ZipUtils;
-import com.atlassian.maven.plugins.amps.util.ant.AntJavaExecutorThread;
-import com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.tools.ant.taskdefs.Java;
-import org.apache.tools.ant.types.Path;
 
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
@@ -163,7 +162,7 @@ public class FeCruProductHandler extends AbstractProductHandler
     }
 
     @Override
-    protected final File getUserInstalledPluginsDirectory(File appDir, File homeDir)
+    protected final File getUserInstalledPluginsDirectory(final Product product, File appDir, File homeDir)
     {
         return new File(new File(new File(homeDir, "var"), "plugins"), "user");
     }

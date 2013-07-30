@@ -1,5 +1,15 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.plugin.MojoExecutionException;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -10,18 +20,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
-
-import com.google.common.collect.ImmutableMap;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.plugin.MojoExecutionException;
 
 public class CrowdProductHandler extends AbstractWebappProductHandler
 {
@@ -63,7 +61,7 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    public File getUserInstalledPluginsDirectory(final File webappDir, final File homeDir)
+    public File getUserInstalledPluginsDirectory(final Product product, final File webappDir, final File homeDir)
     {
         return new File(homeDir, "plugins");
     }

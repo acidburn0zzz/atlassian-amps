@@ -115,7 +115,7 @@ public class StashProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    public File getUserInstalledPluginsDirectory(final File webappDir, final File homeDir)
+    public File getUserInstalledPluginsDirectory(final Product product, final File webappDir, final File homeDir)
     {
         return new File(new File(homeDir, "plugins"), "installed-plugins");
     }
