@@ -20,7 +20,7 @@ public class ConfigFileUtils
 {
     public static void replace(List<File> files, List<Replacement> replacements, boolean inverted, Log log) throws MojoExecutionException
     {
-        for(File file : files)
+        for (File file : files)
         {
             replace(file, replacements, inverted, log);
         }
@@ -48,7 +48,7 @@ public class ConfigFileUtils
                 {
                     if (replacement.applyWhenUnzipping())
                     {
-                        config = config.replace(replacement.getKey(), replacement.getValue());
+                        config = replacement.replace(config);
                     }
                 }
             }
@@ -56,10 +56,7 @@ public class ConfigFileUtils
             {
                 for (Replacement replacement : replacements)
                 {
-                    if (replacement.isReversible())
-                    {
-                        config = config.replace(replacement.getValue(), replacement.getKey());
-                    }
+                    config = replacement.reverse(config);
                 }
             }
             FileUtils.writeStringToFile(cfgFile, config);
@@ -122,16 +119,20 @@ public class ConfigFileUtils
     /**
      * Represents a replacement in a configuration file or set of files.
      */
-    public static class Replacement
+    public static class Replacement implements Comparable<Replacement>
     {
         private final String key;
         private final String value;
 
-        /** Replace the key with the value when unzipping a home. This is the normal meaning of
-         * a replacement, {@code key -> value} */
+        /**
+         * Replace the key with the value when unzipping a home. This is the normal meaning of
+         * a replacement, {@code key -> value}
+         */
         private final boolean applyWhenUnzipping;
 
-        /** Detect the value and replace it with the key when zipping a home directory */
+        /**
+         * Detect the value and replace it with the key when zipping a home directory
+         */
         private final boolean reversible;
 
         /**
@@ -141,7 +142,6 @@ public class ConfigFileUtils
          * <b>Important</b>: If your value is short, such as "/", "", "true", "false", please set reversible=false.
          * When zipping a home, config files are parsed and everything is replaced back with keys, such as %PRODUCT_HOME_DIR%.
          * If you provide a string with false positives, you may parametrise too many variables.
-         *
          *
          * @param key the key to be replaced. Must not be null.
          * @param value the value to be replaced. Must not be null. <b>Important</b>: If short, such as / or "", please set reversible=false.
@@ -153,6 +153,7 @@ public class ConfigFileUtils
 
         /**
          * Represents a key to be replaced in the configuration files.
+         *
          * @param key the key to be replaced. Must not be null.
          * @param value the value to be replaced. Must not be null.
          * @param reversible true if the value should be replaced with the key before
@@ -187,30 +188,32 @@ public class ConfigFileUtils
             return new Replacement(key, value, true, false);
         }
 
-        /**
-         * @return the key to be replaced. Never null.
-         */
-        public String getKey()
+        public final String replace(String s)
         {
-            return key;
+            return replace(s, key, value);
         }
 
-        /**
-         * @return the value. Never null.
-         */
-        public String getValue()
+        public final String reverse(String s)
         {
-            return value;
+            return reversible ? replace(s, value, key) : s;
         }
 
-        public boolean isReversible()
+        protected String replace(String s, String target, String replacement)
         {
-            return reversible;
+            return s.replace(target, replacement);
         }
 
-        public boolean applyWhenUnzipping()
+        public final boolean applyWhenUnzipping()
         {
             return applyWhenUnzipping;
+        }
+
+        @Override
+        public int compareTo(Replacement other)
+        {
+            int length1 = this.value.length();
+            int length2 = other.value.length();
+            return length2 - length1;
         }
 
         @Override
@@ -236,6 +239,20 @@ public class ConfigFileUtils
             }
 
             return key + operation + value;
+        }
+    }
+
+    public static final class RegexReplacement extends Replacement
+    {
+        public RegexReplacement(String key, String value)
+        {
+            super(key, value, false);
+        }
+
+        @Override
+        protected String replace(String s, String target, String replacement)
+        {
+            return s.replaceAll(target, replacement);
         }
     }
 }

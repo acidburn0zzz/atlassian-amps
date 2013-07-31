@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.atlassian.maven.plugins.amps.util.ConfigFileUtils.RegexReplacement;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -57,7 +58,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
 
     public JiraProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new JiraPluginProvider(),artifactFactory);
+        super(context, goals, new JiraPluginProvider(), artifactFactory);
     }
 
     public String getId()
@@ -102,7 +103,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         properties.put("cargo.servlet.uriencoding", "UTF-8");
         return properties.build();
     }
-    
+
     @Override
     protected DataSource getDefaultDataSource(Product ctx)
     {
@@ -164,7 +165,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         // this location used from 4.1 onwards (inclusive)
         String bundledPluginPluginsPath = "WEB-INF/classes/atlassian-bundled-plugins.zip";
 
-    	String[] version = ctx.getVersion().split("-", 2)[0].split("\\.");
+        String[] version = ctx.getVersion().split("-", 2)[0].split("\\.");
         try
         {
             long major = Long.parseLong(version[0]);
@@ -207,8 +208,8 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         replacements.add(0, new Replacement("http://localhost:8080", baseUrl, false));
         replacements.add(new Replacement("@project-dir@", homeDir.getParent(), false));
         replacements.add(new Replacement("/jira-home/", "/home/", false));
-        replacements.add(new Replacement("@base-url@",
-                baseUrl, false));
+        replacements.add(new Replacement("@base-url@", baseUrl, false));
+        replacements.add(new RegexReplacement("'[A-B]{1}[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}'", "''")); // blank out the server ID
         return replacements;
     }
 
@@ -270,8 +271,8 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         protected Collection<ProductArtifact> getSalArtifacts(String salVersion)
         {
             return Arrays.asList(
-                new ProductArtifact("com.atlassian.sal", "sal-api", salVersion),
-                new ProductArtifact("com.atlassian.sal", "sal-jira-plugin", salVersion));
+                    new ProductArtifact("com.atlassian.sal", "sal-api", salVersion),
+                    new ProductArtifact("com.atlassian.sal", "sal-jira-plugin", salVersion));
         }
 
         @Override
@@ -291,6 +292,4 @@ public class JiraProductHandler extends AbstractWebappProductHandler
 
         FileUtils.deleteQuietly(new File(snapshotDir, "log/atlassian-jira.log"));
     }
-
-
 }
