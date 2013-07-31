@@ -19,7 +19,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.factory.DefaultArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -137,17 +136,7 @@ public abstract class AmpsProductHandler implements ProductHandler
 
             // Proceed to replacements
             List<Replacement> replacements = getReplacements(product);
-            // Sort by longer values first, so that the right keys are used.
-            Collections.sort(replacements, new Comparator<Replacement>(){
-                @Override
-                public int compare(Replacement replacement1, Replacement replacement2)
-                {
-                    // longest value < shortest value
-                    int length1 = replacement1.getValue().length();
-                    int length2 = replacement2.getValue().length();
-                    return length2 - length1;
-                }
-            });
+            Collections.sort(replacements);
             List<File> files = getConfigFiles(product, snapshotDir);
 
             ConfigFileUtils.replace(files, replacements, true, log);
