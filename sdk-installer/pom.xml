@@ -468,7 +468,7 @@
         <installbuilder.builder>/tools/installbuilder/bin/builder</installbuilder.builder>
         <buildhelper.version>1.7</buildhelper.version>
         <sdk.scp.user>${user.name}</sdk.scp.user>
-        <sdk.scp.host>plugin-sdk-repo.private.atlassian.com</sdk.scp.host>
+        <sdk.scp.host>plugin-sdk-repo-fe.internal.atlassian.com</sdk.scp.host>
         <sdk.scp.key>${user.home}/.ssh/id_rsa</sdk.scp.key>
     </properties>
 </project>
