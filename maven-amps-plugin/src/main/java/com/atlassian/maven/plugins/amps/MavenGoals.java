@@ -57,10 +57,10 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
  */
 public class MavenGoals
 {
-    private final MavenContext ctx;
 
     private final Log log;
     private final Map<String, String> pluginArtifactIdToVersionMap;
+    private final MavenContext ctx;
 
     private final Map<String, Container> idToContainerMap = new HashMap<String, Container>()
     {{
@@ -803,7 +803,7 @@ public class MavenGoals
         }
 
         final int rmiPort = pickFreePort(0);
-        int actualHttpPort;
+        final int actualHttpPort;
         String protocol = "http";
 
         if(webappContext.getUseHttps())
@@ -947,7 +947,7 @@ public class MavenGoals
      * is shut down.
      *
      * The RMI port is randomly chosen (see startWebapp), thus we don't have any information close at hand. As a future optimisation, e.g. when we move away from cargo to let's say
-     * Apache's Tomcat Maven Plugin we could retrieve the actualy configuration from the server.xml on shutdown and thus know exactly for what which port to wait until it gets closed.
+     * Apache's Tomcat Maven Plugin we could retrieve the actual configuration from the server.xml on shutdown and thus know exactly for what which port to wait until it gets closed.
      * We could do that already in cargo (e.g. container/tomcat6x/<productHome>/conf/server.xml) but that means that we have to support all the containers we are supporting with cargo.
      *
      * Since the HTTP port is the only one that interests us, we set all three ports to this one when calling stop. But since that may be randomly chosen as well we might be waiting
@@ -957,7 +957,7 @@ public class MavenGoals
     private Element[] createShutdownPortsPropertiesConfiguration(final Product webappContext)
     {
         final List<Element> properties = new ArrayList<Element>();
-        String portUsedToDetermineIfShutdownSucceeded = String.valueOf(webappContext.getHttpPort());
+        final String portUsedToDetermineIfShutdownSucceeded = String.valueOf(webappContext.getHttpPort());
         properties.add(element(name("cargo.servlet.port"), portUsedToDetermineIfShutdownSucceeded));
         properties.add(element(name("cargo.rmi.port"), portUsedToDetermineIfShutdownSucceeded));
         properties.add(element(name("cargo.tomcat.ajp.port"), portUsedToDetermineIfShutdownSucceeded));
