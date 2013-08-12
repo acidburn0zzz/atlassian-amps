@@ -281,6 +281,7 @@ public class Product
     // The home directory shared between multiple instances in a cluster (added for JIRA)
     private String sharedHome;
 
+    // The port for the Apache JServ Protocol; defaults to the web container's default value
     private int ajpPort;
 
     /**
@@ -875,7 +876,7 @@ public class Product
     }
 
     /**
-     * Returns the AJP port for this Tomcat instance.
+     * Returns the AJP port for use by the web container.
      *
      * @return see above
      */
@@ -885,7 +886,7 @@ public class Product
     }
 
     /**
-     * Sets the AJP port for this Tomcat instance.
+     * Sets the AJP port for use by the web container.
      *
      * @param ajpPort the AJP port to set
      */
