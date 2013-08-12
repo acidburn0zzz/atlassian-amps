@@ -57,6 +57,7 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
  */
 public class MavenGoals
 {
+    private static final String AJP_PORT_PROPERTY = "cargo.tomcat.ajp.port";
 
     private final Log log;
     private final Map<String, String> pluginArtifactIdToVersionMap;
@@ -960,7 +961,7 @@ public class MavenGoals
         final String portUsedToDetermineIfShutdownSucceeded = String.valueOf(webappContext.getHttpPort());
         properties.add(element(name("cargo.servlet.port"), portUsedToDetermineIfShutdownSucceeded));
         properties.add(element(name("cargo.rmi.port"), portUsedToDetermineIfShutdownSucceeded));
-        properties.add(element(name("cargo.tomcat.ajp.port"), portUsedToDetermineIfShutdownSucceeded));
+        properties.add(element(name(AJP_PORT_PROPERTY), portUsedToDetermineIfShutdownSucceeded));
         return properties.toArray(new Element[properties.size()]);
     }
 
