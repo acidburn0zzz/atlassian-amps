@@ -1408,7 +1408,7 @@ public class MavenGoals
         String packaging = getContextProject().getPackaging();
         if ("atlassian-plugin".equals(packaging) || "bundle".equals(packaging))
         {
-            attachArtifact(getContextProject().getFile(), "jar");
+            attachArtifact(getContextProject().getArtifact().getFile(), "jar");
         }
     }
 
