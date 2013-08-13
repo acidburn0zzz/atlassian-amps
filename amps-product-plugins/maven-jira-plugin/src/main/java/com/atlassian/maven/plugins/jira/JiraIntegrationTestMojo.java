@@ -31,7 +31,7 @@ public class JiraIntegrationTestMojo extends IntegrationTestMojo
                 getMavenContext().getProject().getBasedir() + "/src/test/xml");
         props.put("jira.context", product.getContextPath());
 
-        getLog().error("jira props: " + props);
+        getLog().info("jira props: " + props);
 
         return props;
     }
