@@ -1,32 +1,20 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.*;
-import java.util.jar.Manifest;
-import java.util.regex.Matcher;
-
-import com.atlassian.maven.plugins.amps.util.*;
+import aQute.lib.osgi.Constants;
+import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
+import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
+import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
+import com.atlassian.maven.plugins.amps.util.VersionUtils;
 import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
+import com.google.common.annotations.VisibleForTesting;
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -34,11 +22,25 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.twdata.maven.mojoexecutor.MojoExecutor;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
-import aQute.lib.osgi.Constants;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.jar.Manifest;
+import java.util.regex.Matcher;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
@@ -57,10 +59,12 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
  */
 public class MavenGoals
 {
-    private final MavenContext ctx;
+    @VisibleForTesting
+    static final String AJP_PORT_PROPERTY = "cargo.tomcat.ajp.port";
 
     private final Log log;
     private final Map<String, String> pluginArtifactIdToVersionMap;
+    private final MavenContext ctx;
 
     private final Map<String, Container> idToContainerMap = new HashMap<String, Container>()
     {{
@@ -803,7 +807,7 @@ public class MavenGoals
         }
 
         final int rmiPort = pickFreePort(0);
-        int actualHttpPort;
+        final int actualHttpPort;
         String protocol = "http";
 
         if(webappContext.getUseHttps())
@@ -846,20 +850,8 @@ public class MavenGoals
             }
         }
 
-        final List<Element> props = new ArrayList<Element>();
-        for (final Map.Entry<String, String> entry : systemProperties.entrySet())
-        {
-            props.add(element(name(entry.getKey()), entry.getValue()));
-        }
-        props.add(element(name("cargo.servlet.port"), String.valueOf(actualHttpPort)));
-
-        if(webappContext.getUseHttps())
-        {
-            props.add(element(name("cargo.protocol"), protocol));
-        }
-
-        props.add(element(name("cargo.rmi.port"), String.valueOf(rmiPort)));
-        props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs() + webappContext.getDebugArgs()));
+        final List<Element> props =
+                getConfigurationProperties(systemProperties, webappContext, rmiPort, actualHttpPort, protocol);
 
         int startupTimeout = webappContext.getStartupTimeout();
         if (Boolean.FALSE.equals(webappContext.getSynchronousStartup()))
@@ -906,6 +898,31 @@ public class MavenGoals
         return actualHttpPort;
     }
 
+    @VisibleForTesting
+    List<Element> getConfigurationProperties(final Map<String, String> systemProperties,
+            final Product webappContext, final int rmiPort, final int actualHttpPort, final String protocol)
+    {
+        final List<Element> props = new ArrayList<Element>();
+        for (final Map.Entry<String, String> entry : systemProperties.entrySet())
+        {
+            props.add(element(name(entry.getKey()), entry.getValue()));
+        }
+        props.add(element(name("cargo.servlet.port"), String.valueOf(actualHttpPort)));
+
+        if (webappContext.getUseHttps())
+        {
+            props.add(element(name("cargo.protocol"), protocol));
+        }
+
+        if (webappContext.getAjpPort() != 0)
+        {
+            props.add(element(name(AJP_PORT_PROPERTY), String.valueOf(webappContext.getAjpPort())));
+        }
+        props.add(element(name("cargo.rmi.port"), String.valueOf(rmiPort)));
+        props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs() + webappContext.getDebugArgs()));
+        return props;
+    }
+
     public void stopWebapp(final String productId, final String containerId, final Product webappContext) throws MojoExecutionException
     {
         final Container container = findContainer(containerId);
@@ -947,7 +964,7 @@ public class MavenGoals
      * is shut down.
      *
      * The RMI port is randomly chosen (see startWebapp), thus we don't have any information close at hand. As a future optimisation, e.g. when we move away from cargo to let's say
-     * Apache's Tomcat Maven Plugin we could retrieve the actualy configuration from the server.xml on shutdown and thus know exactly for what which port to wait until it gets closed.
+     * Apache's Tomcat Maven Plugin we could retrieve the actual configuration from the server.xml on shutdown and thus know exactly for what which port to wait until it gets closed.
      * We could do that already in cargo (e.g. container/tomcat6x/<productHome>/conf/server.xml) but that means that we have to support all the containers we are supporting with cargo.
      *
      * Since the HTTP port is the only one that interests us, we set all three ports to this one when calling stop. But since that may be randomly chosen as well we might be waiting
@@ -957,10 +974,10 @@ public class MavenGoals
     private Element[] createShutdownPortsPropertiesConfiguration(final Product webappContext)
     {
         final List<Element> properties = new ArrayList<Element>();
-        String portUsedToDetermineIfShutdownSucceeded = String.valueOf(webappContext.getHttpPort());
+        final String portUsedToDetermineIfShutdownSucceeded = String.valueOf(webappContext.getHttpPort());
         properties.add(element(name("cargo.servlet.port"), portUsedToDetermineIfShutdownSucceeded));
         properties.add(element(name("cargo.rmi.port"), portUsedToDetermineIfShutdownSucceeded));
-        properties.add(element(name("cargo.tomcat.ajp.port"), portUsedToDetermineIfShutdownSucceeded));
+        properties.add(element(name(AJP_PORT_PROPERTY), portUsedToDetermineIfShutdownSucceeded));
         return properties.toArray(new Element[properties.size()]);
     }
 

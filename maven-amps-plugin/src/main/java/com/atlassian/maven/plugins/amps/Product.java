@@ -281,6 +281,9 @@ public class Product
     // The home directory shared between multiple instances in a cluster (added for JIRA)
     private String sharedHome;
 
+    // The port for the Apache JServ Protocol; defaults to the web container's default value
+    private int ajpPort;
+
     /**
      * Creates a new product that is merged with this one, where the properties in this one override the passed
      * in product.
@@ -331,6 +334,7 @@ public class Product
         prod.setContextPath(contextPath == null ? product.getContextPath() : contextPath);
         prod.setContainerId(containerId == null ? product.getContainerId() : containerId);
         prod.setHttpPort(httpPort == 0 ? product.getHttpPort() : httpPort);
+        prod.setAjpPort(ajpPort == 0 ? product.getAjpPort() : ajpPort);
         prod.setJvmDebugPort(jvmDebugPort == 0 ? product.getJvmDebugPort() : jvmDebugPort);
         prod.setUseHttps(useHttps == null ? product.getUseHttps() : useHttps);
 
@@ -869,6 +873,26 @@ public class Product
     public void setSharedHome(final String sharedHome)
     {
         this.sharedHome = sharedHome;
+    }
+
+    /**
+     * Returns the AJP port for use by the web container.
+     *
+     * @return see above
+     */
+    public int getAjpPort()
+    {
+        return ajpPort;
+    }
+
+    /**
+     * Sets the AJP port for use by the web container.
+     *
+     * @param ajpPort the AJP port to set
+     */
+    public void setAjpPort(final int ajpPort)
+    {
+        this.ajpPort = ajpPort;
     }
 
     @Override
