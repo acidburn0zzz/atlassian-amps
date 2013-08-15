@@ -76,6 +76,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     private int httpPort;
 
     /**
+     * AJP port for cargo <-> servlet container comms
+     */
+    @Parameter(property = "ajp.port", defaultValue = "0") // cargo will select 8009 by default
+    private int ajpPort;
+
+    /**
      * If product should be started with https on port 443
      */
     @Parameter(property = "use.https", defaultValue = "false")
@@ -378,6 +384,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setPluginArtifacts(pluginArtifacts);
         ctx.setLog4jProperties(log4jProperties);
         ctx.setHttpPort(httpPort);
+        ctx.setAjpPort(ajpPort);
         ctx.setUseHttps(useHttps);
 
         ctx.setVersion(productVersion);
