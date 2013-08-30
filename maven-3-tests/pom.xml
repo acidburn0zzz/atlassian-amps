@@ -54,12 +54,12 @@
         <dependency>
             <groupId>com.atlassian.devrel</groupId>
             <artifactId>developer-toolbox-plugin</artifactId>
-            <version>2.0.8</version>
+            <version>2.0.11</version>
         </dependency>
         <dependency>
             <groupId>com.atlassian.labs</groupId>
             <artifactId>rest-api-browser</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.4</version>
         </dependency>
         <dependency>
             <groupId>com.atlassian.labs</groupId>
