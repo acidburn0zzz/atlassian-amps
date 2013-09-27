@@ -66,7 +66,7 @@ public abstract class AbstractPluginProvider implements PluginProvider
         return Arrays.asList(
                 new ProductArtifact("org.apache.felix", "org.apache.felix.webconsole", webConsoleVersion),
                 new ProductArtifact("org.apache.felix", "org.osgi.compendium", "1.2.0"),
-                new ProductArtifact("com.atlassian.labs.httpservice", "httpservice-bridge", "0.6.1")
+                new ProductArtifact("com.atlassian.labs.httpservice", "httpservice-bridge", "0.6.2")
                 );
     }
 
