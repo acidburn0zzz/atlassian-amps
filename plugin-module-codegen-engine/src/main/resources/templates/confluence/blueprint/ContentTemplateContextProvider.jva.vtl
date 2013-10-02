@@ -1,16 +1,23 @@
 #* @vtlvariable name="PACKAGE" type="java.lang.String" *#
 package $PACKAGE;
 
-import com.atlassian.confluence.plugins.createcontent.api.contextproviders.AbstractBlueprintContextProvider;
-import com.atlassian.confluence.plugins.createcontent.api.contextproviders.BlueprintContext;
+import com.atlassian.plugin.PluginParseException;
+import com.atlassian.plugin.web.ContextProvider;
+
+import java.util.Map;
 
 /**
  * This provider adds dynamic data for substitution into the content-template's \<at:var> elements.
  */
-public class ContentTemplateContextProvider extends AbstractBlueprintContextProvider
+public class ContentTemplateContextProvider implements ContextProvider
 {
     @Override
-    protected BlueprintContext updateBlueprintContext(BlueprintContext context)
+    public void init(Map<String, String> params) throws PluginParseException
+    {
+    }
+
+    @Override
+    public Map<String, Object> getContextMap(Map<String, Object> context)
     {
         context.put("variableA", "Hello I am variableA");
         // We're adding a string with HTML tags. It will be correctly rendered because of the "rawXhtml"
