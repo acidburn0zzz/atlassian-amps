@@ -899,6 +899,15 @@ public class Product
     public String toString()
     {
         return "Product " + id + " [instanceId=" + instanceId
-				+ ", " + (useHttps ? "https" : "http") + "://" + server + ":" + httpPort + contextPath + "]";
+				+ ", " + getProtocol() + "://" + server + ":" + httpPort + contextPath + "]";
+    }
+
+    /**
+     * Returns the protocol transmission scheme.
+     * @return "http" or "https".
+     */
+    public String getProtocol()
+    {
+        return useHttps ? "https" : "http";
     }
 }

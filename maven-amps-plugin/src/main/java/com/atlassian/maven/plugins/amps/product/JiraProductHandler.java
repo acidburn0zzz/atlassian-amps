@@ -200,7 +200,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             contextPath = "/" + contextPath;
         }
 
-        final String baseUrl = (ctx.getUseHttps() ? "https" : "http") + "://" + ctx.getServer() +
+        final String baseUrl = ctx.getProtocol() + "://" + ctx.getServer() +
 				":" + ctx.getHttpPort() + contextPath;
 
         List<Replacement> replacements = super.getReplacements(ctx);

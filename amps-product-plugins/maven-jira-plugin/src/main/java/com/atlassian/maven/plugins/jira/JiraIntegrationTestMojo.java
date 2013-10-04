@@ -24,7 +24,7 @@ public class JiraIntegrationTestMojo extends IntegrationTestMojo
         Map<String, String> props = new HashMap<String, String>();
 
         // set up properties for JIRA functional test library
-        props.put("jira.protocol",  (product.getUseHttps() ? "https" : "http"));
+        props.put("jira.protocol",  product.getProtocol());
         props.put("jira.host", product.getServer());
         props.put("jira.port", Integer.toString(product.getHttpPort()));
         props.put("jira.xml.data.location",

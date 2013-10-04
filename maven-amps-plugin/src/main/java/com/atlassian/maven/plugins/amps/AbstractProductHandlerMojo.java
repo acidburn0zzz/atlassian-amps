@@ -846,8 +846,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     {
         if (product.getHttpPort() != 0)
         {
-			final String protocol = product.getUseHttps() ? "https" : "http";
-			final String url = protocol + "://" + product.getServer() + ":" + product.getHttpPort()
+			final String url = product.getProtocol() + "://" + product.getServer() + ":" + product.getHttpPort()
 					+ StringUtils.defaultString(product.getContextPath(), "");
 
             int timeout = startingUp ? product.getStartupTimeout() : product.getShutdownTimeout();
