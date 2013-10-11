@@ -898,6 +898,16 @@ public class Product
     @Override
     public String toString()
     {
-        return "Product " + id + " [instanceId=" + instanceId + ", localhost:" + httpPort + contextPath + "]";
+        return "Product " + id + " [instanceId=" + instanceId
+				+ ", " + getProtocol() + "://" + server + ":" + httpPort + contextPath + "]";
+    }
+
+    /**
+     * Returns the protocol transmission scheme.
+     * @return "http" or "https".
+     */
+    public String getProtocol()
+    {
+        return useHttps ? "https" : "http";
     }
 }

@@ -28,7 +28,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -841,17 +840,14 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     /**
      * Ping the product until it's up or stopped
      * @param startingUp true if applications are expected to be up; false if applications are expected to be brought down
-     * @throws MojoExecutionException if the product didn't have the expected behaviour beofre the timeout
+     * @throws MojoExecutionException if the product didn't have the expected behaviour before the timeout
      */
     private void pingRepeatedly(Product product, boolean startingUp) throws MojoExecutionException
     {
         if (product.getHttpPort() != 0)
         {
-            String url = "http://" + product.getServer() + ":" + product.getHttpPort();
-            if (StringUtils.isNotBlank(product.getContextPath()))
-            {
-                url = url + product.getContextPath();
-            }
+			final String url = product.getProtocol() + "://" + product.getServer() + ":" + product.getHttpPort()
+					+ StringUtils.defaultString(product.getContextPath(), "");
 
             int timeout = startingUp ? product.getStartupTimeout() : product.getShutdownTimeout();
             final long end = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeout);

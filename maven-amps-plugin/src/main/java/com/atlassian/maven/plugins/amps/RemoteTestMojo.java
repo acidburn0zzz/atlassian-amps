@@ -103,6 +103,13 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
     @Parameter
     protected List<ProductArtifact> deployArtifacts = new ArrayList<ProductArtifact>();
 
+    /**
+     * Denotes test category as defined by surefire/failsafe notion of groups. In JUnit4, this affects tests annotated
+     * with {@link org.junit.experimental.categories.Category @Category} annotation.
+     */
+    @Parameter
+    protected String category;
+
     protected void doExecute() throws MojoExecutionException
     {
         if (StringUtils.isBlank(server))
@@ -242,7 +249,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
             installPluginFile(testPlugin);
 
             // Actually run the tests
-            goals.runIntegrationTests("group-" + testGroupId, "remote", includes, excludes, systemProperties, targetDirectory);
+            goals.runIntegrationTests("group-" + testGroupId, "remote", includes, excludes, systemProperties, targetDirectory, category);
         }
         catch (Exception e)
         {

@@ -74,6 +74,13 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
     @Parameter(property = "jvm.debug.suspend")
     protected boolean jvmDebugSuspend = false;
 
+    /**
+     * Denotes test category as defined by surefire/failsafe notion of groups. In JUnit4, this affects tests annotated
+     * with {@link org.junit.experimental.categories.Category @Category} annotation.
+     */
+    @Parameter
+    protected String category;
+
     protected void doExecute() throws MojoExecutionException
     {
         final MavenProject project = getMavenContext().getProject();
@@ -252,7 +259,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         waitForProducts(productExecutions, true);
 
         // Actually run the tests
-        goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory);
+        goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory, category);
 
         // Shut all products down
         if (!noWebapp)

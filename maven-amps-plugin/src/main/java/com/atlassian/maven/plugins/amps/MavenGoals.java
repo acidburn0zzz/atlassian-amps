@@ -22,6 +22,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.twdata.maven.mojoexecutor.MojoExecutor;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
@@ -93,7 +94,7 @@ public class MavenGoals
             put("maven-jar-plugin", "2.2");
             //put("maven-surefire-plugin", "2.4.3");
             put("maven-surefire-plugin", "2.12.4");
-            put("maven-failsafe-plugin", "2.9");
+            put("maven-failsafe-plugin", "2.12.4");
             put("maven-exec-plugin", "1.2.1");
 
         }};
@@ -589,13 +590,13 @@ public class MavenGoals
     }
 
     public void runUnitTests(Map<String, Object> systemProperties) throws MojoExecutionException {
-        runUnitTests(systemProperties, null);
+        runUnitTests(systemProperties, null, null);
     }
 
-    public void runUnitTests(Map<String, Object> systemProperties, String excludedGroups) throws MojoExecutionException
+    public void runUnitTests(Map<String, Object> systemProperties, String excludedGroups, final String category) throws MojoExecutionException
     {
         final Element systemProps = convertPropsToElements(systemProperties);
-        Xpp3Dom config = configuration(
+        final Xpp3Dom config = configuration(
                 systemProps,
                 element(name("excludes"),
                         element(name("exclude"), "it/**"),
@@ -603,6 +604,11 @@ public class MavenGoals
 
                 element(name("excludedGroups"), excludedGroups)
         );
+
+        if (isRelevantCategory(category))
+        {
+            appendJunitCategoryToConfiguration(category, config);
+        }
 
         log.info("surefire unit-test configuration:");
         log.info(config.toString());
@@ -1022,7 +1028,7 @@ public class MavenGoals
         return server + port + contextPath;
     }
 
-    public void runIntegrationTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties, final File targetDirectory)
+    public void runIntegrationTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties, final File targetDirectory, final String category)
     		throws MojoExecutionException
 	{
     	List<Element> includeElements = new ArrayList<Element>(includes.size());
@@ -1055,7 +1061,13 @@ public class MavenGoals
                 element(name(reportsDirectory), testOutputDir)
         );
 
+        if (isRelevantCategory(category))
+        {
+            appendJunitCategoryToConfiguration(category, itconfig);
+        }
+
         final Xpp3Dom verifyconfig = configuration(element(name(reportsDirectory), testOutputDir));
+
 
         log.info("Failsafe integration-test configuration:");
         log.info(itconfig.toString());
@@ -1082,6 +1094,17 @@ public class MavenGoals
                 executionEnvironment()
         );
 	}
+
+    private void appendJunitCategoryToConfiguration(final String category, final Xpp3Dom config)
+    {
+        final Element groups = element(name("groups"), category);
+        config.addChild(groups.toDom());
+    }
+
+    private boolean isRelevantCategory(final String category)
+    {
+        return category != null && !"".equals(category);
+    }
 
     /**
      * Converts a map of System properties to maven config elements

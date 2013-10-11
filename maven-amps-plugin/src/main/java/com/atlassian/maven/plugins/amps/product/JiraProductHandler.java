@@ -200,7 +200,8 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             contextPath = "/" + contextPath;
         }
 
-        String baseUrl = "http://" + ctx.getServer() + ":" + ctx.getHttpPort() + contextPath;
+        final String baseUrl = ctx.getProtocol() + "://" + ctx.getServer() +
+				":" + ctx.getHttpPort() + contextPath;
 
         List<Replacement> replacements = super.getReplacements(ctx);
         File homeDir = getHomeDirectory(ctx);
