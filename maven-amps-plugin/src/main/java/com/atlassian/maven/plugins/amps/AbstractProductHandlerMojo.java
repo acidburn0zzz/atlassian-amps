@@ -49,7 +49,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     // ------ start inline product context
 
     protected static final String JUNIT_VERSION = "4.10_1";
-    protected static final String ATLASSIAN_TEST_RUNNER_VERSION = "1.1.1";
+    protected static final String ATLASSIAN_TEST_RUNNER_VERSION = "1.1.2";
     protected static final String NO_TEST_GROUP = "__no_test_group__";
 
     /**
