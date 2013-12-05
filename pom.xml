@@ -346,7 +346,7 @@
 
     <properties>
         <jdkLevel>1.6</jdkLevel>
-        <maven.version>2.1.0</maven.version>
+        <maven.version>3.0.5</maven.version>
         <refapp.version>2.20.0-m2</refapp.version>
         <confluence.version>5.1.2</confluence.version>
         <confluence.data.version>5.1.2</confluence.data.version>
