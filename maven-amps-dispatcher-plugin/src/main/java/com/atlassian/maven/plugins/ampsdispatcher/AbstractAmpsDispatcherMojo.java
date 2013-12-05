@@ -1,6 +1,5 @@
 package com.atlassian.maven.plugins.ampsdispatcher;
 
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -117,24 +116,13 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
     {
         try
         {
-            Class bpmClass = Class.forName("org.apache.maven.plugin.BuildPluginManager");
             Object buildPluginManager = session.lookup("org.apache.maven.plugin.BuildPluginManager");
 
-            Class[] params = new Class[] {project.getClass(),session.getClass(),bpmClass};
-            Method execEnvMethod = MojoExecutor.class.getMethod("executionEnvironment",params);
-            Object[] args = new Object[] {project, session, buildPluginManager};
-
-            MojoExecutor.ExecutionEnvironment execEnv = (MojoExecutor.ExecutionEnvironment) execEnvMethod.invoke(null,args);
-            if(null != execEnv)
-            {
-                return execEnv;
-            }
+            return executionEnvironment(project, session, (BuildPluginManager) buildPluginManager);
         }
         catch (Exception e)
         {
-            // e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        return MojoExecutor.executionEnvironment(project, session, pluginManager);
     }
 }
