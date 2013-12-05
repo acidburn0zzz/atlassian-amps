@@ -154,8 +154,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
             }
             catch (ComponentLookupException e)
             {
-                /* Maven 2 */
-                mavenContext = new MavenContext(project, reactor, session, pluginManager, getLog());
+                throw new RuntimeException(e);
             }
         }
         return mavenContext;
