@@ -58,9 +58,9 @@
 
             <!-- this is used to run some tests against the running application -->
             <plugin>
-                <groupId>org.codehaus.groovy.maven</groupId>
+                <groupId>org.codehaus.gmaven</groupId>
                 <artifactId>gmaven-plugin</artifactId>
-                <version>1.0</version>
+                <version>1.5</version>
                 <configuration>
                     <source>${project.build.directory}/it/runWithTestGroup/webappassertions.groovy</source>
                     <classpath>

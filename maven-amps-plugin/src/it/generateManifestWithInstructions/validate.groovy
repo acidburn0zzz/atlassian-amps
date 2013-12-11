@@ -1,5 +1,4 @@
 import java.util.jar.Manifest
-import static aQute.lib.osgi.Constants.*
 
 assert mavenExitCode == 0, "The maven build should not have failed!"
 
@@ -8,7 +7,7 @@ assert manifestFile.exists(), "There should be a manifest for no instructions an
 
 final Manifest manifest = manifestFile.withInputStream { InputStream is -> new Manifest(is) }
 
-assert manifest.mainAttributes.getValue(BUNDLE_CLASSPATH).contains('META-INF/lib/commons-logging-1.1.1.jar'), "Should contain the commons-logging compile dep"
+assert manifest.mainAttributes.getValue("Bundle-Classpath").contains('META-INF/lib/commons-logging-1.1.1.jar'), "Should contain the commons-logging compile dep"
 
 assert manifest.mainAttributes.getValue('Some-Key').equals('Some-Value'), "Should contain instructions specified in the POM"
 
