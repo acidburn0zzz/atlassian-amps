@@ -15,7 +15,6 @@ public class MavenContext
     private final List<MavenProject> reactor;
     private final MavenSession session;
 
-    /* Maven 3 */
     private final BuildPluginManager buildPluginManager;
 
     private final Log log;
@@ -62,7 +61,6 @@ public class MavenContext
 
     public ExecutionEnvironment getExecutionEnvironment()
     {
-        /* Maven 3 */
         return MojoExecutor.executionEnvironment(project, session, buildPluginManager);
     }
 }
