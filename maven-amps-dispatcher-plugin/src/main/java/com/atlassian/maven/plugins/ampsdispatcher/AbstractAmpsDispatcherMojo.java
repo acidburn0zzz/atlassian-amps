@@ -45,11 +45,8 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
     @Parameter(property = "session", required = true, readonly = true)
     MavenSession session;
 
-    /**
-     * The Maven 2 PluginManager Object
-     */
     @Component
-    PluginManager pluginManager;
+    BuildPluginManager buildPluginManager;
 
     public final void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -114,15 +111,6 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
 
     protected MojoExecutor.ExecutionEnvironment getExecutionEnvironment()
     {
-        try
-        {
-            Object buildPluginManager = session.lookup("org.apache.maven.plugin.BuildPluginManager");
-
-            return executionEnvironment(project, session, (BuildPluginManager) buildPluginManager);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
+        return executionEnvironment(project, session, buildPluginManager);
     }
 }
