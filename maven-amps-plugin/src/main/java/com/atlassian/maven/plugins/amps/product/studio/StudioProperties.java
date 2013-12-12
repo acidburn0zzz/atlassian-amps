@@ -5,13 +5,14 @@ import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
 import java.io.File;
 import java.util.Map;
 
-import org.apache.maven.surefire.shade.org.apache.commons.lang.StringUtils;
-
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.product.FeCruProductHandler;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * This bean shares the configuration of Studio across all products
