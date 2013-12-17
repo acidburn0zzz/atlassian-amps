@@ -7,16 +7,13 @@ import com.atlassian.maven.plugins.amps.util.*;
 import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkResource;
 
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 public abstract class AbstractAmpsMojo extends AbstractMojo
 {
@@ -38,11 +35,8 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     @Parameter(property = "session", required = true, readonly = true)
     private MavenSession session;
 
-    /**
-     * The Maven PluginManager Object
-     */
     @Component
-    private PluginManager pluginManager;
+    private BuildPluginManager buildPluginManager;
 
     /**
      * The current Maven plugin artifact id
@@ -145,18 +139,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     {
         if (mavenContext == null)
         {
-            try
-            {
-                Object buildPluginManager = (BuildPluginManager) session.lookup("org.apache.maven.plugin.BuildPluginManager");
-
-                /* Maven 3 */
-                mavenContext = new MavenContext(project, reactor, session, (BuildPluginManager) buildPluginManager, getLog());
-            }
-            catch (ComponentLookupException e)
-            {
-                /* Maven 2 */
-                mavenContext = new MavenContext(project, reactor, session, pluginManager, getLog());
-            }
+            mavenContext = new MavenContext(project, reactor, session, buildPluginManager, getLog());
         }
         return mavenContext;
     }
