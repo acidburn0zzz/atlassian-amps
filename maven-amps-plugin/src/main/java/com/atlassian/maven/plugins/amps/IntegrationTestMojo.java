@@ -218,34 +218,30 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 
             if (productExecutions.size() == 1)
             {
-                systemProperties.put("http.port", String.valueOf(actualHttpPort));
-                systemProperties.put("context.path", product.getContextPath());
+                putIfNotOverridden(systemProperties, "http.port", String.valueOf(actualHttpPort));
+                putIfNotOverridden(systemProperties, "context.path", product.getContextPath());
             }
 
             String baseUrl = MavenGoals.getBaseUrl(product, actualHttpPort);
             // hard coded system properties...
-            systemProperties.put("http." + product.getInstanceId() + ".port", String.valueOf(actualHttpPort));
-            systemProperties.put("context." + product.getInstanceId() + ".path", product.getContextPath());
-            systemProperties.put("http." + product.getInstanceId() + ".url", MavenGoals.getBaseUrl(product, actualHttpPort));
+            putIfNotOverridden(systemProperties, "http." + product.getInstanceId() + ".port", String.valueOf(actualHttpPort));
+            putIfNotOverridden(systemProperties, "context." + product.getInstanceId() + ".path", product.getContextPath());
+            putIfNotOverridden(systemProperties, "http." + product.getInstanceId() + ".url", MavenGoals.getBaseUrl(product, actualHttpPort));
+            putIfNotOverridden(systemProperties, "http." + product.getInstanceId() + ".protocol", product.getProtocol());
 
-            systemProperties.put("baseurl." + product.getInstanceId(), baseUrl);
-            systemProperties.put("plugin.jar", pluginJar);
+
+            putIfNotOverridden(systemProperties, "baseurl." + product.getInstanceId(), baseUrl);
+            putIfNotOverridden(systemProperties, "plugin.jar", pluginJar);
 
             // yes, this means you only get one base url if multiple products, but that is what selenium would expect
-            if (!systemProperties.containsKey("baseurl"))
-            {
-                systemProperties.put("baseurl", baseUrl);
-            }
+            putIfNotOverridden(systemProperties, "baseurl", baseUrl);
 
-            systemProperties.put("homedir." + product.getInstanceId(), productHandler.getHomeDirectory(product).getAbsolutePath());
-            if (!systemProperties.containsKey("homedir"))
-            {
-                systemProperties.put("homedir", productHandler.getHomeDirectory(product).getAbsolutePath());
-            }
+            putIfNotOverridden(systemProperties, "homedir." + product.getInstanceId(), productHandler.getHomeDirectory(product).getAbsolutePath());
+            putIfNotOverridden(systemProperties, "homedir", productHandler.getHomeDirectory(product).getAbsolutePath());
 
             systemProperties.putAll(getProductFunctionalTestProperties(product));
         }
-        systemProperties.put("testGroup", testGroupId);
+        putIfNotOverridden(systemProperties, "testGroup", testGroupId);
         systemProperties.putAll(getTestGroupSystemProperties(testGroupId));
 
         /*
@@ -265,6 +261,28 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         if (!noWebapp)
         {
             stopProducts(productExecutions);
+        }
+    }
+
+    /**
+     * Adds the property to the map if such property is not overridden in system properties passed to
+     * maven executing this mojo.
+     * @param map the properties map
+     * @param key the key to be added
+     * @param value the value to be set. Will be overridden by an existing system property, if such exits.
+     */
+    private void putIfNotOverridden(Map<String, Object> map, String key, Object value)
+    {
+        if (!map.containsKey(key))
+        {
+            if (System.getProperties().containsKey(key))
+            {
+                map.put(key, System.getProperty(key));
+            }
+            else
+            {
+                map.put(key, value);
+            }
         }
     }
 
