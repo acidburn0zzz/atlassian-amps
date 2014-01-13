@@ -11,7 +11,7 @@ public class AmpsDefaults
     public static final String DEFAULT_WEB_CONSOLE_VERSION = "1.2.8";
     public static final String DEFAULT_FASTDEV_VERSION = "2.2";
     public static final String DEFAULT_DEV_TOOLBOX_VERSION = "2.0.12";
-    public static final String DEFAULT_REST_API_BROWSER_VERSION = "3.0.5";
+    public static final String DEFAULT_REST_API_BROWSER_VERSION = "3.0.6";
     public static final String DEFAULT_PDE_VERSION = "1.2";
 
     /**
