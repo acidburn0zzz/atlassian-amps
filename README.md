@@ -16,7 +16,7 @@ If you're having problems with the Plugin SDK, please go to [Atlassian Answers](
 
 ## Contributing
 
-This project is licensed under the [Apache 2.0 Software License](../LICENSE). External contributors are welcome, but you must agree to the terms of the [Atlassian Contributor License Agreement](https://developer.atlassian.com/display/ABOUT/Atlassian+Contributor+License+Agreement) and then sign and submit a copy of the agreement to Atlassian.
+This project is licensed under the [Apache 2.0 Software License](../atlassian/amps/src/master/LICENSE). External contributors are welcome, but you must agree to the terms of the [Atlassian Contributor License Agreement](https://developer.atlassian.com/display/ABOUT/Atlassian+Contributor+License+Agreement) and then sign and submit a copy of the agreement to Atlassian.
 
 ### Rules of Engagement
 
