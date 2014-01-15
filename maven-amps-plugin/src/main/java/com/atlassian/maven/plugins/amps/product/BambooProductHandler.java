@@ -83,7 +83,7 @@ public class BambooProductHandler extends AbstractWebappProductHandler
 
         // The regex in the following search text is used to match IPv4 ([^:]+) or IPv6 (\[.+]) addresses.
         ConfigFileUtils.replaceAll(new File(homeDir, "/xml-data/configuration/administration.xml"),
-                "http://(?:[^:]+|\\[.+]):8085", "http://" + ctx.getServer() + ":" + ctx.getHttpPort() + "/" + ctx.getContextPath().replaceAll("^/|/$", ""));
+                "https?://(?:[^:]+|\\[.+]):8085", ctx.getProtocol() + "://" + ctx.getServer() + ":" + ctx.getHttpPort() + "/" + ctx.getContextPath().replaceAll("^/|/$", ""));
     }
 
 
