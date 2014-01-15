@@ -2,7 +2,7 @@
 
 ## Quick Links
 
-* [How to Release](https://extranet.atlassian.com/display/DEVNET/HOWTO:+Release+AMPS,+the+Atlassian+Plugin+SDK)
+* [How to Release][2]
 * [Issues][1]
 * [Builds](https://extranet-bamboo.internal.atlassian.com/browse/AMPS)
 
@@ -28,3 +28,4 @@ If you want to submit bug fixes or improvements to the Plugin SDK, please assist
 
 
 [1]: https://ecosystem.atlassian.net/browse/AMPS
+[2]: https://extranet.atlassian.com/pages/viewpage.action?pageId=2130217184
