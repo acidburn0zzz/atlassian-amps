@@ -251,7 +251,7 @@ public class CtkServerProductHandler implements ProductHandler
      */
     private void stopContainer(final Product product) throws IOException, MojoExecutionException
     {
-        final URL url = new URL("http", product.getServer(), product.getHttpPort(), product.getContextPath());
+        final URL url = new URL(product.getProtocol(), product.getServer(), product.getHttpPort(), product.getContextPath());
         final HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
         httpConnection.setConnectTimeout(product.getShutdownTimeout());
         httpConnection.setRequestMethod("DELETE");

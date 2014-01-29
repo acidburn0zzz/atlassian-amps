@@ -97,8 +97,8 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
         // We don't rewrap homes with these values:
         replacements.add(new Replacement("@project-dir@", homeDir.getParent()));
         replacements.add(new Replacement("/confluence-home/", "/home/", false));
-        replacements.add(new Replacement("<baseUrl>http://localhost:1990/confluence</baseUrl>", "<baseUrl>http://" + ctx.getServer() + ":" + ctx.getHttpPort() + "/" + ctx.getContextPath().replaceAll("^/|/$", "") + "</baseUrl>", false));
-        replacements.add(new Replacement("<baseUrl>http://localhost:8080</baseUrl>", "<baseUrl>http://" + ctx.getServer() + ":" + ctx.getHttpPort() + "/" + ctx.getContextPath().replaceAll("^/|/$", "") + "</baseUrl>", false));
+        replacements.add(new Replacement("<baseUrl>http://localhost:1990/confluence</baseUrl>", "<baseUrl>" + ctx.getProtocol() + "://" + ctx.getServer() + ":" + ctx.getHttpPort() + "/" + ctx.getContextPath().replaceAll("^/|/$", "") + "</baseUrl>", false));
+        replacements.add(new Replacement("<baseUrl>http://localhost:8080</baseUrl>", "<baseUrl>" + ctx.getProtocol() + "://" + ctx.getServer() + ":" + ctx.getHttpPort() + "/" + ctx.getContextPath().replaceAll("^/|/$", "") + "</baseUrl>", false));
         return replacements;
     }
 
