@@ -1564,7 +1564,7 @@ public class MavenGoals
         );
     }
 
-    public void generateRestDocs() throws MojoExecutionException
+    public void generateRestDocs(String jacksonModules) throws MojoExecutionException
     {
         MavenProject prj = ctx.getProject();
         StringBuffer packagesPath = new StringBuffer();
@@ -1616,6 +1616,11 @@ public class MavenGoals
             {
                 throw new MojoExecutionException("Dependencies must be resolved", e);
             }
+            String additionalParam =  "-output \"" + resourcedocPath + "\"";
+            if (jacksonModules != null)
+            {
+                additionalParam += " -modules \"" + jacksonModules + "\"";
+            }
 
             executeMojo(
                     plugin(
@@ -1641,7 +1646,7 @@ public class MavenGoals
                                         element(name("version"),"2.6")
                                 )
                             ),
-                            element(name("additionalparam"),"-output \"" + resourcedocPath + "\""),
+                            element(name("additionalparam"), additionalParam),
                             element(name("useStandardDocletOptions"),"false")
                     ),
                     executionEnvironment()
