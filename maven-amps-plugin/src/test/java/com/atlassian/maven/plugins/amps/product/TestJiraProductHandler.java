@@ -7,18 +7,28 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.Product;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestJiraProductHandler
 {
+    static final String BUNDLED_PLUGINS_FROM_4_1 = "WEB-INF/classes/atlassian-bundled-plugins.zip";
+    static final String BUNDLED_PLUGINS_UPTO_4_0 = "WEB-INF/classes/com/atlassian/jira/plugin/atlassian-bundled-plugins.zip";
+
     static File tempHome;
     
     @Before
@@ -77,5 +87,45 @@ public class TestJiraProductHandler
         
         String after = FileUtils.readFileToString(f);
         assertEquals("Original contents", after);
+    }
+
+    @Test
+    public void bundledPluginsLocationCorrectFor41()
+    {
+        final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_FROM_4_1);
+        assertBundledPluginPath("4.1", tempHome, bundledPluginsZip);
+    }
+
+    @Test
+    public void bundledPluginsLocationCorrectFor40()
+    {
+        final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_UPTO_4_0);
+        assertBundledPluginPath("4.0", tempHome, bundledPluginsZip);
+    }
+
+    @Test
+    public void bundledPluginsLocationCorrectForFallback()
+    {
+        final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_FROM_4_1);
+        assertBundledPluginPath("not.a.version", tempHome, bundledPluginsZip);
+    }
+
+    private void assertBundledPluginPath(final String version, final File appDir, final File expectedPath)
+    {
+        // Set up
+
+        final Log mockLog = mock(Log.class);
+        final MavenContext mockMavenContext = mock(MavenContext.class);
+        when(mockMavenContext.getLog()).thenReturn(mockLog);
+        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null);
+        final Product mockProduct = mock(Product.class);
+        when(mockProduct.getVersion()).thenReturn(version);
+
+        // Invoke
+        final File bundledPluginPath = productHandler.getBundledPluginPath(mockProduct, appDir);
+
+        // Check
+        assertNotNull(bundledPluginPath);
+        assertEquals(expectedPath, bundledPluginPath);
     }
 }
