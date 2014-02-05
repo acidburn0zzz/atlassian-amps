@@ -18,6 +18,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+
+import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UNZIPPED;
+import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_FROM_4_1;
+import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UPTO_4_0;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -26,9 +31,6 @@ import static org.mockito.Mockito.when;
 
 public class TestJiraProductHandler
 {
-    static final String BUNDLED_PLUGINS_FROM_4_1 = "WEB-INF/classes/atlassian-bundled-plugins.zip";
-    static final String BUNDLED_PLUGINS_UPTO_4_0 = "WEB-INF/classes/com/atlassian/jira/plugin/atlassian-bundled-plugins.zip";
-
     static File tempHome;
     
     @Before
@@ -49,12 +51,12 @@ public class TestJiraProductHandler
     }
     
     @After
-    public void deleteFileAndTemporaryHomeDirectory() throws Exception
+    public void deleteTemporaryHomeDirectoryAndContents() throws Exception
     {
         if (tempHome != null)
         {
-            new File(tempHome, "dbconfig.xml").delete();
-            tempHome.delete();
+            FileUtils.deleteDirectory(tempHome);
+            tempHome = null;
         }
     }
 
@@ -87,6 +89,15 @@ public class TestJiraProductHandler
         
         String after = FileUtils.readFileToString(f);
         assertEquals("Original contents", after);
+    }
+
+    @Test
+    public void bundledPluginsShouldBeUnzippedIfPresent()
+    {
+        final File bundledPluginsDir = new File(tempHome, BUNDLED_PLUGINS_UNZIPPED);
+        bundledPluginsDir.mkdirs();
+        assertTrue(bundledPluginsDir.exists());
+        assertBundledPluginPath("6.3", tempHome, bundledPluginsDir);
     }
 
     @Test
