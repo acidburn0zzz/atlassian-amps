@@ -36,6 +36,15 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     @VisibleForTesting
     static final String PLUGINS_DIR = "plugins";
 
+    @VisibleForTesting
+    static final String BUNDLED_PLUGINS_UNZIPPED = "WEB-INF/atlassian-bundled-plugins";
+
+    @VisibleForTesting
+    static final String BUNDLED_PLUGINS_FROM_4_1 = "WEB-INF/classes/atlassian-bundled-plugins.zip";
+
+    @VisibleForTesting
+    static final String BUNDLED_PLUGINS_UPTO_4_0 = "WEB-INF/classes/com/atlassian/jira/plugin/atlassian-bundled-plugins.zip";
+
     private static void checkNotFile(final File sharedHomeDir)
     {
         if (sharedHomeDir.isFile())
@@ -162,26 +171,35 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     @Override
     public File getBundledPluginPath(Product ctx, File appDir)
     {
-        // this location used from 4.1 onwards (inclusive)
-        String bundledPluginPluginsPath = "WEB-INF/classes/atlassian-bundled-plugins.zip";
+        // the zip became a directory in 6.3, so if the directory exists and is a directory, use it,
+        // otherwise fallback to the old behaviour.
+        final File bundleDir = new File(appDir, BUNDLED_PLUGINS_UNZIPPED);
 
-        String[] version = ctx.getVersion().split("-", 2)[0].split("\\.");
-        try
+        if (bundleDir.exists() && bundleDir.isDirectory())
         {
-            long major = Long.parseLong(version[0]);
-            long minor = (version.length > 1) ? Long.parseLong(version[1]) : 0;
-
-            if (major < 4 || major == 4 && minor == 0)
+            return bundleDir;
+        }
+        else
+        {
+            // this location used from 4.1 onwards (inclusive), until replaced by unzipped dir.
+            String bundledPluginPluginsPath = BUNDLED_PLUGINS_FROM_4_1;
+            String[] version = ctx.getVersion().split("-", 2)[0].split("\\.");
+            try
             {
-                bundledPluginPluginsPath = "WEB-INF/classes/com/atlassian/jira/plugin/atlassian-bundled-plugins.zip";
-            }
-        }
-        catch (NumberFormatException e)
-        {
-            log.debug(String.format("Unable to parse JIRA version '%s', assuming JIRA 4.1 or newer.", ctx.getVersion()), e);
-        }
+                long major = Long.parseLong(version[0]);
+                long minor = (version.length > 1) ? Long.parseLong(version[1]) : 0;
 
-        return new File(appDir, bundledPluginPluginsPath);
+                if (major < 4 || major == 4 && minor == 0)
+                {
+                    bundledPluginPluginsPath = BUNDLED_PLUGINS_UPTO_4_0;
+                }
+            }
+            catch (NumberFormatException e)
+            {
+                log.debug(String.format("Unable to parse JIRA version '%s', assuming JIRA 4.1 or newer.", ctx.getVersion()), e);
+            }
+            return new File(appDir, bundledPluginPluginsPath);
+        }
     }
 
     @Override
@@ -201,7 +219,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         }
 
         final String baseUrl = ctx.getProtocol() + "://" + ctx.getServer() +
-				":" + ctx.getHttpPort() + contextPath;
+                ":" + ctx.getHttpPort() + contextPath;
 
         List<Replacement> replacements = super.getReplacements(ctx);
         File homeDir = getHomeDirectory(ctx);
