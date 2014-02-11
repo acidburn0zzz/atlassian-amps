@@ -305,16 +305,6 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>nosdk</id>
-            <properties>
-                <release.profiles>release</release.profiles>
-                <release.arguments></release.arguments>
-            </properties>
-        </profile>
-    </profiles>
-
     <distributionManagement>
         <site>
             <id>atlassian-documentation</id>
@@ -341,6 +331,13 @@
             <id>shitty</id>
             <properties>
                 <skipCodegenTests>true</skipCodegenTests>
+            </properties>
+        </profile>
+        <profile>
+            <id>nosdk</id>
+            <properties>
+                <release.profiles>release</release.profiles>
+                <release.arguments></release.arguments>
             </properties>
         </profile>
     </profiles>
