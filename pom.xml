@@ -297,12 +297,23 @@
                <artifactId>maven-release-plugin</artifactId>
                <version>2.2.2</version>
                 <configuration>
-                    <releaseProfiles>release,installer-win,installer-linux,installer-osx</releaseProfiles>
-                    <arguments>-Pinstaller-win,installer-osx,installer-linux</arguments>
+                    <releaseProfiles>${release.profiles}</releaseProfiles>
+                    <arguments>${release.arguments}</arguments>
+                    <goals>deploy</goals>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>nosdk</id>
+            <properties>
+                <release.profiles>release</release.profiles>
+                <release.arguments></release.arguments>
+            </properties>
+        </profile>
+    </profiles>
 
     <distributionManagement>
         <site>
@@ -357,5 +368,7 @@
         <stash.data.version>2.2.0</stash.data.version>
         <skipCodegenTests>false</skipCodegenTests>
         <plugin.testrunner.version>1.1</plugin.testrunner.version>
+        <release.profiles>release,installer-win,installer-linux,installer-osx</release.profiles>
+        <release.arguments>-Pinstaller-win,installer-osx,installer-linux</release.arguments>
     </properties>
 </project>
