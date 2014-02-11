@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
@@ -22,9 +23,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.twdata.maven.mojoexecutor.MojoExecutor;
-import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
-import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
+import org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,28 +31,13 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.goal;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 /**
  * Executes specific maven goals
@@ -1445,10 +1429,87 @@ public class MavenGoals
         // Attach a jar artifact to the project. This helps when resolving dependencies in
         // multi-module maven projects. Otherwise maven will incorrectly try and download
         // the artifact from the remote repository instead of using the one in the reactor
-        String packaging = getContextProject().getPackaging();
-        if ("atlassian-plugin".equals(packaging) || "bundle".equals(packaging))
+        if (isAtlassianPluginOrBundle(getContextProject().getPackaging()))
         {
             attachArtifact(getContextProject().getArtifact().getFile(), "jar");
+        }
+    }
+
+    public void deployNoJars() throws MojoExecutionException
+    {
+        detachJarAndExecuteMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-deploy-plugin"),
+                        version(pluginArtifactIdToVersionMap.get("maven-deploy-plugin"))
+                ),
+                goal("deploy")
+        );
+    }
+
+    public void installNoJars() throws MojoExecutionException
+    {
+        detachJarAndExecuteMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-install-plugin"),
+                        version(pluginArtifactIdToVersionMap.get("maven-install-plugin"))
+                ),
+                goal("install")
+        );
+    }
+
+    private boolean isAtlassianPluginOrBundle(String packaging)
+    {
+        return "atlassian-plugin".equals(packaging) || "bundle".equals(packaging);
+    }
+
+    public void detachJarAndExecuteMojo(Plugin plugin, String goal) throws MojoExecutionException
+    {
+        Artifact temp = null;
+        try
+        {
+            // Has the extra jar artifact been added to the reactor?
+            if (isAtlassianPluginOrBundle(getContextProject().getPackaging()))
+            {
+                // If so, find it.
+                for (Object o : getContextProject().getAttachedArtifacts())
+                {
+                    Artifact a = (Artifact)o;
+                    if (a.getType().equals("jar"))
+                    {
+                        temp = a;
+                        break;
+                    }
+                }
+
+                if (temp != null)
+                {
+                    // And temporarily remove it from the reactor
+                    getContextProject().getAttachedArtifacts().remove(temp);
+                }
+            }
+
+            // Since we are essentially "shadowing" the real Maven Mojo, let's try to respect any configuration specified in the project for it.
+            Map pluginsAsMap = getContextProject().getBuild().getPluginsAsMap();
+            Plugin p = (Plugin)pluginsAsMap.get(plugin.getKey());
+            Xpp3Dom configuration = p == null ? null : (Xpp3Dom)(p.getConfiguration());
+
+            // Execute the shadowed Mojo in our jar-free environment
+            executeMojo(
+                    plugin,
+                    goal,
+                    configuration,
+                    executionEnvironment()
+            );
+        }
+        finally
+        {
+            if (temp != null)
+            {
+                // Re-attach the artifact, if it was removed in the first place
+                getContextProject().addAttachedArtifact(temp);
+            }
         }
     }
 
@@ -1464,7 +1525,7 @@ public class MavenGoals
                 configuration(
                         element(name("finalName"), finalName),
                         element(name("archive"),
-                            element(name("manifestFile"), "${project.build.testOutputDirectory}/META-INF/MANIFEST.MF"))
+                                element(name("manifestFile"), "${project.build.testOutputDirectory}/META-INF/MANIFEST.MF"))
                 ),
                 executionEnvironment()
         );

@@ -40,8 +40,8 @@
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-amps-plugin:integration-test
                             </integration-test>
-                            <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-                            <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+                            <install>com.atlassian.maven.plugins:maven-amps-plugin:install-no-jars</install>
+                            <deploy>com.atlassian.maven.plugins:maven-amps-plugin:deploy-no-jars</deploy>
                         </phases>
                     </lifecycle>
                 </lifecycles>
