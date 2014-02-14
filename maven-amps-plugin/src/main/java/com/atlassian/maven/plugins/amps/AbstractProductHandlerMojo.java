@@ -77,7 +77,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     /**
      * AJP port for cargo <-> servlet container comms
      */
-    @Parameter(property = "ajp.port", defaultValue = "0") // cargo will select 8009 by default
+    @Parameter(property = "ajp.port", defaultValue = "8009") // Cargo's default is 8009
     private int ajpPort;
 
     /**

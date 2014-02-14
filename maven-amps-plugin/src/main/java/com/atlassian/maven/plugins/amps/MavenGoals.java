@@ -814,6 +814,7 @@ public class MavenGoals
         }
 
         final int rmiPort = pickFreePort(0);
+        final int actualAjpPort = pickFreePort(webappContext.getAjpPort());
         final int actualHttpPort;
         String protocol = "http";
 
@@ -834,7 +835,7 @@ public class MavenGoals
             sysProps.add(element(name(entry.getKey()), entry.getValue()));
         }
         log.info("Starting " + productInstanceId + " on the " + container.getId() + " container on ports "
-                + actualHttpPort + " (" + protocol + ") and " + rmiPort + " (rmi)");
+                + actualHttpPort + " (" + protocol + "), " + rmiPort + " (rmi) and " + actualAjpPort + " (ajp)");
 
         final String baseUrl = getBaseUrl(webappContext, actualHttpPort);
         sysProps.add(element(name("baseurl"), baseUrl));
@@ -858,7 +859,7 @@ public class MavenGoals
         }
 
         final List<Element> props =
-                getConfigurationProperties(systemProperties, webappContext, rmiPort, actualHttpPort, protocol);
+                getConfigurationProperties(systemProperties, webappContext, rmiPort, actualHttpPort, actualAjpPort, protocol);
 
         int startupTimeout = webappContext.getStartupTimeout();
         if (Boolean.FALSE.equals(webappContext.getSynchronousStartup()))
@@ -907,7 +908,7 @@ public class MavenGoals
 
     @VisibleForTesting
     List<Element> getConfigurationProperties(final Map<String, String> systemProperties,
-            final Product webappContext, final int rmiPort, final int actualHttpPort, final String protocol)
+            final Product webappContext, final int rmiPort, final int actualHttpPort, final int actualAjpPort, final String protocol)
     {
         final List<Element> props = new ArrayList<Element>();
         for (final Map.Entry<String, String> entry : systemProperties.entrySet())
@@ -921,10 +922,7 @@ public class MavenGoals
             props.add(element(name("cargo.protocol"), protocol));
         }
 
-        if (webappContext.getAjpPort() != 0)
-        {
-            props.add(element(name(AJP_PORT_PROPERTY), String.valueOf(webappContext.getAjpPort())));
-        }
+        props.add(element(name(AJP_PORT_PROPERTY), String.valueOf(actualAjpPort)));
         props.add(element(name("cargo.rmi.port"), String.valueOf(rmiPort)));
         props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs() + webappContext.getDebugArgs()));
         return props;

@@ -117,23 +117,6 @@ public class TestMavenGoals
         fail("No element called " + AJP_PORT_PROPERTY);
     }
 
-    @Test
-    public void configurationPropertiesShouldNotIncludeAjpPortIfSetToZero()
-    {
-        // Invoke
-        final List<MojoExecutor.Element> configurationProperties = getConfigurationProperties(0);
-
-        // Check
-        for (final MojoExecutor.Element element : configurationProperties)
-        {
-            final Xpp3Dom elementDom = element.toDom();
-            if (elementDom.getName().equals(AJP_PORT_PROPERTY))
-            {
-                fail("Found an element called " + AJP_PORT_PROPERTY);
-            }
-        }
-    }
-
     private List<MojoExecutor.Element> getConfigurationProperties(final int ajpPort)
     {
         // Set up
@@ -146,7 +129,7 @@ public class TestMavenGoals
 
         // Invoke
         final List<MojoExecutor.Element> configurationProperties =
-                goals.getConfigurationProperties(systemProperties, mockProduct, rmiPort, httpPort, protocol);
+                goals.getConfigurationProperties(systemProperties, mockProduct, rmiPort, httpPort, ajpPort, protocol);
 
         // Check
         assertNotNull(configurationProperties);
