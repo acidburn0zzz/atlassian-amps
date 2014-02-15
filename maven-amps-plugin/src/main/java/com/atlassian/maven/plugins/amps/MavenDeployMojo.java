@@ -7,12 +7,12 @@ import org.apache.maven.plugins.annotations.Mojo;
 /**
  *
  */
-@Mojo(name="deploy-no-jars")
-public class DeployNoJarsMojo extends AbstractAmpsMojo
+@Mojo(name="mvn-deploy")
+public class MavenDeployMojo extends AbstractAmpsMojo
 {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        getMavenGoals().deployNoJars();
+        getMavenGoals().mvnDeploy();
     }
 }

@@ -1435,7 +1435,7 @@ public class MavenGoals
         }
     }
 
-    public void deployNoJars() throws MojoExecutionException
+    public void mvnDeploy() throws MojoExecutionException
     {
         detachJarAndExecuteMojo(
                 plugin(
@@ -1447,7 +1447,7 @@ public class MavenGoals
         );
     }
 
-    public void installNoJars() throws MojoExecutionException
+    public void mvnInstall() throws MojoExecutionException
     {
         detachJarAndExecuteMojo(
                 plugin(
@@ -1464,51 +1464,55 @@ public class MavenGoals
         return "atlassian-plugin".equals(packaging) || "bundle".equals(packaging);
     }
 
-    public void detachJarAndExecuteMojo(Plugin plugin, String goal) throws MojoExecutionException
+    private String artifactToString(final Artifact artifact)
     {
-        Artifact temp = null;
+        return String.format("GAV: %s:%s:%s Type: %s, Classifier: %s", artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier());
+    }
+
+    public void detachJarAndExecuteMojo(final Plugin plugin, final String goal) throws MojoExecutionException
+    {
+        Artifact detachedArtifact = null;
         try
         {
             // Has the extra jar artifact been added to the reactor?
             if (isAtlassianPluginOrBundle(getContextProject().getPackaging()))
             {
                 // If so, find it.
+                log.debug("Detected atlassian-plugin or bundle packaging");
                 for (Object o : getContextProject().getAttachedArtifacts())
                 {
                     Artifact a = (Artifact)o;
-                    if (a.getType().equals("jar"))
+                    if (a.getType().equals("jar") && a.getFile().equals(getContextProject().getArtifact().getFile()))
                     {
-                        temp = a;
+                        log.debug(String.format("Found sneaky, superfluous artifact (%s)", artifactToString(a)));
+                        detachedArtifact = a;
                         break;
                     }
                 }
 
-                if (temp != null)
+                if (detachedArtifact != null)
                 {
                     // And temporarily remove it from the reactor
-                    getContextProject().getAttachedArtifacts().remove(temp);
+                    log.debug("Temporarily removing artifact from reactor.");
+                    getContextProject().getAttachedArtifacts().remove(detachedArtifact);
                 }
             }
-
-            // Since we are essentially "shadowing" the real Maven Mojo, let's try to respect any configuration specified in the project for it.
-            Map pluginsAsMap = getContextProject().getBuild().getPluginsAsMap();
-            Plugin p = (Plugin)pluginsAsMap.get(plugin.getKey());
-            Xpp3Dom configuration = p == null ? null : (Xpp3Dom)(p.getConfiguration());
 
             // Execute the shadowed Mojo in our jar-free environment
             executeMojo(
                     plugin,
                     goal,
-                    configuration,
+                    (Xpp3Dom) plugin.getConfiguration(),
                     executionEnvironment()
             );
         }
         finally
         {
-            if (temp != null)
+            if (detachedArtifact != null)
             {
                 // Re-attach the artifact, if it was removed in the first place
-                getContextProject().addAttachedArtifact(temp);
+                log.debug("Re-attaching removed artifact.");
+                getContextProject().addAttachedArtifact(detachedArtifact);
             }
         }
     }

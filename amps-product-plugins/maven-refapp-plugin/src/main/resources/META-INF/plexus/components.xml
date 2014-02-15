@@ -39,8 +39,8 @@
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-refapp-plugin:integration-test
                             </integration-test>
-                            <install>com.atlassian.maven.plugins:maven-amps-plugin:install-no-jars</install>
-                            <deploy>com.atlassian.maven.plugins:maven-amps-plugin:deploy-no-jars</deploy>
+                            <install>com.atlassian.maven.plugins:maven-amps-plugin:mvn-install</install>
+                            <deploy>com.atlassian.maven.plugins:maven-amps-plugin:mvn-deploy</deploy>
                         </phases>
                     </lifecycle>
                 </lifecycles>

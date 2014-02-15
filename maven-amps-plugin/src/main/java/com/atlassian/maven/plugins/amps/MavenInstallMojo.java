@@ -7,12 +7,14 @@ import org.apache.maven.plugins.annotations.Mojo;
 /**
  *
  */
-@Mojo(name="install-no-jars")
-public class InstallNoJarsMojo extends AbstractAmpsMojo
+@Mojo(name="mvn-install")
+public class MavenInstallMojo extends AbstractAmpsMojo
 {
+
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        getMavenGoals().installNoJars();
+        getMavenGoals().mvnInstall();
     }
 }
