@@ -5,13 +5,12 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 
 /**
- *
+ * Shadows the real maven-install-plugin:install goal, but does some prep-work before and after the execution of the
+ * install because of AMPS-1042.
  */
 @Mojo(name="mvn-install")
 public class MavenInstallMojo extends AbstractAmpsMojo
 {
-
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
