@@ -56,6 +56,7 @@ public class MavenGoals
             put("tomcat5x", new Container("tomcat5x", "org.apache.tomcat", "apache-tomcat", "5.5.26"));
             put("tomcat6x", new Container("tomcat6x", "org.apache.tomcat", "apache-tomcat", "6.0.20"));
             put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.40", "windows-x64"));
+            put("tomcat8x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.0.1", "windows-x64"));
             put("resin3x", new Container("resin3x", "com.caucho", "resin", "3.0.26"));
             put("jboss42x", new Container("jboss42x", "org.jboss.jbossas", "jbossas", "4.2.3.GA"));
             put("jetty6x", new Container("jetty6x"));
@@ -64,7 +65,7 @@ public class MavenGoals
     private final Map<String, String> defaultArtifactIdToVersionMap = new HashMap<String, String>()
     {{
             put("maven-cli-plugin", "1.0.10");
-            put("org.codehaus.cargo:cargo-maven2-plugin", "1.2.3");
+            put("org.codehaus.cargo:cargo-maven2-plugin", "1.4.7");
             put("atlassian-pdk", "2.3.1");
             put("maven-archetype-plugin", "2.0-alpha-4");
             put("maven-bundle-plugin", "2.3.7");
@@ -797,6 +798,7 @@ public class MavenGoals
         }
 
         final int rmiPort = pickFreePort(0);
+        final int actualAjpPort = pickFreePort(webappContext.getAjpPort());
         final int actualHttpPort;
         String protocol = "http";
 
@@ -817,7 +819,7 @@ public class MavenGoals
             sysProps.add(element(name(entry.getKey()), entry.getValue()));
         }
         log.info("Starting " + productInstanceId + " on the " + container.getId() + " container on ports "
-                + actualHttpPort + " (" + protocol + ") and " + rmiPort + " (rmi)");
+                + actualHttpPort + " (" + protocol + "), " + rmiPort + " (rmi) and " + actualAjpPort + " (ajp)");
 
         final String baseUrl = getBaseUrl(webappContext, actualHttpPort);
         sysProps.add(element(name("baseurl"), baseUrl));
@@ -841,7 +843,7 @@ public class MavenGoals
         }
 
         final List<Element> props =
-                getConfigurationProperties(systemProperties, webappContext, rmiPort, actualHttpPort, protocol);
+                getConfigurationProperties(systemProperties, webappContext, rmiPort, actualHttpPort, actualAjpPort, protocol);
 
         int startupTimeout = webappContext.getStartupTimeout();
         if (Boolean.FALSE.equals(webappContext.getSynchronousStartup()))
@@ -890,7 +892,7 @@ public class MavenGoals
 
     @VisibleForTesting
     List<Element> getConfigurationProperties(final Map<String, String> systemProperties,
-            final Product webappContext, final int rmiPort, final int actualHttpPort, final String protocol)
+            final Product webappContext, final int rmiPort, final int actualHttpPort, final int actualAjpPort, final String protocol)
     {
         final List<Element> props = new ArrayList<Element>();
         for (final Map.Entry<String, String> entry : systemProperties.entrySet())
@@ -904,10 +906,7 @@ public class MavenGoals
             props.add(element(name("cargo.protocol"), protocol));
         }
 
-        if (webappContext.getAjpPort() != 0)
-        {
-            props.add(element(name(AJP_PORT_PROPERTY), String.valueOf(webappContext.getAjpPort())));
-        }
+        props.add(element(name(AJP_PORT_PROPERTY), String.valueOf(actualAjpPort)));
         props.add(element(name("cargo.rmi.port"), String.valueOf(rmiPort)));
         props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs() + webappContext.getDebugArgs()));
         return props;
