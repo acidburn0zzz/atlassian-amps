@@ -4,6 +4,7 @@ import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.Product;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.junit.After;
 import org.junit.Before;
@@ -18,6 +19,10 @@ import javax.xml.xpath.XPathFactory;
 
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.INSTALLED_PLUGINS_DIR;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.PLUGINS_DIR;
+import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UNZIPPED;
+import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_FROM_4_1;
+import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UPTO_4_0;
+
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -51,12 +56,12 @@ public class TestJiraProductHandler
     }
     
     @After
-    public void deleteFileAndTemporaryHomeDirectory() throws Exception
+    public void deleteTemporaryHomeDirectoryAndContents() throws Exception
     {
         if (tempHome != null)
         {
-            new File(tempHome, "dbconfig.xml").delete();
-            tempHome.delete();
+            FileUtils.deleteDirectory(tempHome);
+            tempHome = null;
         }
     }
 
@@ -123,5 +128,55 @@ public class TestJiraProductHandler
         // Check
         assertNotNull(userInstalledPluginsDirectory);
         assertEquals(new File(new File(expectedParentDir, PLUGINS_DIR), INSTALLED_PLUGINS_DIR), userInstalledPluginsDirectory);
+    }
+
+    @Test
+    public void bundledPluginsShouldBeUnzippedIfPresent()
+    {
+        final File bundledPluginsDir = new File(tempHome, BUNDLED_PLUGINS_UNZIPPED);
+        bundledPluginsDir.mkdirs();
+        assertTrue(bundledPluginsDir.exists());
+        assertBundledPluginPath("6.3", tempHome, bundledPluginsDir);
+    }
+
+    @Test
+    public void bundledPluginsLocationCorrectFor41()
+    {
+        final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_FROM_4_1);
+        assertBundledPluginPath("4.1", tempHome, bundledPluginsZip);
+    }
+
+    @Test
+    public void bundledPluginsLocationCorrectFor40()
+    {
+        final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_UPTO_4_0);
+        assertBundledPluginPath("4.0", tempHome, bundledPluginsZip);
+    }
+
+    @Test
+    public void bundledPluginsLocationCorrectForFallback()
+    {
+        final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_FROM_4_1);
+        assertBundledPluginPath("not.a.version", tempHome, bundledPluginsZip);
+    }
+
+
+    private void assertBundledPluginPath(final String version, final File appDir, final File expectedPath)
+    {
+        // Set up
+
+        final Log mockLog = mock(Log.class);
+        final MavenContext mockMavenContext = mock(MavenContext.class);
+        when(mockMavenContext.getLog()).thenReturn(mockLog);
+        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
+        final Product mockProduct = mock(Product.class);
+        when(mockProduct.getVersion()).thenReturn(version);
+
+        // Invoke
+        final File bundledPluginPath = productHandler.getBundledPluginPath(mockProduct, appDir);
+
+        // Check
+        assertNotNull(bundledPluginPath);
+        assertEquals(expectedPath, bundledPluginPath);
     }
 }

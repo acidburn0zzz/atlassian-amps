@@ -252,7 +252,10 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
             waitForProducts(productExecutions, true);
         }*/
 
-        waitForProducts(productExecutions, true);
+        if (!noWebapp)
+        {
+            waitForProducts(productExecutions, true);
+        }
 
         // Actually run the tests
         goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory, category);

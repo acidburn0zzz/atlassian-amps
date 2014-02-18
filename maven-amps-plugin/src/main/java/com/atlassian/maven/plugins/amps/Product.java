@@ -909,6 +909,6 @@ public class Product
      */
     public String getProtocol()
     {
-        return useHttps ? "https" : "http";
+        return useHttps != null && useHttps ? "https" : "http";
     }
 }
