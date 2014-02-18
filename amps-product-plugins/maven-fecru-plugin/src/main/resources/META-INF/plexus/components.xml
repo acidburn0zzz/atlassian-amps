@@ -45,8 +45,8 @@
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-fecru-plugin:integration-test
                             </integration-test>
-                            <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-                            <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+                            <install>com.atlassian.maven.plugins:maven-amps-plugin:mvn-install</install>
+                            <deploy>com.atlassian.maven.plugins:maven-amps-plugin:mvn-deploy</deploy>
                         </phases>
                     </lifecycle>
                 </lifecycles>
