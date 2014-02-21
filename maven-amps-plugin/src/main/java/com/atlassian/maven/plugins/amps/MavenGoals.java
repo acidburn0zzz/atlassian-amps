@@ -1498,10 +1498,15 @@ public class MavenGoals
             }
 
             // Execute the shadowed Mojo in our jar-free environment
+            Xpp3Dom configuration = (Xpp3Dom)plugin.getConfiguration();
+            if (configuration == null)
+            {
+                configuration = new Xpp3Dom("configuration");
+            }
             executeMojo(
                     plugin,
                     goal,
-                    (Xpp3Dom) plugin.getConfiguration(),
+                    configuration,
                     executionEnvironment()
             );
         }
