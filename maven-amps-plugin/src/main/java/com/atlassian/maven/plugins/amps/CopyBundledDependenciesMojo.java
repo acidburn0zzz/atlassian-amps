@@ -12,7 +12,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 @Mojo(name = "copy-bundled-dependencies", requiresDependencyResolution = ResolutionScope.TEST)
 public class CopyBundledDependenciesMojo extends AbstractAmpsMojo
 {
-    @Parameter(property = "extractDependencies", defaultValue = "false")
+    @Parameter(property = "extractDependencies", defaultValue = "true")
     private Boolean extractDependencies;
 
     public void execute() throws MojoExecutionException, MojoFailureException
