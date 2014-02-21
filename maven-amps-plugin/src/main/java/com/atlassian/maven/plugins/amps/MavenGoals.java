@@ -71,6 +71,8 @@ public class MavenGoals
             put("maven-bundle-plugin", "2.3.7");
             put("yuicompressor-maven-plugin", "1.3.0");
             put("build-helper-maven-plugin", "1.7");
+            put("maven-install-plugin", "2.3");
+            put("maven-deploy-plugin", "2.4");
 
             // You can't actually override the version a plugin if defined in the project, so these don't actually do
             // anything, since the super pom already defines versions.
@@ -1436,25 +1438,44 @@ public class MavenGoals
 
     public void mvnDeploy() throws MojoExecutionException
     {
+        // Get plugin from reactor, if available
+        Map pluginsAsMap = getContextProject().getBuild().getPluginsAsMap();
+        Plugin p = (Plugin)pluginsAsMap.get("org.apache.maven.plugins:maven-deploy-plugin");
+        if (p == null)
+        {
+            // Otherwise, use a sensible default
+            p = plugin(
+                    groupId("org.apache.maven.plugins"),
+                    artifactId("maven-deploy-plugin"),
+                    version(pluginArtifactIdToVersionMap.get("maven-deploy-plugin"))
+            );
+        }
+        log.debug("Using " + p.toString() + " version " + p.getVersion());
+
         detachJarAndExecuteMojo(
-                plugin(
-                        groupId("org.apache.maven.plugins"),
-                        artifactId("maven-deploy-plugin"),
-                        version(pluginArtifactIdToVersionMap.get("maven-deploy-plugin"))
-                ),
-                goal("deploy")
+            p,
+            goal("deploy")
         );
     }
 
     public void mvnInstall() throws MojoExecutionException
     {
+        // Get plugin from reactor, if available
+        Map pluginsAsMap = getContextProject().getBuild().getPluginsAsMap();
+        Plugin p = (Plugin)pluginsAsMap.get("org.apache.maven.plugins:maven-install-plugin");
+        if (p == null)
+        {
+            // Otherwise, use a sensible default
+            p = plugin(
+                    groupId("org.apache.maven.plugins"),
+                    artifactId("maven-install-plugin"),
+                    version(pluginArtifactIdToVersionMap.get("maven-install-plugin"))
+                );
+        }
+        log.debug("Using " + p.toString() + " version " + p.getVersion());
+
         detachJarAndExecuteMojo(
-                plugin(
-                        groupId("org.apache.maven.plugins"),
-                        artifactId("maven-install-plugin"),
-                        version(pluginArtifactIdToVersionMap.get("maven-install-plugin"))
-                ),
-                goal("install")
+            p, goal("install")
         );
     }
 
