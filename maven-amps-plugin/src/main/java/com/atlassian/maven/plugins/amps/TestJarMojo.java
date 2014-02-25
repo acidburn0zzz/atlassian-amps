@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.atlassian.fugue.Option;
 import com.atlassian.maven.plugins.amps.util.ClassUtils;
+import com.atlassian.maven.plugins.amps.util.WiredTestInfo;
 import com.atlassian.plugins.codegen.ClassId;
 import com.atlassian.plugins.codegen.ComponentDeclaration;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
@@ -90,7 +91,8 @@ public class TestJarMojo extends AbstractAmpsMojo
                     for(File classFile : classFiles)
                     {
                         String className = ClassUtils.getClassnameFromFile(classFile, prj.getBuild().getTestOutputDirectory());
-                        if(ClassUtils.isWiredPluginTestClass(classFile))
+                        WiredTestInfo wiredInfo = ClassUtils.getWiredTestInfo(classFile);
+                        if(wiredInfo.isWiredTest())
                         {
                             getLog().info("found Test: " + className + ", adding to plugin.xml...");
 
@@ -103,6 +105,7 @@ public class TestJarMojo extends AbstractAmpsMojo
                                     .interfaceId(Option.some(ClassId.fullyQualified(className)))
                                     .visibility(ComponentDeclaration.Visibility.PUBLIC)
                                     .serviceProperties(serviceProps)
+                                    .application(Option.some(wiredInfo.getApplicationFilter()))
                                     .build();
                            
                             changes = changes.with(component);

@@ -1,7 +1,9 @@
 package com.atlassian.maven.plugins.amps.util;
 
+import com.atlassian.plugins.osgi.test.Application;
 import com.atlassian.plugins.osgi.test.AtlassianPluginsTestRunner;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.runner.RunWith;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Type;
@@ -15,11 +17,13 @@ public class TestClassVisitor extends EmptyVisitor
     private boolean isWiredTestClass;
     private boolean inITPackage;
     private String normalClassName;
+    private String applicationFilter;
 
     public TestClassVisitor()
     {
         this.isWiredTestClass = false;
         this.inITPackage = false;
+        this.applicationFilter = "";
     }
 
     @Override
@@ -46,6 +50,11 @@ public class TestClassVisitor extends EmptyVisitor
         if (RunWith.class.getName().equals(normalName))
         {
             return new RunWithAnnotationVisitor();
+        }
+
+        if (Application.class.getName().equals(normalName))
+        {
+            return new ApplicationAnnotationVisitor();
         }
 
         return null;
@@ -76,6 +85,11 @@ public class TestClassVisitor extends EmptyVisitor
         return name.replace('/', '.');
     }
 
+    public String getApplicationFilter()
+    {
+        return applicationFilter;
+    }
+
     private class RunWithAnnotationVisitor extends EmptyVisitor
     {
 
@@ -89,6 +103,23 @@ public class TestClassVisitor extends EmptyVisitor
                 if (AtlassianPluginsTestRunner.class.getName().equals(normalize(type.getInternalName())))
                 {
                     isWiredTestClass = true;
+                }
+            }
+        }
+    }
+
+    private class ApplicationAnnotationVisitor extends EmptyVisitor
+    {
+        @Override
+        public void visit(String name, Object value)
+        {
+            if (value instanceof String)
+            {
+                String app = (String) value;
+
+                if (StringUtils.isNotBlank(app))
+                {
+                    applicationFilter = app;
                 }
             }
         }

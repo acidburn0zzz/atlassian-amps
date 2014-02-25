@@ -140,6 +140,17 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
 
     @Parameter(property = "offline", defaultValue = "${settings.offline}")
     protected boolean offline;
+
+    /**
+     * The path to a properties file to override internal plugin versions.
+     * The props file should be in the folowing format:
+     * artifactId=version
+     * 
+     * e.g.
+     * maven-deploy-plugin=2.5
+     */
+    @Parameter(property = "version.override.path")
+    private String versionOverridesPath;
     
     protected MavenContext getMavenContext()
     {
@@ -158,6 +169,8 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
                 mavenContext = new MavenContext(project, reactor, session, pluginManager, getLog());
             }
         }
+        
+        mavenContext.setVersionOverridesPath(this.versionOverridesPath);
         return mavenContext;
     }
 

@@ -8,11 +8,11 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import javax.annotation.Nullable;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import com.atlassian.maven.plugins.amps.product.AmpsDefaults;
 import com.atlassian.maven.plugins.amps.util.ClassUtils;
+import com.atlassian.maven.plugins.amps.util.WiredTestInfo;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -379,7 +379,8 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
             for (File classFile : classFiles)
             {
                 String className = ClassUtils.getClassnameFromFile(classFile, prj.getBuild().getTestOutputDirectory());
-                if (ClassUtils.isWiredPluginTestClass(classFile))
+                WiredTestInfo wiredInfo = ClassUtils.getWiredTestInfo(classFile);
+                if (wiredInfo.isWiredTest())
                 {
                     wiredClasses.add(className);
                 }
@@ -393,7 +394,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
     private Map<ProductArtifact,File> getFrameworkFiles() throws MojoExecutionException
     {
         List<ProductArtifact> pluginsToDeploy = new ArrayList<ProductArtifact>();
-        pluginsToDeploy.addAll(testFrameworkPlugins);
+        pluginsToDeploy.addAll(getTestFrameworkPlugins());
         pluginsToDeploy.add(new ProductArtifact("com.atlassian.labs","fastdev-plugin", AmpsDefaults.DEFAULT_FASTDEV_VERSION));
         pluginsToDeploy.addAll(deployArtifacts);
 
