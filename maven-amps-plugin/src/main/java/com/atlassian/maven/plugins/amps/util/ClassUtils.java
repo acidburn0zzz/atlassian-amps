@@ -29,10 +29,12 @@ public class ClassUtils
                 , ".class");
     }
     
-    public static boolean isWiredPluginTestClass(File classFile)
+    public static WiredTestInfo getWiredTestInfo(File classFile)
     {
         FileInputStream fis = null;
         boolean isWiredClass = false;
+        String applicationFilter = "";
+        
         try
         {
             TestClassVisitor visitor = new TestClassVisitor();
@@ -41,20 +43,23 @@ public class ClassUtils
             
             reader.accept(visitor, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
             isWiredClass = visitor.isWiredTest();
+            applicationFilter = visitor.getApplicationFilter();
         }
         catch (FileNotFoundException e)
         {
             isWiredClass = false;
+            applicationFilter = "";
         }
         catch (IOException e)
         {
             isWiredClass = false;
+            applicationFilter = "";
         }
         finally
         {
             IOUtils.closeQuietly(fis);
         }
         
-        return isWiredClass;
+        return new WiredTestInfo(isWiredClass,applicationFilter);
     }
 }

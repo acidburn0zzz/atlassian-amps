@@ -189,7 +189,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
             if(shouldBuildTestPlugin())
             {
                 List<ProductArtifact> plugins = product.getBundledArtifacts();
-                plugins.addAll(testFrameworkPlugins);
+                plugins.addAll(getTestFrameworkPlugins());
             }
 
             int actualHttpPort = 0;

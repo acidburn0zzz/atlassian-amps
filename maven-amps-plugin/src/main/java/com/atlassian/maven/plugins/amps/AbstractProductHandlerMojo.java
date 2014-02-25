@@ -49,19 +49,18 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     // ------ start inline product context
 
     protected static final String JUNIT_VERSION = "4.10_1";
-    protected static final String ATLASSIAN_TEST_RUNNER_VERSION = "1.1.2";
+    protected static final String ATLASSIAN_TEST_RUNNER_VERSION = "1.1.4";
     protected static final String NO_TEST_GROUP = "__no_test_group__";
+    public static final String JUNIT_GROUP_ID = "org.apache.servicemix.bundles";
+    public static final String JUNIT_ARTIFACT_ID = "org.apache.servicemix.bundles.junit";
+    public static final String TESTRUNNER_GROUP_ID = "com.atlassian.plugins";
+    public static final String TESTRUNNER_ARTIFACT_ID = "atlassian-plugins-osgi-testrunner-bundle";
 
     /**
      *  The artifacts to deploy for the test console if needed
      */
-    protected final List<ProductArtifact> testFrameworkPlugins = new ArrayList<ProductArtifact>()
-    {{
-            add(new ProductArtifact("org.apache.servicemix.bundles","org.apache.servicemix.bundles.junit",JUNIT_VERSION));
-            add(new ProductArtifact("com.atlassian.plugins","atlassian-plugins-osgi-testrunner-bundle",ATLASSIAN_TEST_RUNNER_VERSION));
-        }};
+    private List<ProductArtifact> testFrameworkPlugins;
     
-
     /**
      * Container to run in
      */
@@ -647,6 +646,21 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         detectDeprecatedVersionOverrides();
 
         doExecute();
+    }
+
+    public List<ProductArtifact> getTestFrameworkPlugins()
+    {
+        if(null == testFrameworkPlugins)
+        {
+            Properties overrides = getMavenContext().getVersionOverrides();
+            
+            this.testFrameworkPlugins = new ArrayList<ProductArtifact>();
+            
+            testFrameworkPlugins.add(new ProductArtifact(JUNIT_GROUP_ID, JUNIT_ARTIFACT_ID,overrides.getProperty(JUNIT_ARTIFACT_ID,JUNIT_VERSION)));
+            testFrameworkPlugins.add(new ProductArtifact(TESTRUNNER_GROUP_ID, TESTRUNNER_ARTIFACT_ID,overrides.getProperty(TESTRUNNER_ARTIFACT_ID,ATLASSIAN_TEST_RUNNER_VERSION)));
+        }
+        
+        return testFrameworkPlugins;
     }
 
     private void detectDeprecatedVersionOverrides()

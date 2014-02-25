@@ -62,29 +62,7 @@ public class MavenGoals
             put("jetty6x", new Container("jetty6x"));
         }};
 
-    private final Map<String, String> defaultArtifactIdToVersionMap = new HashMap<String, String>()
-    {{
-            put("maven-cli-plugin", "1.0.10");
-            put("org.codehaus.cargo:cargo-maven2-plugin", "1.4.7");
-            put("atlassian-pdk", "2.3.1");
-            put("maven-archetype-plugin", "2.0-alpha-4");
-            put("maven-bundle-plugin", "2.3.7");
-            put("yuicompressor-maven-plugin", "1.3.0");
-            put("build-helper-maven-plugin", "1.7");
-            put("maven-install-plugin", "2.3");
-            put("maven-deploy-plugin", "2.4");
-
-            // You can't actually override the version a plugin if defined in the project, so these don't actually do
-            // anything, since the super pom already defines versions.
-            put("maven-dependency-plugin", "2.5.1");
-            put("maven-resources-plugin", "2.3");
-            put("maven-jar-plugin", "2.2");
-            //put("maven-surefire-plugin", "2.4.3");
-            put("maven-surefire-plugin", "2.12.4");
-            put("maven-failsafe-plugin", "2.12.4");
-            put("maven-exec-plugin", "1.2.1");
-
-        }};
+    private final Map<String, String> defaultArtifactIdToVersionMap;
 
     public MavenGoals(final MavenContext ctx)
     {
@@ -92,7 +70,38 @@ public class MavenGoals
 
         this.log = ctx.getLog();
 
-        this.pluginArtifactIdToVersionMap = Collections.unmodifiableMap(defaultArtifactIdToVersionMap);
+        this.defaultArtifactIdToVersionMap = Collections.unmodifiableMap(getArtifactIdToVersionMap(ctx));
+        this.pluginArtifactIdToVersionMap = defaultArtifactIdToVersionMap;
+    }
+
+    private Map<String,String> getArtifactIdToVersionMap(MavenContext ctx)
+    {
+        final Properties overrides = ctx.getVersionOverrides();
+        
+        return new HashMap<String, String>()
+        {{
+                //overrides.getProperty(JUNIT_ARTIFACT_ID,"
+                put("maven-cli-plugin", overrides.getProperty("maven-cli-plugin","1.0.10"));
+                put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.4.7"));
+                put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.1"));
+                put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
+                put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","2.3.7"));
+                put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.3.0"));
+                put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","1.7"));
+                put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.3"));
+                put("maven-deploy-plugin", overrides.getProperty("maven-deploy-plugin","2.4"));
+
+                // You can't actually override the version a plugin if defined in the project, so these don't actually do
+                // anything, since the super pom already defines versions.
+                put("maven-dependency-plugin", overrides.getProperty("maven-dependency-plugin","2.5.1"));
+                put("maven-resources-plugin", overrides.getProperty("maven-resources-plugin","2.3"));
+                put("maven-jar-plugin", overrides.getProperty("maven-jar-plugin","2.2"));
+                //put("maven-surefire-plugin", "2.4.3");
+                put("maven-surefire-plugin", overrides.getProperty("maven-surefire-plugin","2.12.4"));
+                put("maven-failsafe-plugin", overrides.getProperty("maven-failsafe-plugin","2.12.4"));
+                put("maven-exec-plugin", overrides.getProperty("maven-exec-plugin","1.2.1"));
+
+            }};
     }
 
     private ExecutionEnvironment executionEnvironment()
