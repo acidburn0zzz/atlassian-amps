@@ -23,6 +23,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.surefire.shade.org.apache.commons.lang.StringUtils;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -355,14 +356,16 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
     }
 
     /**
-     * Determines whether current project is last in a Reactor chain
+     * Determines whether current project is last in a Reactor chain. Defaults to single-project build.
      *
      * @return <code>true</code> when this is the last project, <code>false</code> otherwise
      */
     protected boolean isThisTheLastProjectInReactor()
     {
         final MavenContext mavenContext = getMavenContext();
-        return Iterables.getLast(mavenContext.getReactor()).equals(mavenContext.getProject());
+        final List<MavenProject> reactor = mavenContext.getReactor();
+        final MavenProject currentProject = mavenContext.getProject();
+        return reactor == null || Iterables.getLast(reactor, currentProject).equals(currentProject);
     }
 
 }
