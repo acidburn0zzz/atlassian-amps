@@ -597,9 +597,6 @@ public class MavenGoals
             appendJunitCategoryToConfiguration(category, config);
         }
 
-        log.info("surefire unit-test configuration:");
-        log.info(config.toString());
-
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
