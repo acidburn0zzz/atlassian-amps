@@ -45,8 +45,8 @@
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-confluence-plugin:integration-test
                             </integration-test>
-                            <install>com.atlassian.maven.plugins:maven-amps-plugin:mvn-install</install>
-                            <deploy>com.atlassian.maven.plugins:maven-amps-plugin:mvn-deploy</deploy>
+                            <install>com.atlassian.maven.plugins:maven-confluence-plugin:mvn-install</install>
+                            <deploy>com.atlassian.maven.plugins:maven-confluence-plugin:mvn-deploy</deploy>
                         </phases>
                     </lifecycle>
                 </lifecycles>
