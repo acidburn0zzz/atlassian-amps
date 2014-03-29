@@ -39,14 +39,14 @@
                                 com.atlassian.maven.plugins:maven-jira-plugin:validate-manifest,
                                 com.atlassian.maven.plugins:maven-jira-plugin:jar,
                                 com.atlassian.maven.plugins:maven-jira-plugin:generate-obr-artifact,
-                                com.atlassian.maven.plugins:maven-amps-plugin:validate-test-manifest,
+                                com.atlassian.maven.plugins:maven-jira-plugin:validate-test-manifest,
                                 com.atlassian.maven.plugins:maven-jira-plugin:test-jar
                             </package>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-jira-plugin:integration-test
                             </integration-test>
-                            <install>com.atlassian.maven.plugins:maven-amps-plugin:mvn-install</install>
-                            <deploy>com.atlassian.maven.plugins:maven-amps-plugin:mvn-deploy</deploy>
+                            <install>com.atlassian.maven.plugins:maven-jira-plugin:mvn-install</install>
+                            <deploy>com.atlassian.maven.plugins:maven-jira-plugin:mvn-deploy</deploy>
                         </phases>
                     </lifecycle>
                 </lifecycles>

@@ -24,7 +24,7 @@
                                 com.atlassian.maven.plugins:maven-stash-plugin:generate-manifest,
                                 com.atlassian.maven.plugins:maven-stash-plugin:generate-rest-docs
                             </process-classes>
-<generate-test-resources> org.apache.maven.plugins:maven-resources-plugin:testResources, com.atlassian.maven.plugins:maven-amps-plugin:filter-test-plugin-descriptor </generate-test-resources>                           
+<generate-test-resources> org.apache.maven.plugins:maven-resources-plugin:testResources, com.atlassian.maven.plugins:maven-stash-plugin:filter-test-plugin-descriptor </generate-test-resources>
                             <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
                             <test>com.atlassian.maven.plugins:maven-stash-plugin:unit-test</test>
                             <package>
@@ -36,8 +36,8 @@
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-stash-plugin:integration-test
                             </integration-test>
-                            <install>com.atlassian.maven.plugins:maven-amps-plugin:mvn-install</install>
-                            <deploy>com.atlassian.maven.plugins:maven-amps-plugin:mvn-deploy</deploy>
+                            <install>com.atlassian.maven.plugins:maven-stash-plugin:mvn-install</install>
+                            <deploy>com.atlassian.maven.plugins:maven-stash-plugin:mvn-deploy</deploy>
                         </phases>
                     </lifecycle>
                 </lifecycles>

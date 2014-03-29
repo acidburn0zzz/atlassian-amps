@@ -42,8 +42,8 @@
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-crowd-plugin:integration-test
                             </integration-test>
-                            <install>com.atlassian.maven.plugins:maven-amps-plugin:mvn-install</install>
-                            <deploy>com.atlassian.maven.plugins:maven-amps-plugin:mvn-deploy</deploy>
+                            <install>com.atlassian.maven.plugins:maven-crowd-plugin:mvn-install</install>
+                            <deploy>com.atlassian.maven.plugins:maven-crowd-plugin:mvn-deploy</deploy>
                         </phases>
                     </lifecycle>
                 </lifecycles>
