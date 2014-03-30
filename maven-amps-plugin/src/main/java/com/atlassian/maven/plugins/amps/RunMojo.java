@@ -105,7 +105,7 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
             if(shouldBuildTestPlugin())
             {
                 List<ProductArtifact> plugins = product.getBundledArtifacts();
-                plugins.addAll(testFrameworkPlugins);
+                plugins.addAll(getTestFrameworkPlugins());
             }
 
             // Leave a blank line and say what it's doing

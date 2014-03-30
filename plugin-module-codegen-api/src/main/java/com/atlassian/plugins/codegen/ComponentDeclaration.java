@@ -35,6 +35,7 @@ public final class ComponentDeclaration implements PluginProjectChange
     private final Option<String> descriptionI18nKey;
     private final Option<ClassId> interfaceId;
     private final Option<String> alias;
+    private final Option<String> application;
     private final ImmutableMap<String, String> serviceProperties;
     
     public static Builder builder(ClassId classId, String key)
@@ -58,6 +59,7 @@ public final class ComponentDeclaration implements PluginProjectChange
         this.descriptionI18nKey = builder.descriptionI18nKey;
         this.interfaceId = builder.interfaceId;
         this.alias = builder.alias;
+        this.application = builder.application;
         this.serviceProperties = ImmutableMap.copyOf(builder.serviceProperties);
     }
 
@@ -105,6 +107,11 @@ public final class ComponentDeclaration implements PluginProjectChange
     {
         return alias;
     }
+
+    public Option<String> getApplication()
+    {
+        return application;
+    }
     
     public ImmutableMap<String, String> getServiceProperties()
     {
@@ -128,6 +135,7 @@ public final class ComponentDeclaration implements PluginProjectChange
         private Option<String> descriptionI18nKey = none();
         private Option<ClassId> interfaceId = none();
         private Option<String> alias = none();
+        private Option<String> application = none();
         private Map<String, String> serviceProperties = Maps.newHashMap();
     
         public Builder(ClassId classId, String key)
@@ -180,6 +188,12 @@ public final class ComponentDeclaration implements PluginProjectChange
         public Builder alias(Option<String> alias)
         {
             this.alias = checkNotNull(alias, "alias");
+            return this;
+        }
+
+        public Builder application(Option<String> application)
+        {
+            this.application = checkNotNull(application, "application");
             return this;
         }
         

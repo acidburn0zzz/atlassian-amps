@@ -17,6 +17,7 @@ import java.net.ServerSocket;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.jar.Manifest;
 
 import static com.atlassian.maven.plugins.amps.MavenGoals.AJP_PORT_PROPERTY;
@@ -42,6 +43,7 @@ public class TestMavenGoals
         MockitoAnnotations.initMocks(this);
         when(project.getBuild()).thenReturn(build);
         when(ctx.getProject()).thenReturn(project);
+        when(ctx.getVersionOverrides()).thenReturn(new Properties());
         
         goals = new MavenGoals(ctx);
     }
