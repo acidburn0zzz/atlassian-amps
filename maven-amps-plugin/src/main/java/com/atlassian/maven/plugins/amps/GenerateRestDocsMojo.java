@@ -13,8 +13,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 @Mojo(name = "generate-rest-docs", requiresDependencyResolution = ResolutionScope.TEST)
 public class GenerateRestDocsMojo extends AbstractAmpsMojo
 {
-    @Parameter(property = "rest.docs.generation.skip")
-    protected boolean restDocsGenerationSkip = false;
+    @Parameter(property = "rest.doc.generation.skip")
+    protected boolean skipRestDocGeneration = false;
 
     @Parameter
     private String jacksonModules;
@@ -22,7 +22,7 @@ public class GenerateRestDocsMojo extends AbstractAmpsMojo
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        if (restDocsGenerationSkip) {
+        if (skipRestDocGeneration) {
             getLog().info("Skipping generation of the REST docs");
         } else {
             getMavenGoals().generateRestDocs(jacksonModules);
