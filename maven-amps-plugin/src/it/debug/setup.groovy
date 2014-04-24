@@ -12,7 +12,7 @@ debugPortClosed = false;
 try {
     for(int attempt=0; attempt<MAX_RETRIES; attempt++)
     {
-        socket = new Socket('localhost', debugPort);
+        new Socket('localhost', debugPort);
         println "Debug port is still open - waiting for ${WAIT_PERIOD_IN_SECONDS} seconds";
         sleep WAIT_PERIOD_IN_SECONDS * 1000;
     }
