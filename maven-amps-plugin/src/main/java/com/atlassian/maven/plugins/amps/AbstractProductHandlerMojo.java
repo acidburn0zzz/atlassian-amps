@@ -28,8 +28,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -49,19 +49,18 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     // ------ start inline product context
 
     protected static final String JUNIT_VERSION = "4.10_1";
-    protected static final String ATLASSIAN_TEST_RUNNER_VERSION = "1.1";
+    protected static final String ATLASSIAN_TEST_RUNNER_VERSION = "1.2.0";
     protected static final String NO_TEST_GROUP = "__no_test_group__";
+    public static final String JUNIT_GROUP_ID = "org.apache.servicemix.bundles";
+    public static final String JUNIT_ARTIFACT_ID = "org.apache.servicemix.bundles.junit";
+    public static final String TESTRUNNER_GROUP_ID = "com.atlassian.plugins";
+    public static final String TESTRUNNER_ARTIFACT_ID = "atlassian-plugins-osgi-testrunner-bundle";
 
     /**
      *  The artifacts to deploy for the test console if needed
      */
-    protected final List<ProductArtifact> testFrameworkPlugins = new ArrayList<ProductArtifact>()
-    {{
-            add(new ProductArtifact("org.apache.servicemix.bundles","org.apache.servicemix.bundles.junit",JUNIT_VERSION));
-            add(new ProductArtifact("com.atlassian.plugins","atlassian-plugins-osgi-testrunner-bundle",ATLASSIAN_TEST_RUNNER_VERSION));
-        }};
+    private List<ProductArtifact> testFrameworkPlugins;
     
-
     /**
      * Container to run in
      */
@@ -73,6 +72,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      */
     @Parameter(property = "http.port", defaultValue = "0")
     private int httpPort;
+
+    /**
+     * AJP port for cargo <-> servlet container comms
+     */
+    @Parameter(property = "ajp.port", defaultValue = "8009") // Cargo's default is 8009
+    private int ajpPort;
 
     /**
      * If product should be started with https on port 443
@@ -292,6 +297,9 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     @Component
     protected ArtifactResolver artifactResolver;
 
+    @Component
+    protected RepositoryMetadataManager repositoryMetadataManager;
+
     /**
      * The local Maven repository. This is used by the artifact resolver to download resolved
      * JARs and put them in the local repository so that they won't have to be fetched again next
@@ -313,8 +321,8 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * the artifact resolver so that it can download the required JARs to put in the embedded
      * container's classpaths.
      */
-    @Component
-    protected ArtifactFactory artifactFactory;
+    //@Component
+    //protected ArtifactFactory artifactFactory;
 
     /**
      * A list of product-specific configurations (as literally provided in the pom.xml)
@@ -374,6 +382,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setPluginArtifacts(pluginArtifacts);
         ctx.setLog4jProperties(log4jProperties);
         ctx.setHttpPort(httpPort);
+        ctx.setAjpPort(ajpPort);
         ctx.setUseHttps(useHttps);
 
         ctx.setVersion(productVersion);
@@ -413,16 +422,24 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             String[] dirs = StringUtils.split(additionalResourceFolders,",");
             for(String rDir : dirs)
             {
-                resourceProp.append(StringUtils.trim(rDir)).append(",");
+                File af = new File(rDir);
+                if(af.exists())
+                {
+                    resourceProp.append(StringUtils.trim(rDir)).append(",");
+                }
             }
         }
         
         MavenProject mavenProject = getMavenContext().getProject();
         @SuppressWarnings("unchecked") List<Resource> resList = mavenProject.getResources();
         for (int i = 0; i < resList.size(); i++) {
-            resourceProp.append(resList.get(i).getDirectory());
-            if (i + 1 != resList.size()) {
-                resourceProp.append(",");
+            File rd = new File(resList.get(i).getDirectory());
+            if(rd.exists())
+            {
+                resourceProp.append(resList.get(i).getDirectory());
+                if (i + 1 != resList.size()) {
+                    resourceProp.append(",");
+                }
             }
         }
 
@@ -451,7 +468,15 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     private String buildRootProperty()
     {
         MavenProject mavenProject = getMavenContext().getProject();
-        return mavenProject.getBasedir().getPath();
+        
+        if(null != mavenProject && null != mavenProject.getBasedir())
+        {
+            return mavenProject.getBasedir().getPath();
+        }
+        else
+        {
+            return "";
+        }
     }
 
     private static void setDefaultSystemProperty(final Map<String,Object> props, final String key, final String value)
@@ -490,7 +515,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             }
         }
 
-        product.setArtifactRetriever(new ArtifactRetriever(artifactResolver, artifactFactory, localRepository, repositories));
+        product.setArtifactRetriever(new ArtifactRetriever(artifactResolver, artifactFactory, localRepository, repositories, repositoryMetadataManager));
 
         if (product.getContainerId() == null)
         {
@@ -579,7 +604,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         if (product.getContextPath() == null)
         {
-            product.setContextPath("/" + handler.getId());
+            product.setContextPath(handler.getDefaultContextPath());
         }
         
         if (product.getDataSources() == null)
@@ -623,6 +648,21 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         doExecute();
     }
 
+    public List<ProductArtifact> getTestFrameworkPlugins()
+    {
+        if(null == testFrameworkPlugins)
+        {
+            Properties overrides = getMavenContext().getVersionOverrides();
+            
+            this.testFrameworkPlugins = new ArrayList<ProductArtifact>();
+            
+            testFrameworkPlugins.add(new ProductArtifact(JUNIT_GROUP_ID, JUNIT_ARTIFACT_ID,overrides.getProperty(JUNIT_ARTIFACT_ID,JUNIT_VERSION)));
+            testFrameworkPlugins.add(new ProductArtifact(TESTRUNNER_GROUP_ID, TESTRUNNER_ARTIFACT_ID,overrides.getProperty(TESTRUNNER_ARTIFACT_ID,ATLASSIAN_TEST_RUNNER_VERSION)));
+        }
+        
+        return testFrameworkPlugins;
+    }
+
     private void detectDeprecatedVersionOverrides()
     {
         Properties props = getMavenContext().getProject().getProperties();
@@ -654,7 +694,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         for (Product ctx : Lists.newArrayList(productMap.values()))
         {
-            ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals);
+            ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals,artifactFactory);
             setDefaultValues(ctx, handler);
 
             // If it's a Studio product, check dependent instance are present
@@ -669,7 +709,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         }
 
         // Submit the Studio products for configuration
-        StudioProductHandler studioProductHandler = (StudioProductHandler) ProductHandlerFactory.create(ProductHandlerFactory.STUDIO, mavenContext, goals);
+        StudioProductHandler studioProductHandler = (StudioProductHandler) ProductHandlerFactory.create(ProductHandlerFactory.STUDIO, mavenContext, goals,artifactFactory);
         studioProductHandler.configureStudioProducts(productMap);
 
         return productMap;
@@ -814,17 +854,14 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     /**
      * Ping the product until it's up or stopped
      * @param startingUp true if applications are expected to be up; false if applications are expected to be brought down
-     * @throws MojoExecutionException if the product didn't have the expected behaviour beofre the timeout
+     * @throws MojoExecutionException if the product didn't have the expected behaviour before the timeout
      */
     private void pingRepeatedly(Product product, boolean startingUp) throws MojoExecutionException
     {
         if (product.getHttpPort() != 0)
         {
-            String url = "http://" + product.getServer() + ":" + product.getHttpPort();
-            if (StringUtils.isNotBlank(product.getContextPath()))
-            {
-                url = url + product.getContextPath();
-            }
+			final String url = product.getProtocol() + "://" + product.getServer() + ":" + product.getHttpPort()
+					+ StringUtils.defaultString(product.getContextPath(), "");
 
             int timeout = startingUp ? product.getStartupTimeout() : product.getShutdownTimeout();
             final long end = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeout);

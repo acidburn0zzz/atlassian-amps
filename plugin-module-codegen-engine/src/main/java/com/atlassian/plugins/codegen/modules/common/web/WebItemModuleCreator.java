@@ -27,7 +27,8 @@ public class WebItemModuleCreator extends AbstractPluginModuleCreator<WebItemPro
     public static final String MODULE_NAME = "Web Item";
     private static final String TEMPLATE_PREFIX = "templates/common/web/webitem/";
 
-    private static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "web-item-plugin.xml.vtl";
+    // public for use in other creators needing web-item modules
+    public static final String PLUGIN_MODULE_TEMPLATE = TEMPLATE_PREFIX + "web-item-plugin.xml.vtl";
 
     @Override
     public PluginProjectChangeset createModule(WebItemProperties props) throws Exception

@@ -1,0 +1,31 @@
+#* @vtlvariable name="CONTEXT_PROVIDER" type="com.atlassian.plugins.codegen.modules.common.ContextProviderProperties" *#
+#* @vtlvariable name="CONTENT_TEMPLATE_PLACEHOLDER" type="java.lang.String" *#
+#* @vtlvariable name="CONTENT_TEMPLATE_MENTION_PLACEHOLDER" type="java.lang.String" *#
+#* @vtlvariable name="DIALOG_WIZARD" type="java.lang.String" *#
+#* @vtlvariable name="CONTENT_I18N_KEY" type="java.lang.String" *#
+<p>
+    <at:i18n at:key="$CONTENT_I18N_KEY" />
+</p>
+#if ($CONTENT_TEMPLATE_PLACEHOLDER)
+<p>
+    <!-- This placeholder is replaced by user-entered text when typed in -->
+    <ac:placeholder><at:i18n at:key="$CONTENT_TEMPLATE_PLACEHOLDER" /></ac:placeholder>
+</p>
+<p>
+    <!-- This placholder starts a User @mention when clicked in -->
+    <ac:placeholder ac:type="mention"><at:i18n at:key="$CONTENT_TEMPLATE_MENTION_PLACEHOLDER" /></ac:placeholder>
+</p>
+#end
+#if ($!DIALOG_WIZARD == "true")
+<p>
+    <at:var at:name="wizardVariable" />
+</p>
+#end
+#if ($CONTEXT_PROVIDER)
+<p>
+    <at:var at:name="variableA" />
+</p>
+<p>
+    <at:var at:name="variableB" at:rawxhtml="true" />
+</p>
+#end

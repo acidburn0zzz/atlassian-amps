@@ -71,6 +71,10 @@ export ATLAS_VERSION
 M2_HOME="${dollar}{ATLAS_HOME}"/apache-maven
 MAVEN_EXECUTABLE="${dollar}{M2_HOME}"/bin/mvn
 
+if [ -n "${dollar}{ATLAS_MVN}" ]; then
+    MAVEN_EXECUTABLE="${dollar}{ATLAS_MVN}"
+fi
+
 #if( $echoPaths )
 echo
 echo "ATLAS Version:    ${version}"
@@ -92,7 +96,7 @@ fi
 ##############################################
 
 export MAVEN_OPTS="-Xmx768M -XX:MaxPermSize=256M ${dollar}ATLAS_OPTS"
-MVN_PARAMS=""
+MVN_PARAMS="-gs ${dollar}{M2_HOME}/conf/settings.xml"
 
 while [ $# -gt 0 ]
 do

@@ -6,6 +6,7 @@ import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 
 import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
+import static com.atlassian.plugins.codegen.modules.Dependencies.SLF4J;
 
 /**
  * @since 3.6
@@ -30,7 +31,8 @@ public class CustomFieldModuleCreator extends AbstractPluginModuleCreator<Custom
     public PluginProjectChangeset createModule(CustomFieldProperties props) throws Exception
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
-            .with(MOCKITO_TEST)
+            .with(SLF4J,
+                  MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
         
         if (props.includeExamples())

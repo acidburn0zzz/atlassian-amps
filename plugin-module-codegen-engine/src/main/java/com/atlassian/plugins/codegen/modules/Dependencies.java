@@ -18,7 +18,9 @@ public final class Dependencies
     public static final ArtifactDependency HTTPCLIENT_TEST = dependency("org.apache.httpcomponents", "httpclient", "4.1.1", TEST);
 
     public static final ArtifactDependency MOCKITO_TEST = dependency("org.mockito", "mockito-all", "1.8.5", TEST);
-    
+
+    public static final ArtifactDependency SLF4J = dependency("org.slf4j", "slf4j-api", "1.6.6", PROVIDED);
+
     public static final ArtifactDependency SERVLET_API = dependency("javax.servlet", "servlet-api", "2.4", PROVIDED);
 
     public static final ArtifactDependency SAL_API = dependency("com.atlassian.sal", "sal-api",

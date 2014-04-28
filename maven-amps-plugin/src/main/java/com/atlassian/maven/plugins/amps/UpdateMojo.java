@@ -61,6 +61,14 @@ public class UpdateMojo extends AbstractAmpsMojo {
             // determine which version to download from PAC
             String downloadVersion = StringUtils.isNotBlank(updateVersion) ?
                     updateVersion : sdkResource.getLatestSdkVersion(packageType);
+            String ourVersion = getSdkVersion();
+            
+            if(ourVersion.equals(downloadVersion))
+            {
+                getLog().info("SDK is already at the latest version: " + ourVersion);
+                return;
+            }
+            
             getLog().info("Downloading SDK version " + downloadVersion + " from marketplace.atlassian.com...");
             sdkArchive = sdkResource.downloadSdk(packageType, downloadVersion);
             getLog().info("Download complete.");

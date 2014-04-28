@@ -9,6 +9,8 @@ import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import com.google.common.collect.Lists;
+
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
@@ -25,9 +27,9 @@ import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STU
  */
 public class StudioJiraProductHandler extends JiraProductHandler implements StudioComponentProductHandler
 {
-    public StudioJiraProductHandler(final MavenContext context, final MavenGoals goals)
+    public StudioJiraProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals);
+        super(context, goals,artifactFactory);
     }
 
 

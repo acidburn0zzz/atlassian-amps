@@ -7,6 +7,8 @@ import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.google.common.collect.ImmutableMap;
+
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 import java.io.IOException;
@@ -16,9 +18,9 @@ import static com.atlassian.maven.plugins.amps.util.FileUtils.deleteDir;
 
 public class BambooProductHandler extends AbstractWebappProductHandler
 {
-    public BambooProductHandler(MavenContext context, MavenGoals goals)
+    public BambooProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new BambooPluginProvider());
+        super(context, goals, new BambooPluginProvider(),artifactFactory);
     }
 
     public String getId()
@@ -54,11 +56,13 @@ public class BambooProductHandler extends AbstractWebappProductHandler
         properties.putAll(super.getSystemProperties(ctx));
         properties.put("bamboo.home", getHomeDirectory(ctx).getPath());
         properties.put("org.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES", "false");
+        properties.put("cargo.servlet.uriencoding", "UTF-8");
+        properties.put("file.encoding", "UTF-8");
         return properties.build();
     }
 
     @Override
-    public File getUserInstalledPluginsDirectory(final File webappDir, final File homeDir)
+    public File getUserInstalledPluginsDirectory(final Product product, final File webappDir, final File homeDir)
     {
         return new File(homeDir, "plugins");
     }
@@ -79,7 +83,7 @@ public class BambooProductHandler extends AbstractWebappProductHandler
 
         // The regex in the following search text is used to match IPv4 ([^:]+) or IPv6 (\[.+]) addresses.
         ConfigFileUtils.replaceAll(new File(homeDir, "/xml-data/configuration/administration.xml"),
-                "http://(?:[^:]+|\\[.+]):8085", "http://" + ctx.getServer() + ":" + ctx.getHttpPort() + "/" + ctx.getContextPath().replaceAll("^/|/$", ""));
+                "https?://(?:[^:]+|\\[.+]):8085", ctx.getProtocol() + "://" + ctx.getServer() + ":" + ctx.getHttpPort() + "/" + ctx.getContextPath().replaceAll("^/|/$", ""));
     }
 
 

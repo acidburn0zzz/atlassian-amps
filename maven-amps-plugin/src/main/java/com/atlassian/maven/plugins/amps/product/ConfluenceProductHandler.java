@@ -8,6 +8,7 @@ import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 import java.io.IOException;
@@ -16,9 +17,9 @@ import java.util.*;
 public class ConfluenceProductHandler extends AbstractWebappProductHandler
 {
 
-    public ConfluenceProductHandler(MavenContext context, MavenGoals goals)
+    public ConfluenceProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new ConfluencePluginProvider());
+        super(context, goals, new ConfluencePluginProvider(),artifactFactory);
     }
 
     public String getId()
@@ -56,11 +57,12 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
         ImmutableMap.Builder<String, String> systemProperties = ImmutableMap.<String, String>builder();
         systemProperties.putAll(super.getSystemProperties(ctx));
         systemProperties.put("confluence.home", getHomeDirectory(ctx).getPath());
+        systemProperties.put("cargo.servlet.uriencoding", "UTF-8");
         return systemProperties.build();
     }
 
     @Override
-    public File getUserInstalledPluginsDirectory(final File webappDir, File homeDir)
+    public File getUserInstalledPluginsDirectory(final Product product, final File webappDir, File homeDir)
     {
         // indicates plugins should be bundled
         return null;
@@ -95,8 +97,8 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
         // We don't rewrap homes with these values:
         replacements.add(new Replacement("@project-dir@", homeDir.getParent()));
         replacements.add(new Replacement("/confluence-home/", "/home/", false));
-        replacements.add(new Replacement("<baseUrl>http://localhost:1990/confluence</baseUrl>", "<baseUrl>http://" + ctx.getServer() + ":" + ctx.getHttpPort() + "/" + ctx.getContextPath().replaceAll("^/|/$", "") + "</baseUrl>", false));
-        replacements.add(new Replacement("<baseUrl>http://localhost:8080</baseUrl>", "<baseUrl>http://" + ctx.getServer() + ":" + ctx.getHttpPort() + "/" + ctx.getContextPath().replaceAll("^/|/$", "") + "</baseUrl>", false));
+        replacements.add(new Replacement("<baseUrl>http://localhost:1990/confluence</baseUrl>", "<baseUrl>" + ctx.getProtocol() + "://" + ctx.getServer() + ":" + ctx.getHttpPort() + "/" + ctx.getContextPath().replaceAll("^/|/$", "") + "</baseUrl>", false));
+        replacements.add(new Replacement("<baseUrl>http://localhost:8080</baseUrl>", "<baseUrl>" + ctx.getProtocol() + "://" + ctx.getServer() + ":" + ctx.getHttpPort() + "/" + ctx.getContextPath().replaceAll("^/|/$", "") + "</baseUrl>", false));
         return replacements;
     }
 

@@ -6,6 +6,7 @@ import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 
 import static com.atlassian.plugins.codegen.modules.Dependencies.HTTPCLIENT_TEST;
 import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
+import static com.atlassian.plugins.codegen.modules.Dependencies.SLF4J;
 
 /**
  * @since 3.6
@@ -34,6 +35,7 @@ public class WorkflowValidatorModuleCreator extends AbstractPluginModuleCreator<
     {
         PluginProjectChangeset ret = new PluginProjectChangeset()
             .with(HTTPCLIENT_TEST,
+                  SLF4J,
                   MOCKITO_TEST)
             .with(createModule(props, PLUGIN_MODULE_TEMPLATE));
 

@@ -2,7 +2,7 @@ package com.atlassian.maven.plugins.amps.codegen.prompter.common.web;
 
 import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractPrompterTest;
 import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompter;
-import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformerProperties;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformer;
 
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
@@ -52,7 +52,7 @@ public class WebResourceTransformerPrompterTest extends AbstractPrompterTest
 
         WebResourceTransformerPrompter modulePrompter = new WebResourceTransformerPrompter(prompter);
         modulePrompter.setUseAnsiColor(false);
-        WebResourceTransformerProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
+        WebResourceTransformer props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong class", CLASSNAME, props.getClassId().getName());
         assertEquals("wrong class package", PACKAGE, props.getClassId().getPackage());
@@ -79,7 +79,7 @@ public class WebResourceTransformerPrompterTest extends AbstractPrompterTest
 
         WebResourceTransformerPrompter modulePrompter = new WebResourceTransformerPrompter(prompter);
         modulePrompter.setUseAnsiColor(false);
-        WebResourceTransformerProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
+        WebResourceTransformer props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv class", CLASSNAME, props.getClassId().getName());
         assertEquals("wrong adv package", PACKAGE, props.getClassId().getPackage());

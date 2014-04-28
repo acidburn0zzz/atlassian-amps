@@ -20,8 +20,8 @@
     <packaging>atlassian-plugin</packaging>
 
     <properties>
-        <bamboo.version>${bamboo.version}</bamboo.version>
-        <bamboo.data.version>${bamboo.data.version}</bamboo.data.version>
+        <bamboo.version>\${bambooVersion}</bamboo.version>
+        <bamboo.data.version>\${bambooDataVersion}</bamboo.data.version>
         <amps.version>${project.version}</amps.version>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
     </properties>

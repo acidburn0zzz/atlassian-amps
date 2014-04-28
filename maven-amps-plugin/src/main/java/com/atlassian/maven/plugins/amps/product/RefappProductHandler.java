@@ -6,15 +6,20 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 import com.google.common.collect.ImmutableMap;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class RefappProductHandler extends AbstractWebappProductHandler
 {
-    public RefappProductHandler(MavenContext context, MavenGoals goals)
+    public RefappProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new RefappPluginProvider());
+        super(context, goals, new RefappPluginProvider(),artifactFactory);
     }
 
     public String getId()
@@ -28,7 +33,7 @@ public class RefappProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    protected File getUserInstalledPluginsDirectory(final File webappDir, File homeDir)
+    protected File getUserInstalledPluginsDirectory(final Product product, final File webappDir, File homeDir)
     {
         return null;
     }
@@ -65,17 +70,18 @@ public class RefappProductHandler extends AbstractWebappProductHandler
         properties.put("refapp.home", getHomeDirectory(ctx).getPath());
         properties.put("osgi.cache", getHomeDirectory(ctx).getPath()+ "/osgi-cache");
         properties.put("bundledplugins.cache", getHomeDirectory(ctx).getPath()+ "/bundled-plugins");
+        properties.put("cargo.servlet.uriencoding", "UTF-8");
         return properties.build();
     }
 
     @Override
-    protected ProductArtifact getArtifact()
+    public ProductArtifact getArtifact()
     {
         return new ProductArtifact("com.atlassian.refapp", "atlassian-refapp", VersionUtils.getVersion());
     }
 
     @Override
-    protected ProductArtifact getTestResourcesArtifact()
+    public ProductArtifact getTestResourcesArtifact()
     {
         return null;
     }

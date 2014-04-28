@@ -21,6 +21,13 @@ public class UnitTestMojo extends AbstractAmpsMojo
     protected Map<String, Object> systemPropertyVariables = new HashMap<String, Object>();
 
     /**
+     * Denotes test category as defined by surefire/failsafe notion of groups. In JUnit4, this affects tests annotated
+     * with {@link org.junit.experimental.categories.Category @Category} annotation
+     */
+    @Parameter
+    protected String category;
+
+    /**
      * Sets the excludedGroups element in surefire. This will allow your unit tests to be excluded
      * depending on the value of this element. See {@link http://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#excludedGroups}
      * Defaults to null.
@@ -32,6 +39,6 @@ public class UnitTestMojo extends AbstractAmpsMojo
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        getMavenGoals().runUnitTests(systemPropertyVariables, excludedGroups);
+        getMavenGoals().runUnitTests(systemPropertyVariables, excludedGroups, category);
     }
 }

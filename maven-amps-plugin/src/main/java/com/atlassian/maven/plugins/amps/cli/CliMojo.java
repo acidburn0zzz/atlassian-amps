@@ -6,8 +6,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
-@Mojo(name = "cli")
+@Mojo(name = "cli", requiresDependencyResolution = ResolutionScope.TEST)
 public class CliMojo extends AbstractProductAwareMojo
 {
     @Parameter(property = "cli.port", defaultValue = "4330")

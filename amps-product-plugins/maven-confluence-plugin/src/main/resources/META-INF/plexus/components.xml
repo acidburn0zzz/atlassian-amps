@@ -25,8 +25,13 @@
                                 com.atlassian.maven.plugins:maven-confluence-plugin:generate-manifest,
                                 com.atlassian.maven.plugins:maven-confluence-plugin:generate-rest-docs
                             </process-classes>
+                            <generate-test-resources>
+                                com.atlassian.maven.plugins:maven-confluence-plugin:copy-test-bundled-dependencies
+                            </generate-test-resources>
                             <process-test-resources>
                                 org.apache.maven.plugins:maven-resources-plugin:testResources
+                                ,com.atlassian.maven.plugins:maven-confluence-plugin:filter-test-plugin-descriptor
+                                ,com.atlassian.maven.plugins:maven-confluence-plugin:generate-test-manifest
                             </process-test-resources>
                             <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
                             <test>com.atlassian.maven.plugins:maven-confluence-plugin:unit-test</test>
@@ -34,13 +39,14 @@
                                 com.atlassian.maven.plugins:maven-confluence-plugin:validate-manifest,
                                 com.atlassian.maven.plugins:maven-confluence-plugin:jar,
                                 com.atlassian.maven.plugins:maven-confluence-plugin:generate-obr-artifact,
+                                com.atlassian.maven.plugins:maven-confluence-plugin:validate-test-manifest,
                                 com.atlassian.maven.plugins:maven-confluence-plugin:test-jar
                             </package>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-confluence-plugin:integration-test
                             </integration-test>
-                            <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-                            <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+                            <install>com.atlassian.maven.plugins:maven-confluence-plugin:mvn-install</install>
+                            <deploy>com.atlassian.maven.plugins:maven-confluence-plugin:mvn-deploy</deploy>
                         </phases>
                     </lifecycle>
                 </lifecycles>

@@ -1,5 +1,20 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.atlassian.maven.plugins.amps.util.ZipUtils;
+import com.atlassian.maven.plugins.amps.util.ant.AntJavaExecutorThread;
+import com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.tools.ant.taskdefs.Java;
+import org.apache.tools.ant.types.Path;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
@@ -9,20 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
-import com.atlassian.maven.plugins.amps.util.ZipUtils;
-import com.atlassian.maven.plugins.amps.util.ant.AntJavaExecutorThread;
-import com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.tools.ant.taskdefs.Java;
-import org.apache.tools.ant.types.Path;
 
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
@@ -36,9 +37,9 @@ public class FeCruProductHandler extends AbstractProductHandler
 
     private final JavaTaskFactory javaTaskFactory;
 
-    public FeCruProductHandler(MavenContext context, MavenGoals goals)
+    public FeCruProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new FeCruPluginProvider());
+        super(context, goals, new FeCruPluginProvider(), artifactFactory);
         this.javaTaskFactory = new JavaTaskFactory(log);
     }
 
@@ -47,7 +48,7 @@ public class FeCruProductHandler extends AbstractProductHandler
         return ProductHandlerFactory.FECRU;
     }
 
-    protected ProductArtifact getArtifact()
+    public ProductArtifact getArtifact()
     {
         return new ProductArtifact("com.atlassian.crucible", "atlassian-crucible", "RELEASE");
     }
@@ -63,7 +64,7 @@ public class FeCruProductHandler extends AbstractProductHandler
                 + ctx.getHttpPort() + " (http) and " + controlPort(ctx.getHttpPort()) + " (control)");
         try
         {
-            execFishEyeCmd("stop", ctx);
+            execFishEyeCmd("stop", ctx, false);
         }
         catch (Exception e)
         {
@@ -128,7 +129,7 @@ public class FeCruProductHandler extends AbstractProductHandler
     }
 
     @Override
-    protected final ProductArtifact getTestResourcesArtifact()
+    public final ProductArtifact getTestResourcesArtifact()
     {
           return new ProductArtifact("com.atlassian.fecru", "amps-fecru");
     }
@@ -161,7 +162,7 @@ public class FeCruProductHandler extends AbstractProductHandler
     }
 
     @Override
-    protected final File getUserInstalledPluginsDirectory(File appDir, File homeDir)
+    protected final File getUserInstalledPluginsDirectory(final Product product, File appDir, File homeDir)
     {
         return new File(new File(new File(homeDir, "var"), "plugins"), "user");
     }
@@ -181,7 +182,7 @@ public class FeCruProductHandler extends AbstractProductHandler
         AntJavaExecutorThread thread;
         try
         {
-            thread = execFishEyeCmd("run", ctx);
+            thread = execFishEyeCmd("run", ctx, true);
         }
         catch (Exception e)
         {
@@ -259,14 +260,14 @@ public class FeCruProductHandler extends AbstractProductHandler
         }
     }
 
-    private AntJavaExecutorThread execFishEyeCmd(String bootCommand, final Product ctx) throws MojoExecutionException
+    private AntJavaExecutorThread execFishEyeCmd(String bootCommand, final Product ctx, boolean useDebugArgs) throws MojoExecutionException
     {
         final Map<String, String> properties = mergeSystemProperties(ctx);
 
         Java java = javaTaskFactory.newJavaTask(
                 output(ctx.getOutput()).
                 systemProperties(properties).
-                jvmArgs(ctx.getJvmArgs()));
+                jvmArgs(ctx.getJvmArgs() + (useDebugArgs ? ctx.getDebugArgs() : "")));
 
         addOverridesToJavaTask(ctx, java);
 

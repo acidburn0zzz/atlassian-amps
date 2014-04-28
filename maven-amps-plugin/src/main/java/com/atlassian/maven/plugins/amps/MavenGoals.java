@@ -1,7 +1,31 @@
 package com.atlassian.maven.plugins.amps;
 
+import aQute.lib.osgi.Constants;
+import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
+import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
+import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
+import com.atlassian.maven.plugins.amps.util.VersionUtils;
+import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
+import com.google.common.annotations.VisibleForTesting;
+import com.googlecode.htmlcompressor.compressor.XmlCompressor;
+import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Resource;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.twdata.maven.mojoexecutor.MojoExecutor.*;
+
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -11,87 +35,34 @@ import java.util.*;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
-import com.atlassian.maven.plugins.amps.util.*;
-import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.lang.StringUtils;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.Resource;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.components.interactivity.PrompterException;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.twdata.maven.mojoexecutor.MojoExecutor;
-import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
-import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
-
-import aQute.lib.osgi.Constants;
-
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.goal;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 /**
  * Executes specific maven goals
  */
 public class MavenGoals
 {
-    private final MavenContext ctx;
+    @VisibleForTesting
+    static final String AJP_PORT_PROPERTY = "cargo.tomcat.ajp.port";
 
     private final Log log;
     private final Map<String, String> pluginArtifactIdToVersionMap;
+    private final MavenContext ctx;
 
     private final Map<String, Container> idToContainerMap = new HashMap<String, Container>()
     {{
             put("tomcat5x", new Container("tomcat5x", "org.apache.tomcat", "apache-tomcat", "5.5.26"));
             put("tomcat6x", new Container("tomcat6x", "org.apache.tomcat", "apache-tomcat", "6.0.20"));
-            put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.32", "windows-x64"));
+            put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.40", "windows-x64"));
+            put("tomcat8x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.0.1", "windows-x64"));
             put("resin3x", new Container("resin3x", "com.caucho", "resin", "3.0.26"));
             put("jboss42x", new Container("jboss42x", "org.jboss.jbossas", "jbossas", "4.2.3.GA"));
             put("jetty6x", new Container("jetty6x"));
         }};
 
-    private final Map<String, String> defaultArtifactIdToVersionMap = new HashMap<String, String>()
-    {{
-            put("maven-cli-plugin", "0.7");
-            put("org.codehaus.cargo:cargo-maven2-plugin", "1.2.3");
-            put("atlassian-pdk", "2.3.1");
-            put("maven-archetype-plugin", "2.0-alpha-4");
-            put("maven-bundle-plugin", "2.3.7");
-            put("yuicompressor-maven-plugin", "1.3.0");
-            put("build-helper-maven-plugin", "1.7");
-
-            // You can't actually override the version a plugin if defined in the project, so these don't actually do
-            // anything, since the super pom already defines versions.
-            put("maven-dependency-plugin", "2.5.1");
-            put("maven-resources-plugin", "2.3");
-            put("maven-jar-plugin", "2.2");
-            //put("maven-surefire-plugin", "2.4.3");
-            put("maven-surefire-plugin", "2.12.4");
-            put("maven-failsafe-plugin", "2.9");
-            put("maven-exec-plugin", "1.2.1");
-
-        }};
+    private final Map<String, String> defaultArtifactIdToVersionMap;
 
     public MavenGoals(final MavenContext ctx)
     {
@@ -99,7 +70,38 @@ public class MavenGoals
 
         this.log = ctx.getLog();
 
-        this.pluginArtifactIdToVersionMap = Collections.unmodifiableMap(defaultArtifactIdToVersionMap);
+        this.defaultArtifactIdToVersionMap = Collections.unmodifiableMap(getArtifactIdToVersionMap(ctx));
+        this.pluginArtifactIdToVersionMap = defaultArtifactIdToVersionMap;
+    }
+
+    private Map<String,String> getArtifactIdToVersionMap(MavenContext ctx)
+    {
+        final Properties overrides = ctx.getVersionOverrides();
+        
+        return new HashMap<String, String>()
+        {{
+                //overrides.getProperty(JUNIT_ARTIFACT_ID,"
+                put("maven-cli-plugin", overrides.getProperty("maven-cli-plugin","1.0.10"));
+                put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.4.7"));
+                put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.1"));
+                put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
+                put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","2.3.7"));
+                put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.3.0"));
+                put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","1.7"));
+                put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.3"));
+                put("maven-deploy-plugin", overrides.getProperty("maven-deploy-plugin","2.4"));
+
+                // You can't actually override the version a plugin if defined in the project, so these don't actually do
+                // anything, since the super pom already defines versions.
+                put("maven-dependency-plugin", overrides.getProperty("maven-dependency-plugin","2.5.1"));
+                put("maven-resources-plugin", overrides.getProperty("maven-resources-plugin","2.3"));
+                put("maven-jar-plugin", overrides.getProperty("maven-jar-plugin","2.2"));
+                //put("maven-surefire-plugin", "2.4.3");
+                put("maven-surefire-plugin", overrides.getProperty("maven-surefire-plugin","2.12.4"));
+                put("maven-failsafe-plugin", overrides.getProperty("maven-failsafe-plugin","2.12.4"));
+                put("maven-exec-plugin", overrides.getProperty("maven-exec-plugin","1.2.1"));
+
+            }};
     }
 
     private ExecutionEnvironment executionEnvironment()
@@ -162,12 +164,14 @@ public class MavenGoals
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install" + " "
                                 + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-install"),
                 element(name("package"),
-                        "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
-                        + "compile" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
-                        + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " ")));
+                        "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
+                                + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
+                                + "compile" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
+                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " ")));
         if (port > 0)
         {
             configs.add(element(name("port"), String.valueOf(port)));
@@ -491,10 +495,10 @@ public class MavenGoals
         }
     }
 
-    public void compressResources(boolean useClosureForJs) throws MojoExecutionException
+    public void compressResources(boolean compressJs, boolean compressCss, boolean useClosureForJs) throws MojoExecutionException
     {
 
-        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), new File(ctx.getProject().getBuild().getOutputDirectory()), useClosureForJs, log);
+        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), new File(ctx.getProject().getBuild().getOutputDirectory()), compressJs, compressCss, useClosureForJs, log);
         /*
         executeMojo(
                 plugin(
@@ -535,6 +539,24 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
+
+
+        XmlCompressor compressor = new XmlCompressor();
+        File pluginXmlFile = new File(ctx.getProject().getBuild().getOutputDirectory(), "atlassian-plugin.xml");
+        
+        if (pluginXmlFile.exists())
+        {
+            try
+            {
+                String source = FileUtils.readFileToString(pluginXmlFile);
+                String min = compressor.compress(source);
+                FileUtils.writeStringToFile(pluginXmlFile,min);
+            }
+            catch (IOException e)
+            {
+                throw new MojoExecutionException("IOException while minifying plugin XML file", e);
+            }
+        }
     }
 
     public void filterTestPluginDescriptor() throws MojoExecutionException
@@ -564,13 +586,13 @@ public class MavenGoals
     }
 
     public void runUnitTests(Map<String, Object> systemProperties) throws MojoExecutionException {
-        runUnitTests(systemProperties, null);
+        runUnitTests(systemProperties, null, null);
     }
 
-    public void runUnitTests(Map<String, Object> systemProperties, String excludedGroups) throws MojoExecutionException
+    public void runUnitTests(Map<String, Object> systemProperties, String excludedGroups, final String category) throws MojoExecutionException
     {
         final Element systemProps = convertPropsToElements(systemProperties);
-        Xpp3Dom config = configuration(
+        final Xpp3Dom config = configuration(
                 systemProps,
                 element(name("excludes"),
                         element(name("exclude"), "it/**"),
@@ -578,6 +600,11 @@ public class MavenGoals
 
                 element(name("excludedGroups"), excludedGroups)
         );
+
+        if (isRelevantCategory(category))
+        {
+            appendJunitCategoryToConfiguration(category, config);
+        }
 
         log.info("surefire unit-test configuration:");
         log.info(config.toString());
@@ -782,7 +809,8 @@ public class MavenGoals
         }
 
         final int rmiPort = pickFreePort(0);
-        int actualHttpPort;
+        final int actualAjpPort = pickFreePort(webappContext.getAjpPort());
+        final int actualHttpPort;
         String protocol = "http";
 
         if(webappContext.getUseHttps())
@@ -802,7 +830,7 @@ public class MavenGoals
             sysProps.add(element(name(entry.getKey()), entry.getValue()));
         }
         log.info("Starting " + productInstanceId + " on the " + container.getId() + " container on ports "
-                + actualHttpPort + " (" + protocol + ") and " + rmiPort + " (rmi)");
+                + actualHttpPort + " (" + protocol + "), " + rmiPort + " (rmi) and " + actualAjpPort + " (ajp)");
 
         final String baseUrl = getBaseUrl(webappContext, actualHttpPort);
         sysProps.add(element(name("baseurl"), baseUrl));
@@ -825,20 +853,8 @@ public class MavenGoals
             }
         }
 
-        final List<Element> props = new ArrayList<Element>();
-        for (final Map.Entry<String, String> entry : systemProperties.entrySet())
-        {
-            props.add(element(name(entry.getKey()), entry.getValue()));
-        }
-        props.add(element(name("cargo.servlet.port"), String.valueOf(actualHttpPort)));
-
-        if(webappContext.getUseHttps())
-        {
-            props.add(element(name("cargo.protocol"), protocol));
-        }
-
-        props.add(element(name("cargo.rmi.port"), String.valueOf(rmiPort)));
-        props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs()));
+        final List<Element> props =
+                getConfigurationProperties(systemProperties, webappContext, rmiPort, actualHttpPort, actualAjpPort, protocol);
 
         int startupTimeout = webappContext.getStartupTimeout();
         if (Boolean.FALSE.equals(webappContext.getSynchronousStartup()))
@@ -885,6 +901,28 @@ public class MavenGoals
         return actualHttpPort;
     }
 
+    @VisibleForTesting
+    List<Element> getConfigurationProperties(final Map<String, String> systemProperties,
+            final Product webappContext, final int rmiPort, final int actualHttpPort, final int actualAjpPort, final String protocol)
+    {
+        final List<Element> props = new ArrayList<Element>();
+        for (final Map.Entry<String, String> entry : systemProperties.entrySet())
+        {
+            props.add(element(name(entry.getKey()), entry.getValue()));
+        }
+        props.add(element(name("cargo.servlet.port"), String.valueOf(actualHttpPort)));
+
+        if (webappContext.getUseHttps())
+        {
+            props.add(element(name("cargo.protocol"), protocol));
+        }
+
+        props.add(element(name(AJP_PORT_PROPERTY), String.valueOf(actualAjpPort)));
+        props.add(element(name("cargo.rmi.port"), String.valueOf(rmiPort)));
+        props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs() + webappContext.getDebugArgs()));
+        return props;
+    }
+
     public void stopWebapp(final String productId, final String containerId, final Product webappContext) throws MojoExecutionException
     {
         final Container container = findContainer(containerId);
@@ -904,9 +942,12 @@ public class MavenGoals
              ),
              element(name("configuration"),
                      // org.twdata.maven
-                     element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId))/*,
+                     element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId)),
+                     /*,
                      // we don't need that atm. since timeout is 0 for org.codehaus.cargo
-                     element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext)) */
+                      */
+                     //hoping this will fix AMPS-987
+                     element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext))
              )
         ),
         executionEnvironment()
@@ -923,7 +964,7 @@ public class MavenGoals
      * is shut down.
      *
      * The RMI port is randomly chosen (see startWebapp), thus we don't have any information close at hand. As a future optimisation, e.g. when we move away from cargo to let's say
-     * Apache's Tomcat Maven Plugin we could retrieve the actualy configuration from the server.xml on shutdown and thus know exactly for what which port to wait until it gets closed.
+     * Apache's Tomcat Maven Plugin we could retrieve the actual configuration from the server.xml on shutdown and thus know exactly for what which port to wait until it gets closed.
      * We could do that already in cargo (e.g. container/tomcat6x/<productHome>/conf/server.xml) but that means that we have to support all the containers we are supporting with cargo.
      *
      * Since the HTTP port is the only one that interests us, we set all three ports to this one when calling stop. But since that may be randomly chosen as well we might be waiting
@@ -933,10 +974,10 @@ public class MavenGoals
     private Element[] createShutdownPortsPropertiesConfiguration(final Product webappContext)
     {
         final List<Element> properties = new ArrayList<Element>();
-        String portUsedToDetermineIfShutdownSucceeded = String.valueOf(webappContext.getHttpPort());
+        final String portUsedToDetermineIfShutdownSucceeded = String.valueOf(webappContext.getHttpPort());
         properties.add(element(name("cargo.servlet.port"), portUsedToDetermineIfShutdownSucceeded));
         properties.add(element(name("cargo.rmi.port"), portUsedToDetermineIfShutdownSucceeded));
-        properties.add(element(name("cargo.tomcat.ajp.port"), portUsedToDetermineIfShutdownSucceeded));
+        properties.add(element(name(AJP_PORT_PROPERTY), portUsedToDetermineIfShutdownSucceeded));
         return properties.toArray(new Element[properties.size()]);
     }
 
@@ -981,7 +1022,7 @@ public class MavenGoals
         return server + port + contextPath;
     }
 
-    public void runIntegrationTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties, final File targetDirectory)
+    public void runIntegrationTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties, final File targetDirectory, final String category)
     		throws MojoExecutionException
 	{
     	List<Element> includeElements = new ArrayList<Element>(includes.size());
@@ -1014,7 +1055,13 @@ public class MavenGoals
                 element(name(reportsDirectory), testOutputDir)
         );
 
+        if (isRelevantCategory(category))
+        {
+            appendJunitCategoryToConfiguration(category, itconfig);
+        }
+
         final Xpp3Dom verifyconfig = configuration(element(name(reportsDirectory), testOutputDir));
+
 
         log.info("Failsafe integration-test configuration:");
         log.info(itconfig.toString());
@@ -1041,6 +1088,17 @@ public class MavenGoals
                 executionEnvironment()
         );
 	}
+
+    private void appendJunitCategoryToConfiguration(final String category, final Xpp3Dom config)
+    {
+        final Element groups = element(name("groups"), category);
+        config.addChild(groups.toDom());
+    }
+
+    private boolean isRelevantCategory(final String category)
+    {
+        return category != null && !"".equals(category);
+    }
 
     /**
      * Converts a map of System properties to maven config elements
@@ -1377,6 +1435,120 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
+
+        // Attach a jar artifact to the project. This helps when resolving dependencies in
+        // multi-module maven projects. Otherwise maven will incorrectly try and download
+        // the artifact from the remote repository instead of using the one in the reactor
+        if (isAtlassianPluginOrBundle(getContextProject().getPackaging()))
+        {
+            attachArtifact(getContextProject().getArtifact().getFile(), "jar");
+        }
+    }
+
+    public void mvnDeploy() throws MojoExecutionException
+    {
+        // Get plugin from reactor, if available
+        Map pluginsAsMap = getContextProject().getBuild().getPluginsAsMap();
+        Plugin p = (Plugin)pluginsAsMap.get("org.apache.maven.plugins:maven-deploy-plugin");
+        if (p == null)
+        {
+            // Otherwise, use a sensible default
+            p = plugin(
+                    groupId("org.apache.maven.plugins"),
+                    artifactId("maven-deploy-plugin"),
+                    version(pluginArtifactIdToVersionMap.get("maven-deploy-plugin"))
+            );
+        }
+        log.debug("Using " + p.toString() + " version " + p.getVersion());
+
+        detachJarAndExecuteMojo(
+            p,
+            goal("deploy")
+        );
+    }
+
+    public void mvnInstall() throws MojoExecutionException
+    {
+        // Get plugin from reactor, if available
+        Map pluginsAsMap = getContextProject().getBuild().getPluginsAsMap();
+        Plugin p = (Plugin)pluginsAsMap.get("org.apache.maven.plugins:maven-install-plugin");
+        if (p == null)
+        {
+            // Otherwise, use a sensible default
+            p = plugin(
+                    groupId("org.apache.maven.plugins"),
+                    artifactId("maven-install-plugin"),
+                    version(pluginArtifactIdToVersionMap.get("maven-install-plugin"))
+                );
+        }
+        log.debug("Using " + p.toString() + " version " + p.getVersion());
+
+        detachJarAndExecuteMojo(
+            p, goal("install")
+        );
+    }
+
+    private boolean isAtlassianPluginOrBundle(String packaging)
+    {
+        return "atlassian-plugin".equals(packaging) || "bundle".equals(packaging);
+    }
+
+    private String artifactToString(final Artifact artifact)
+    {
+        return String.format("GAV: %s:%s:%s Type: %s, Classifier: %s", artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier());
+    }
+
+    public void detachJarAndExecuteMojo(final Plugin plugin, final String goal) throws MojoExecutionException
+    {
+        Artifact detachedArtifact = null;
+        try
+        {
+            // Has the extra jar artifact been added to the reactor?
+            if (isAtlassianPluginOrBundle(getContextProject().getPackaging()))
+            {
+                // If so, find it.
+                log.debug("Detected atlassian-plugin or bundle packaging");
+                for (Object o : getContextProject().getAttachedArtifacts())
+                {
+                    Artifact a = (Artifact)o;
+                    if (a.getType().equals("jar") && a.getFile().equals(getContextProject().getArtifact().getFile()))
+                    {
+                        log.debug(String.format("Found sneaky, superfluous artifact (%s)", artifactToString(a)));
+                        detachedArtifact = a;
+                        break;
+                    }
+                }
+
+                if (detachedArtifact != null)
+                {
+                    // And temporarily remove it from the reactor
+                    log.debug("Temporarily removing artifact from reactor.");
+                    getContextProject().getAttachedArtifacts().remove(detachedArtifact);
+                }
+            }
+
+            // Execute the shadowed Mojo in our jar-free environment
+            Xpp3Dom configuration = (Xpp3Dom)plugin.getConfiguration();
+            if (configuration == null)
+            {
+                configuration = new Xpp3Dom("configuration");
+            }
+            executeMojo(
+                    plugin,
+                    goal,
+                    configuration,
+                    executionEnvironment()
+            );
+        }
+        finally
+        {
+            if (detachedArtifact != null)
+            {
+                // Re-attach the artifact, if it was removed in the first place
+                log.debug("Re-attaching removed artifact.");
+                getContextProject().addAttachedArtifact(detachedArtifact);
+            }
+        }
     }
 
     public void jarTests(String finalName) throws MojoExecutionException
@@ -1391,7 +1563,7 @@ public class MavenGoals
                 configuration(
                         element(name("finalName"), finalName),
                         element(name("archive"),
-                            element(name("manifestFile"), "${project.build.testOutputDirectory}/META-INF/MANIFEST.MF"))
+                                element(name("manifestFile"), "${project.build.testOutputDirectory}/META-INF/MANIFEST.MF"))
                 ),
                 executionEnvironment()
         );
@@ -1491,7 +1663,7 @@ public class MavenGoals
         );
     }
 
-    public void generateRestDocs() throws MojoExecutionException
+    public void generateRestDocs(String jacksonModules) throws MojoExecutionException
     {
         MavenProject prj = ctx.getProject();
         StringBuffer packagesPath = new StringBuffer();
@@ -1543,6 +1715,11 @@ public class MavenGoals
             {
                 throw new MojoExecutionException("Dependencies must be resolved", e);
             }
+            String additionalParam =  "-output \"" + resourcedocPath + "\"";
+            if (jacksonModules != null)
+            {
+                additionalParam += " -modules \"" + jacksonModules + "\"";
+            }
 
             executeMojo(
                     plugin(
@@ -1568,7 +1745,7 @@ public class MavenGoals
                                         element(name("version"),"2.6")
                                 )
                             ),
-                            element(name("additionalparam"),"-output \"" + resourcedocPath + "\""),
+                            element(name("additionalparam"), additionalParam),
                             element(name("useStandardDocletOptions"),"false")
                     ),
                     executionEnvironment()

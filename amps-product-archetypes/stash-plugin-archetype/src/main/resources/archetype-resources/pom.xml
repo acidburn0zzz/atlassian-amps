@@ -33,6 +33,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.atlassian.sal</groupId>
+            <artifactId>sal-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.atlassian.stash</groupId>
             <artifactId>stash-api</artifactId>
             <scope>provided</scope>
@@ -62,6 +67,7 @@
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- WIRED TEST RUNNER DEPENDENCIES -->
@@ -113,8 +119,8 @@
     </build>
     
     <properties>
-        <stash.version>${stash.version}</stash.version>
-        <stash.data.version>${stash.version}</stash.data.version>
+        <stash.version>${stashVersion}</stash.version>
+        <stash.data.version>${stashVersion}</stash.data.version>
         <amps.version>${project.version}</amps.version>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
     </properties>

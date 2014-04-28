@@ -17,7 +17,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 /**
  * Debug the webapp
  */
-@Mojo(name = "debug", requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(name = "debug", requiresDependencyResolution = ResolutionScope.TEST)
 @Execute(phase = LifecyclePhase.PACKAGE)
 public class DebugMojo extends RunMojo
 {
@@ -63,12 +63,12 @@ public class DebugMojo extends RunMojo
             String debugArgs = " -Xdebug -Xrunjdwp:transport=dt_socket,address=" +
                                String.valueOf(port) + ",suspend=" + (jvmDebugSuspend ? "y" : "n") + ",server=y ";
 
-            if (product.getJvmArgs() == null)
+            if (StringUtils.stripToNull(product.getJvmArgs()) == null)
             {
                 product.setJvmArgs(StringUtils.defaultString(jvmArgs));
             }
 
-            product.setJvmArgs(product.getJvmArgs() + debugArgs);
+            product.setDebugArgs(debugArgs);
 
             if (writePropertiesToFile)
             {
@@ -79,20 +79,8 @@ public class DebugMojo extends RunMojo
 
                 properties.put("debug." + product.getInstanceId() + ".port", String.valueOf(port));
             }
-
-            if (ProductHandlerFactory.FECRU.equals(getDefaultProductId()) && debugNotSet()) {
-                String message = "You must set the ATLAS_OPTS environment variable to the following string:'" + product.getJvmArgs() + "' when calling atlas-debug to enable Fisheye/Crucible debugging.";
-                getLog().error(message);
-                throw new MojoFailureException(message);
-            }
         }
 
         startProducts(productExecutions);
-    }
-
-    protected boolean debugNotSet()
-    {
-        String atlasOpts = System.getenv("ATLAS_OPTS");
-        return atlasOpts == null || !atlasOpts.contains("-Xdebug");
     }
 }

@@ -6,23 +6,36 @@ import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
+import static com.atlassian.maven.plugins.amps.util.ConfigFileUtils.RegexReplacement;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class JiraProductHandler extends AbstractWebappProductHandler
 {
+    @VisibleForTesting
+    static final String INSTALLED_PLUGINS_DIR = "installed-plugins";
+
+    @VisibleForTesting
+    static final String PLUGINS_DIR = "plugins";
+
     @VisibleForTesting
     static final String BUNDLED_PLUGINS_UNZIPPED = "WEB-INF/atlassian-bundled-plugins";
 
@@ -32,9 +45,29 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     @VisibleForTesting
     static final String BUNDLED_PLUGINS_UPTO_4_0 = "WEB-INF/classes/com/atlassian/jira/plugin/atlassian-bundled-plugins.zip";
 
-    public JiraProductHandler(final MavenContext context, final MavenGoals goals)
+    private static void checkNotFile(final File sharedHomeDir)
     {
-        super(context, goals, new JiraPluginProvider());
+        if (sharedHomeDir.isFile())
+        {
+            final String error =
+                    String.format("The specified shared home '%s' is a file, not a directory", sharedHomeDir);
+            throw new IllegalArgumentException(error);
+        }
+    }
+
+    private static void createIfNotExists(final File sharedHome)
+    {
+        sharedHome.mkdirs();
+        if (!sharedHome.isDirectory())
+        {
+            final String error = String.format("The specified shared home '%s' cannot be created", sharedHome);
+            throw new IllegalStateException(error);
+        }
+    }
+
+    public JiraProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
+    {
+        super(context, goals, new JiraPluginProvider(), artifactFactory);
     }
 
     public String getId()
@@ -65,15 +98,21 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
+    public String getDefaultContainerId()
+    {
+        return "tomcat7x";
+    }
+
+    @Override
     public Map<String, String> getSystemProperties(final Product ctx)
     {
-        ImmutableMap.Builder<String, String> properties = ImmutableMap.<String, String>builder();
+        final ImmutableMap.Builder<String, String> properties = ImmutableMap.builder();
         properties.putAll(super.getSystemProperties(ctx));
         properties.put("jira.home", fixWindowsSlashes(getHomeDirectory(ctx).getPath()));
-        properties.put("catalina.servlet.uriencoding", "UTF-8");
+        properties.put("cargo.servlet.uriencoding", "UTF-8");
         return properties.build();
     }
-    
+
     @Override
     protected DataSource getDefaultDataSource(Product ctx)
     {
@@ -88,9 +127,24 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    public File getUserInstalledPluginsDirectory(final File webappDir, final File homeDir)
+    public File getUserInstalledPluginsDirectory(final Product product, final File webappDir, final File homeDir)
     {
-        return new File(new File(homeDir, "plugins"), "installed-plugins");
+        final File pluginHomeDirectory = getPluginHomeDirectory(product.getSharedHome(), homeDir);
+        return new File(new File(pluginHomeDirectory, PLUGINS_DIR), INSTALLED_PLUGINS_DIR);
+    }
+
+    private File getPluginHomeDirectory(final String sharedHomePath, final File homeDir)
+    {
+        if (isBlank(sharedHomePath))
+        {
+            return homeDir;
+        }
+
+        // A shared home was specified
+        final File sharedHomeDir = new File(sharedHomePath);
+        checkNotFile(sharedHomeDir);
+        createIfNotExists(sharedHomeDir);
+        return sharedHomeDir;
     }
 
     @Override
@@ -164,7 +218,8 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             contextPath = "/" + contextPath;
         }
 
-        String baseUrl = "http://" + ctx.getServer() + ":" + ctx.getHttpPort() + contextPath;
+        final String baseUrl = ctx.getProtocol() + "://" + ctx.getServer() +
+                ":" + ctx.getHttpPort() + contextPath;
 
         List<Replacement> replacements = super.getReplacements(ctx);
         File homeDir = getHomeDirectory(ctx);
@@ -172,8 +227,8 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         replacements.add(0, new Replacement("http://localhost:8080", baseUrl, false));
         replacements.add(new Replacement("@project-dir@", homeDir.getParent(), false));
         replacements.add(new Replacement("/jira-home/", "/home/", false));
-        replacements.add(new Replacement("@base-url@",
-                baseUrl, false));
+        replacements.add(new Replacement("@base-url@", baseUrl, false));
+        replacements.add(new RegexReplacement("'[A-B]{1}[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}'", "''")); // blank out the server ID
         return replacements;
     }
 
@@ -235,8 +290,8 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         protected Collection<ProductArtifact> getSalArtifacts(String salVersion)
         {
             return Arrays.asList(
-                new ProductArtifact("com.atlassian.sal", "sal-api", salVersion),
-                new ProductArtifact("com.atlassian.sal", "sal-jira-plugin", salVersion));
+                    new ProductArtifact("com.atlassian.sal", "sal-api", salVersion),
+                    new ProductArtifact("com.atlassian.sal", "sal-jira-plugin", salVersion));
         }
 
         @Override
@@ -256,6 +311,4 @@ public class JiraProductHandler extends AbstractWebappProductHandler
 
         FileUtils.deleteQuietly(new File(snapshotDir, "log/atlassian-jira.log"));
     }
-
-
 }

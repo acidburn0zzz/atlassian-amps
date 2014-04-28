@@ -13,6 +13,7 @@ import com.atlassian.plugins.codegen.util.PluginXmlHelper;
 import com.google.common.collect.ImmutableList;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -204,6 +205,13 @@ public class PluginXmlRewriter implements ProjectRewriter
             for (String alias : component.getAlias())
             {
                 element.addAttribute("alias", alias);
+            }
+            for (String application : component.getApplication())
+            {
+                if(StringUtils.isNotBlank(application))
+                {
+                    element.addAttribute("application", application);
+                }
             }
             for (String description : component.getDescription())
             {

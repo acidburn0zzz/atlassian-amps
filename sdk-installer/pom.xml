@@ -3,7 +3,7 @@
     <parent>
         <artifactId>atlassian-amps-parent</artifactId>
         <groupId>com.atlassian.amps</groupId>
-        <version>4.1.5-m01-AMPS-1086-SNAPSHOT</version>
+        <version>4.2.21-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -31,9 +31,9 @@
                                 <configuration>
                                     <artifactItems>
                                         <artifactItem>
-                                            <groupId>${groupId}</groupId>
+                                            <groupId>${project.groupId}</groupId>
                                             <artifactId>atlassian-plugin-sdk</artifactId>
-                                            <version>${version}</version>
+                                            <version>${project.version}</version>
                                             <type>zip</type>
                                             <overWrite>true</overWrite>
                                             <outputDirectory>${project.build.directory}/win-unzip</outputDirectory>
@@ -62,7 +62,7 @@
                                         <argument>--license</argument>
                                         <argument>${project.basedir}/installbuilder-license.xml</argument>
                                         <argument>--setvars</argument>
-                                        <argument>project.version=${version}</argument>
+                                        <argument>project.version=${project.version}</argument>
                                         <argument>project.outputDirectory=${project.build.directory}</argument>
                                         <argument>sdkUnzipDir=${project.build.directory}/win-unzip/atlassian-plugin-sdk-${project.version}/*</argument>
                                     </arguments>
@@ -213,9 +213,9 @@
                                 <configuration>
                                     <artifactItems>
                                         <artifactItem>
-                                            <groupId>${groupId}</groupId>
+                                            <groupId>${project.groupId}</groupId>
                                             <artifactId>atlassian-plugin-sdk</artifactId>
-                                            <version>${version}</version>
+                                            <version>${project.version}</version>
                                             <type>tar.gz</type>
                                             <overWrite>true</overWrite>
                                             <outputDirectory>${project.build.directory}/deb-work/usr/share/</outputDirectory>
@@ -232,9 +232,9 @@
                                 <configuration>
                                     <artifactItems>
                                         <artifactItem>
-                                            <groupId>${groupId}</groupId>
+                                            <groupId>${project.groupId}</groupId>
                                             <artifactId>atlassian-plugin-sdk</artifactId>
-                                            <version>${version}</version>
+                                            <version>${project.version}</version>
                                             <type>tar.gz</type>
                                             <overWrite>true</overWrite>
                                             <outputDirectory>${project.build.directory}/rpm-work/unzip/usr/share/</outputDirectory>
@@ -292,7 +292,7 @@
                                 <id>native-deb</id>
                                 <phase>package</phase>
                                 <configuration>
-                                    <executable>${basedir}/deb-builder.sh</executable>
+                                    <executable>${project.basedir}/deb-builder.sh</executable>
                                     <outputFile>${project.build.directory}/dpkg-out.txt</outputFile>
                                     <arguments>
                                         <argument>${project.version}</argument>
@@ -307,7 +307,7 @@
                                 <id>native-rpm</id>
                                 <phase>package</phase>
                                 <configuration>
-                                    <executable>${basedir}/rpm-builder.sh</executable>
+                                    <executable>${project.basedir}/rpm-builder.sh</executable>
                                     <outputFile>${project.build.directory}/rpm-out.txt</outputFile>
                                     <arguments>
                                         <argument>${project.version}</argument>
@@ -347,7 +347,7 @@
                                 <configuration>
                                     <target unless="no.installer.deploy">
                                         <scp todir="${sdk.scp.user}@${sdk.scp.host}:/var/packages/incoming" port="22" trust="true" verbose="true" keyfile="${sdk.scp.key}">
-                                            <fileset dir="${build.directory}" casesensitive="yes">
+                                            <fileset dir="${project.build.directory}" casesensitive="yes">
                                                 <include name="**/*.deb" />
                                                 <include name="**/*.rpm" />
                                             </fileset>
@@ -382,9 +382,9 @@
                                 <configuration>
                                     <artifactItems>
                                         <artifactItem>
-                                            <groupId>${groupId}</groupId>
+                                            <groupId>${project.groupId}</groupId>
                                             <artifactId>atlassian-plugin-sdk</artifactId>
-                                            <version>${version}</version>
+                                            <version>${project.version}</version>
                                             <type>tar.gz</type>
                                             <overWrite>true</overWrite>
                                             <outputDirectory>${project.build.directory}/osx-unzip</outputDirectory>
@@ -404,7 +404,7 @@
                                 <id>native-osx</id>
                                 <phase>package</phase>
                                 <configuration>
-                                    <executable>${basedir}/osx-builder.sh</executable>
+                                    <executable>${project.basedir}/osx-builder.sh</executable>
                                     <outputFile>${project.build.directory}/osx-out.txt</outputFile>
                                     <arguments>
                                         <argument>${project.version}</argument>
@@ -463,12 +463,58 @@
                 </plugins>
             </build>
         </profile>
+        
+        <profile>
+            <id>scp</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.6</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.ant</groupId>
+                                <artifactId>ant-jsch</artifactId>
+                                <version>1.8.2</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>jsch</groupId>
+                                <artifactId>jsch</artifactId>
+                                <version>0.1.44</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>upload-to-linux-repos</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target unless="no.installer.deploy">
+                                        <scp todir="${sdk.scp.user}@${sdk.scp.host}:/var/packages/incoming" port="22" trust="true" verbose="true" keyfile="${sdk.scp.key}">
+                                            <fileset dir="${project.build.directory}" casesensitive="yes">
+                                                <include name="**/*.deb" />
+                                                <include name="**/*.rpm" />
+                                            </fileset>
+                                        </scp>
+                                        <sshexec host="${sdk.scp.host}" username="${sdk.scp.user}" keyfile="${sdk.scp.key}" command="chgrp developer-relations /var/packages/incoming/*" />
+                                        <sshexec host="${sdk.scp.host}" username="${sdk.scp.user}" keyfile="${sdk.scp.key}" command="chmod 774 /var/packages/incoming/*" />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
     <properties>
         <installbuilder.builder>/tools/installbuilder/bin/builder</installbuilder.builder>
         <buildhelper.version>1.7</buildhelper.version>
         <sdk.scp.user>${user.name}</sdk.scp.user>
-        <sdk.scp.host>plugin-sdk-repo.private.atlassian.com</sdk.scp.host>
+        <sdk.scp.host>plugin-sdk-repo-fe.internal.atlassian.com</sdk.scp.host>
         <sdk.scp.key>${user.home}/.ssh/id_rsa</sdk.scp.key>
     </properties>
 </project>

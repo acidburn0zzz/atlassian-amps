@@ -30,7 +30,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 /**
  * Run the webapp
  */
-@Mojo(name = "run", requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(name = "run", requiresDependencyResolution = ResolutionScope.TEST)
 @Execute(phase = LifecyclePhase.PACKAGE)
 public class RunMojo extends AbstractTestGroupsHandlerMojo
 {
@@ -105,7 +105,7 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
             if(shouldBuildTestPlugin())
             {
                 List<ProductArtifact> plugins = product.getBundledArtifacts();
-                plugins.addAll(testFrameworkPlugins);
+                plugins.addAll(getTestFrameworkPlugins());
             }
 
             // Leave a blank line and say what it's doing

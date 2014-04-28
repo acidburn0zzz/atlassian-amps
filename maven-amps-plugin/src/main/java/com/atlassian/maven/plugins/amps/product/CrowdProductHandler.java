@@ -1,5 +1,15 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.plugin.MojoExecutionException;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -11,22 +21,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
-
-import com.google.common.collect.ImmutableMap;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-
 public class CrowdProductHandler extends AbstractWebappProductHandler
 {
-    public CrowdProductHandler(final MavenContext context, final MavenGoals goals)
+    public CrowdProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new CrowdPluginProvider());
+        super(context, goals, new CrowdPluginProvider(),artifactFactory);
     }
 
     public String getId()
@@ -57,11 +56,12 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
         ImmutableMap.Builder<String, String> systemProperties = ImmutableMap.<String, String>builder();
         systemProperties.putAll(super.getSystemProperties(ctx));
         systemProperties.put("crowd.home", getHomeDirectory(ctx).getPath());
+        systemProperties.put("cargo.servlet.uriencoding", "UTF-8");
         return systemProperties.build();
     }
 
     @Override
-    public File getUserInstalledPluginsDirectory(final File webappDir, final File homeDir)
+    public File getUserInstalledPluginsDirectory(final Product product, final File webappDir, final File homeDir)
     {
         return new File(homeDir, "plugins");
     }
@@ -86,6 +86,10 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
     @Override
     public void processHomeDirectory(final Product ctx, final File homeDir) throws MojoExecutionException
     {
+        /* Replace %TOKENS% */
+        super.processHomeDirectory(ctx, homeDir);
+
+        /* Now Crowd-specific config changes */
         String baseUrl = MavenGoals.getBaseUrl(ctx, ctx.getHttpPort());
 
         /* Crowd connects back to itself; use 'localhost' rather than the hostname an external client would see */
@@ -169,8 +173,7 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
     public void cleanupProductHomeForZip(Product product, File homeDirectory) throws MojoExecutionException, IOException
     {
         super.cleanupProductHomeForZip(product, homeDirectory);
-        FileUtils.deleteQuietly(new File(homeDirectory, "caches/transformed-plugins"));
-        FileUtils.deleteQuietly(new File(homeDirectory, "caches/felix/felix-cache"));
+        FileUtils.deleteQuietly(new File(homeDirectory, "caches"));
         FileUtils.deleteQuietly(new File(homeDirectory, "logs"));
     }
 

@@ -83,7 +83,7 @@ public class TestMavenGoalsHomeZip
         when(ctx.getReactor()).thenReturn(reactor);
         when(ctx.getSession()).thenReturn(null);
 
-        productHandler = new RefappProductHandler(ctx, null);
+        productHandler = new RefappProductHandler(ctx, null,null);
     }
 
     @After

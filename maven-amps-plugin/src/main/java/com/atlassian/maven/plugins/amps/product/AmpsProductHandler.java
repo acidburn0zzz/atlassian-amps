@@ -17,6 +17,8 @@ import java.util.List;
 import com.atlassian.maven.plugins.amps.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -40,13 +42,15 @@ public abstract class AmpsProductHandler implements ProductHandler
     protected final MavenGoals goals;
     protected final MavenProject project;
     protected final MavenContext context;
+    protected final ArtifactFactory artifactFactory;
     protected final Log log;
 
-    protected AmpsProductHandler(MavenContext context, MavenGoals goals)
+    protected AmpsProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
         this.project = context.getProject();
         this.context = context;
         this.goals = goals;
+        this.artifactFactory = artifactFactory;
         this.log = context.getLog();
     }
 
@@ -132,17 +136,7 @@ public abstract class AmpsProductHandler implements ProductHandler
 
             // Proceed to replacements
             List<Replacement> replacements = getReplacements(product);
-            // Sort by longer values first, so that the right keys are used.
-            Collections.sort(replacements, new Comparator<Replacement>(){
-                @Override
-                public int compare(Replacement replacement1, Replacement replacement2)
-                {
-                    // longest value < shortest value
-                    int length1 = replacement1.getValue().length();
-                    int length2 = replacement2.getValue().length();
-                    return length2 - length1;
-                }
-            });
+            Collections.sort(replacements);
             List<File> files = getConfigFiles(product, snapshotDir);
 
             ConfigFileUtils.replace(files, replacements, true, log);
@@ -153,7 +147,7 @@ public abstract class AmpsProductHandler implements ProductHandler
         }
     }
 
-    abstract protected ProductArtifact getTestResourcesArtifact();
+    abstract public ProductArtifact getTestResourcesArtifact();
 
     protected File getProductHomeData(final Product ctx) throws MojoExecutionException
     {
@@ -177,6 +171,19 @@ public abstract class AmpsProductHandler implements ProductHandler
         ProductArtifact testResourcesArtifact = getTestResourcesArtifact();
         if (productHomeZip == null && testResourcesArtifact != null)
         {
+            //make sure we have the latest if needed
+            
+            if(StringUtils.isBlank(ctx.getDataVersion()) || Artifact.RELEASE_VERSION.equals(ctx.getDataVersion()) || Artifact.LATEST_VERSION.equals(ctx.getDataVersion()))
+            {
+                log.info("determining latest stable data version...");
+                Artifact dataArtifact = artifactFactory.createProjectArtifact(testResourcesArtifact.getGroupId(), testResourcesArtifact.getArtifactId(), ctx.getDataVersion());
+                String stableVersion = ctx.getArtifactRetriever().getLatestStableVersion(dataArtifact);
+
+                log.info("using latest stable data version: " + stableVersion);
+                testResourcesArtifact.setVersion(stableVersion);
+                ctx.setDataVersion(stableVersion);
+            }
+            
             ProductArtifact artifact = new ProductArtifact(
                 testResourcesArtifact.getGroupId(), testResourcesArtifact.getArtifactId(), ctx.getDataVersion());
             productHomeZip = goals.copyHome(getBaseDirectory(ctx), artifact);
@@ -283,6 +290,12 @@ public abstract class AmpsProductHandler implements ProductHandler
     public File getSnapshotDirectory(Product product)
     {
         return getHomeDirectory(product);
+    }
+
+    @Override
+    public String getDefaultContextPath()
+    {
+        return "/" + getId();
     }
 
     @Override

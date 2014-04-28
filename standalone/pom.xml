@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>4.1.5-m01-AMPS-1086-SNAPSHOT</version>
+        <version>4.2.21-SNAPSHOT</version>
     </parent>
 
     <artifactId>standalone</artifactId>
@@ -18,7 +18,7 @@
                 <plugin>
                     <groupId>com.atlassian.maven.plugins</groupId>
                     <artifactId>maven-amps-plugin</artifactId>
-                    <version>4.1.5-m01-AMPS-1086-SNAPSHOT</version>
+                    <version>4.2.21-SNAPSHOT</version>
                     <extensions>true</extensions>
                     <configuration>
                         <products>
@@ -29,33 +29,39 @@
                             </product>
                             <product>
                                 <id>confluence</id>
-                                <version>${confluence.version}</version>
-                                <dataVersion>${confluence.data.version}</dataVersion>
-                                <output>${project.build.directory}/confluence-${confluence.version}.log</output>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/confluence-LATEST.log</output>
                             </product>
                             <product>
                                 <id>jira</id>
-                                <version>${jira.version}</version>
-                                <dataVersion>${jira.data.version}</dataVersion>
-                                <output>${project.build.directory}/jira-${jira.version}.log</output>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/jira-LATEST.log</output>
+                            </product>
+                            <product>
+                                <id>stash</id>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/stash-LATEST.log</output>
                             </product>
                             <product>
                                 <id>bamboo</id>
-                                <version>${bamboo.version}</version>
-                                <dataVersion>${bamboo.data.version}</dataVersion>
-                                <output>${project.build.directory}/bamboo-${bamboo.version}.log</output>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/bamboo-LATEST.log</output>
                             </product>
                             <product>
                                 <id>fecru</id>
-                                <version>${fecru.version}</version>
-                                <dataVersion>${fecru.data.version}</dataVersion>
-                                <output>${project.build.directory}/fecru-${fecru.version}.log</output>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/fecru-LATEST.log</output>
                             </product>
                             <product>
                                 <id>crowd</id>
-                                <version>${crowd.version}</version>
-                                <dataVersion>${crowd.data.version}</dataVersion>
-                                <output>${project.build.directory}/crowd-${crowd.version}.log</output>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/crowd-LATEST.log</output>
                             </product>
                         </products>
                     </configuration>

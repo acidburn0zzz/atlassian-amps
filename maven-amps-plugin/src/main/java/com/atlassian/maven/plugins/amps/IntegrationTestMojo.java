@@ -74,6 +74,13 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
     @Parameter(property = "jvm.debug.suspend")
     protected boolean jvmDebugSuspend = false;
 
+    /**
+     * Denotes test category as defined by surefire/failsafe notion of groups. In JUnit4, this affects tests annotated
+     * with {@link org.junit.experimental.categories.Category @Category} annotation.
+     */
+    @Parameter
+    protected String category;
+
     protected void doExecute() throws MojoExecutionException
     {
         final MavenProject project = getMavenContext().getProject();
@@ -182,7 +189,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
             if(shouldBuildTestPlugin())
             {
                 List<ProductArtifact> plugins = product.getBundledArtifacts();
-                plugins.addAll(testFrameworkPlugins);
+                plugins.addAll(getTestFrameworkPlugins());
             }
 
             int actualHttpPort = 0;
@@ -198,12 +205,12 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                     String debugArgs = " -Xdebug -Xrunjdwp:transport=dt_socket,address=" +
                             String.valueOf(debugPort) + ",suspend=" + (jvmDebugSuspend ? "y" : "n") + ",server=y ";
     
-                    if (product.getJvmArgs() == null)
+                    if (StringUtils.stripToNull(product.getJvmArgs()) == null)
                     {
                         product.setJvmArgs(StringUtils.defaultString(jvmArgs));
                     }
     
-                    product.setJvmArgs(product.getJvmArgs() + debugArgs);
+                    product.setDebugArgs(debugArgs);
                 }
                 
                 actualHttpPort = productHandler.start(product);
@@ -211,34 +218,30 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 
             if (productExecutions.size() == 1)
             {
-                systemProperties.put("http.port", String.valueOf(actualHttpPort));
-                systemProperties.put("context.path", product.getContextPath());
+                putIfNotOverridden(systemProperties, "http.port", String.valueOf(actualHttpPort));
+                putIfNotOverridden(systemProperties, "context.path", product.getContextPath());
             }
 
             String baseUrl = MavenGoals.getBaseUrl(product, actualHttpPort);
             // hard coded system properties...
-            systemProperties.put("http." + product.getInstanceId() + ".port", String.valueOf(actualHttpPort));
-            systemProperties.put("context." + product.getInstanceId() + ".path", product.getContextPath());
-            systemProperties.put("http." + product.getInstanceId() + ".url", MavenGoals.getBaseUrl(product, actualHttpPort));
+            putIfNotOverridden(systemProperties, "http." + product.getInstanceId() + ".port", String.valueOf(actualHttpPort));
+            putIfNotOverridden(systemProperties, "context." + product.getInstanceId() + ".path", product.getContextPath());
+            putIfNotOverridden(systemProperties, "http." + product.getInstanceId() + ".url", MavenGoals.getBaseUrl(product, actualHttpPort));
+            putIfNotOverridden(systemProperties, "http." + product.getInstanceId() + ".protocol", product.getProtocol());
 
-            systemProperties.put("baseurl." + product.getInstanceId(), baseUrl);
-            systemProperties.put("plugin.jar", pluginJar);
+
+            putIfNotOverridden(systemProperties, "baseurl." + product.getInstanceId(), baseUrl);
+            putIfNotOverridden(systemProperties, "plugin.jar", pluginJar);
 
             // yes, this means you only get one base url if multiple products, but that is what selenium would expect
-            if (!systemProperties.containsKey("baseurl"))
-            {
-                systemProperties.put("baseurl", baseUrl);
-            }
+            putIfNotOverridden(systemProperties, "baseurl", baseUrl);
 
-            systemProperties.put("homedir." + product.getInstanceId(), productHandler.getHomeDirectory(product).getAbsolutePath());
-            if (!systemProperties.containsKey("homedir"))
-            {
-                systemProperties.put("homedir", productHandler.getHomeDirectory(product).getAbsolutePath());
-            }
+            putIfNotOverridden(systemProperties, "homedir." + product.getInstanceId(), productHandler.getHomeDirectory(product).getAbsolutePath());
+            putIfNotOverridden(systemProperties, "homedir", productHandler.getHomeDirectory(product).getAbsolutePath());
 
             systemProperties.putAll(getProductFunctionalTestProperties(product));
         }
-        systemProperties.put("testGroup", testGroupId);
+        putIfNotOverridden(systemProperties, "testGroup", testGroupId);
         systemProperties.putAll(getTestGroupSystemProperties(testGroupId));
 
         /*
@@ -249,15 +252,40 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
             waitForProducts(productExecutions, true);
         }*/
 
-        waitForProducts(productExecutions, true);
+        if (!noWebapp)
+        {
+            waitForProducts(productExecutions, true);
+        }
 
         // Actually run the tests
-        goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory);
+        goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory, category);
 
         // Shut all products down
         if (!noWebapp)
         {
             stopProducts(productExecutions);
+        }
+    }
+
+    /**
+     * Adds the property to the map if such property is not overridden in system properties passed to
+     * maven executing this mojo.
+     * @param map the properties map
+     * @param key the key to be added
+     * @param value the value to be set. Will be overridden by an existing system property, if such exits.
+     */
+    private void putIfNotOverridden(Map<String, Object> map, String key, Object value)
+    {
+        if (!map.containsKey(key))
+        {
+            if (System.getProperties().containsKey(key))
+            {
+                map.put(key, System.getProperty(key));
+            }
+            else
+            {
+                map.put(key, value);
+            }
         }
     }
 

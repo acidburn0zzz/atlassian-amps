@@ -1,0 +1,55 @@
+#* @vtlvariable name="SOY_PACKAGE" type="java.lang.String" *#
+#* @vtlvariable name="HOW_TO_USE" type="boolean" *#
+#* @vtlvariable name="DIALOG_WIZARD" type="boolean" *#
+#* @vtlvariable name="HOW_TO_USE_HEADING" type="java.lang.String" *#
+#* @vtlvariable name="HOW_TO_USE_CONTENT" type="java.lang.String" *#
+#* @vtlvariable name="INDEX_KEY" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_TITLE_FIELD_ID" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_TITLE_FIELD_LABEL" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_TITLE_FIELD_PLACEHOLDER" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_FIELD_REQUIRED_I18N" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_JSVAR_FIELD_LABEL" type="java.lang.String" *#
+#* @vtlvariable name="WIZARD_FORM_JSVAR_FIELD_PLACEHOLDER" type="java.lang.String" *#
+{namespace $SOY_PACKAGE}
+
+#if ($HOW_TO_USE)
+/**
+ * How-to-use page for the wizard.
+ */
+{template .howToUse}
+<h2>{getText('$HOW_TO_USE_HEADING')}</h2>
+<p>{getText('$HOW_TO_USE_CONTENT')}</p>
+{/template}
+#end
+
+#if ($DIALOG_WIZARD)
+/**
+ * A form page for the Wizard. This form will be processed by the Blueprints Wizard JS automatically.
+ *
+ * @param preRenderText some text added by the pre-render Wizard JS hook
+*/
+{template .wizardPage0}
+<form action="#" method="post" id="wizard-page0-form" class="aui">
+    <fieldset>
+        <div class="field-group">
+            <label for="$WIZARD_FORM_TITLE_FIELD_ID">
+                {getText('$WIZARD_FORM_TITLE_FIELD_LABEL')}
+                <span class="aui-icon icon-required">{getText('$WIZARD_FORM_FIELD_REQUIRED_I18N')}</span>
+            </label>
+            <input id="$WIZARD_FORM_TITLE_FIELD_ID" class="text" type="text" name="title" title="title"
+                   placeholder="{getText('$WIZARD_FORM_TITLE_FIELD_PLACEHOLDER')}" maxlength="255">
+            <div class="error"></div>
+        </div>
+        <div class="field-group">
+            <label>
+                {getText('$WIZARD_FORM_JSVAR_FIELD_LABEL')}
+            </label>
+            <input class="text" type="text" name="wizardVariable" title="title"
+                   placeholder="{getText('$WIZARD_FORM_JSVAR_FIELD_PLACEHOLDER')}" maxlength="255">
+            <div class="error"></div>
+        </div>
+    </fieldset>
+    <p>{$preRenderText}</p>
+</form>
+{/template}
+#end

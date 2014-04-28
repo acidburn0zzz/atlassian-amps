@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.ampsdispatcher;
 
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -10,13 +11,11 @@ import com.atlassian.maven.plugins.amps.util.VersionUtils;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.*;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
@@ -48,7 +47,7 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
     MavenSession session;
 
     /**
-     * The Maven PluginManager Object
+     * The Maven 2 PluginManager Object
      */
     @Component
     PluginManager pluginManager;
@@ -70,7 +69,7 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
                 ),
                 goal(goal),
                 configuration(),
-                executionEnvironment(project, session, pluginManager));
+                getExecutionEnvironment());
         }
         else
         {
@@ -112,5 +111,30 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
         }
         return null;
 
+    }
+
+    protected MojoExecutor.ExecutionEnvironment getExecutionEnvironment()
+    {
+        try
+        {
+            Class bpmClass = Class.forName("org.apache.maven.plugin.BuildPluginManager");
+            Object buildPluginManager = session.lookup("org.apache.maven.plugin.BuildPluginManager");
+
+            Class[] params = new Class[] {project.getClass(),session.getClass(),bpmClass};
+            Method execEnvMethod = MojoExecutor.class.getMethod("executionEnvironment",params);
+            Object[] args = new Object[] {project, session, buildPluginManager};
+
+            MojoExecutor.ExecutionEnvironment execEnv = (MojoExecutor.ExecutionEnvironment) execEnvMethod.invoke(null,args);
+            if(null != execEnv)
+            {
+                return execEnv;
+            }
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
+        }
+
+        return MojoExecutor.executionEnvironment(project, session, pluginManager);
     }
 }

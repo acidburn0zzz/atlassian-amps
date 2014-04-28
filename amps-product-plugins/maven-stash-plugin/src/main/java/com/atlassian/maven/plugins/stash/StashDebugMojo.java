@@ -11,7 +11,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 /**
  * @since 3.10
  */
-@Mojo(name = "debug", requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(name = "debug", requiresDependencyResolution = ResolutionScope.TEST)
 @Execute(phase = LifecyclePhase.PACKAGE)
 public class StashDebugMojo extends DebugMojo
 {

@@ -1,24 +1,24 @@
 package com.atlassian.maven.plugins.amps.product;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.Product;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import java.io.File;
+import java.io.IOException;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
+import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.INSTALLED_PLUGINS_DIR;
+import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.PLUGINS_DIR;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UNZIPPED;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_FROM_4_1;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UPTO_4_0;
@@ -32,6 +32,11 @@ import static org.mockito.Mockito.when;
 public class TestJiraProductHandler
 {
     static File tempHome;
+
+    private static File createTempDir(final String subPath)
+    {
+        return new File(System.getProperty("java.io.tmpdir"), subPath);
+    }
     
     @Before
     public void createTemporaryHomeDirectory() throws IOException
@@ -92,6 +97,40 @@ public class TestJiraProductHandler
     }
 
     @Test
+    public void pluginsShouldGoIntoLocalHomeIfNoSharedHomeIsSpecified()
+    {
+        final File localHome = createTempDir("jira-local");
+        assertUserInstalledPluginsDirectory(localHome, null, localHome);
+    }
+
+    @Test
+    public void pluginsShouldGoIntoSharedHomeIfOneIsSpecified()
+    {
+        final File sharedHome = createTempDir("jira-shared");
+        assertUserInstalledPluginsDirectory(null, sharedHome.getPath(), sharedHome);
+    }
+
+    private void assertUserInstalledPluginsDirectory(
+            final File localHome, final String sharedHomePath, final File expectedParentDir)
+    {
+        // Set up
+        final MavenProject mockMavenProject = mock(MavenProject.class);
+        final MavenContext mockMavenContext = mock(MavenContext.class);
+        when(mockMavenContext.getProject()).thenReturn(mockMavenProject);
+        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
+        final Product mockProduct = mock(Product.class);
+        when(mockProduct.getSharedHome()).thenReturn(sharedHomePath);
+
+        // Invoke
+        final File userInstalledPluginsDirectory =
+                productHandler.getUserInstalledPluginsDirectory(mockProduct, null, localHome);
+
+        // Check
+        assertNotNull(userInstalledPluginsDirectory);
+        assertEquals(new File(new File(expectedParentDir, PLUGINS_DIR), INSTALLED_PLUGINS_DIR), userInstalledPluginsDirectory);
+    }
+
+    @Test
     public void bundledPluginsShouldBeUnzippedIfPresent()
     {
         final File bundledPluginsDir = new File(tempHome, BUNDLED_PLUGINS_UNZIPPED);
@@ -128,7 +167,7 @@ public class TestJiraProductHandler
         final Log mockLog = mock(Log.class);
         final MavenContext mockMavenContext = mock(MavenContext.class);
         when(mockMavenContext.getLog()).thenReturn(mockLog);
-        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null);
+        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
         final Product mockProduct = mock(Product.class);
         when(mockProduct.getVersion()).thenReturn(version);
 

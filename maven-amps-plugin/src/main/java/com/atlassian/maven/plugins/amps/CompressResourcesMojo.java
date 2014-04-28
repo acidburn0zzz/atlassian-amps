@@ -20,11 +20,17 @@ public class CompressResourcesMojo extends AbstractAmpsMojo
     @Parameter(defaultValue = "true")
     private boolean compressResources;
 
+    @Parameter(defaultValue = "true")
+    private boolean compressJs;
+
+    @Parameter(defaultValue = "true")
+    private boolean compressCss;
+
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         if (compressResources)
         {
-            getMavenGoals().compressResources(closureJsCompiler);
+            getMavenGoals().compressResources(compressJs, compressCss, closureJsCompiler);
         }
         else
         {

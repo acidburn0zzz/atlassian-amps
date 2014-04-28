@@ -66,7 +66,7 @@ public abstract class AbstractPluginProvider implements PluginProvider
         return Arrays.asList(
                 new ProductArtifact("org.apache.felix", "org.apache.felix.webconsole", webConsoleVersion),
                 new ProductArtifact("org.apache.felix", "org.osgi.compendium", "1.2.0"),
-                new ProductArtifact("com.atlassian.labs.httpservice", "httpservice-bridge", "0.6.1")
+                new ProductArtifact("com.atlassian.labs.httpservice", "httpservice-bridge", "0.6.2")
                 );
     }
 
@@ -77,7 +77,10 @@ public abstract class AbstractPluginProvider implements PluginProvider
 
     protected Collection<ProductArtifact> getDevToolboxArtifacts(String devToolboxVersion)
     {
-        return Collections.singletonList(new ProductArtifact("com.atlassian.devrel", "developer-toolbox-plugin", devToolboxVersion));
+        List<ProductArtifact> artifacts = new ArrayList();
+        artifacts.add(new ProductArtifact("com.atlassian.devrel", "developer-toolbox-plugin", devToolboxVersion));
+        artifacts.add(new ProductArtifact("com.atlassian.labs", "rest-api-browser", AmpsDefaults.DEFAULT_REST_API_BROWSER_VERSION));
+        return artifacts;
     }
 
     protected Collection<ProductArtifact> getPdeArtifacts(String pdeVersion)

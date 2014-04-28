@@ -4,7 +4,7 @@ import com.atlassian.maven.plugins.amps.codegen.annotations.ModuleCreatorClass;
 import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter;
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformerModuleCreator;
-import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformerProperties;
+import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformer;
 import com.atlassian.plugins.codegen.util.ClassnameUtil;
 
 import org.codehaus.plexus.components.interactivity.Prompter;
@@ -14,7 +14,7 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
  * @since 3.6
  */
 @ModuleCreatorClass(WebResourceTransformerModuleCreator.class)
-public class WebResourceTransformerPrompter extends AbstractModulePrompter<WebResourceTransformerProperties>
+public class WebResourceTransformerPrompter extends AbstractModulePrompter<WebResourceTransformer>
 {
 
     public WebResourceTransformerPrompter(Prompter prompter)
@@ -24,7 +24,7 @@ public class WebResourceTransformerPrompter extends AbstractModulePrompter<WebRe
     }
 
     @Override
-    public WebResourceTransformerProperties promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException
+    public WebResourceTransformer promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException
     {
         String className = promptJavaClassname("Enter New Classname", "MyWebResourceTransformer");
 
@@ -34,11 +34,11 @@ public class WebResourceTransformerPrompter extends AbstractModulePrompter<WebRe
         String packageName = "com.atlassian.plugin.webresource";
         String fqClass = ClassnameUtil.fullyQualifiedName(packageName, className);
 
-        return new WebResourceTransformerProperties(fqClass);
+        return new WebResourceTransformer(fqClass);
     }
 
     @Override
-    public void promptForAdvancedProperties(WebResourceTransformerProperties props, PluginModuleLocation moduleLocation) throws PrompterException
+    public void promptForAdvancedProperties(WebResourceTransformer props, PluginModuleLocation moduleLocation) throws PrompterException
     {
 
     }

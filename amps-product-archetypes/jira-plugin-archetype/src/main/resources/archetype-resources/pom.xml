@@ -61,6 +61,17 @@
             <artifactId>gson</artifactId>
             <version>2.2.2-atlassian-1</version>
         </dependency>
+
+		<!-- Uncomment to use TestKit in your project. Details at https://bitbucket.org/atlassian/jira-testkit -->
+		<!-- You can read more about TestKit at https://developer.atlassian.com/display/JIRADEV/Plugin+Tutorial+-+Smarter+integration+testing+with+TestKit -->
+		<!--
+		<dependency>
+			<groupId>com.atlassian.jira.tests</groupId>
+			<artifactId>jira-testkit-client</artifactId>
+			<version>\${dollar}{testkit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		-->
     </dependencies>
 
     <build>
@@ -73,6 +84,16 @@
                 <configuration>
                     <productVersion>\${dollar}{jira.version}</productVersion>
                     <productDataVersion>\${dollar}{jira.version}</productDataVersion>
+					<!-- Uncomment to install TestKit backdoor in JIRA. -->
+					<!--
+					<pluginArtifacts>
+						<pluginArtifact>
+							<groupId>com.atlassian.jira.tests</groupId>
+							<artifactId>jira-testkit-plugin</artifactId>
+							<version>\${dollar}{testkit.version}</version>
+						</pluginArtifact>
+					</pluginArtifacts>
+					-->
                 </configuration>
             </plugin>
             <plugin>
@@ -86,9 +107,11 @@
     </build>
 
     <properties>
-        <jira.version>5.1.8</jira.version>
+        <jira.version>\${jiraVersion}</jira.version>
         <amps.version>${project.version}</amps.version>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
+		<!-- TestKit version 5.x for JIRA 5.x, 6.x for JIRA 6.x -->
+		<testkit.version>5.2.26</testkit.version>
     </properties>
 
 </project>

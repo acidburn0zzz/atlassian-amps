@@ -8,7 +8,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
-@Mojo(name = "debug", requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(name = "debug", requiresDependencyResolution = ResolutionScope.TEST)
 @Execute(phase = LifecyclePhase.PACKAGE)
 public class JiraDebugMojo extends DebugMojo
 {

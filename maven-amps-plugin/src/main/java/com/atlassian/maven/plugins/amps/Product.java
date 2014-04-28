@@ -48,7 +48,12 @@ public class Product
     /**
      * JVM arguments to pass to cargo
      */
-    protected String jvmArgs = null;
+    protected String jvmArgs = "";
+
+    /**
+     * Debug arguments to pass to cargo as JVM arguments
+     */
+    protected String debugArgs = "";
 
     /**
      * A log4j properties file
@@ -196,8 +201,6 @@ public class Product
      */
     private String artifactId;
 
-
-
     /**
      * The studio configuration which is shared for all products in the same
      * studio instance. Null if products are not studio or not yet configured.
@@ -206,7 +209,6 @@ public class Product
      * It must be called before Studio products are launched.
      */
     protected StudioProperties studioProperties;
-
 
     /**
      * Only applies to Studio
@@ -275,9 +277,12 @@ public class Product
      * 
      */
     protected List<DataSource> dataSources;
-    
 
+    // The home directory shared between multiple instances in a cluster (added for JIRA)
+    private String sharedHome;
 
+    // The port for the Apache JServ Protocol; defaults to the web container's default value
+    private int ajpPort;
 
     /**
      * Creates a new product that is merged with this one, where the properties in this one override the passed
@@ -285,9 +290,9 @@ public class Product
      * @param product The product to merge with
      * @return A new product
      */
-    public Product merge(Product product)
+    public Product merge(final Product product)
     {
-        Product prod = new Product();
+        final Product prod = new Product();
         prod.setOutput(output == null ? product.getOutput() : output);
 
         Map<String,Object> sysProps = new HashMap<String,Object>();
@@ -318,7 +323,8 @@ public class Product
         prod.setDataVersion(productDataVersion == null ? product.getDataVersion() : productDataVersion);
         prod.setDataHome(dataHome == null ? product.getDataHome() : dataHome);
         prod.setLog4jProperties(log4jProperties == null ? product.getLog4jProperties() : log4jProperties);
-        prod.setJvmArgs(jvmArgs == null ? product.getJvmArgs() : jvmArgs);
+        prod.setJvmArgs(StringUtils.stripToNull(jvmArgs) == null ? product.getJvmArgs() : jvmArgs);
+        prod.setDebugArgs(StringUtils.stripToNull(debugArgs) == null ? product.getDebugArgs() : debugArgs);
         prod.setDataSources(dataSources == null ? product.getDataSources() : dataSources);
         prod.setGroupId(groupId == null ? product.getGroupId() : groupId);
         prod.setArtifactId(artifactId == null ? product.getArtifactId() : artifactId);
@@ -328,12 +334,14 @@ public class Product
         prod.setContextPath(contextPath == null ? product.getContextPath() : contextPath);
         prod.setContainerId(containerId == null ? product.getContainerId() : containerId);
         prod.setHttpPort(httpPort == 0 ? product.getHttpPort() : httpPort);
+        prod.setAjpPort(ajpPort == 0 ? product.getAjpPort() : ajpPort);
         prod.setJvmDebugPort(jvmDebugPort == 0 ? product.getJvmDebugPort() : jvmDebugPort);
         prod.setUseHttps(useHttps == null ? product.getUseHttps() : useHttps);
 
         prod.setStartupTimeout(startupTimeout == 0 ? product.getStartupTimeout() : startupTimeout);
         prod.setShutdownTimeout(shutdownTimeout == 0 ? product.getShutdownTimeout() : shutdownTimeout);
         prod.setSynchronousStartup(synchronousStartup == null ? product.getSynchronousStartup() : synchronousStartup);
+        prod.setSharedHome(sharedHome == null ? product.getSharedHome() : sharedHome);
 
         // Studio-related properties
         prod.setStudioProperties(studioProperties == null ? product.getStudioProperties() : studioProperties);
@@ -400,7 +408,17 @@ public class Product
 
     public void setJvmArgs(String jvmArgs)
     {
-        this.jvmArgs = jvmArgs;
+        this.jvmArgs = jvmArgs == null ? "" : jvmArgs;
+    }
+
+    public String getDebugArgs()
+    {
+        return debugArgs;
+    }
+
+    public void setDebugArgs(String debugArgs)
+    {
+        this.debugArgs = debugArgs == null ? "" :debugArgs;
     }
 
     public ArtifactRetriever getArtifactRetriever()
@@ -806,7 +824,6 @@ public class Product
         this.synchronousStartup = synchronousStartup;
     }
 
-
     public String getDataHome()
     {
         return dataHome;
@@ -820,7 +837,6 @@ public class Product
     {
         this.dataHome = dataHome;
     }
-    
 
     /**
      * @return the dataSources. Not null, because initialized in {@link AbstractProductHandlerMojo#setDefaultValues(Product, com.atlassian.maven.plugins.amps.product.ProductHandler)}
@@ -839,10 +855,59 @@ public class Product
         this.dataSources = dataSources;    
     }
 
+    /**
+     * Returns the shared home directory for a JIRA cluster.
+     *
+     * @return null if no shared home is set, otherwise the path to that directory
+     */
+    public String getSharedHome()
+    {
+        return sharedHome;
+    }
+
+    /**
+     * Sets the shared home directory for a JIRA cluster.
+     *
+     * @param sharedHome the directory path to set (can be null)
+     */
+    public void setSharedHome(final String sharedHome)
+    {
+        this.sharedHome = sharedHome;
+    }
+
+    /**
+     * Returns the AJP port for use by the web container.
+     *
+     * @return see above
+     */
+    public int getAjpPort()
+    {
+        return ajpPort;
+    }
+
+    /**
+     * Sets the AJP port for use by the web container.
+     *
+     * @param ajpPort the AJP port to set
+     */
+    public void setAjpPort(final int ajpPort)
+    {
+        this.ajpPort = ajpPort;
+    }
+
     @Override
     public String toString()
     {
-        return "Product " + id + " [instanceId=" + instanceId + ", localhost:" + httpPort + contextPath + "]";
+        return "Product " + id + " [instanceId=" + instanceId
+				+ ", " + getProtocol() + "://" + server + ":" + httpPort + contextPath + "]";
     }
 
+    /**
+     * Returns the protocol transmission scheme.
+     * @return "http" or "https".
+     */
+    public String getProtocol()
+    {
+        return useHttps != null && useHttps ? "https" : "http";
+    }
 }

@@ -9,6 +9,7 @@ public class RepositoryHookProperties extends BasicClassModuleProperties
 {
     private static final String ICON = "ICON";
     private static final String FIELDS = "FIELDS";
+    private static final String SOY_PACKAGE = "SOY_PACKAGE";
 
     private final String type;
     private String icon;
@@ -75,5 +76,15 @@ public class RepositoryHookProperties extends BasicClassModuleProperties
         {
             remove(FIELDS);
         }
+    }
+
+    @Override
+    public void setFullyQualifiedClassname(String fqName) {
+        super.setFullyQualifiedClassname(fqName);
+        put(SOY_PACKAGE, getClassId().getPackage() + "." + getClassId().getName().toLowerCase());
+    }
+
+    public String getSoyFile() {
+        return getProperty(MODULE_KEY) + ".soy";
     }
 }
