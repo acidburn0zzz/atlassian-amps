@@ -187,7 +187,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <echo>Patching Maven 2 scripts</echo>
+                                <echo>Patching Maven 3 scripts</echo>
                                 <patch backups="true" patchfile="src/main/resources/patches/mvn.diff" originalfile="${project.build.directory}/apache-maven-${bundled.maven.version}/bin/mvn" />
                                 <patch backups="true" patchfile="src/main/resources/patches/settings.xml.diff" originalfile="${project.build.directory}/apache-maven-${bundled.maven.version}/conf/settings.xml" />
                             </tasks>
