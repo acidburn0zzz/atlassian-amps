@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.pom</groupId>
         <artifactId>public-pom</artifactId>
-        <version>3.0.7</version>
+        <version>3.0.11</version>
     </parent>
 
     <groupId>com.atlassian.amps</groupId>
@@ -59,7 +59,22 @@
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-core</artifactId>
-                <version>3.0</version>
+                <version>${bundled.maven.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-model</artifactId>
+                <version>${bundled.maven.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-plugin-api</artifactId>
+                <version>${bundled.maven.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-artifact</artifactId>
+                <version>${bundled.maven.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.atlassian.fugue</groupId>
@@ -270,7 +285,7 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>[${maven.version}]</version>
+                                    <version>[${build.maven.version},)</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
@@ -346,7 +361,8 @@
 
     <properties>
         <jdkLevel>1.6</jdkLevel>
-        <maven.version>3.0.5</maven.version>
+        <build.maven.version>3.0.5</build.maven.version>
+        <bundled.maven.version>3.2.1</bundled.maven.version>
         <refapp.version>2.20.0-m2</refapp.version>
         <confluence.version>5.1.2</confluence.version>
         <confluence.data.version>5.1.2</confluence.data.version>
