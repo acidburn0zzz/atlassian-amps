@@ -27,7 +27,8 @@
         <connection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</connection>
         <developerConnection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</developerConnection>
         <url>https://bitbucket.org/atlassian/amps</url>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
 
     <issueManagement>
         <system>JIRA</system>
