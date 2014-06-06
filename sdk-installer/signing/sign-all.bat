@@ -8,10 +8,10 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 REM The directory to search for executables
 set INPUT_DIR=%1
 
-REM The directory to place executables
+REM The directory to place signed executables
 set OUTPUT_DIR=%2
 
-REM The pasword for the certificate
+REM The password for the certificate
 set PASSWORD=%3
 
 REM This simply finds a single PFX signing file in the current directory
