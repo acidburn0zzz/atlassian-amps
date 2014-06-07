@@ -1,6 +1,5 @@
-REM This script is a convenience for signing windows executables
-
 @echo off
+REM This script is a convenience for signing windows executables
 
 REM This is needed to set variables inside for-loops
 SETLOCAL ENABLEDELAYEDEXPANSION
