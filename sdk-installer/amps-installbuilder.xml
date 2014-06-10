@@ -50,13 +50,6 @@
             </startMenuShortcutList>
         </component>
     </componentList>
-    <preInstallationActionList>
-        <renameFile>
-            <destination>${installdir}\.apache-maven.old\</destination>
-            <explanation>Renaming existing bundled Maven version</explanation>
-            <origin>${installdir}\apache-maven\</origin>
-        </renameFile>
-    </preInstallationActionList>
     <postInstallationActionList>
         <setInstallerVariable>
             <name>hasJavaHome</name>

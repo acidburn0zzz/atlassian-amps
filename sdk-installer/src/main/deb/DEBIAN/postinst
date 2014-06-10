@@ -5,7 +5,7 @@ for f in `find /usr/share/atlassian-plugin-sdk-${version}/bin/ -name "atlas-*"`;
   chmod 755 $f
 done
 
-for f in `find /usr/share/atlassian-plugin-sdk-${version}/apache-maven/bin/ -name "*"`; do
+for f in `find /usr/share/atlassian-plugin-sdk-${version}/apache-maven-${bundled.maven.version}/bin/ -name "*"`; do
   chown root:root $f
   chmod 755 $f
 done

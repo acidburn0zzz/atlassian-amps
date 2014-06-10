@@ -55,6 +55,9 @@ public class StashProductHandler extends AbstractWebappProductHandler
         configFiles.add(new File(homeDir, "data/db.log"));
         configFiles.add(new File(homeDir, "data/db.script"));
         configFiles.add(new File(homeDir, "data/db.properties"));
+        configFiles.add(new File(homeDir, "shared/data/db.log"));
+        configFiles.add(new File(homeDir, "shared/data/db.script"));
+        configFiles.add(new File(homeDir, "shared/data/db.properties"));
         return configFiles;
     }
 
