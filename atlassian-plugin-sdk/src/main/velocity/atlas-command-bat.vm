@@ -66,7 +66,7 @@ rem ---------------------------------------------------------------
 rem Identify Maven location relative to script
 rem ---------------------------------------------------------------
 
-set MVN2_HOME=%ATLAS_HOME%\apache-maven
+set MVN2_HOME=%ATLAS_HOME%\apache-maven-${mavenVersion}
 set MAVEN_EXECUTABLE="%MVN2_HOME%\bin\mvn.bat"
 set ATLAS_VERSION="${version}"
 
