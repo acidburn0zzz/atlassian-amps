@@ -12,7 +12,7 @@
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
-    <url>http://studio.atlassian.com/browse/AMPS</url>
+    <url>http://ecosystem.atlassian.net/browse/AMPS</url>
 
     <licenses>
         <license>
@@ -364,8 +364,8 @@
         <build.maven.version>3.0.5</build.maven.version>
         <bundled.maven.version>3.2.1</bundled.maven.version>
         <refapp.version>2.20.0-m2</refapp.version>
-        <confluence.version>5.1.2</confluence.version>
-        <confluence.data.version>5.1.2</confluence.data.version>
+        <confluence.version>5.5</confluence.version>
+        <confluence.data.version>5.5</confluence.data.version>
         <jira.version>5.2.11</jira.version>
         <jira.data.version>5.2.11</jira.data.version>
         <fugue.version>1.0</fugue.version>
