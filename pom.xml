@@ -12,7 +12,7 @@
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
-    <url>http://ecosystem.atlassian.net/browse/AMPS</url>
+    <url>https://ecosystem.atlassian.net/browse/AMPS</url>
 
     <licenses>
         <license>
