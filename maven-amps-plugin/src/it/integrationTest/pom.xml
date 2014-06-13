@@ -5,6 +5,7 @@
     <artifactId>maven-amps-plugin-integration-test</artifactId>
     <version>testing</version>
     <name>TestIntegrationTest</name>
+    <packaging>atlassian-plugin</packaging>
 
     <build>
         <plugins>
@@ -12,6 +13,7 @@
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-${shitty.product}-plugin</artifactId>
                 <version>testing</version>
+                <extensions>true</extensions>
                 <configuration>
                     <container>tomcat6x</container>
                     <!--for testing that libartifacts are copied to correct place  -->
