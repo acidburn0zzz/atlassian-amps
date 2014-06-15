@@ -12,7 +12,7 @@
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
-    <url>http://studio.atlassian.com/browse/AMPS</url>
+    <url>https://ecosystem.atlassian.net/browse/AMPS</url>
 
     <licenses>
         <license>
@@ -94,13 +94,13 @@
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-annotations</artifactId>
-            <version>3.0</version>
+            <version>3.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.twdata.maven</groupId>
             <artifactId>mojo-executor</artifactId>
-            <version>2.2.0</version>
+            <version>1.5.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -296,7 +296,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.3</version>
                 <configuration>
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                 </configuration>
@@ -364,8 +364,8 @@
         <build.maven.version>3.0.5</build.maven.version>
         <bundled.maven.version>3.2.1</bundled.maven.version>
         <refapp.version>2.20.0-m2</refapp.version>
-        <confluence.version>5.1.2</confluence.version>
-        <confluence.data.version>5.1.2</confluence.data.version>
+        <confluence.version>5.5</confluence.version>
+        <confluence.data.version>5.5</confluence.data.version>
         <jira.version>5.2.11</jira.version>
         <jira.data.version>5.2.11</jira.data.version>
         <fugue.version>1.0</fugue.version>
