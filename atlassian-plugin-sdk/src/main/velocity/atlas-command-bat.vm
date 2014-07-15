@@ -26,6 +26,11 @@ echo.
 echo Usage: atlas-${mojo} [options]
 echo.
 echo ${goalhelp}
+#if( $deprecated )
+echo.
+echo DEPRECATED
+echo ${deprecated}
+#end
 #if ($opts.size() > 0)
     echo.
     echo The following options are available:
