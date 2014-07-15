@@ -17,8 +17,12 @@ echo.
 
 #foreach( $command in $commandNames )
 
+    #set( $deprecated = false )
     #parse( "commands/${command}" )
-    echo atlas-${command}
+    echo atlas-${command}#if(${deprecated}) [DEPRECATED]
+    #else
+    #end
+
     echo     ${goalhelp}
     echo.
 
@@ -28,10 +32,20 @@ goto :finalmessage
 :verboseoutput
 #foreach( $command in $commandNames )
 
+    #set( $deprecated = false )
     #parse( "commands/${command}" )
-    echo atlas-${command}
+    echo atlas-${command}#if(${deprecated}) [DEPRECATED]
+    #else
+    #end
+
     echo     ${goalhelp}
     echo.
+
+    #if( $deprecated )
+    echo     DEPRECATED
+    echo     ${deprecated}
+    echo.
+    #end
 
     #if ($opts.size() > 0)
 

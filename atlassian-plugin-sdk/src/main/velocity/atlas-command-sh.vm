@@ -16,6 +16,11 @@ if [ $# -ge 1 ]; then
             echo
             echo "${goalhelp}"
             echo
+            #if( $deprecated )
+            echo "DEPRECATED"
+            echo "${deprecated}"
+            echo
+            #end
             #if ($opts.size() > 0)
                 echo "The following options are available:"
                 #foreach($o in $opts)

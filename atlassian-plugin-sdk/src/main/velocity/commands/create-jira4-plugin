@@ -2,6 +2,8 @@
 
 #set( $goalhelp = "Creates a JIRA 4.x (or earlier) plugin." )
 
+#set( $deprecated = "JIRA 4.x and earlier have reach End of Support - see https://confluence.atlassian.com/x/HQCID." )
+
 #set( $opts = [
 {
   'name' : 'artifact-id',
