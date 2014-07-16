@@ -35,9 +35,9 @@ public class DebugMojo extends RunMojo
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
-        if (!isThisTheLastProjectInReactor())
+        if (!shouldExecute())
         {
-            getLog().debug("This is not the last project in reactor. Skipping execution");
+            getLog().info("Skipping execution");
             return;
         }
 
