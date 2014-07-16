@@ -39,8 +39,7 @@ $SED -i -e '/POSTRM/{r ./target/deb-work/DEBIAN/postrm' -e 'd}' target/rpm-work/
 echo "using rpm version: $RPMVERSION"
 
 # Make the rpm file
-#cd ./target/rpm-work
-sudo rpmbuild -bb --buildroot=${PWD}/target/rpm-work/unzip --target=noarch-linux-linux -v -- ./target/rpm-work/atlassian-plugin-sdk.spec 2>&1
+rpmbuild -bb --buildroot=${PWD}/target/rpm-work/unzip --target=noarch-linux-linux -v -- ./target/rpm-work/atlassian-plugin-sdk.spec 2>&1
 
 
 exit 0

@@ -23,8 +23,8 @@ import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLE
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_FROM_4_1;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UPTO_4_0;
 
-import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -159,7 +159,6 @@ public class TestJiraProductHandler
         final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_FROM_4_1);
         assertBundledPluginPath("not.a.version", tempHome, bundledPluginsZip);
     }
-
 
     private void assertBundledPluginPath(final String version, final File appDir, final File expectedPath)
     {

@@ -13,6 +13,7 @@ Group: misc
 %define _rpmdir ${project.build.directory}
 %define _rpmfilename %%{NAME}-RPMVERSION.noarch.rpm
 %define _unpackaged_files_terminate_build 0
+%define _tmppath ${project.build.directory}/tmp
 
 
 %post
