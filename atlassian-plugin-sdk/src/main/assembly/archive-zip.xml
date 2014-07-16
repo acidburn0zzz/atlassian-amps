@@ -10,8 +10,8 @@
         <!-- want to chmod (u+x) the .sh files.  to do this we collect the files in seperate
              filesets so we can chmod just the .sh files. -->
         <fileSet>
-            <directory>target/apache-maven-${maven.version}/</directory>
-            <outputDirectory>apache-maven</outputDirectory>
+            <directory>target/apache-maven-${bundled.maven.version}/</directory>
+            <outputDirectory>apache-maven-${bundled.maven.version}</outputDirectory>
             <includes>
                 <include>bin/mvn*</include>
             </includes>
@@ -19,8 +19,8 @@
             <fileMode>0744</fileMode>
         </fileSet>
         <fileSet>
-            <directory>target/apache-maven-${maven.version}/</directory>
-            <outputDirectory>apache-maven</outputDirectory>
+            <directory>target/apache-maven-${bundled.maven.version}/</directory>
+            <outputDirectory>apache-maven-${bundled.maven.version}</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>
@@ -32,8 +32,8 @@
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>target/apache-maven-${maven.version}/</directory>
-            <outputDirectory>apache-maven/maven-docs</outputDirectory>
+            <directory>target/apache-maven-${bundled.maven.version}/</directory>
+            <outputDirectory>apache-maven-${bundled.maven.version}/maven-docs</outputDirectory>
             <includes>
                 <include>LICENSE.txt</include>
                 <include>NOTICE.txt</include>

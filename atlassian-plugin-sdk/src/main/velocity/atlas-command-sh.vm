@@ -16,6 +16,11 @@ if [ $# -ge 1 ]; then
             echo
             echo "${goalhelp}"
             echo
+            #if( $deprecated )
+            echo "DEPRECATED"
+            echo "${deprecated}"
+            echo
+            #end
             #if ($opts.size() > 0)
                 echo "The following options are available:"
                 #foreach($o in $opts)
@@ -68,7 +73,7 @@ ATLAS_HOME=`dirname "${dollar}{ATLAS_HOME}"`
 export ATLAS_HOME
 ATLAS_VERSION="${version}"
 export ATLAS_VERSION
-M2_HOME="${dollar}{ATLAS_HOME}"/apache-maven
+M2_HOME="${dollar}{ATLAS_HOME}"/apache-maven-${mavenVersion}
 MAVEN_EXECUTABLE="${dollar}{M2_HOME}"/bin/mvn
 
 if [ -n "${dollar}{ATLAS_MVN}" ]; then

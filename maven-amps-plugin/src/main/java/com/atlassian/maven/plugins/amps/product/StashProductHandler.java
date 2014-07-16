@@ -55,6 +55,9 @@ public class StashProductHandler extends AbstractWebappProductHandler
         configFiles.add(new File(homeDir, "data/db.log"));
         configFiles.add(new File(homeDir, "data/db.script"));
         configFiles.add(new File(homeDir, "data/db.properties"));
+        configFiles.add(new File(homeDir, "shared/data/db.log"));
+        configFiles.add(new File(homeDir, "shared/data/db.script"));
+        configFiles.add(new File(homeDir, "shared/data/db.properties"));
         return configFiles;
     }
 
@@ -117,7 +120,17 @@ public class StashProductHandler extends AbstractWebappProductHandler
     @Override
     public File getUserInstalledPluginsDirectory(final Product product, final File webappDir, final File homeDir)
     {
-        return new File(new File(homeDir, "plugins"), "installed-plugins");
+        File baseDir = homeDir;
+
+        File sharedHomeDir = new File(homeDir, "shared");
+        // In Stash 3.1 we've changed the home directory layout and moved plugins/installed-plugins under
+        // shared home, which usually is home/shared. If this directory does not exist, then we assume that
+        // Stash will do the migration at a later point.
+        if(sharedHomeDir.exists()) {
+            baseDir = sharedHomeDir;
+        }
+
+        return new File(new File(baseDir, "plugins"), "installed-plugins");
     }
 
     private static class StashPluginProvider extends AbstractPluginProvider

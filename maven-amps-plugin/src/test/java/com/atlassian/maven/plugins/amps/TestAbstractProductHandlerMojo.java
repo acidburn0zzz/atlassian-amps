@@ -1,9 +1,9 @@
 package com.atlassian.maven.plugins.amps;
 
 import org.apache.maven.model.Build;
+import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 
@@ -106,7 +106,7 @@ public class TestAbstractProductHandlerMojo
             when(build.getTestOutputDirectory()).thenReturn(".");
             when(project.getBuild()).thenReturn(build);
             when(project.getBasedir()).thenReturn(new File("."));
-            return new MavenContext(project, null, null, (PluginManager) null, null);
+            return new MavenContext(project, null, null, (BuildPluginManager) null, null);
         }
 
         @Override

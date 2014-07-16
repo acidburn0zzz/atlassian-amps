@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>4.2.21-SNAPSHOT</version>
+        <version>5.0.4-SNAPSHOT</version>
     </parent>
 
     <groupId>com.atlassian.maven.plugins</groupId>
@@ -40,8 +40,18 @@
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
-            <artifactId>maven-project</artifactId>
-            <version>2.1.0</version>
+            <artifactId>maven-core</artifactId>
+            <version>${bundled.maven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>${bundled.maven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-compat</artifactId>
+            <version>${bundled.maven.version}</version>
         </dependency>
         <dependency>
             <!-- Version required by mojo-executor -->
@@ -50,40 +60,26 @@
             <version>1.5.6</version>
         </dependency>
 
-        <!-- These actually don't do anything, but still declared here for documentation purposes -->
+        <!-- Depend on libraries used, rather than on plugins -->
         <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.0</version>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-archiver</artifactId>
+            <version>1.0-alpha-9</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-archiver</artifactId>
             <version>2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <version>2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.twdata.maven</groupId>
-            <artifactId>maven-cli-plugin</artifactId>
-            <version>${maven.cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.guava-osgi</groupId>
-            <artifactId>guava-osgi</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <version>1.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.2.0</version>
         </dependency>
 
         <!-- needed for plugin module generation -->
@@ -168,14 +164,16 @@
             <version>1.4</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven.shared</groupId>
-            <artifactId>maven-common-artifact-filters</artifactId>
-            <version>1.3</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.wink</groupId>
             <artifactId>wink-client-apache-httpclient</artifactId>
             <version>1.1.3-incubating</version>
+        </dependency>
+
+        <!-- Only used in tests -->
+        <dependency>
+            <groupId>com.googlecode.guava-osgi</groupId>
+            <artifactId>guava-osgi</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

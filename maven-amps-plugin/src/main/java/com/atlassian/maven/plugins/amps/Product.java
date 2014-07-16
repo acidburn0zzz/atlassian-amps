@@ -4,6 +4,8 @@ import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
 import com.atlassian.maven.plugins.amps.product.studio.StudioProperties;
 import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.surefire.shade.org.apache.commons.lang.StringUtils;
 
 public class Product
 {

@@ -26,6 +26,11 @@ echo.
 echo Usage: atlas-${mojo} [options]
 echo.
 echo ${goalhelp}
+#if( $deprecated )
+echo.
+echo DEPRECATED
+echo ${deprecated}
+#end
 #if ($opts.size() > 0)
     echo.
     echo The following options are available:
@@ -66,7 +71,7 @@ rem ---------------------------------------------------------------
 rem Identify Maven location relative to script
 rem ---------------------------------------------------------------
 
-set MVN2_HOME=%ATLAS_HOME%\apache-maven
+set MVN2_HOME=%ATLAS_HOME%\apache-maven-${mavenVersion}
 set MAVEN_EXECUTABLE="%MVN2_HOME%\bin\mvn.bat"
 set ATLAS_VERSION="${version}"
 

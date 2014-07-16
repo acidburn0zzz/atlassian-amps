@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>4.2.21-SNAPSHOT</version>
+        <version>5.0.4-SNAPSHOT</version>
     </parent>
 
     <groupId>com.atlassian.amps</groupId>
@@ -13,7 +13,7 @@
     <name>AMPS Maven Plugin - Maven 3 tests</name>
 
     <properties>
-        <maven3.version>3.0.3</maven3.version>
+        <maven3.version>3.2.1</maven3.version>
     </properties>
 
     <dependencies>

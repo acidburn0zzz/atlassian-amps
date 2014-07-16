@@ -1,11 +1,13 @@
 package com.atlassian.maven.plugins.ampsdispatcher;
 
 import junit.framework.TestCase;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.project.MavenProject;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -18,7 +20,7 @@ public class TestAbstractAmpsDispatcherMojo extends TestCase
 
     MavenProject project;
     MavenSession session;
-    PluginManager pluginManager;
+    BuildPluginManager buildPluginManager;
     AbstractAmpsDispatcherMojo mojo;
 
     @Override
@@ -27,9 +29,9 @@ public class TestAbstractAmpsDispatcherMojo extends TestCase
         super.setUp();
         project = new MavenProject();
         session = mock(MavenSession.class);
-        pluginManager = mock(PluginManager.class);
+        buildPluginManager = mock(BuildPluginManager.class);
         mojo = new AbstractAmpsDispatcherMojo(){};
-        mojo.pluginManager = pluginManager;
+        mojo.buildPluginManager = buildPluginManager;
         mojo.project = project;
         mojo.session = session;
     }

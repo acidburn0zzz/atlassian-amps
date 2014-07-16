@@ -2,17 +2,17 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.atlassian.pom</groupId>
-        <artifactId>atlassian-public-pom</artifactId>
-        <version>27</version>
+        <artifactId>public-pom</artifactId>
+        <version>3.0.11</version>
     </parent>
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>4.2.21-SNAPSHOT</version>
+    <version>5.0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
-    <url>http://studio.atlassian.com/browse/AMPS</url>
+    <url>https://ecosystem.atlassian.net/browse/AMPS</url>
 
     <licenses>
         <license>
@@ -27,7 +27,8 @@
         <connection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</connection>
         <developerConnection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</developerConnection>
         <url>https://bitbucket.org/atlassian/amps</url>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
 
     <issueManagement>
         <system>JIRA</system>
@@ -59,7 +60,22 @@
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-core</artifactId>
-                <version>3.0</version>
+                <version>${bundled.maven.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-model</artifactId>
+                <version>${bundled.maven.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-plugin-api</artifactId>
+                <version>${bundled.maven.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-artifact</artifactId>
+                <version>${bundled.maven.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.atlassian.fugue</groupId>
@@ -78,13 +94,13 @@
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-annotations</artifactId>
-            <version>3.0</version>
+            <version>3.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.twdata.maven</groupId>
             <artifactId>mojo-executor</artifactId>
-            <version>1.5.1</version>
+            <version>1.5.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -124,14 +140,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>2.0.1</version>
-                    <dependencies>
-                        <dependency><!-- add support for ssh/scp -->
-                            <groupId>org.apache.maven.wagon</groupId>
-                            <artifactId>wagon-ssh</artifactId>
-                            <version>1.0</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
@@ -254,6 +262,11 @@
                         </lifecycleMappingMetadata>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>2.5</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -270,7 +283,7 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>[${maven.version}]</version>
+                                    <version>[${build.maven.version},)</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
@@ -280,7 +293,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.3</version>
                 <configuration>
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                 </configuration>
@@ -303,7 +316,6 @@
             </plugin>
             <plugin>
                <artifactId>maven-release-plugin</artifactId>
-               <version>2.2.2</version>
                 <configuration>
                     <releaseProfiles>${release.profiles}</releaseProfiles>
                     <arguments>${release.arguments}</arguments>
@@ -326,7 +338,7 @@
     <distributionManagement>
         <site>
             <id>atlassian-documentation</id>
-            <url>scp://docs-fe.internal.atlassian.com/var/www/domains/docs.atlassian.com/${project.artifactId}/${project.version}</url>
+            <url>scpexe://docs-app.internal.atlassian.com/var/www/domains/docs.atlassian.com/${project.artifactId}/${project.version}</url>
         </site>
     </distributionManagement>
 
@@ -346,10 +358,11 @@
 
     <properties>
         <jdkLevel>1.6</jdkLevel>
-        <maven.version>2.1.0</maven.version>
+        <build.maven.version>3.0.5</build.maven.version>
+        <bundled.maven.version>3.2.1</bundled.maven.version>
         <refapp.version>2.20.0-m2</refapp.version>
-        <confluence.version>5.1.2</confluence.version>
-        <confluence.data.version>5.1.2</confluence.data.version>
+        <confluence.version>5.5</confluence.version>
+        <confluence.data.version>5.5</confluence.data.version>
         <jira.version>5.2.11</jira.version>
         <jira.data.version>5.2.11</jira.data.version>
         <fugue.version>1.0</fugue.version>
@@ -366,7 +379,7 @@
         <stash.version>2.4.1</stash.version>
         <stash.data.version>2.4.1</stash.data.version>
         <plugin.testrunner.version>1.2.0</plugin.testrunner.version>
-        <maven.cli.version>1.0.10</maven.cli.version>
+        <maven.cli.version>1.0.11</maven.cli.version>
         <release.profiles>release,installer-win,installer-linux,installer-osx</release.profiles>
         <release.arguments>-Pinstaller-win,installer-osx,installer-linux</release.arguments>
     </properties>

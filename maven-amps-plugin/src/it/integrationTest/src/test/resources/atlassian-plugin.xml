@@ -1,4 +1,4 @@
-<atlassian-plugin key="plugin-tests" plugins-version="2">
+<atlassian-plugin key="${project.artifactId}-${project.version}" plugins-version="2">
 
     <plugin-info>
         <description>Test IT Plugin's tests</description>

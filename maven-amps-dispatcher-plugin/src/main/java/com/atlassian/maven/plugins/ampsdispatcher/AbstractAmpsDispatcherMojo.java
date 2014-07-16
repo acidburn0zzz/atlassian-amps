@@ -1,6 +1,5 @@
 package com.atlassian.maven.plugins.ampsdispatcher;
 
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -46,11 +45,8 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
     @Parameter(property = "session", required = true, readonly = true)
     MavenSession session;
 
-    /**
-     * The Maven 2 PluginManager Object
-     */
     @Component
-    PluginManager pluginManager;
+    BuildPluginManager buildPluginManager;
 
     public final void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -115,26 +111,6 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
 
     protected MojoExecutor.ExecutionEnvironment getExecutionEnvironment()
     {
-        try
-        {
-            Class bpmClass = Class.forName("org.apache.maven.plugin.BuildPluginManager");
-            Object buildPluginManager = session.lookup("org.apache.maven.plugin.BuildPluginManager");
-
-            Class[] params = new Class[] {project.getClass(),session.getClass(),bpmClass};
-            Method execEnvMethod = MojoExecutor.class.getMethod("executionEnvironment",params);
-            Object[] args = new Object[] {project, session, buildPluginManager};
-
-            MojoExecutor.ExecutionEnvironment execEnv = (MojoExecutor.ExecutionEnvironment) execEnvMethod.invoke(null,args);
-            if(null != execEnv)
-            {
-                return execEnv;
-            }
-        }
-        catch (Exception e)
-        {
-            // e.printStackTrace();
-        }
-
-        return MojoExecutor.executionEnvironment(project, session, pluginManager);
+        return executionEnvironment(project, session, buildPluginManager);
     }
 }

@@ -3,7 +3,7 @@
     <parent>
         <artifactId>atlassian-amps-parent</artifactId>
         <groupId>com.atlassian.amps</groupId>
-        <version>4.2.21-SNAPSHOT</version>
+        <version>5.0.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -23,9 +23,9 @@
             <version>4.0</version>
         </dependency>
         <dependency>
-            <groupId>org.twdata.maven</groupId>
-            <artifactId>maven-cli-plugin</artifactId>
-            <version>${maven.cli.version}</version>
+            <groupId>jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>0.9.94</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>

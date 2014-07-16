@@ -16,13 +16,19 @@ echo "The following scripts are available to assist with plugin development"
 echo
 #foreach( $command in $commandNames )
 
+    #set( $deprecated = false )
     #parse( "commands/${command}" )
-    echo "atlas-${command}"
+    echo "atlas-${command}#if(${deprecated}) [DEPRECATED]#end"
     echo "    ${goalhelp}"
     echo
 
     #if ($opts.size() > 0)
         if [ ${dollar}{VERBOSE} = "true" ]; then
+            #if( $deprecated )
+            echo "    DEPRECATED"
+            echo "    ${deprecated}"
+            echo
+            #end
             echo "    The following options are available:"
             #foreach($o in $opts)
                     #if ($o.short)
