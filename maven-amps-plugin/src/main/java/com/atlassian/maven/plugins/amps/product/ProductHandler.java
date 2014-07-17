@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.plugin.MojoExecutionException;
-
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
+
+import org.apache.maven.plugin.MojoExecutionException;
 
 public interface ProductHandler
 {
@@ -93,4 +93,10 @@ public interface ProductHandler
      * @param homeDirectory an image of the home directory. This is not the current home, so you're free to remove files and parametrise them.
      */
     public void cleanupProductHomeForZip(Product product, File homeDirectory) throws MojoExecutionException, IOException;
+
+    /**
+     * Get the default port for HTTP for each product.
+     * @since 5.0.4
+     */
+    int getDefaultHttpsPort();
 }

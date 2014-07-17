@@ -1,14 +1,32 @@
 package com.atlassian.maven.plugins.amps;
 
-import aQute.lib.osgi.Constants;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.jar.Manifest;
+import java.util.regex.Matcher;
+
 import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
 import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -23,21 +41,22 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.twdata.maven.mojoexecutor.MojoExecutor.*;
+import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
+import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.*;
-import java.util.jar.Manifest;
-import java.util.regex.Matcher;
+import aQute.lib.osgi.Constants;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.goal;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
 
 /**
  * Executes specific maven goals
@@ -812,7 +831,7 @@ public class MavenGoals
 
         if(webappContext.getUseHttps())
         {
-            actualHttpPort = 443;
+            actualHttpPort = webappContext.getHttpsPort();
             protocol = "https";
         }
         else
@@ -911,7 +930,28 @@ public class MavenGoals
 
         if (webappContext.getUseHttps())
         {
+            log.debug("starting tomcat using Https via cargo with the following parameters:");
+            log.debug("cargo.servlet.port = " + actualHttpPort);
+            log.debug("cargo.protocol = " + protocol);
             props.add(element(name("cargo.protocol"), protocol));
+
+            log.debug("cargo.tomcat.connector.clientAuth = " + webappContext.getHttpsClientAuth().toString());
+            props.add(element(name("cargo.tomcat.connector.clientAuth"), webappContext.getHttpsClientAuth().toString()));
+
+            log.debug("cargo.tomcat.connector.sslProtocol = " +  webappContext.getHttpsSSLProtocol());
+            props.add(element(name("cargo.tomcat.connector.sslProtocol"), webappContext.getHttpsSSLProtocol()));
+
+            log.debug("cargo.tomcat.connector.keystoreFile = " + webappContext.getHttpsKeystoreFile());
+            props.add(element(name("cargo.tomcat.connector.keystoreFile"), webappContext.getHttpsKeystoreFile()));
+
+            log.debug("cargo.tomcat.connector.keystorePass = " + webappContext.getHttpsKeystorePass());
+            props.add(element(name("cargo.tomcat.connector.keystorePass"), webappContext.getHttpsKeystorePass()));
+
+            log.debug("cargo.tomcat.connector.keyAlias = " +webappContext.getHttpsKeyAlias());
+            props.add(element(name("cargo.tomcat.connector.keyAlias"), webappContext.getHttpsKeyAlias()));
+
+            log.debug("cargo.tomcat.httpSecure = " + webappContext.getHttpsHttpSecure().toString());
+            props.add(element(name("cargo.tomcat.httpSecure"), webappContext.getHttpsHttpSecure().toString()));
         }
 
         props.add(element(name(AJP_PORT_PROPERTY), String.valueOf(actualAjpPort)));

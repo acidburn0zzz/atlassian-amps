@@ -32,6 +32,59 @@ public class Product
     private Boolean useHttps;
 
     /**
+     * the HTTPS port to use.
+     * @since 5.0.4
+     */
+    private int httpsPort;
+
+    /**
+     * The SSL certificate chain option.
+     * @see <a href="http://tomcat.apache.org/tomcat-7.0-doc/ssl-howto.html#Configuration">Tomcat SSL HOWTO</a>
+     * @see <a href="http://tomcat.apache.org/tomcat-7.0-doc/config/http.html#SSL_Support">Tomcat SSL Support</a>
+     * @since 5.0.4
+     */
+    private String httpsClientAuth;
+
+    /**
+     * The SSL protocols to use.
+     * @see <a href="http://tomcat.apache.org/tomcat-7.0-doc/ssl-howto.html#Configuration">Tomcat SSL HOWTO</a>
+     * @see <a href="http://tomcat.apache.org/tomcat-7.0-doc/config/http.html#SSL_Support">Tomcat SSL Support</a>
+     * @since 5.0.4
+     */
+    private String httpsSslProtocol;
+
+    /**
+     * The pathname of the keystore file.
+     * @see <a href="http://tomcat.apache.org/tomcat-7.0-doc/ssl-howto.html#Configuration">Tomcat SSL HOWTO</a>
+     * @see <a href="http://tomcat.apache.org/tomcat-7.0-doc/config/http.html#SSL_Support">Tomcat SSL Support</a>
+     * @since 5.0.4
+     */
+    private String httpsKeystoreFile;
+
+    /**
+     * The password of the keystore file.
+     * @see <a href="http://tomcat.apache.org/tomcat-7.0-doc/ssl-howto.html#Configuration">Tomcat SSL HOWTO</a>
+     * @see <a href="http://tomcat.apache.org/tomcat-7.0-doc/config/http.html#SSL_Support">Tomcat SSL Support</a>
+     * @since 5.0.4
+     */
+    private String httpsKeystorePass;
+
+    /**
+     * The alias of the certificate to use.
+     * @see <a href="http://tomcat.apache.org/tomcat-7.0-doc/ssl-howto.html#Configuration">Tomcat SSL HOWTO</a>
+     * @see <a href="http://tomcat.apache.org/tomcat-7.0-doc/config/http.html#SSL_Support">Tomcat SSL Support</a>
+     * @since 5.0.4
+     */
+    private String httpsKeyAlias;
+
+    /**
+     * Cargo httpSecure flag
+     * @see <a href="http://svn.codehaus.org/cargo/core/trunk/containers/tomcat/src/main/java/org/codehaus/cargo/container/tomcat/TomcatPropertySet.java">Cargo Tomcat Properties</a>
+     * @since 5.0.4
+     */
+    private Boolean httpsHttpSecure;
+
+    /**
      * Application context path, in the format: /context-path
      */
     protected String contextPath;
@@ -349,6 +402,15 @@ public class Product
         prod.setInstanceIds(instanceIds == null ? product.getInstanceIds() : instanceIds);
         prod.setShutdownEnabled(shutdownEnabled == null ? product.getShutdownEnabled() : shutdownEnabled);
 
+        // https related properties
+        prod.setHttpsPort(httpsPort == 0 ? product.getHttpsPort() : httpsPort);
+        prod.setHttpsClientAuth(httpsClientAuth == null ? product.getHttpsClientAuth() : httpsClientAuth);
+        prod.setHttpsSSLProtocol(httpsSslProtocol == null ? product.getHttpsSSLProtocol() : httpsSslProtocol);
+        prod.setHttpsKeystoreFile(httpsKeystoreFile == null ? product.getHttpsKeystoreFile() : httpsKeystoreFile);
+        prod.setHttpsKeystorePass(httpsKeystorePass == null ? product.getHttpsKeystorePass() : httpsKeystorePass);
+        prod.setHttpsKeyAlias(httpsKeyAlias == null ? product.getHttpsKeyAlias() : httpsKeyAlias);
+        prod.setHttpsHttpSecure(httpsHttpSecure == null ? product.getHttpsHttpSecure() : httpsHttpSecure);
+
         return prod;
     }
 
@@ -390,6 +452,118 @@ public class Product
     public void setUseHttps(Boolean useHttps)
     {
         this.useHttps = useHttps;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public void setHttpsPort(final int httpsPort)
+    {
+        this.httpsPort = httpsPort;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public int getHttpsPort()
+    {
+        return this.httpsPort;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public void setHttpsClientAuth(final String httpsClientAuth)
+    {
+        this.httpsClientAuth = httpsClientAuth;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public String getHttpsClientAuth()
+    {
+        return this.httpsClientAuth;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public void setHttpsSSLProtocol(final String httpsSslProtocol)
+    {
+        this.httpsSslProtocol = httpsSslProtocol;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public String getHttpsSSLProtocol()
+    {
+        return this.httpsSslProtocol;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public void setHttpsKeystoreFile(final String httpsKeystoreFile)
+    {
+        this.httpsKeystoreFile = httpsKeystoreFile;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public String getHttpsKeystoreFile()
+    {
+        return this.httpsKeystoreFile;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public void setHttpsKeystorePass(final String httpsKeystorePass)
+    {
+        this.httpsKeystorePass = httpsKeystorePass;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public String getHttpsKeystorePass()
+    {
+        return this.httpsKeystorePass;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public void setHttpsKeyAlias(final String httpsKeyAlias)
+    {
+        this.httpsKeyAlias = httpsKeyAlias;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public String getHttpsKeyAlias()
+    {
+        return this.httpsKeyAlias;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public void setHttpsHttpSecure(final Boolean httpsHttpSecure)
+    {
+        this.httpsHttpSecure = httpsHttpSecure;
+    }
+
+    /**
+     * @since 5.0.4
+     */
+    public Boolean getHttpsHttpSecure()
+    {
+        return this.httpsHttpSecure;
     }
 
     public String getContextPath()
