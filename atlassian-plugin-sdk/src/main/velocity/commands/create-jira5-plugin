@@ -2,6 +2,8 @@
 
 #set( $goalhelp = "Creates a JIRA 5.x plugin." )
 
+#set( $deprecated = "Use atlas-create-jira-plugin and edit jira.version in the generated pom.xml." )
+
 #set( $opts = [
 {
   'name' : 'artifact-id',
