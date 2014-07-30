@@ -28,6 +28,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -54,7 +55,8 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     public static final String JUNIT_GROUP_ID = "org.apache.servicemix.bundles";
     public static final String JUNIT_ARTIFACT_ID = "org.apache.servicemix.bundles.junit";
     public static final String TESTRUNNER_GROUP_ID = "com.atlassian.plugins";
-    public static final String TESTRUNNER_ARTIFACT_ID = "atlassian-plugins-osgi-testrunner-bundle";
+    public static final String TESTRUNNER_ARTIFACT_ID = "atlassian-plugins-osgi-testrunner";
+    public static final String TESTRUNNER_BUNDLE_ARTIFACT_ID = "atlassian-plugins-osgi-testrunner-bundle";
 
     /**
      *  The artifacts to deploy for the test console if needed
@@ -652,12 +654,23 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     {
         if(null == testFrameworkPlugins)
         {
+            String testRunnerVersion;
+            Artifact testRunnerArtifact = ProjectUtils.getReactorArtifact(getMavenContext(), TESTRUNNER_GROUP_ID, TESTRUNNER_ARTIFACT_ID);
+            if (testRunnerArtifact == null)
+            {
+                testRunnerVersion = ATLASSIAN_TEST_RUNNER_VERSION;
+            }
+            else
+            {
+                testRunnerVersion = testRunnerArtifact.getVersion();
+            }
+
             Properties overrides = getMavenContext().getVersionOverrides();
             
             this.testFrameworkPlugins = new ArrayList<ProductArtifact>();
-            
+
             testFrameworkPlugins.add(new ProductArtifact(JUNIT_GROUP_ID, JUNIT_ARTIFACT_ID,overrides.getProperty(JUNIT_ARTIFACT_ID,JUNIT_VERSION)));
-            testFrameworkPlugins.add(new ProductArtifact(TESTRUNNER_GROUP_ID, TESTRUNNER_ARTIFACT_ID,overrides.getProperty(TESTRUNNER_ARTIFACT_ID,ATLASSIAN_TEST_RUNNER_VERSION)));
+            testFrameworkPlugins.add(new ProductArtifact(TESTRUNNER_GROUP_ID, TESTRUNNER_BUNDLE_ARTIFACT_ID,overrides.getProperty(TESTRUNNER_BUNDLE_ARTIFACT_ID,testRunnerVersion)));
         }
         
         return testFrameworkPlugins;
