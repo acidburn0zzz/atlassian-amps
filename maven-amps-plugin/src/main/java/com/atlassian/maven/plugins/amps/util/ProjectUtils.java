@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.List;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.project.MavenProject;
 
 import org.apache.maven.model.Resource;
 
@@ -54,5 +56,23 @@ public class ProjectUtils
             throw new RuntimeException("Failed to create directory " + dir.getAbsolutePath());
         }
         return dir;
+    }
+
+    /**
+     * Attempt to retrieve an artifact matching the group ID and artifact ID requested.
+     *
+     * @return null if not found
+     */
+    public static Artifact getReactorArtifact(MavenContext context, String groupId, String artifactId)
+    {
+        MavenProject project = context.getProject();
+        for (Artifact artifact : project.getArtifacts())
+        {
+            if (artifact.getGroupId().equals(groupId) && artifact.getArtifactId().equals(artifactId))
+            {
+                return artifact;
+            }
+        }
+        return null;
     }
 }
