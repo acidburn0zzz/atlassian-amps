@@ -1,19 +1,21 @@
 package com.atlassian.maven.plugins.amps.product;
 
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.VersionUtils;
-import com.google.common.collect.ImmutableMap;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.util.VersionUtils;
+
+import com.google.common.collect.ImmutableMap;
+
+import org.apache.maven.artifact.factory.ArtifactFactory;
 
 public class RefappProductHandler extends AbstractWebappProductHandler
 {
@@ -27,9 +29,16 @@ public class RefappProductHandler extends AbstractWebappProductHandler
         return "refapp";
     }
 
+    @Override
     public int getDefaultHttpPort()
     {
         return 5990;
+    }
+
+    @Override
+    public int getDefaultHttpsPort()
+    {
+        return 8445;
     }
 
     @Override

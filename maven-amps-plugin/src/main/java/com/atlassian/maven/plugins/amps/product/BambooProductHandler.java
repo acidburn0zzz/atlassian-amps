@@ -1,18 +1,24 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.deleteDir;
 
@@ -45,9 +51,16 @@ public class BambooProductHandler extends AbstractWebappProductHandler
         return new ProductArtifact("com.atlassian.bamboo.plugins", "bamboo-plugin-test-resources");
     }
 
+    @Override
     public int getDefaultHttpPort()
     {
         return 6990;
+    }
+
+    @Override
+    public int getDefaultHttpsPort()
+    {
+        return 8446;
     }
 
     public Map<String, String> getSystemProperties(Product ctx)

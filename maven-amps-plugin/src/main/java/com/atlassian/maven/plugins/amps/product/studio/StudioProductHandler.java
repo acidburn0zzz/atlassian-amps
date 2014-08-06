@@ -224,6 +224,13 @@ public class StudioProductHandler extends AmpsProductHandler
         return 0;
     }
 
+    @Override
+    public int getDefaultHttpsPort()
+    {
+        // No default - this product can't be launched
+        return 0;
+    }
+
     /**
      * Does nothing for non-studios products.
      * For Studio products, defaults the studio-specific properties.

@@ -1,17 +1,5 @@
 package com.atlassian.maven.plugins.amps.product;
 
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
-import com.atlassian.maven.plugins.amps.util.ProjectUtils;
-import com.atlassian.maven.plugins.amps.util.ant.AntJavaExecutorThread;
-import com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.tools.ant.taskdefs.Java;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -22,6 +10,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
+import com.atlassian.maven.plugins.amps.util.ProjectUtils;
+import com.atlassian.maven.plugins.amps.util.ant.AntJavaExecutorThread;
+import com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory;
+
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.tools.ant.taskdefs.Java;
 
 import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
 import static com.atlassian.maven.plugins.amps.util.ant.JavaTaskFactory.output;
@@ -55,6 +56,12 @@ public class CtkServerProductHandler implements ProductHandler
     public int getDefaultHttpPort()
     {
         return 8990;
+    }
+
+    @Override
+    public int getDefaultHttpsPort()
+    {
+        return 8448;
     }
 
     @Override
