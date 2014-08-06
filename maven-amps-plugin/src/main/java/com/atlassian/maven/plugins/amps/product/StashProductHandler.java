@@ -1,18 +1,23 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+
 import com.google.common.collect.ImmutableMap;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 public class StashProductHandler extends AbstractWebappProductHandler
 {
@@ -77,6 +82,12 @@ public class StashProductHandler extends AbstractWebappProductHandler
     public int getDefaultHttpPort()
     {
         return 7990;
+    }
+
+    @Override
+    public int getDefaultHttpsPort()
+    {
+        return 8447;
     }
 
     @Override

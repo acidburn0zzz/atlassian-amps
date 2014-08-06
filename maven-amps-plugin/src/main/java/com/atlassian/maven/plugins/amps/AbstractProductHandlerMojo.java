@@ -57,6 +57,14 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     public static final String TESTRUNNER_GROUP_ID = "com.atlassian.plugins";
     public static final String TESTRUNNER_ARTIFACT_ID = "atlassian-plugins-osgi-testrunner";
     public static final String TESTRUNNER_BUNDLE_ARTIFACT_ID = "atlassian-plugins-osgi-testrunner-bundle";
+    // SSL/https defaults
+    public static final String DEFAULT_HTTPS_KEYSTOREFILE = "${user.home}/.keystore";
+    public static final String DEFAULT_HTTPS_KETSTOREPASS = "changeit";
+    public static final String DEFAULT_HTTPS_KEYALIAS = "tomcat";
+    public static final String DEFAULT_HTTP_SECURE = "true";
+    public static final String DEFAULT_HTTPS_SSL_PROTOCOL = "TLS";
+    public static final String DEFAULT_HTTPS_CLIENTAUTH = "false";
+    public static final String DEFAULT_HTTPS_PORT = "0";
 
     /**
      *  The artifacts to deploy for the test console if needed
@@ -82,10 +90,58 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     private int ajpPort;
 
     /**
-     * If product should be started with https on port 443
+     * If product should be started with https
      */
     @Parameter(property = "use.https", defaultValue = "false")
     protected boolean useHttps;
+
+    /**
+     * HTTPS port for the servlet containers
+     */
+    @Parameter(property = "https.port", defaultValue = DEFAULT_HTTPS_PORT)
+    private int httpsPort;
+
+    /**
+     * The SSL certificate chain option.
+     * @since 5.0.4
+     */
+    @Parameter(property = "https.clientAuth", defaultValue = DEFAULT_HTTPS_CLIENTAUTH)
+    protected String httpsClientAuth;
+
+    /**
+     * The SSL protocols to use.
+     * @since 5.0.4
+     */
+    @Parameter(property = "https.sslProtocol", defaultValue = DEFAULT_HTTPS_SSL_PROTOCOL)
+    protected String httpsSslProtocol;
+
+    /**
+     * The pathname of the keystore file.
+     * @since 5.0.4
+     */
+    @Parameter(property = "https.keystoreFile", defaultValue = DEFAULT_HTTPS_KEYSTOREFILE)
+    protected String httpsKeystoreFile;
+
+    /**
+     * The password to use to access the keypass store.
+     * @since 5.0.4
+     */
+    @Parameter(property = "https.keystorePass", defaultValue = DEFAULT_HTTPS_KETSTOREPASS)
+    protected String httpsKeystorePass;
+
+    /**
+     * The alias of the certificate to use.
+     * @since 5.0.4
+     */
+    @Parameter(property = "https.keyAlias", defaultValue = DEFAULT_HTTPS_KEYALIAS)
+    protected String httpsKeyAlias;
+
+    /**
+     * Cargo httpSecure flag
+     * @since 5.0.4
+     */
+    @Parameter(property = "https.httpSecure", defaultValue = DEFAULT_HTTP_SECURE)
+    protected boolean httpsHttpSecure;
 
     /**
      * Application context path
@@ -385,7 +441,16 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setLog4jProperties(log4jProperties);
         ctx.setHttpPort(httpPort);
         ctx.setAjpPort(ajpPort);
+
+        // HTTPS settings to pass via cargo to tomcat
         ctx.setUseHttps(useHttps);
+        ctx.setHttpsPort(httpsPort);
+        ctx.setHttpsClientAuth(httpsClientAuth);
+        ctx.setHttpsSSLProtocol(httpsSslProtocol);
+        ctx.setHttpsKeystoreFile(httpsKeystoreFile);
+        ctx.setHttpsKeystorePass(httpsKeystorePass);
+        ctx.setHttpsKeyAlias(httpsKeyAlias);
+        ctx.setHttpsHttpSecure(httpsHttpSecure);
 
         ctx.setVersion(productVersion);
         ctx.setDataVersion(productDataVersion);
@@ -587,6 +652,41 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         if (product.getUseHttps() == null)
         {
             product.setUseHttps(false);
+        }
+
+        if (product.getHttpsPort() == 0)
+        {
+            product.setHttpsPort(handler.getDefaultHttpsPort());
+        }
+
+        if (product.getHttpsClientAuth() == null)
+        {
+            product.setHttpsClientAuth(DEFAULT_HTTPS_CLIENTAUTH);
+        }
+
+        if (product.getHttpsSSLProtocol() == null)
+        {
+            product.setHttpsSSLProtocol(DEFAULT_HTTPS_SSL_PROTOCOL);
+        }
+
+        if (product.getHttpsKeystoreFile() == null)
+        {
+            product.setHttpsKeystoreFile(DEFAULT_HTTPS_KEYSTOREFILE);
+        }
+
+        if (product.getHttpsKeystorePass() == null)
+        {
+            product.setHttpsKeystorePass(DEFAULT_HTTPS_KETSTOREPASS);
+        }
+
+        if (product.getHttpsKeyAlias() == null)
+        {
+            product.setHttpsKeyAlias(DEFAULT_HTTPS_KEYALIAS);
+        }
+
+        if (product.getHttpsHttpSecure() == null)
+        {
+            product.setHttpsHttpSecure(Boolean.parseBoolean(DEFAULT_HTTP_SECURE));
         }
 
         if (product.getVersion() == null)
