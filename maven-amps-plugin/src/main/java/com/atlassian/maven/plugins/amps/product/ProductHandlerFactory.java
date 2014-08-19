@@ -120,7 +120,7 @@ public class ProductHandlerFactory
 
     public static Collection<String> getIds()
     {
-        return Arrays.asList(REFAPP, CONFLUENCE, JIRA, JIRA_PLATFORM, JIRA_SOFTWARE, BAMBOO, FECRU, CROWD, STASH, CTK_SERVER,
+        return Arrays.asList(REFAPP, CONFLUENCE, JIRA, JIRA_PLATFORM, JIRA_SOFTWARE, SERVICEDESK, BAMBOO, FECRU, CROWD, STASH, CTK_SERVER,
                 STUDIO, STUDIO_CONFLUENCE, STUDIO_JIRA, STUDIO_BAMBOO, STUDIO_FECRU, STUDIO_CROWD);
     }
 }
