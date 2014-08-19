@@ -6,6 +6,8 @@ import com.atlassian.maven.plugins.amps.ProductArtifact;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 
+import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.JIRA_SOFTWARE;
+
 public class JiraSoftwareProductHandler extends JiraProductHandler
 {
       public JiraSoftwareProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
@@ -15,7 +17,7 @@ public class JiraSoftwareProductHandler extends JiraProductHandler
 
     public String getId()
     {
-        return "jira-software";
+        return JIRA_SOFTWARE;
     }
 
     @Override

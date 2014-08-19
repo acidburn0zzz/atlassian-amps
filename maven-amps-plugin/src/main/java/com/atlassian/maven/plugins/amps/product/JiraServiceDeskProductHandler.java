@@ -5,6 +5,8 @@ import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 
+import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.SERVICEDESK;
+
 public class JiraServiceDeskProductHandler extends JiraProductHandler
 {
       public JiraServiceDeskProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
@@ -14,7 +16,7 @@ public class JiraServiceDeskProductHandler extends JiraProductHandler
 
     public String getId()
     {
-        return "servicedesk";
+        return SERVICEDESK;
     }
 
     @Override

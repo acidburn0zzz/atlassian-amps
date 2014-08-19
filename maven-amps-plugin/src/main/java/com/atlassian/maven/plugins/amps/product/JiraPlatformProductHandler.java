@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.JIRA_PLATFORM;
 import static com.atlassian.maven.plugins.amps.util.ConfigFileUtils.RegexReplacement;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static java.lang.String.format;
@@ -37,7 +38,7 @@ public class JiraPlatformProductHandler extends JiraProductHandler
 
     public String getId()
     {
-        return "jira-platform";
+        return JIRA_PLATFORM;
     }
 
     @Override
