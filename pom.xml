@@ -24,9 +24,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</developerConnection>
-        <url>https://bitbucket.org/atlassian/amps</url>
+        <connection>scm:git:ssh://git@bitbucket.org/pbugalski/amps.git</connection>
+        <developerConnection>scm:git:ssh://git@bitbucket.org/pbugalski/amps.git</developerConnection>
+        <url>https://bitbucket.org/pbugalski/amps</url>
       <tag>HEAD</tag>
   </scm>
 
