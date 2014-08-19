@@ -3,7 +3,6 @@ package com.atlassian.maven.plugins.amps.product;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 
 import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.JIRA_SOFTWARE;
