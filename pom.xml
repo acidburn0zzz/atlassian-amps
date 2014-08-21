@@ -8,7 +8,7 @@
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>5.0.4-lego-2-SNAPSHOT</version>
+    <version>5.0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
@@ -381,6 +381,6 @@
         <plugin.testrunner.version>1.2.0</plugin.testrunner.version>
         <maven.cli.version>1.0.11</maven.cli.version>
         <release.profiles>release</release.profiles>
-        <release.arguments />
+        <release.arguments/>
     </properties>
 </project>
