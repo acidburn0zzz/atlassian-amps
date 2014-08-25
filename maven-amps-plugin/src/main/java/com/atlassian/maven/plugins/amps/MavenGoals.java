@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -39,8 +40,11 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.tools.ant.filters.StringInputStream;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
@@ -119,6 +123,7 @@ public class MavenGoals
                 put("maven-surefire-plugin", overrides.getProperty("maven-surefire-plugin","2.12.4"));
                 put("maven-failsafe-plugin", overrides.getProperty("maven-failsafe-plugin","2.12.4"));
                 put("maven-exec-plugin", overrides.getProperty("maven-exec-plugin","1.2.1"));
+                put("maven-antrun-plugin", overrides.getProperty("maven-antrun-plugin","1.6"));
 
             }};
     }
@@ -1874,6 +1879,56 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
+    }
+
+    public void extractProductObrToDirectory(final ProductArtifact artifact, final File outputDirectory) throws MojoExecutionException
+    {
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("copy"),
+                configuration(
+                        element(name("artifactItems"),
+                                element(name("artifactItem"),
+                                        element(name("groupId"), artifact.getGroupId()),
+                                        element(name("artifactId"), artifact.getArtifactId()),
+                                        element(name("version"), artifact.getVersion()),
+                                        element(name("type"), "obr"))),
+                        element(name("outputDirectory"), getBuildDirectory())
+                ),
+                executionEnvironment());
+
+        try
+        {
+            executeMojo(
+                    plugin(
+                            groupId("org.apache.maven.plugins"),
+                            artifactId("maven-antrun-plugin"),
+                            version(defaultArtifactIdToVersionMap.get("maven-antrun-plugin"))
+                    ),
+                    goal("run"),
+                    Xpp3DomBuilder.build(new StringReader("<configuration><tasks><echo message=\"prepare-package\"/>\n"
+                            + "<unzip src=\"" + getBuildDirectory() + "/" + artifact.getArtifactId() + "-" + artifact.getVersion() + ".obr\"\n"
+                            + "       dest=\"" + outputDirectory + "\">\n"
+                            + "    <patternset>\n"
+                            + "        <include name=\"**/*.jar\"/>\n"
+                            + "    </patternset>\n"
+                            + "    <flattenmapper/>\n"
+                            + "</unzip></tasks></configuration>"))
+                    ,
+                    executionEnvironment());
+        }
+        catch (final XmlPullParserException e)
+        {
+            throw new MojoExecutionException("Unable to extract product: " + artifact.getArtifactId(),e);
+        }
+        catch (final IOException e)
+        {
+            throw new MojoExecutionException("Unable to extract product" + artifact.getArtifactId(),e);
+        }
     }
 
     private static class Container extends ProductArtifact

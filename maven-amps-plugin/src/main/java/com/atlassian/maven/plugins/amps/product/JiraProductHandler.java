@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.atlassian.maven.plugins.amps.AddonProduct;
 import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
@@ -18,12 +19,17 @@ import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import com.google.common.collect.Iterables;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
+
+import javax.annotation.Nullable;
 
 import static com.atlassian.maven.plugins.amps.util.ConfigFileUtils.RegexReplacement;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
@@ -294,6 +300,29 @@ public class JiraProductHandler extends AbstractWebappProductHandler
 
     private static class JiraPluginProvider extends AbstractPluginProvider
     {
+        @Override
+        public List<ProductArtifact> provideAddonProducts(final Product product)
+        {
+            return ImmutableList.copyOf(Iterables.transform(product.getAddonProducts(), new Function<AddonProduct, ProductArtifact>()
+            {
+                @Override
+                public ProductArtifact apply(final AddonProduct input)
+                {
+                    if (input.getProductId().equals("jira-software"))
+                    {
+                        return new ProductArtifact("com.atlassian.jira", "jira-software-obr-dist", input.getVersion());
+                    }
+                    else if (input.getProductId().equals("servicedesk"))
+                    {
+                        return new ProductArtifact("com.atlassian.servicedesk", "jira-servicedesk", input.getVersion());
+                    }
+                    else
+                    {
+                        throw new RuntimeException("Unknown addon product: " + input.getProductId());
+                    }
+                }
+            }));
+        }
 
         @Override
         protected Collection<ProductArtifact> getSalArtifacts(String salVersion)

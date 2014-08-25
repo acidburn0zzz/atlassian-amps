@@ -20,8 +20,6 @@ public class ProductHandlerFactory
     public static final String CONFLUENCE = "confluence";
     public static final String JIRA = "jira";
     public static final String JIRA_PLATFORM = "jira-platform";
-    public static final String JIRA_SOFTWARE = "jira-software";
-    public static final String SERVICEDESK = "servicedesk";
     public static final String BAMBOO = "bamboo";
     public static final String FECRU = "fecru";
     public static final String CROWD = "crowd";
@@ -54,14 +52,6 @@ public class ProductHandlerFactory
         else if (JIRA_PLATFORM.equals(id))
         {
             return new JiraPlatformProductHandler(context, goals,artifactFactory);
-        }
-        else if (JIRA_SOFTWARE.equals(id))
-        {
-            return new JiraSoftwareProductHandler(context, goals,artifactFactory);
-        }
-        else if (SERVICEDESK.equals(id))
-        {
-            return new JiraServiceDeskProductHandler(context, goals,artifactFactory);
         }
         else if (BAMBOO.equals(id))
         {
@@ -120,7 +110,7 @@ public class ProductHandlerFactory
 
     public static Collection<String> getIds()
     {
-        return Arrays.asList(REFAPP, CONFLUENCE, JIRA, JIRA_PLATFORM, JIRA_SOFTWARE, SERVICEDESK, BAMBOO, FECRU, CROWD, STASH, CTK_SERVER,
+        return Arrays.asList(REFAPP, CONFLUENCE, JIRA, JIRA_PLATFORM, BAMBOO, FECRU, CROWD, STASH, CTK_SERVER,
                 STUDIO, STUDIO_CONFLUENCE, STUDIO_JIRA, STUDIO_BAMBOO, STUDIO_FECRU, STUDIO_CROWD);
     }
 }
