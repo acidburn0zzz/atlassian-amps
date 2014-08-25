@@ -11,7 +11,8 @@ import java.util.Collections;
 
 public abstract class AbstractPluginProvider implements PluginProvider
 {
-    public final List<ProductArtifact> provide(Product product)
+    @Override
+    public final List<ProductArtifact> providePlugins(final Product product)
     {
         final List<ProductArtifact> artifacts = new ArrayList<ProductArtifact>();
         artifacts.addAll(product.getPluginArtifacts());
@@ -50,8 +51,14 @@ public abstract class AbstractPluginProvider implements PluginProvider
         {
             artifacts.addAll(getPdeArtifacts(product.getPdeVersion()));
         }
-        
+
         return artifacts;
+    }
+
+    @Override
+    public List<ProductArtifact> provideAddonProducts(final Product product)
+    {
+        return Collections.emptyList();
     }
 
     protected abstract Collection<ProductArtifact> getSalArtifacts(String salVersion);

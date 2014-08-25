@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps.product;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -11,5 +12,7 @@ import java.util.List;
  */
 public interface PluginProvider
 {
-    List<ProductArtifact> provide(Product product);
+    List<ProductArtifact> providePlugins(Product product);
+
+    List<ProductArtifact> provideAddonProducts(Product product);
 }

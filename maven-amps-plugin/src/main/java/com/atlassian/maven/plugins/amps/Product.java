@@ -131,6 +131,8 @@ public class Product
      */
     protected String dataHome = "";
 
+    private List<AddonProduct> addonProducts;
+
     /**
      */
     private List<ProductArtifact> pluginArtifacts = new ArrayList<ProductArtifact>();
@@ -674,6 +676,16 @@ public class Product
     public void setProductDataPath(String productDataPath)
     {
         this.productDataPath = productDataPath;
+    }
+
+    public List<AddonProduct> getAddonProducts()
+    {
+        return addonProducts;
+    }
+
+    public void setAddonProducts(final List<AddonProduct> addonProducts)
+    {
+        this.addonProducts = addonProducts;
     }
 
     public List<ProductArtifact> getPluginArtifacts()

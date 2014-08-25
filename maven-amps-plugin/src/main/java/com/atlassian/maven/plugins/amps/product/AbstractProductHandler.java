@@ -32,6 +32,8 @@ import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.iterateFiles;
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
 
 public abstract class AbstractProductHandler extends AmpsProductHandler
 {
@@ -273,7 +275,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         // add plugins2 plugins if necessary
         if (!isStaticPlugin())
         {
-            addArtifactsToDirectory(pluginProvider.provide(ctx), pluginsDir);
+            addArtifactsToDirectory(pluginProvider.providePlugins(ctx), pluginsDir);
         }
 
         // add plugins1 plugins
@@ -281,6 +283,8 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         artifacts.addAll(getDefaultLibPlugins());
         artifacts.addAll(ctx.getLibArtifacts());
         addArtifactsToDirectory(artifacts, new File(appDir, getLibArtifactTargetDir()));
+
+        extractAddonProductPlugins(pluginProvider.provideAddonProducts(ctx), bundledPluginsDir);
 
         artifacts = new ArrayList<ProductArtifact>();
         artifacts.addAll(getDefaultBundledPlugins());
@@ -405,6 +409,15 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
                 }
             }
             goals.copyPlugins(pluginsDir, artifacts);
+        }
+    }
+
+    private void extractAddonProductPlugins(final List<ProductArtifact> products, final File bundledPluginsDir)
+            throws MojoExecutionException
+    {
+        for (final ProductArtifact product : products)
+        {
+            goals.extractProductObrToDirectory(product, bundledPluginsDir);
         }
     }
 

@@ -260,6 +260,9 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected String pdeVersion;
 
     @Parameter
+    private List<AddonProduct> addonProducts = new ArrayList<AddonProduct>();
+
+    @Parameter
     private List<ProductArtifact> pluginArtifacts = new ArrayList<ProductArtifact>();
 
     /**
@@ -437,6 +440,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setSystemPropertyVariables(properties);
         ctx.setBundledArtifacts(bundledArtifacts);
         ctx.setLibArtifacts(libArtifacts);
+        ctx.setAddonProducts(addonProducts);
         ctx.setPluginArtifacts(pluginArtifacts);
         ctx.setLog4jProperties(log4jProperties);
         ctx.setHttpPort(httpPort);
