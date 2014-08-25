@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.atlassian.pom</groupId>
-        <artifactId>public-pom</artifactId>
+        <artifactId>private-pom</artifactId>
         <version>3.0.11</version>
     </parent>
 
@@ -24,9 +24,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</developerConnection>
-        <url>https://bitbucket.org/atlassian/amps</url>
+        <connection>scm:git:ssh://git@bitbucket.org/pbugalski/amps.git</connection>
+        <developerConnection>scm:git:ssh://git@bitbucket.org/pbugalski/amps.git</developerConnection>
+        <url>https://bitbucket.org/pbugalski/amps</url>
       <tag>HEAD</tag>
   </scm>
 
@@ -380,7 +380,7 @@
         <stash.data.version>2.4.1</stash.data.version>
         <plugin.testrunner.version>1.2.0</plugin.testrunner.version>
         <maven.cli.version>1.0.11</maven.cli.version>
-        <release.profiles>release,installer-win,installer-linux,installer-osx</release.profiles>
-        <release.arguments>-Pinstaller-win,installer-osx,installer-linux</release.arguments>
+        <release.profiles>release</release.profiles>
+        <release.arguments />
     </properties>
 </project>
