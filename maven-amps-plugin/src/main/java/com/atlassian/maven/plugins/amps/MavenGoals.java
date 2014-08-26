@@ -1883,6 +1883,13 @@ public class MavenGoals
 
     public void extractProductObrToDirectory(final ProductArtifact artifact, final File outputDirectory) throws MojoExecutionException
     {
+        copyArtifactToDirectory(artifact, getBuildDirectory());
+        unzipJarsFromFileToDirectory(getBuildDirectory() + "/" + artifact.getArtifactId() + "-" + artifact.getVersion() + ".obr", outputDirectory);
+    }
+
+    private void copyArtifactToDirectory(final ProductArtifact artifact, final String outputDirectory)
+            throws MojoExecutionException
+    {
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
@@ -1897,10 +1904,14 @@ public class MavenGoals
                                         element(name("artifactId"), artifact.getArtifactId()),
                                         element(name("version"), artifact.getVersion()),
                                         element(name("type"), "obr"))),
-                        element(name("outputDirectory"), getBuildDirectory())
+                        element(name("outputDirectory"), outputDirectory)
                 ),
                 executionEnvironment());
+    }
 
+    private void unzipJarsFromFileToDirectory(final String sourceFile, final File outputDirectory)
+            throws MojoExecutionException
+    {
         try
         {
             executeMojo(
@@ -1910,8 +1921,8 @@ public class MavenGoals
                             version(defaultArtifactIdToVersionMap.get("maven-antrun-plugin"))
                     ),
                     goal("run"),
-                    Xpp3DomBuilder.build(new StringReader("<configuration><tasks><echo message=\"prepare-package\"/>\n"
-                            + "<unzip src=\"" + getBuildDirectory() + "/" + artifact.getArtifactId() + "-" + artifact.getVersion() + ".obr\"\n"
+                    Xpp3DomBuilder.build(new StringReader("<configuration><tasks>\n"
+                            + "<unzip src=\"" + sourceFile + "\"\n"
                             + "       dest=\"" + outputDirectory + "\">\n"
                             + "    <patternset>\n"
                             + "        <include name=\"**/*.jar\"/>\n"
@@ -1923,11 +1934,11 @@ public class MavenGoals
         }
         catch (final XmlPullParserException e)
         {
-            throw new MojoExecutionException("Unable to extract product: " + artifact.getArtifactId(),e);
+            throw new MojoExecutionException("Unable to extract file: " + sourceFile,e);
         }
         catch (final IOException e)
         {
-            throw new MojoExecutionException("Unable to extract product" + artifact.getArtifactId(),e);
+            throw new MojoExecutionException("Unable to extract file: " + sourceFile,e);
         }
     }
 
