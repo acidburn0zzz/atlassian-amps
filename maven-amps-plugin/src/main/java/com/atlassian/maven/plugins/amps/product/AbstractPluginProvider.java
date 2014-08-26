@@ -58,7 +58,14 @@ public abstract class AbstractPluginProvider implements PluginProvider
     @Override
     public List<ProductArtifact> provideAddonProducts(final Product product)
     {
-        return Collections.emptyList();
+        if (product.getAddonProducts().isEmpty())
+        {
+            return Collections.emptyList();
+        }
+        else
+        {
+            throw new RuntimeException("Product " + product.getId() + " does not support addon products.");
+        }
     }
 
     protected abstract Collection<ProductArtifact> getSalArtifacts(String salVersion);
