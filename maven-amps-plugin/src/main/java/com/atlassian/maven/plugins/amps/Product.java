@@ -131,7 +131,9 @@ public class Product
      */
     protected String dataHome = "";
 
-    private List<AddonProduct> addonProducts;
+    /**
+     */
+    private List<AddonProduct> addonProducts  = new ArrayList<AddonProduct>();
 
     /**
      */
@@ -374,6 +376,7 @@ public class Product
         prod.setBundledArtifacts(bundledArtifacts.isEmpty() ? product.getBundledArtifacts() : bundledArtifacts);
         prod.setPluginArtifacts(pluginArtifacts.isEmpty() ? product.getPluginArtifacts() : pluginArtifacts);
         prod.setLibArtifacts(libArtifacts.isEmpty() ? product.getLibArtifacts() : libArtifacts);
+        prod.setAddonProducts(addonProducts.isEmpty() ? product.getAddonProducts() : addonProducts);
 
         prod.setDataPath(StringUtils.isBlank(productDataPath) ? product.getDataPath() : productDataPath);
         prod.setDataVersion(productDataVersion == null ? product.getDataVersion() : productDataVersion);
