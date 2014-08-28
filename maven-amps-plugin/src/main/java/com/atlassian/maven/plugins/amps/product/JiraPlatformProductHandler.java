@@ -16,7 +16,7 @@ import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.JIR
 
 public class JiraPlatformProductHandler extends JiraProductHandler
 {
-      public JiraPlatformProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
+    public JiraPlatformProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
     {
         super(context, goals, new JiraPlatformPluginsProvider(), artifactFactory);
     }
@@ -38,7 +38,8 @@ public class JiraPlatformProductHandler extends JiraProductHandler
         return new ProductArtifact("com.atlassian.jira.plugins", "jira-platform-plugin-test-resources");
     }
 
-    private static class JiraPlatformPluginsProvider extends JiraPluginProvider {
+    private static class JiraPlatformPluginsProvider extends JiraPluginProvider
+    {
         @Override
         public List<ProductArtifact> provideAddonProducts(final Product product)
         {
