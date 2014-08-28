@@ -9,6 +9,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 
 import java.util.List;
@@ -62,7 +63,8 @@ public class JiraPlatformProductHandler extends JiraProductHandler
                     }
                     else
                     {
-                        throw new RuntimeException("Unknown addon product: " + productId);
+                        throw new RuntimeException("Unknown addon product: " + productId
+                                + " Possible values: " + StringUtils.join(addonProductIdsToProductArtifacts.keySet(), ", "));
                     }
                 }
             }));
