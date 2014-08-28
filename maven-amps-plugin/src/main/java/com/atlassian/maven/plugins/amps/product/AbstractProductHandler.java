@@ -12,8 +12,16 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.io.File;
 import java.io.IOException;
@@ -413,12 +421,38 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     }
 
     private void extractAddonProductPlugins(final List<ProductArtifact> products, final File bundledPluginsDir)
-            throws MojoExecutionException
+            throws MojoExecutionException, RuntimeException
     {
         for (final ProductArtifact product : products)
         {
-            goals.extractProductObrToDirectory(product, bundledPluginsDir);
+            final Artifact artifact = resolveArtifactForProduct(product);
+            goals.unzipJarsFromFileToDirectory(artifact.getFile().getAbsolutePath(), bundledPluginsDir);
         }
+    }
+
+    private Artifact resolveArtifactForProduct(final ProductArtifact product)
+    {
+        final Artifact artifact = artifactFactory.createArtifact(product.getGroupId(), product.getArtifactId(), product.getVersion(), "compile", "obr");
+        try
+        {
+            final MavenSession session = context.getExecutionEnvironment().getMavenSession();
+            final MavenProject project = context.getExecutionEnvironment().getMavenProject();
+            final ArtifactResolver resolver = session.getContainer().lookup(ArtifactResolver.class);
+            resolver.resolve(artifact, project.getRemoteArtifactRepositories(), session.getLocalRepository());
+        }
+        catch (final ComponentLookupException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (final ArtifactNotFoundException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (final ArtifactResolutionException e)
+        {
+            throw new RuntimeException(e);
+        }
+        return artifact;
     }
 
     protected final void addOverrides(File appDir, final Product ctx) throws IOException
