@@ -7,16 +7,23 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.JIRA_PLATFORM;
 
 public class JiraPlatformProductHandler extends JiraProductHandler
 {
-      public JiraPlatformProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
+    private static final Map<String, ProductArtifact> addonProductIdsToProductArtifacts = ImmutableMap.of(
+            "jira-software", new ProductArtifact("com.atlassian.jira", "jira-software-obr-dist"),
+            "servicedesk", new ProductArtifact("com.atlassian.servicedesk", "jira-servicedesk"));
+
+    public JiraPlatformProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
     {
         super(context, goals, new JiraPlatformPluginsProvider(), artifactFactory);
     }
@@ -38,7 +45,8 @@ public class JiraPlatformProductHandler extends JiraProductHandler
         return new ProductArtifact("com.atlassian.jira.plugins", "jira-platform-plugin-test-resources");
     }
 
-    private static class JiraPlatformPluginsProvider extends JiraPluginProvider {
+    private static class JiraPlatformPluginsProvider extends JiraPluginProvider
+    {
         @Override
         public List<ProductArtifact> provideAddonProducts(final Product product)
         {
@@ -47,20 +55,24 @@ public class JiraPlatformProductHandler extends JiraProductHandler
                 @Override
                 public ProductArtifact apply(final AddonProduct input)
                 {
-                    if (input.getProductId().equals("jira-software"))
+                    final String productId = input.getProductId();
+                    if (addonProductIdsToProductArtifacts.containsKey(productId))
                     {
-                        return new ProductArtifact("com.atlassian.jira", "jira-software-obr-dist", input.getVersion());
-                    }
-                    else if (input.getProductId().equals("servicedesk"))
-                    {
-                        return new ProductArtifact("com.atlassian.servicedesk", "jira-servicedesk", input.getVersion());
+                        final ProductArtifact artifact = addonProductIdsToProductArtifacts.get(productId);
+                        return copyOfArtifactWithVersion(artifact, input.getVersion());
                     }
                     else
                     {
-                        throw new RuntimeException("Unknown addon product: " + input.getProductId());
+                        throw new RuntimeException("Unknown addon product: " + productId
+                                + " Possible values: " + StringUtils.join(addonProductIdsToProductArtifacts.keySet(), ", "));
                     }
                 }
             }));
+        }
+
+        private ProductArtifact copyOfArtifactWithVersion(final ProductArtifact artifact, final String version)
+        {
+            return new ProductArtifact(artifact.getGroupId(), artifact.getArtifactId(), version);
         }
     }
 }

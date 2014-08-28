@@ -40,7 +40,6 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -1881,35 +1880,7 @@ public class MavenGoals
         );
     }
 
-    public void extractProductObrToDirectory(final ProductArtifact artifact, final File outputDirectory) throws MojoExecutionException
-    {
-        copyArtifactToDirectory(artifact, getBuildDirectory());
-        unzipJarsFromFileToDirectory(getBuildDirectory() + "/" + artifact.getArtifactId() + "-" + artifact.getVersion() + ".obr", outputDirectory);
-    }
-
-    private void copyArtifactToDirectory(final ProductArtifact artifact, final String outputDirectory)
-            throws MojoExecutionException
-    {
-        executeMojo(
-                plugin(
-                        groupId("org.apache.maven.plugins"),
-                        artifactId("maven-dependency-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
-                ),
-                goal("copy"),
-                configuration(
-                        element(name("artifactItems"),
-                                element(name("artifactItem"),
-                                        element(name("groupId"), artifact.getGroupId()),
-                                        element(name("artifactId"), artifact.getArtifactId()),
-                                        element(name("version"), artifact.getVersion()),
-                                        element(name("type"), "obr"))),
-                        element(name("outputDirectory"), outputDirectory)
-                ),
-                executionEnvironment());
-    }
-
-    private void unzipJarsFromFileToDirectory(final String sourceFile, final File outputDirectory)
+    public void unzipJarsFromFileToDirectory(final String sourceFile, final File outputDirectory)
             throws MojoExecutionException
     {
         try
