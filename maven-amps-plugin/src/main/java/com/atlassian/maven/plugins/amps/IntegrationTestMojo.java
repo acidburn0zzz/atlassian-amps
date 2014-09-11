@@ -235,7 +235,10 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
             putIfNotOverridden(systemProperties, "homedir." + product.getInstanceId(), productHandler.getHomeDirectory(product).getAbsolutePath());
             putIfNotOverridden(systemProperties, "homedir", productHandler.getHomeDirectory(product).getAbsolutePath());
 
-            systemProperties.putAll(getProductFunctionalTestProperties(product));
+            if (product.isInstallPlugin())
+            {
+                systemProperties.putAll(getProductFunctionalTestProperties(product));
+            }
         }
         putIfNotOverridden(systemProperties, "testGroup", testGroupId);
         systemProperties.putAll(getTestGroupSystemProperties(testGroupId));
