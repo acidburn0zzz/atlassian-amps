@@ -16,12 +16,11 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
 /**
- * Run the integration tests against the webapp
+ * Run the integration tests against the webapp.
  */
 @Mojo(name = "integration-test", requiresDependencyResolution = ResolutionScope.TEST)
 public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 {
-
     /**
      * Pattern for to use to find integration tests.  Only used if no test groups are defined.
      */
@@ -155,7 +154,6 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
     {
         Set<String> ids = new HashSet<String>();
 
-        //ids.addAll(ProductHandlerFactory.getIds());
         for (TestGroup group : getTestGroups())
         {
             ids.add(group.getId());
@@ -163,8 +161,6 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 
         return ids;
     }
-
-
 
     private void runTestsForTestGroup(String testGroupId, MavenGoals goals, String pluginJar, Map<String,Object> systemProperties) throws MojoExecutionException
     {
@@ -243,14 +239,6 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         }
         putIfNotOverridden(systemProperties, "testGroup", testGroupId);
         systemProperties.putAll(getTestGroupSystemProperties(testGroupId));
-
-        /*
-        Commenting out the parallel check so we ALWAYS wait until the products are started
-         */
-        /*if (parallel)
-        {
-            waitForProducts(productExecutions, true);
-        }*/
 
         if (!noWebapp)
         {
@@ -355,7 +343,6 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         }
         return Collections.singletonList(functionalTestPattern);
     }
-
 
     private List<String> getExcludesForTestGroup(String testGroupId)
     {
