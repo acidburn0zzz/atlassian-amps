@@ -378,7 +378,7 @@
         <studio.data.version>108.2-m0</studio.data.version>
         <stash.version>2.4.1</stash.version>
         <stash.data.version>2.4.1</stash.data.version>
-        <plugin.testrunner.version>1.2.0</plugin.testrunner.version>
+        <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <maven.cli.version>1.0.11</maven.cli.version>
         <release.profiles>release,installer-win,installer-linux,installer-osx</release.profiles>
         <release.arguments>-Pinstaller-win,installer-osx,installer-linux</release.arguments>
