@@ -162,7 +162,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
      *  &#60;/project&#62;
      * </pre>
      * 
-     * For maven2 value could be defined as a global property:
+     * For maven 2.x value inherits from the global property 'project.build.sourceEncoding':
      * <pre>
      * &#60;project&#62;
      *  ...

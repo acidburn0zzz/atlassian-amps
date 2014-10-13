@@ -48,7 +48,7 @@ public class CompressResourcesMojo extends AbstractAmpsMojo
                 }
                 catch (IllegalCharsetNameException ex)
                 {
-                    throw new MojoFailureException(this, "Failed to resolve charset: "+encoding, ex.getMessage());
+                    throw new MojoExecutionException("Failed to resolve charset: "+encoding, ex);
                 }
                 catch (UnsupportedCharsetException ex)
                 {
