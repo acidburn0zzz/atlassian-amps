@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,7 +23,6 @@ import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
@@ -45,7 +45,6 @@ import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
 import aQute.lib.osgi.Constants;
-
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
@@ -514,10 +513,9 @@ public class MavenGoals
         }
     }
 
-    public void compressResources(boolean compressJs, boolean compressCss, boolean useClosureForJs) throws MojoExecutionException
+    public void compressResources(boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs) throws MojoExecutionException
     {
-
-        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), new File(ctx.getProject().getBuild().getOutputDirectory()), compressJs, compressCss, useClosureForJs, log);
+        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), new File(ctx.getProject().getBuild().getOutputDirectory()), compressJs, compressCss, useClosureForJs, cs, log);
         /*
         executeMojo(
                 plugin(
