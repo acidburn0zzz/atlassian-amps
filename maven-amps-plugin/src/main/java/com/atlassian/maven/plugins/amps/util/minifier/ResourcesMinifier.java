@@ -1,6 +1,7 @@
 package com.atlassian.maven.plugins.amps.util.minifier;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
@@ -28,7 +29,7 @@ public class ResourcesMinifier
     {
     }
 
-    public static void minify(List<Resource> resources, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Log log) throws MojoExecutionException
+    public static void minify(List<Resource> resources, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Log log) throws MojoExecutionException
     {
         if(null == INSTANCE)
         {
@@ -37,11 +38,11 @@ public class ResourcesMinifier
         
         for(Resource resource : resources)
         {
-            INSTANCE.processResource(resource,outputDir,compressJs, compressCss, useClosureForJs,log);
+            INSTANCE.processResource(resource,outputDir,compressJs, compressCss, useClosureForJs, cs, log);
         }
     }
     
-    public void processResource(Resource resource, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Log log) throws MojoExecutionException
+    public void processResource(Resource resource, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Log log) throws MojoExecutionException
     {
         File destDir = outputDir;
         if(StringUtils.isNotBlank(resource.getTargetPath()))
@@ -58,18 +59,18 @@ public class ResourcesMinifier
 
         if(compressJs)
         {
-            processJs(resourceDir,destDir,resource.getExcludes(),useClosureForJs,log);
+            processJs(resourceDir,destDir,resource.getExcludes(),useClosureForJs,cs,log);
         }
         
         if(compressCss)
         {
-            processCss(resourceDir,destDir,resource.getExcludes(), log);
+            processCss(resourceDir,destDir,resource.getExcludes(), cs, log);
         }
 
-        processXml(resourceDir, destDir, resource.getExcludes(), log);
+        processXml(resourceDir, destDir, resource.getExcludes(), cs, log);
     }
 
-    public void processXml(final File resourceDir, final File destDir, final List<String> excludes, final Log log) throws MojoExecutionException
+    public void processXml(final File resourceDir, final File destDir, final List<String> excludes, Charset cs, final Log log) throws MojoExecutionException
     {
         log.info("Compressing XML files");
 
@@ -105,9 +106,9 @@ public class ResourcesMinifier
                 try
                 {
                     FileUtils.forceMkdir(destFile.getParentFile());
-                    String source = FileUtils.readFileToString(sourceFile);
+                    String source = FileUtils.readFileToString(sourceFile, cs);
                     String min = compressor.compress(source);
-                    FileUtils.writeStringToFile(destFile,min);
+                    FileUtils.writeStringToFile(destFile, min, cs);
                 }
                 catch (IOException e)
                 {
@@ -117,7 +118,7 @@ public class ResourcesMinifier
         }
     }
 
-    public void processJs(File resourceDir, File destDir, List<String> excludes, boolean useClosure, Log log) throws MojoExecutionException
+    public void processJs(File resourceDir, File destDir, List<String> excludes, boolean useClosure, Charset cs, Log log) throws MojoExecutionException
     {
         if(useClosure)
         {
@@ -157,17 +158,17 @@ public class ResourcesMinifier
                 log.info("compressing to " + destFile.getAbsolutePath());
                 if(useClosure)
                 {
-                    closureJsCompile(sourceFile,destFile);
+                    closureJsCompile(sourceFile, destFile, cs);
                 }
                 else
                 {
-                    yuiJsCompile(sourceFile,destFile,log);
+                    yuiJsCompile(sourceFile, destFile, log, cs);
                 }
             }
         }
     }
 
-    public void processCss(File resourceDir, File destDir, List<String> excludes, Log log) throws MojoExecutionException
+    public void processCss(File resourceDir, File destDir, List<String> excludes, Charset cs, Log log) throws MojoExecutionException
     {
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(resourceDir);
@@ -195,19 +196,19 @@ public class ResourcesMinifier
                     continue;
                 }
                 log.info("compressing to " + destFile.getAbsolutePath());
-                yuiCssCompile(sourceFile,destFile);
+                yuiCssCompile(sourceFile, destFile, cs);
             }
         }
     }
 
-    private void closureJsCompile(File sourceFile, File destFile) throws MojoExecutionException
+    private void closureJsCompile(File sourceFile, File destFile, Charset cs) throws MojoExecutionException
     {
         try
         {
             FileUtils.forceMkdir(destFile.getParentFile());
-            String source = FileUtils.readFileToString(sourceFile);
+            String source = FileUtils.readFileToString(sourceFile, cs);
             String min = GoogleClosureJSMinifier.compile(source);
-            FileUtils.writeStringToFile(destFile,min);
+            FileUtils.writeStringToFile(destFile, min, cs);
         }
         catch (IOException e)
         {
@@ -215,15 +216,15 @@ public class ResourcesMinifier
         }
     }
     
-    private void yuiJsCompile(File sourceFile, File destFile, Log log) throws MojoExecutionException
+    private void yuiJsCompile(File sourceFile, File destFile, Log log, Charset cs) throws MojoExecutionException
     {
         InputStreamReader in = null;
         OutputStreamWriter out = null;
         try
         {
             FileUtils.forceMkdir(destFile.getParentFile());
-            in = new InputStreamReader(new FileInputStream(sourceFile));
-            out = new OutputStreamWriter(new FileOutputStream(destFile));
+            in = new InputStreamReader(new FileInputStream(sourceFile), cs);
+            out = new OutputStreamWriter(new FileOutputStream(destFile), cs);
             
             JavaScriptCompressor yui = new JavaScriptCompressor(in,new YUIErrorReporter(log));
             yui.compress(out,-1,true,false,false,false);
@@ -238,15 +239,15 @@ public class ResourcesMinifier
         }
     }
 
-    private void yuiCssCompile(File sourceFile, File destFile) throws MojoExecutionException
+    private void yuiCssCompile(File sourceFile, File destFile, Charset cs) throws MojoExecutionException
     {
         InputStreamReader in = null;
         OutputStreamWriter out = null;
         try
         {
             FileUtils.forceMkdir(destFile.getParentFile());
-            in = new InputStreamReader(new FileInputStream(sourceFile));
-            out = new OutputStreamWriter(new FileOutputStream(destFile));
+            in = new InputStreamReader(new FileInputStream(sourceFile), cs);
+            out = new OutputStreamWriter(new FileOutputStream(destFile), cs);
 
             CssCompressor yui = new CssCompressor(in);
             yui.compress(out,-1);
