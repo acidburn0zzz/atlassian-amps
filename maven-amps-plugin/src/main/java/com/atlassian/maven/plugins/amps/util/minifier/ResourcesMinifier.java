@@ -97,7 +97,7 @@ public class ResourcesMinifier
             {
                 if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
                 {
-                    log.info("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
+                    log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
                     continue;
                 }
 
@@ -151,7 +151,7 @@ public class ResourcesMinifier
             {
                 if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
                 {
-                    log.info("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
+                    log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
                     continue;
                 }
 
@@ -192,7 +192,7 @@ public class ResourcesMinifier
             {
                 if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
                 {
-                    log.info("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
+                    log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
                     continue;
                 }
                 log.info("compressing to " + destFile.getAbsolutePath());
