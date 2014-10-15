@@ -1,6 +1,7 @@
 package com.atlassian.maven.plugins.amps.util.minifier;
 
 import java.io.*;
+import java.util.Collections;
 import java.util.List;
 
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
@@ -58,24 +59,28 @@ public class ResourcesMinifier
 
         if(compressJs)
         {
-            processJs(resourceDir,destDir,resource.getExcludes(),useClosureForJs,log);
+            processJs(resourceDir,destDir,resource.getIncludes(),resource.getExcludes(),useClosureForJs,log);
         }
         
         if(compressCss)
         {
-            processCss(resourceDir,destDir,resource.getExcludes(), log);
+            processCss(resourceDir,destDir,resource.getIncludes(),resource.getExcludes(), log);
         }
 
-        processXml(resourceDir, destDir, resource.getExcludes(), log);
+        processXml(resourceDir, destDir, resource.getIncludes(), resource.getExcludes(), log);
     }
 
-    public void processXml(final File resourceDir, final File destDir, final List<String> excludes, final Log log) throws MojoExecutionException
+    public void processXml(final File resourceDir, final File destDir, List<String> includes, final List<String> excludes, final Log log) throws MojoExecutionException
     {
         log.info("Compressing XML files");
 
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(resourceDir);
-        scanner.setIncludes(new String[]{"**/*.xml"});
+        if(null == includes || includes.isEmpty())
+        {
+            includes = Collections.singletonList("**/*.xml");
+        }
+        scanner.setIncludes(includes.toArray(new String[includes.size()]));
 
         if(null != excludes && !excludes.isEmpty())
         {
@@ -90,6 +95,11 @@ public class ResourcesMinifier
         for (String name : scanner.getIncludedFiles())
         {
             File sourceFile = new File(resourceDir,name);
+            // double check xml file
+            if(!sourceFile.getName().endsWith(".xml"))
+            {
+                continue;
+            }
             File destFile = new File(destDir,name);
 
             if(sourceFile.exists() && sourceFile.canRead())
@@ -117,7 +127,7 @@ public class ResourcesMinifier
         }
     }
 
-    public void processJs(File resourceDir, File destDir, List<String> excludes, boolean useClosure, Log log) throws MojoExecutionException
+    public void processJs(File resourceDir, File destDir, List<String> includes, List<String> excludes, boolean useClosure, Log log) throws MojoExecutionException
     {
         if(useClosure)
         {
@@ -130,7 +140,11 @@ public class ResourcesMinifier
         
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(resourceDir);
-        scanner.setIncludes(new String[]{"**/*.js"});
+        if (includes == null || includes.isEmpty())
+        {
+            includes = Collections.singletonList("**/*.js");
+        }
+        scanner.setIncludes(includes.toArray(new String[includes.size()]));
 
         if(null != excludes && !excludes.isEmpty())
         {
@@ -143,9 +157,12 @@ public class ResourcesMinifier
         for(String name : scanner.getIncludedFiles())
         {
             File sourceFile = new File(resourceDir,name);
+            // double check javascript file
+            if (!sourceFile.getName().endsWith(".js")) {
+                continue;
+            }
             String baseName = FilenameUtils.removeExtension(name);
             File destFile = new File(destDir,baseName + "-min.js");
-            
             if(sourceFile.exists() && sourceFile.canRead())
             {
                 if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
@@ -167,11 +184,15 @@ public class ResourcesMinifier
         }
     }
 
-    public void processCss(File resourceDir, File destDir, List<String> excludes, Log log) throws MojoExecutionException
+    public void processCss(File resourceDir, File destDir, List<String> includes, List<String> excludes, Log log) throws MojoExecutionException
     {
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(resourceDir);
-        scanner.setIncludes(new String[]{"**/*.css"});
+        if(null == includes || includes.isEmpty())
+        {
+            includes = Collections.singletonList("**/*.css");
+        }
+        scanner.setIncludes(includes.toArray(new String[includes.size()]));
 
         if(null != excludes && !excludes.isEmpty())
         {
@@ -184,6 +205,11 @@ public class ResourcesMinifier
         for(String name : scanner.getIncludedFiles())
         {
             File sourceFile = new File(resourceDir,name);
+            // double check css file
+            if(!sourceFile.getName().endsWith(".css"))
+            {
+                continue;
+            }
             String baseName = FilenameUtils.removeExtension(name);
             File destFile = new File(destDir,baseName + "-min.css");
 
