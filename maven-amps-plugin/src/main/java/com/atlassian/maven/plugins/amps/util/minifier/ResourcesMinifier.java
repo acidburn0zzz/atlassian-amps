@@ -140,7 +140,7 @@ public class ResourcesMinifier
         
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(resourceDir);
-        if (includes == null || includes.isEmpty())
+        if (null == includes || includes.isEmpty())
         {
             includes = Collections.singletonList("**/*.js");
         }
