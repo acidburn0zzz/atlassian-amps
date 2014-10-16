@@ -92,7 +92,7 @@ public class ResourcesMinifier
         scanner.scan();
 
         XmlCompressor compressor = new XmlCompressor();
-
+        int numberOfMinifiedFile = 0;
         for (String name : scanner.getIncludedFiles())
         {
             File sourceFile = new File(resourceDir,name);
@@ -107,11 +107,11 @@ public class ResourcesMinifier
             {
                 if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
                 {
-                    log.info("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
+                    log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
                     continue;
                 }
 
-                log.info("compressing to " + destFile.getAbsolutePath());
+                log.debug("compressing to " + destFile.getAbsolutePath());
 
                 try
                 {
@@ -119,6 +119,7 @@ public class ResourcesMinifier
                     String source = FileUtils.readFileToString(sourceFile, cs);
                     String min = compressor.compress(source);
                     FileUtils.writeStringToFile(destFile, min, cs);
+                    numberOfMinifiedFile++;
                 }
                 catch (IOException e)
                 {
@@ -126,6 +127,7 @@ public class ResourcesMinifier
                 }
             }
         }
+        log.info(numberOfMinifiedFile +" XML file(s) were minified into target directory " + destDir.getAbsolutePath());
     }
 
     public void processJs(File resourceDir, File destDir, List<String> includes, List<String> excludes, boolean useClosure, Charset cs, Log log) throws MojoExecutionException
@@ -154,7 +156,7 @@ public class ResourcesMinifier
 
         scanner.addDefaultExcludes();
         scanner.scan();
-        
+        int numberOfMinifiedFile = 0;
         for(String name : scanner.getIncludedFiles())
         {
             File sourceFile = new File(resourceDir,name);
@@ -168,11 +170,11 @@ public class ResourcesMinifier
             {
                 if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
                 {
-                    log.info("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
+                    log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
                     continue;
                 }
 
-                log.info("compressing to " + destFile.getAbsolutePath());
+                log.debug("compressing to " + destFile.getAbsolutePath());
                 if(useClosure)
                 {
                     closureJsCompile(sourceFile, destFile, cs);
@@ -181,8 +183,10 @@ public class ResourcesMinifier
                 {
                     yuiJsCompile(sourceFile, destFile, log, cs);
                 }
+                numberOfMinifiedFile++;
             }
         }
+        log.info(numberOfMinifiedFile + " Javascript file(s) were minified into target directory " + destDir.getAbsolutePath());
     }
 
     public void processCss(File resourceDir, File destDir, List<String> includes, List<String> excludes, Charset cs, Log log) throws MojoExecutionException
@@ -202,7 +206,7 @@ public class ResourcesMinifier
 
         scanner.addDefaultExcludes();
         scanner.scan();
-
+        int numberOfMinifiedFile = 0;
         for(String name : scanner.getIncludedFiles())
         {
             File sourceFile = new File(resourceDir,name);
@@ -218,13 +222,15 @@ public class ResourcesMinifier
             {
                 if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
                 {
-                    log.info("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
+                    log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
                     continue;
                 }
-                log.info("compressing to " + destFile.getAbsolutePath());
+                log.debug("compressing to " + destFile.getAbsolutePath());
                 yuiCssCompile(sourceFile, destFile, cs);
+                numberOfMinifiedFile++;
             }
         }
+        log.info(numberOfMinifiedFile + " CSS file(s) were minified into target directory " + destDir.getAbsolutePath());
     }
 
     private void closureJsCompile(File sourceFile, File destFile, Charset cs) throws MojoExecutionException
