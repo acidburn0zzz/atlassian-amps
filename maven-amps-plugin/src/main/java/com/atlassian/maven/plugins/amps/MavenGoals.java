@@ -877,6 +877,10 @@ public class MavenGoals
         }
 
         Plugin cargo = cargo(webappContext);
+        // remove application cargo plugin for avoiding amps standalone cargo merges configuration
+        log.info("Remove application cargo plugin");
+        Plugin appCargo = plugin(groupId("org.codehaus.cargo"), artifactId("cargo-maven2-plugin"));
+        executionEnvironment().getMavenProject().getBuild().removePlugin(appCargo);
 
         executeMojo(
                 cargo,
@@ -908,10 +912,14 @@ public class MavenGoals
                                 element(name("type"), "standalone"),
                                 element(name("properties"), props.toArray(new Element[props.size()]))
 
-                        )
+                        ),
+                        element(name("deployer")) // The project's packaging is WAR, so added empty <deployer/> tag to avoid Cargo automaticically copy generated artifact
                 ),
                 executionEnvironment()
         );
+        // restore application cargo plugin for maven next tasks
+        log.info("Restore application cargo plugin");
+        executionEnvironment().getMavenProject().getBuild().addPlugin(appCargo);
         return actualHttpPort;
     }
 
