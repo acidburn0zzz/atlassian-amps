@@ -923,7 +923,10 @@ public class MavenGoals
         );
         // restore application cargo plugin for maven next tasks
         log.info("Restore application cargo plugin");
-        executionEnvironment().getMavenProject().getBuild().addPlugin(appCargo);
+        if (appCargo != null)
+        {
+            executionEnvironment().getMavenProject().getBuild().addPlugin(appCargo);
+        }
         return actualHttpPort;
     }
 
