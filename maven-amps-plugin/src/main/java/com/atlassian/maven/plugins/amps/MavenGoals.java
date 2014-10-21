@@ -879,7 +879,7 @@ public class MavenGoals
         Plugin cargo = cargo(webappContext);
         // remove application cargo plugin for avoiding amps standalone cargo merges configuration
         log.info("Remove application cargo plugin");
-        Plugin appCargo = plugin(groupId("org.codehaus.cargo"), artifactId("cargo-maven2-plugin"));
+        Plugin appCargo = executionEnvironment().getMavenProject().getPlugin("org.codehaus.cargo:cargo-maven2-plugin");
         executionEnvironment().getMavenProject().getBuild().removePlugin(appCargo);
 
         executeMojo(
