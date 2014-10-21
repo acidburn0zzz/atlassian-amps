@@ -913,7 +913,10 @@ public class MavenGoals
                                 element(name("properties"), props.toArray(new Element[props.size()]))
 
                         ),
-                        element(name("deployer")) // The project's packaging is WAR, so added empty <deployer/> tag to avoid Cargo automaticically copy generated artifact
+                        element(name("deployer"))   // Fix issue AMPS copy 2 War files to container
+                                                    // Refer to Cargo documentation: when project's packaging is war, ear, ejb
+                                                    // the generated artifact will automatic copy to target container.
+                                                    // For avoiding this behavior, just add an empty <deployer/> element
                 ),
                 executionEnvironment()
         );
