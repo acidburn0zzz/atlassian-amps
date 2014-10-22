@@ -877,6 +877,10 @@ public class MavenGoals
         }
 
         Plugin cargo = cargo(webappContext);
+        // remove application cargo plugin for avoiding amps standalone cargo merges configuration
+        log.info("Remove application cargo plugin");
+        Plugin appCargo = executionEnvironment().getMavenProject().getPlugin("org.codehaus.cargo:cargo-maven2-plugin");
+        executionEnvironment().getMavenProject().getBuild().removePlugin(appCargo);
 
         executeMojo(
                 cargo,
@@ -908,10 +912,21 @@ public class MavenGoals
                                 element(name("type"), "standalone"),
                                 element(name("properties"), props.toArray(new Element[props.size()]))
 
-                        )
+                        ),
+                        // Fix issue AMPS copy 2 War files to container
+                        // Refer to Cargo documentation: when project's packaging is war, ear, ejb
+                        // the generated artifact will automatic copy to target container.
+                        // For avoiding this behavior, just add an empty <deployer/> element
+                        element(name("deployer"))
                 ),
                 executionEnvironment()
         );
+        // restore application cargo plugin for maven next tasks
+        log.info("Restore application cargo plugin");
+        if (appCargo != null)
+        {
+            executionEnvironment().getMavenProject().getBuild().addPlugin(appCargo);
+        }
         return actualHttpPort;
     }
 
