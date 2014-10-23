@@ -54,9 +54,20 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
     @Parameter(property = "testGroup")
     protected String testGroup;
 
+    /**
+     * When this property is set to {@literal true}, Mojo will be executed on the last project in the Reactor
+     */
     @Parameter(property = "runLastProject", required = true, defaultValue = "false")
     protected boolean runLastProject;
 
+    /**
+     * When there is {@literal runProject} property set, Mojo will be executed on project with specified artifact's ID.
+     * <p>Example:
+     * <ul>
+     *     <li><code>mvn amps:run -DrunProject=my-project</code></li>
+     * </ul>
+     * </p>
+     */
     @Parameter(property = "runProject", required = false)
     protected String runProject;
 
@@ -365,12 +376,11 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
     }
 
     /**
-     * <p>Determines whether Mojo should be executed. By default it won't affect execution but there are few possibilities to influence that:</p>
-     * <ul>
-     *     <li>When there is {@literal runLastProject} property set it will allow to run Mojo only on the last project in build order.</li>
-     *     <li>When there is {@literal runProject} property set, Mojo will be executed on project with specified artifact's ID.<br/>Example:
-     *          <code>mvn amps:run -DrunProject=my-project</code></li>
-     * </ul>
+     * <p>Determines whether Mojo should be executed. By default it won't affect execution but it can be influenced by
+     * {@link com.atlassian.maven.plugins.amps.RunMojo#runLastProject} and {@link com.atlassian.maven.plugins.amps.RunMojo#runProject} properties</p>
+     *
+     * @see com.atlassian.maven.plugins.amps.RunMojo#runLastProject
+     * @see com.atlassian.maven.plugins.amps.RunMojo#runProject
      *
      * @return <code>true</code> when this execution not should be skipped, <code>false</code> otherwise
      */
