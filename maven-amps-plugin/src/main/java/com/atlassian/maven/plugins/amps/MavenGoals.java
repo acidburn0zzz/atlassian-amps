@@ -23,6 +23,7 @@ import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
@@ -45,6 +46,7 @@ import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
 import aQute.lib.osgi.Constants;
+
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
@@ -802,6 +804,22 @@ public class MavenGoals
         return configuration(nonNullElements.toArray(new Element[nonNullElements.size()]));
     }
 
+    // wrap execute Mojo function for temporary removing product's Cargo configuration
+    // before starting AMPS standalone Cargo configuration
+    private static void executeMojoExcludeProductCargoConfig(Plugin plugin, String goal, Xpp3Dom configuration, ExecutionEnvironment env)
+            throws MojoExecutionException
+    {
+        // remove application cargo plugin for avoiding amps standalone cargo merges configuration
+        Plugin appCargo = env.getMavenProject().getPlugin("org.codehaus.cargo:cargo-maven2-plugin");
+        env.getMavenProject().getBuild().removePlugin(appCargo);
+        env.executeMojo(plugin, goal, configuration);
+        // restore application cargo plugin for maven next tasks
+        if (null != appCargo)
+        {
+            env.getMavenProject().getBuild().addPlugin(appCargo);
+        }
+    }
+
     public int startWebapp(final String productInstanceId, final File war, final Map<String, String> systemProperties, final List<ProductArtifact> extraContainerDependencies,
                            final Product webappContext) throws MojoExecutionException
     {
@@ -877,12 +895,7 @@ public class MavenGoals
         }
 
         Plugin cargo = cargo(webappContext);
-        // remove application cargo plugin for avoiding amps standalone cargo merges configuration
-        log.info("Remove application cargo plugin");
-        Plugin appCargo = executionEnvironment().getMavenProject().getPlugin("org.codehaus.cargo:cargo-maven2-plugin");
-        executionEnvironment().getMavenProject().getBuild().removePlugin(appCargo);
-
-        executeMojo(
+        executeMojoExcludeProductCargoConfig(
                 cargo,
                 goal("start"),
                 configurationWithoutNullElements(
@@ -921,12 +934,6 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
-        // restore application cargo plugin for maven next tasks
-        log.info("Restore application cargo plugin");
-        if (appCargo != null)
-        {
-            executionEnvironment().getMavenProject().getBuild().addPlugin(appCargo);
-        }
         return actualHttpPort;
     }
 
@@ -979,7 +986,7 @@ public class MavenGoals
 
         String actualShutdownTimeout = webappContext.getSynchronousStartup() ? "0" : String.valueOf(webappContext.getShutdownTimeout());
 
-        executeMojo(
+        executeMojoExcludeProductCargoConfig(
         cargo(webappContext),
         goal("stop"),
         configuration(
