@@ -802,8 +802,10 @@ public class MavenGoals
         return configuration(nonNullElements.toArray(new Element[nonNullElements.size()]));
     }
 
-    // wrap execute Mojo function for temporary removing product's Cargo configuration
-    // before starting AMPS standalone Cargo configuration
+    /**
+     * Wrap execute Mojo function for temporary removing global Cargo configuration
+     * before starting AMPS internal Cargo
+     */
     private static void executeMojoExcludeProductCargoConfig(Plugin internalCargo, String goal, Xpp3Dom configuration, ExecutionEnvironment env)
             throws MojoExecutionException
     {
