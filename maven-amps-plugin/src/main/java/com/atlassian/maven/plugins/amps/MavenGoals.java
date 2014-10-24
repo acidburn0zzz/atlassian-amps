@@ -804,17 +804,17 @@ public class MavenGoals
 
     // wrap execute Mojo function for temporary removing product's Cargo configuration
     // before starting AMPS standalone Cargo configuration
-    private static void executeMojoExcludeProductCargoConfig(Plugin plugin, String goal, Xpp3Dom configuration, ExecutionEnvironment env)
+    private static void executeMojoExcludeProductCargoConfig(Plugin internalCargo, String goal, Xpp3Dom configuration, ExecutionEnvironment env)
             throws MojoExecutionException
     {
         // remove application cargo plugin for avoiding amps standalone cargo merges configuration
-        Plugin appCargo = env.getMavenProject().getPlugin("org.codehaus.cargo:cargo-maven2-plugin");
-        env.getMavenProject().getBuild().removePlugin(appCargo);
-        env.executeMojo(plugin, goal, configuration);
+        Plugin globalCargo = env.getMavenProject().getPlugin("org.codehaus.cargo:cargo-maven2-plugin");
+        env.getMavenProject().getBuild().removePlugin(globalCargo);
+        env.executeMojo(internalCargo, goal, configuration);
         // restore application cargo plugin for maven next tasks
-        if (null != appCargo)
+        if (null != globalCargo)
         {
-            env.getMavenProject().getBuild().addPlugin(appCargo);
+            env.getMavenProject().getBuild().addPlugin(globalCargo);
         }
     }
 
