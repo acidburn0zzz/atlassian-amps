@@ -806,7 +806,8 @@ public class MavenGoals
      * Wrap execute Mojo function for temporary removing global Cargo configuration
      * before starting AMPS internal Cargo
      */
-    private static void executeMojoExcludeProductCargoConfig(Plugin internalCargo, String goal, Xpp3Dom configuration, ExecutionEnvironment env)
+    @VisibleForTesting
+    protected void executeMojoExcludeProductCargoConfig(Plugin internalCargo, String goal, Xpp3Dom configuration, ExecutionEnvironment env)
             throws MojoExecutionException
     {
         // remove application cargo plugin for avoiding amps standalone cargo merges configuration
@@ -1043,7 +1044,7 @@ public class MavenGoals
      * <p/>
      * This has now been changed to just return the codehaus version since there are new features/fixes we need and the twdata version is no longer useful.
      */
-    private Plugin cargo(Product context)
+    protected Plugin cargo(Product context)
     {
         log.info("using codehaus cargo v" + pluginArtifactIdToVersionMap.get("org.codehaus.cargo:cargo-maven2-plugin"));
         return plugin(
