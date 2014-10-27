@@ -802,6 +802,25 @@ public class MavenGoals
         return configuration(nonNullElements.toArray(new Element[nonNullElements.size()]));
     }
 
+    /**
+     * Wrap execute Mojo function for temporary removing global Cargo configuration
+     * before starting AMPS internal Cargo
+     */
+    @VisibleForTesting
+    protected void executeMojoExcludeProductCargoConfig(Plugin internalCargo, String goal, Xpp3Dom configuration, ExecutionEnvironment env)
+            throws MojoExecutionException
+    {
+        // remove application cargo plugin for avoiding amps standalone cargo merges configuration
+        Plugin globalCargo = env.getMavenProject().getPlugin("org.codehaus.cargo:cargo-maven2-plugin");
+        env.getMavenProject().getBuild().removePlugin(globalCargo);
+        env.executeMojo(internalCargo, goal, configuration);
+        // restore application cargo plugin for maven next tasks
+        if (null != globalCargo)
+        {
+            env.getMavenProject().getBuild().addPlugin(globalCargo);
+        }
+    }
+
     public int startWebapp(final String productInstanceId, final File war, final Map<String, String> systemProperties, final List<ProductArtifact> extraContainerDependencies,
                            final Product webappContext) throws MojoExecutionException
     {
@@ -877,12 +896,7 @@ public class MavenGoals
         }
 
         Plugin cargo = cargo(webappContext);
-        // remove application cargo plugin for avoiding amps standalone cargo merges configuration
-        log.info("Remove application cargo plugin");
-        Plugin appCargo = executionEnvironment().getMavenProject().getPlugin("org.codehaus.cargo:cargo-maven2-plugin");
-        executionEnvironment().getMavenProject().getBuild().removePlugin(appCargo);
-
-        executeMojo(
+        executeMojoExcludeProductCargoConfig(
                 cargo,
                 goal("start"),
                 configurationWithoutNullElements(
@@ -921,12 +935,6 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
-        // restore application cargo plugin for maven next tasks
-        log.info("Restore application cargo plugin");
-        if (appCargo != null)
-        {
-            executionEnvironment().getMavenProject().getBuild().addPlugin(appCargo);
-        }
         return actualHttpPort;
     }
 
@@ -979,7 +987,7 @@ public class MavenGoals
 
         String actualShutdownTimeout = webappContext.getSynchronousStartup() ? "0" : String.valueOf(webappContext.getShutdownTimeout());
 
-        executeMojo(
+        executeMojoExcludeProductCargoConfig(
         cargo(webappContext),
         goal("stop"),
         configuration(
@@ -1036,7 +1044,7 @@ public class MavenGoals
      * <p/>
      * This has now been changed to just return the codehaus version since there are new features/fixes we need and the twdata version is no longer useful.
      */
-    private Plugin cargo(Product context)
+    protected Plugin cargo(Product context)
     {
         log.info("using codehaus cargo v" + pluginArtifactIdToVersionMap.get("org.codehaus.cargo:cargo-maven2-plugin"));
         return plugin(
