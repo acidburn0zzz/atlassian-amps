@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.jar.Manifest;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.maven.execution.MavenSession;
@@ -37,9 +38,11 @@ import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 import static com.atlassian.maven.plugins.amps.MavenGoals.AJP_PORT_PROPERTY;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
+import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.any;
@@ -105,9 +108,10 @@ public class TestMavenGoals
         final PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
         final MojoDescriptor mojoDescriptor = mock(MojoDescriptor.class);
         // Setup Cargo mojo descriptor parameters for merging child node configuration
-        final List<Parameter> params = new ArrayList<Parameter>();
-        params.add(createParamByName("deployables"));
-        params.add(createParamByName("container"));
+        final List<Parameter> params = ImmutableList.of(
+                createParamByName("container"),
+                createParamByName("deployables")
+        );
 
         globalCargo.setConfiguration(globalConfig);
         build.addPlugin(globalCargo);
@@ -144,16 +148,7 @@ public class TestMavenGoals
         // Invoke
         goals.executeMojoExcludeProductCargoConfig(internalCargo, "start", internalConfig, executionEnvironment);
         // Check
-        boolean isRestored = false;
-        for (Plugin p : build.getPlugins())
-        {
-            if (globalCargo == p)
-            {
-                isRestored = true;
-                break;
-            }
-        }
-        assertTrue(isRestored);
+        assertThat(build.getPlugins(), hasItem(globalCargo));
     }
 
     @Test
