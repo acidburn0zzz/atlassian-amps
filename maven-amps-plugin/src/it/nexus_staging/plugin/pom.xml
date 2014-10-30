@@ -1,0 +1,40 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.atlassian.amps.it</groupId>
+        <artifactId>maven-amps-pom-deploy</artifactId>
+        <version>testing</version>
+    </parent>
+    <artifactId>maven-amps-plugin-deploy</artifactId>
+    <packaging>atlassian-plugin</packaging>
+    <name>TestUnitTest</name>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>file://${basedir}/target/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>nexus-staging</id>
+            <url>file://${basedir}/target/releases</url>
+        </repository>
+    </distributionManagement>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>maven-${shitty.product}-plugin</artifactId>
+                <version>testing</version>
+                <extensions>true</extensions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
