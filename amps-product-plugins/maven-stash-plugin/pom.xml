@@ -51,7 +51,7 @@
                 filterPluginDescriptorWithPluginDescriptor, generateManifestWithInstructions,
                 generateManifestWithNoInstructions, generateManifestWithNoInstructionsButIsAtlassianPlugin,
                 generateManifestWithNoInstructionsNorIsAtlassianPlugin, generateObr, integrationTest,
-                integrationTestWithTestGroup,
+                integrationTestWithTestGroup, nexus_staging,
                 jarWithExistingManifest, run, runParallel, runWithTestGroup, 
                 unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
                 validateManifestWithValidManifest
