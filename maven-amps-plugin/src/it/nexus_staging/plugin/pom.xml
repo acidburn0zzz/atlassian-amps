@@ -7,17 +7,7 @@
     </parent>
     <artifactId>maven-amps-plugin-deploy</artifactId>
     <packaging>atlassian-plugin</packaging>
-    <name>TestUnitTest</name>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <url>file://${basedir}/target/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>nexus-staging</id>
-            <url>file://${basedir}/target/releases</url>
-        </repository>
-    </distributionManagement>
+    <name>TestUnitTest plugin</name>
     <build>
         <plugins>
             <plugin>
@@ -30,6 +20,14 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <!-- will this enforce the project ordering?-->
+            <groupId>com.atlassian.amps.it</groupId>
+            <artifactId>maven-amps-pom-deploy</artifactId>
+            <version>testing</version>
+            <type>pom</type>
+        </dependency>
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

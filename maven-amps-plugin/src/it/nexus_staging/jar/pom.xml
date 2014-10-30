@@ -8,17 +8,7 @@
 
     <artifactId>maven-amps-jar-deploy</artifactId>
     <packaging>jar</packaging>
-    <name>TestUnitTest</name>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <url>file://${basedir}/target/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>nexus-staging</id>
-            <url>file://${basedir}/target/releases</url>
-        </repository>
-    </distributionManagement>
+    <name>TestUnitTest jar depending on plugin and pom</name>
     <dependencies>
         <dependency>
             <groupId>com.atlassian.amps.it</groupId>

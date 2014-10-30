@@ -5,7 +5,7 @@
     <artifactId>maven-amps-pom-deploy</artifactId>
     <version>testing</version>
     <packaging>pom</packaging>
-    <name>TestUnitTest</name>
+    <name>TestUnitTest parent</name>
     <distributionManagement>
         <snapshotRepository>
             <id>nexus-snapshots</id>
