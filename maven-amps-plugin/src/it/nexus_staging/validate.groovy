@@ -10,7 +10,7 @@ def deployrepo = new File(basedir, 'target/releases-wrong')
 assert !deployrepo.exists(), "deploy repo should not exist at:" + deployrepo
 
 def deferred = new File(basedir, "target/nexus-staging/deferred/.index");
-assert deferred.exists(), "deffered directory should exist at:" + deffered
+assert deferred.exists(), "deferred directory should exist at:" + deferred
 //we want to make sure that nexus staging .index properties file only contains
 // one entry per file. With attached jar artifact we ended up with 2 and the wrong one took over because it
 // came later in the file.
