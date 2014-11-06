@@ -1494,119 +1494,11 @@ public class MavenGoals
                 executionEnvironment()
         );
 
-        // Attach a jar artifact to the project. This helps when resolving dependencies in
-        // multi-module maven projects. Otherwise maven will incorrectly try and download
-        // the artifact from the remote repository instead of using the one in the reactor
-        if (isAtlassianPluginOrBundle(getContextProject().getPackaging()))
-        {
-            attachArtifact(getContextProject().getArtifact().getFile(), "jar");
-        }
-    }
-
-    public void mvnDeploy() throws MojoExecutionException
-    {
-        // Get plugin from reactor, if available
-        Map pluginsAsMap = getContextProject().getBuild().getPluginsAsMap();
-        Plugin p = (Plugin)pluginsAsMap.get("org.apache.maven.plugins:maven-deploy-plugin");
-        if (p == null)
-        {
-            // Otherwise, use a sensible default
-            p = plugin(
-                    groupId("org.apache.maven.plugins"),
-                    artifactId("maven-deploy-plugin"),
-                    version(pluginArtifactIdToVersionMap.get("maven-deploy-plugin"))
-            );
-        }
-        log.debug("Using " + p.toString() + " version " + p.getVersion());
-
-        detachJarAndExecuteMojo(
-            p,
-            goal("deploy")
-        );
-    }
-
-    public void mvnInstall() throws MojoExecutionException
-    {
-        // Get plugin from reactor, if available
-        Map pluginsAsMap = getContextProject().getBuild().getPluginsAsMap();
-        Plugin p = (Plugin)pluginsAsMap.get("org.apache.maven.plugins:maven-install-plugin");
-        if (p == null)
-        {
-            // Otherwise, use a sensible default
-            p = plugin(
-                    groupId("org.apache.maven.plugins"),
-                    artifactId("maven-install-plugin"),
-                    version(pluginArtifactIdToVersionMap.get("maven-install-plugin"))
-                );
-        }
-        log.debug("Using " + p.toString() + " version " + p.getVersion());
-
-        detachJarAndExecuteMojo(
-            p, goal("install")
-        );
-    }
-
-    private boolean isAtlassianPluginOrBundle(String packaging)
-    {
-        return "atlassian-plugin".equals(packaging) || "bundle".equals(packaging);
     }
 
     private String artifactToString(final Artifact artifact)
     {
         return String.format("GAV: %s:%s:%s Type: %s, Classifier: %s", artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier());
-    }
-
-    public void detachJarAndExecuteMojo(final Plugin plugin, final String goal) throws MojoExecutionException
-    {
-        Artifact detachedArtifact = null;
-        try
-        {
-            // Has the extra jar artifact been added to the reactor?
-            if (isAtlassianPluginOrBundle(getContextProject().getPackaging()))
-            {
-                // If so, find it.
-                log.debug("Detected atlassian-plugin or bundle packaging");
-                for (Object o : getContextProject().getAttachedArtifacts())
-                {
-                    Artifact a = (Artifact)o;
-                    if (a.getType().equals("jar") && a.getFile().equals(getContextProject().getArtifact().getFile()))
-                    {
-                        log.debug(String.format("Found sneaky, superfluous artifact (%s)", artifactToString(a)));
-                        detachedArtifact = a;
-                        break;
-                    }
-                }
-
-                if (detachedArtifact != null)
-                {
-                    // And temporarily remove it from the reactor
-                    log.debug("Temporarily removing artifact from reactor.");
-                    getContextProject().getAttachedArtifacts().remove(detachedArtifact);
-                }
-            }
-
-            // Execute the shadowed Mojo in our jar-free environment
-            Xpp3Dom configuration = (Xpp3Dom)plugin.getConfiguration();
-            if (configuration == null)
-            {
-                configuration = new Xpp3Dom("configuration");
-            }
-            executeMojo(
-                    plugin,
-                    goal,
-                    configuration,
-                    executionEnvironment()
-            );
-        }
-        finally
-        {
-            if (detachedArtifact != null)
-            {
-                // Re-attach the artifact, if it was removed in the first place
-                log.debug("Re-attaching removed artifact.");
-                getContextProject().addAttachedArtifact(detachedArtifact);
-            }
-        }
     }
 
     public void jarTests(String finalName) throws MojoExecutionException
