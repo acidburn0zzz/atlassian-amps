@@ -1,1 +1,1 @@
-package ${shitty.product}:compress-resources -DskipAllPrompts=true
+${shitty.product}:compress-resources process-resources -DskipAllPrompts=true
