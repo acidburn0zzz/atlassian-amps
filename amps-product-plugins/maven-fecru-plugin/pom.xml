@@ -64,7 +64,7 @@
                 generateManifestWithNoInstructions, generateObr, libArtifact
                 <!-- Commenting out tests that start fecru until AMPS-312 is fixed -->
                 <!-- cli, integrationTest, integrationTestWithTestGroup, run, stop -->
-                jarWithExistingManifest,  
+                jarWithExistingManifest,  nexus_staging,
                 unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
                 validateManifestWithValidManifest, libArtifacts
                 </tests>
