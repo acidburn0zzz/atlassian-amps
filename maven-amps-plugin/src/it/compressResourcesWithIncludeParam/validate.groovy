@@ -19,6 +19,10 @@ assert new File(targetClasses, 'js_-min.js').exists()
 assert new File(targetClasses, 'ab_foo.css').exists()
 assert new File(targetClasses, 'ab_foo-min.css').exists()
 
-def targetClassesInt = new File(basedir, 'target/classes/int')
-assert new File(targetClassesInt, 'test.xml').exists()
+def testCompressedXML = new File(targetClasses, 'test-compressed.xml')
+assert testCompressedXML.exists()
 
+def testXML = new File(targetClasses, 'int/test.xml')
+assert testXML.exists()
+
+assert testCompressedXML.compareTo(testXML)
