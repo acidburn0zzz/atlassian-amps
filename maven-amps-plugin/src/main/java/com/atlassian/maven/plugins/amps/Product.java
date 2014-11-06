@@ -294,7 +294,7 @@ public class Product
      * <ul>
      * <li>Default values depend on the product.</li>
      * <li>Default values will be applied to the first datasource if its definition is incomplete.</li>
-     * <li>Only Jira, Studio-Jira, Studio-Bamboo, Studio-Confluence and Studio-Crowd have a datasource by default, and they use hsqldb.</li>
+     * <li>Only Jira, Studio-Jira, Studio-Bamboo, Studio-Confluence and Studio-Crowd have a datasource by default, and they use HSQL or H2.</li>
      * <li>Other products can use datasources if you configure them this way during the setup process (Requires to
      * start with an empty data home).</li>
      * <li>There is a simple prerequisite to configuring multiple datasources. You must use {@code <parallel>true</parallel>},

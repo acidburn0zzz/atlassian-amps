@@ -17,12 +17,12 @@ public class DataSource
 {
 
     /**
-     * Connection url, such as "jdbc:hsqldb:/path/to/database"
+     * Connection url, such as "jdbc:h2:file:/path/to/database/file"
      */
     private String url;
 
     /**
-     * Driver, such as "org.hsqldb.jdbcDriver"
+     * Driver, such as "org.h2.Driver"
      */
     private String driver;
 

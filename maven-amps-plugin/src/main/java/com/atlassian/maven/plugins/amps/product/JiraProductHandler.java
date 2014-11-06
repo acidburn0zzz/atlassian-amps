@@ -1,6 +1,7 @@
 package com.atlassian.maven.plugins.amps.product;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenContext;
@@ -46,6 +48,10 @@ public class JiraProductHandler extends AbstractWebappProductHandler
 
     @VisibleForTesting
     static final String BUNDLED_PLUGINS_UPTO_4_0 = "WEB-INF/classes/com/atlassian/jira/plugin/atlassian-bundled-plugins.zip";
+
+    private static final String JIRADS_PROPERTIES_FILE = "JiraDS.properties";
+
+    private static final String JIRA_HOME_PLACEHOLDER = "${jirahome}";
 
     private static void checkNotFile(final File sharedHomeDir)
     {
@@ -101,6 +107,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         return 8442;
     }
 
+    // only neeeded for older versions of JIRA; 7.0 onwards will have JiraDS.properties
     protected static File getHsqlDatabaseFile(final File homeDirectory)
     {
         return new File(homeDirectory, "database");
@@ -126,8 +133,34 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     protected DataSource getDefaultDataSource(Product ctx)
     {
         DataSource dataSource = new DataSource();
+
+        final String jiraHome = fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath());
+
+        final File dsPropsFile = new File(getHomeDirectory(ctx), JIRADS_PROPERTIES_FILE);
+        if (dsPropsFile.exists())
+        {
+            final Properties dsProps = new Properties();
+            try
+            {
+                // read properties from the JiraDS.properties
+                dsProps.load(new FileInputStream(dsPropsFile));
+                dataSource.setJndi(dsProps.getProperty("jndi"));
+                dataSource.setUrl(dsProps.getProperty("url").replace(JIRA_HOME_PLACEHOLDER, jiraHome));
+                dataSource.setDriver(dsProps.getProperty("driver-class"));
+                dataSource.setUsername(dsProps.getProperty("username"));
+                dataSource.setPassword(dsProps.getProperty("password"));
+                return dataSource;
+            }
+            catch (IOException e)
+            {
+                // nothing we can do here; fall back to defaults
+                log.warn("failed to read " + dsPropsFile.getAbsolutePath(), e);
+            }
+        }
+
+        // legacy JIRA without JiraDS.properties; still uses HSQL
         dataSource.setJndi("jdbc/JiraDS");
-        dataSource.setUrl(format("jdbc:hsqldb:%s/database", fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath())));
+        dataSource.setUrl(format("jdbc:hsqldb:%s/database", jiraHome));
         dataSource.setDriver("org.hsqldb.jdbcDriver");
         dataSource.setType("javax.sql.DataSource");
         dataSource.setUsername("sa");
@@ -251,6 +284,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         return configFiles;
     }
 
+    // only neeeded for older versions of JIRA; 7.0 onwards will have JiraDS.properties
     static void createDbConfigXmlIfNecessary(File homeDir) throws MojoExecutionException
     {
         File dbConfigXml = new File(homeDir, "dbconfig.xml");
