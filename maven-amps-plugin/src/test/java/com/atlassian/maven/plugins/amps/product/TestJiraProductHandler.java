@@ -25,10 +25,14 @@ import org.w3c.dom.Document;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_FROM_4_1;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UNZIPPED;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UPTO_4_0;
+import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.FILENAME_DBCONFIG;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.INSTALLED_PLUGINS_DIR;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.PLUGINS_DIR;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -73,51 +77,159 @@ public class TestJiraProductHandler
     public void dbconfigXmlCreatedWithCorrectPath() throws Exception
     {
         JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
-        
-        File f = new File(tempHome, "dbconfig.xml");
+
+        File f = new File(tempHome, FILENAME_DBCONFIG);
         assertTrue("The dbconfig.xml is created", f.exists());
         assertTrue("And it's a regular file", f.isFile());
 
         File dbFile = new File(tempHome, "database");
-        
+
         Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
-        
+
         XPathExpression xpe = XPathFactory.newInstance().newXPath().compile("/jira-database-config/jdbc-datasource/url");
-        
+
         String x = xpe.evaluate(d);
         assertEquals("The JDBC URI for the embedded database is as expected",
                 "jdbc:hsqldb:file:" + dbFile.toURI().getPath(), x);
     }
 
     @Test
-    public void updateDbTypeforDbConfigXml() throws Exception
+    public void updateDBConfigXmlForOracle() throws Exception
     {
         // Create default dbconfig.xml
         JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
         // Setup
-        final File f = new File(tempHome, "dbconfig.xml");
+        final DatabaseType dbType = DatabaseType.ORACLE;
+        final File f = new File(tempHome, FILENAME_DBCONFIG);
+        final String schema = "test-schema";
         final SAXReader reader = new SAXReader();
+        org.dom4j.Document dbConfigXml = reader.read(f);
         final MavenContext mockMavenContext = mock(MavenContext.class);
         final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
         // Check default db type
-        assertEquals("hsql", getDbType(f, reader));
-        // Invoke
-        productHandler.updateDatabaseTypeForDbConfigXml(tempHome, DatabaseType.ORACLE, "test-schema");
+        assertEquals("hsql", getDbType(dbConfigXml));
+        assertEquals("PUBLIC", getDbSchema(dbConfigXml));
+        // Invoke: update dbconfig.xml
+        productHandler.updateDbConfigXml(tempHome, dbType, schema);
+        dbConfigXml = reader.read(f);
         // Check
-        assertEquals(DatabaseType.ORACLE.getDbType(), getDbType(f, reader));
+        assertEquals(dbType.getDbType(), getDbType(dbConfigXml));
+        assertFalse(schema.equals(getDbSchema(dbConfigXml)));
     }
 
-    private String getDbType(final File f, final SAXReader reader) throws Exception
+    @Test
+    public void updateDBConfigXmlForMysql() throws Exception
     {
-        final org.dom4j.Document dbConfigXml = reader.read(f);
+        // Create default dbconfig.xml
+        JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
+        // Setup
+        final DatabaseType dbType = DatabaseType.MYSQL;
+        final File f = new File(tempHome, FILENAME_DBCONFIG);
+        final String schema = "test-schema";
+        final SAXReader reader = new SAXReader();
+        org.dom4j.Document dbConfigXml = reader.read(f);
+        final MavenContext mockMavenContext = mock(MavenContext.class);
+        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
+        // Check default db type
+        assertEquals("hsql", getDbType(dbConfigXml));
+        assertEquals("PUBLIC", getDbSchema(dbConfigXml));
+        // Invoke: update dbconfig.xml
+        productHandler.updateDbConfigXml(tempHome, dbType, schema);
+        dbConfigXml = reader.read(f);
+        // Check
+        assertEquals(dbType.getDbType(), getDbType(dbConfigXml));
+        assertFalse(schema.equals(getDbSchema(dbConfigXml)));
+    }
+
+    @Test
+    public void updateDBConfigXmlForPostgres() throws Exception
+    {
+        // Create default dbconfig.xml
+        JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
+        // Setup
+        final DatabaseType dbType = DatabaseType.POSTGRESQL;
+        final File f = new File(tempHome, FILENAME_DBCONFIG);
+        final String schema = "test-schema";
+        final SAXReader reader = new SAXReader();
+        org.dom4j.Document dbConfigXml = reader.read(f);
+        final MavenContext mockMavenContext = mock(MavenContext.class);
+        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
+        // Check default db type
+        assertEquals("hsql", getDbType(dbConfigXml));
+        assertEquals("PUBLIC", getDbSchema(dbConfigXml));
+        // Invoke: update dbconfig.xml
+        productHandler.updateDbConfigXml(tempHome, dbType, schema);
+        dbConfigXml = reader.read(f);
+        // Check
+        assertEquals(dbType.getDbType(), getDbType(dbConfigXml));
+        assertTrue(schema.equals(getDbSchema(dbConfigXml)));
+    }
+
+    @Test
+    public void updateDBConfigXmlForMssql() throws Exception
+    {
+        // Create default dbconfig.xml
+        JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
+        // Setup
+        final DatabaseType dbType = DatabaseType.MSSQL;
+        final File f = new File(tempHome, FILENAME_DBCONFIG);
+        final String schema = "test-schema";
+        final SAXReader reader = new SAXReader();
+        org.dom4j.Document dbConfigXml = reader.read(f);
+        final MavenContext mockMavenContext = mock(MavenContext.class);
+        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
+        // Check default db type
+        assertEquals("hsql", getDbType(dbConfigXml));
+        assertEquals("PUBLIC", getDbSchema(dbConfigXml));
+        // Invoke: update dbconfig.xml
+        productHandler.updateDbConfigXml(tempHome, dbType, schema);
+        dbConfigXml = reader.read(f);
+        // Check
+        assertEquals(dbType.getDbType(), getDbType(dbConfigXml));
+        assertTrue(schema.equals(getDbSchema(dbConfigXml)));
+    }
+
+    @Test
+    public void updateDBConfigXmlForMssqlJTDS() throws Exception
+    {
+        // Create default dbconfig.xml
+        JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
+        // Setup
+        final DatabaseType dbType = DatabaseType.MSSQL_JTDS;
+        final File f = new File(tempHome, FILENAME_DBCONFIG);
+        final String schema = "test-schema";
+        final SAXReader reader = new SAXReader();
+        org.dom4j.Document dbConfigXml = reader.read(f);
+        final MavenContext mockMavenContext = mock(MavenContext.class);
+        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
+        // Check default db type
+        assertEquals("hsql", getDbType(dbConfigXml));
+        assertEquals("PUBLIC", getDbSchema(dbConfigXml));
+        // Invoke: update dbconfig.xml
+        productHandler.updateDbConfigXml(tempHome, dbType, schema);
+        dbConfigXml = reader.read(f);
+        // Check
+        assertEquals(dbType.getDbType(), getDbType(dbConfigXml));
+        assertTrue(schema.equals(getDbSchema(dbConfigXml)));
+    }
+
+    private String getDbType(org.dom4j.Document dbConfigXml) throws Exception
+    {
+
         final Node dbTypeNode = dbConfigXml.selectSingleNode("//jira-database-config/database-type");
         return dbTypeNode == null ? "" : dbTypeNode.getStringValue();
+    }
+
+    private String getDbSchema(org.dom4j.Document dbConfigXml) throws Exception
+    {
+        final Node schemaNode = dbConfigXml.selectSingleNode("//jira-database-config/schema-name");
+        return schemaNode == null ? "" : schemaNode.getStringValue();
     }
     
     @Test
     public void dbconfigXmlNotCreatedWhenAlreadyExists() throws MojoExecutionException, IOException
     {
-        File f = new File(tempHome, "dbconfig.xml");
+        File f = new File(tempHome, FILENAME_DBCONFIG);
         FileUtils.writeStringToFile(f, "Original contents");
         JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
         

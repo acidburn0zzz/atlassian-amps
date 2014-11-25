@@ -59,6 +59,9 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     @VisibleForTesting
     static final String BUNDLED_PLUGINS_UPTO_4_0 = "WEB-INF/classes/com/atlassian/jira/plugin/atlassian-bundled-plugins.zip";
 
+    @VisibleForTesting
+    static final String FILENAME_DBCONFIG = "dbconfig.xml";
+
     private static final String JIRADS_PROPERTIES_FILE = "JiraDS.properties";
 
     private static final String JIRA_HOME_PLACEHOLDER = "${jirahome}";
@@ -262,67 +265,78 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         if (ctx.getDataSources().size() > 0)
         {
             final DataSource ds = ctx.getDataSources().get(0);
-            updateDatabaseTypeForDbConfigXml(homeDir, DatabaseType.produceDatabaseType(ds.getUrl(), ds.getDriver()), ds.getSchema());
+            updateDbConfigXml(homeDir, DatabaseType.produceDatabaseType(ds.getUrl(), ds.getDriver()), ds.getSchema());
         }
     }
 
-    protected void updateDatabaseTypeForDbConfigXml(File homeDir, DatabaseType dbType, String schema) throws MojoExecutionException
+    @VisibleForTesting
+    protected void updateDbConfigXml(final File homeDir, final DatabaseType dbType, final String schema)
+            throws MojoExecutionException
     {
-        File dbConfigXml = new File(homeDir, "dbconfig.xml");
+        final File dbConfigXml = new File(homeDir, FILENAME_DBCONFIG);
         if (!dbConfigXml.exists() || dbType == null)
         {
             return;
         }
         try
         {
-            SAXReader reader = new SAXReader();
-            Document dbConfigDoc = reader.read(dbConfigXml);
-            Node dbTypeNode = dbConfigDoc.selectSingleNode("//jira-database-config/database-type");
-            Node schemaNode = dbConfigDoc.selectSingleNode("//jira-database-config/schema-name");
-            if (null != dbTypeNode)
+            final SAXReader reader = new SAXReader();
+            final Document dbConfigDoc = reader.read(dbConfigXml);
+            final Node dbTypeNode = dbConfigDoc.selectSingleNode("//jira-database-config/database-type");
+            final Node schemaNode = dbConfigDoc.selectSingleNode("//jira-database-config/schema-name");
+            boolean modified = false;
+            // update database type
+            if (null != dbTypeNode && StringUtils.isNotEmpty(dbTypeNode.getStringValue()))
             {
                 String currentDbType = dbTypeNode.getStringValue();
                 // check null and difference value from dbType
-                if (StringUtils.isNotEmpty(currentDbType) && !currentDbType.equals(dbType))
+                if (!currentDbType.equals(dbType))
                 {
                     // update database type
+                    modified = true;
                     dbTypeNode.setText(dbType.getDbType());
                 }
             }
-            if(StringUtils.isNotEmpty(schema))
+            // update database schema for Postgres, MSSQL only
+            // Please refer to the JIRA database documentation at the following URL: http://www.atlassian.com/software/jira/docs/latest/databases/index.html
+            if (null != schemaNode && StringUtils.isNotEmpty(schema))
             {
-                switch(dbType)
+                switch (dbType)
                 {
                     case POSTGRESQL:
                     case MSSQL:
                     case MSSQL_JTDS:
                         // update schema
+                        modified = true;
                         schemaNode.setText(schema);
                         break;
                     default:
                 }
             }
-            // write dbconfig.xml
-            FileOutputStream fos = new FileOutputStream(dbConfigXml);
-            OutputFormat format = OutputFormat.createPrettyPrint();
-            XMLWriter writer = new XMLWriter(fos, format);
-            try
+            if (modified)
             {
-                writer.write(dbConfigDoc);
+                // write dbconfig.xml
+                FileOutputStream fos = new FileOutputStream(dbConfigXml);
+                OutputFormat format = OutputFormat.createPrettyPrint();
+                XMLWriter writer = new XMLWriter(fos, format);
+                try
+                {
+                    writer.write(dbConfigDoc);
+                }
+                finally
+                {
+                    writer.close();
+                    closeQuietly(fos);
+                }
             }
-            finally
-            {
-                writer.close();
-                closeQuietly(fos);
-            }
-        }
-        catch (IOException ie)
-        {
-            throw new MojoExecutionException("Unable to write dbconfig.xml", ie);
         }
         catch (DocumentException de)
         {
             throw new MojoExecutionException("Unable parse file dbconfig.xml", de);
+        }
+        catch (IOException ie)
+        {
+            throw new MojoExecutionException("Unable to write dbconfig.xml", ie);
         }
     }
 
@@ -355,14 +369,14 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         List<File> configFiles = super.getConfigFiles(product, homeDir);
         configFiles.add(new File(homeDir, "database.log"));
         configFiles.add(new File(homeDir, "database.script"));
-        configFiles.add(new File(homeDir, "dbconfig.xml"));
+        configFiles.add(new File(homeDir, FILENAME_DBCONFIG));
         return configFiles;
     }
 
     // only neeeded for older versions of JIRA; 7.0 onwards will have JiraDS.properties
     static void createDbConfigXmlIfNecessary(File homeDir) throws MojoExecutionException
     {
-        File dbConfigXml = new File(homeDir, "dbconfig.xml");
+        File dbConfigXml = new File(homeDir, FILENAME_DBCONFIG);
         if (dbConfigXml.exists())
         {
             return;
