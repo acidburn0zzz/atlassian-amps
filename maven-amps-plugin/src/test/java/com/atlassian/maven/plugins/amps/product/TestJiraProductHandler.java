@@ -7,6 +7,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import com.atlassian.maven.plugins.amps.DatabaseType;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.Product;
 
@@ -94,7 +95,6 @@ public class TestJiraProductHandler
         // Create default dbconfig.xml
         JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
         // Setup
-        final String ORACLE = "oracle";
         final File f = new File(tempHome, "dbconfig.xml");
         final SAXReader reader = new SAXReader();
         final MavenContext mockMavenContext = mock(MavenContext.class);
@@ -102,9 +102,9 @@ public class TestJiraProductHandler
         // Check default db type
         assertEquals("hsql", getDbType(f, reader));
         // Invoke
-        productHandler.updateDatabaseTypeForDbConfigXml(tempHome, ORACLE);
+        productHandler.updateDatabaseTypeForDbConfigXml(tempHome, DatabaseType.ORACLE, "test-schema");
         // Check
-        assertEquals(ORACLE, getDbType(f, reader));
+        assertEquals(DatabaseType.ORACLE.getDbType(), getDbType(f, reader));
     }
 
     private String getDbType(final File f, final SAXReader reader) throws Exception

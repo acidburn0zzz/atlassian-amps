@@ -262,14 +262,14 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         final DataSource ds = ctx.getDataSources().get(0);
         if (null != ds)
         {
-            updateDatabaseTypeForDbConfigXml(homeDir, DatabaseType.getDatabaseType(ds.getUrl(), ds.getDriver()));
+            updateDatabaseTypeForDbConfigXml(homeDir, DatabaseType.produceDatabaseType(ds.getUrl(), ds.getDriver()), ds.getSchema());
         }
     }
 
-    protected void updateDatabaseTypeForDbConfigXml(File homeDir, String dbType) throws MojoExecutionException
+    protected void updateDatabaseTypeForDbConfigXml(File homeDir, DatabaseType dbType, String schema) throws MojoExecutionException
     {
         File dbConfigXml = new File(homeDir, "dbconfig.xml");
-        if (!dbConfigXml.exists() || StringUtils.isEmpty(dbType))
+        if (!dbConfigXml.exists() || dbType == null)
         {
             return;
         }
@@ -278,6 +278,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             SAXReader reader = new SAXReader();
             Document dbConfigDoc = reader.read(dbConfigXml);
             Node dbTypeNode = dbConfigDoc.selectSingleNode("//jira-database-config/database-type");
+            Node schemaNode = dbConfigDoc.selectSingleNode("//jira-database-config/schema-name");
             if (null != dbTypeNode)
             {
                 String currentDbType = dbTypeNode.getStringValue();
@@ -285,21 +286,34 @@ public class JiraProductHandler extends AbstractWebappProductHandler
                 if (StringUtils.isNotEmpty(currentDbType) && !currentDbType.equals(dbType))
                 {
                     // update database type
-                    dbTypeNode.setText(dbType);
-                    // write dbconfig.xml
-                    FileOutputStream fos = new FileOutputStream(dbConfigXml);
-                    OutputFormat format = OutputFormat.createPrettyPrint();
-                    XMLWriter writer = new XMLWriter(fos, format);
-                    try
-                    {
-                        writer.write(dbConfigDoc);
-                    }
-                    finally
-                    {
-                        writer.close();
-                        closeQuietly(fos);
-                    }
+                    dbTypeNode.setText(dbType.getDbType());
                 }
+            }
+            if(StringUtils.isNotEmpty(schema))
+            {
+                switch(dbType)
+                {
+                    case POSTGRESQL:
+                    case MSSQL:
+                    case MSSQL_JTDS:
+                        // update schema
+                        schemaNode.setText(schema);
+                        break;
+                    default:
+                }
+            }
+            // write dbconfig.xml
+            FileOutputStream fos = new FileOutputStream(dbConfigXml);
+            OutputFormat format = OutputFormat.createPrettyPrint();
+            XMLWriter writer = new XMLWriter(fos, format);
+            try
+            {
+                writer.write(dbConfigDoc);
+            }
+            finally
+            {
+                writer.close();
+                closeQuietly(fos);
             }
         }
         catch (IOException ie)
