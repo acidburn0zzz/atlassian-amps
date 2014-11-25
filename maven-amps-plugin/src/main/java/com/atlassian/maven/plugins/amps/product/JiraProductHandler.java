@@ -259,9 +259,9 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     {
         super.processHomeDirectory(ctx, homeDir);
         createDbConfigXmlIfNecessary(homeDir);
-        final DataSource ds = ctx.getDataSources().get(0);
-        if (null != ds)
+        if (ctx.getDataSources().size() > 0)
         {
+            final DataSource ds = ctx.getDataSources().get(0);
             updateDatabaseTypeForDbConfigXml(homeDir, DatabaseType.produceDatabaseType(ds.getUrl(), ds.getDriver()), ds.getSchema());
         }
     }
