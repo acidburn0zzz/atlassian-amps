@@ -2,6 +2,7 @@ package com.atlassian.maven.plugins.amps.product;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.atlassian.maven.plugins.amps.DataSource;
+import com.atlassian.maven.plugins.amps.DatabaseType;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
@@ -24,12 +26,20 @@ import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Node;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 
 import static com.atlassian.maven.plugins.amps.util.ConfigFileUtils.RegexReplacement;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static java.lang.String.format;
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class JiraProductHandler extends AbstractWebappProductHandler
@@ -249,6 +259,57 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     {
         super.processHomeDirectory(ctx, homeDir);
         createDbConfigXmlIfNecessary(homeDir);
+        final DataSource ds = ctx.getDataSources().get(0);
+        if (null != ds)
+        {
+            updateDatabaseTypeForDbConfigXml(homeDir, DatabaseType.getDatabaseType(ds.getUrl(), ds.getDriver()));
+        }
+    }
+
+    protected void updateDatabaseTypeForDbConfigXml(File homeDir, String dbType) throws MojoExecutionException
+    {
+        File dbConfigXml = new File(homeDir, "dbconfig.xml");
+        if (!dbConfigXml.exists() || StringUtils.isEmpty(dbType))
+        {
+            return;
+        }
+        try
+        {
+            SAXReader reader = new SAXReader();
+            Document dbConfigDoc = reader.read(dbConfigXml);
+            Node dbTypeNode = dbConfigDoc.selectSingleNode("//jira-database-config/database-type");
+            if (null != dbTypeNode)
+            {
+                String currentDbType = dbTypeNode.getStringValue();
+                // check null and difference value from dbType
+                if (StringUtils.isNotEmpty(currentDbType) && !currentDbType.equals(dbType))
+                {
+                    // update database type
+                    dbTypeNode.setText(dbType);
+                    // write dbconfig.xml
+                    FileOutputStream fos = new FileOutputStream(dbConfigXml);
+                    OutputFormat format = OutputFormat.createPrettyPrint();
+                    XMLWriter writer = new XMLWriter(fos, format);
+                    try
+                    {
+                        writer.write(dbConfigDoc);
+                    }
+                    finally
+                    {
+                        writer.close();
+                        closeQuietly(fos);
+                    }
+                }
+            }
+        }
+        catch (IOException ie)
+        {
+            throw new MojoExecutionException("Unable to write dbconfig.xml", ie);
+        }
+        catch (DocumentException de)
+        {
+            throw new MojoExecutionException("Unable parse file dbconfig.xml", de);
+        }
     }
 
     @Override

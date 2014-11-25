@@ -1,28 +1,31 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import java.io.File;
+import java.io.IOException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.Product;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.dom4j.Node;
+import org.dom4j.io.SAXReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-import java.io.File;
-import java.io.IOException;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-
+import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_FROM_4_1;
+import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UNZIPPED;
+import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UPTO_4_0;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.INSTALLED_PLUGINS_DIR;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.PLUGINS_DIR;
-import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UNZIPPED;
-import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_FROM_4_1;
-import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UPTO_4_0;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -84,6 +87,32 @@ public class TestJiraProductHandler
         assertEquals("The JDBC URI for the embedded database is as expected",
                 "jdbc:hsqldb:file:" + dbFile.toURI().getPath(), x);
     }
+
+    @Test
+    public void updateDbTypeforDbConfigXml() throws Exception
+    {
+        // Create default dbconfig.xml
+        JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
+        // Setup
+        final String ORACLE = "oracle";
+        final File f = new File(tempHome, "dbconfig.xml");
+        final SAXReader reader = new SAXReader();
+        final MavenContext mockMavenContext = mock(MavenContext.class);
+        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
+        // Check default db type
+        assertEquals("hsql", getDbType(f, reader));
+        // Invoke
+        productHandler.updateDatabaseTypeForDbConfigXml(tempHome, ORACLE);
+        // Check
+        assertEquals(ORACLE, getDbType(f, reader));
+    }
+
+    private String getDbType(final File f, final SAXReader reader) throws Exception
+    {
+        final org.dom4j.Document dbConfigXml = reader.read(f);
+        final Node dbTypeNode = dbConfigXml.selectSingleNode("//jira-database-config/database-type");
+        return dbTypeNode == null ? "" : dbTypeNode.getStringValue();
+    }
     
     @Test
     public void dbconfigXmlNotCreatedWhenAlreadyExists() throws MojoExecutionException, IOException
@@ -94,6 +123,12 @@ public class TestJiraProductHandler
         
         String after = FileUtils.readFileToString(f);
         assertEquals("Original contents", after);
+    }
+
+    @Test
+    public void updateDatabaseTypeForDbConfigXml()throws MojoExecutionException, IOException{
+        final String dbType = "postgres";
+
     }
 
     @Test
