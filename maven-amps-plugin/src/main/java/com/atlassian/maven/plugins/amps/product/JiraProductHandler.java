@@ -297,20 +297,16 @@ public class JiraProductHandler extends AbstractWebappProductHandler
                     dbTypeNode.setText(dbType.getDbType());
                 }
             }
-            // update database schema for Postgres, MSSQL only
-            // Please refer to the JIRA database documentation at the following URL: http://www.atlassian.com/software/jira/docs/latest/databases/index.html
             if (null != schemaNode && StringUtils.isNotEmpty(schema))
             {
-                switch (dbType)
+                if(dbType.isHaveSchema())
                 {
-                    case POSTGRESQL:
-                    case MSSQL:
-                    case MSSQL_JTDS:
-                        // update schema
-                        modified = true;
-                        schemaNode.setText(schema);
-                        break;
-                    default:
+                    schemaNode.setText(schema);
+                }
+                else
+                {
+                    // remove schema node
+                    schemaNode.detach();
                 }
             }
             if (modified)

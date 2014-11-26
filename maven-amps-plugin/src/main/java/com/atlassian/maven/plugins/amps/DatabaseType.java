@@ -3,24 +3,28 @@ package com.atlassian.maven.plugins.amps;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- *  Mapping database type by database uri prefix and database driver
- *  Please refer to the JIRA database documentation at the following URL: http://www.atlassian.com/software/jira/docs/latest/databases/index.html
+ * Mapping database type by database uri prefix and database driver Please refer to the JIRA database documentation at
+ * the following URL: http://www.atlassian.com/software/jira/docs/latest/databases/index.html
  */
 public enum DatabaseType
 {
-    HSQL("hsql", "jdbc:hsqldb", "org.hsqldb.jdbcDriver"),
-    MYSQL("mysql", "jdbc:mysql", "com.mysql.jdbc.Driver"),
-    POSTGRESQL("postgres72", "jdbc:postgresql", "org.postgresql.Driver"),
-    ORACLE("oracle10", "jdbc:oracle", "oracle.jdbc.OracleDriver"),
-    MSSQL("mssql", "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
-    MSSQL_JTDS("mssql", "jdbc:jtds:sqlserver", "net.sourceforge.jtds.jdbc.Driver");
+    HSQL("hsql", true, "jdbc:hsqldb", "org.hsqldb.jdbcDriver"),
+    MYSQL("mysql", false, "jdbc:mysql", "com.mysql.jdbc.Driver"),
+    POSTGRESQL("postgres72", true, "jdbc:postgresql", "org.postgresql.Driver"),
+    ORACLE("oracle10", false, "jdbc:oracle", "oracle.jdbc.OracleDriver"),
+    MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
+    MSSQL_JTDS("mssql", true, "jdbc:jtds:sqlserver", "net.sourceforge.jtds.jdbc.Driver");
 
     private final String dbType;
+    // if database does not have schema, schema-name node will be removed
+    private final boolean haveSchema;
     private final String uriPrefix;
     private final String driverClassName;
 
-    DatabaseType(String dbType, String uriPrefix, String driverClassName){
+    DatabaseType(String dbType, boolean haveSchema, String uriPrefix, String driverClassName)
+    {
         this.dbType = dbType;
+        this.haveSchema = haveSchema;
         this.uriPrefix = uriPrefix;
         this.driverClassName = driverClassName;
     }
@@ -40,7 +44,7 @@ public enum DatabaseType
     {
         for (DatabaseType databaseType : values())
         {
-            if(databaseType.accept(uriPrefix) && databaseType.driverClassName.equals(driverClassName))
+            if (databaseType.accept(uriPrefix) && databaseType.driverClassName.equals(driverClassName))
             {
                 return databaseType;
             }
@@ -50,8 +54,7 @@ public enum DatabaseType
 
     /**
      * get database type from database url and driver
-     * @param url
-     * @param driver
+     *
      * @return database type
      */
     public static String getDatabaseType(String url, String driver)
@@ -63,5 +66,10 @@ public enum DatabaseType
     public String getDbType()
     {
         return this.dbType;
+    }
+
+    public boolean isHaveSchema()
+    {
+        return this.haveSchema;
     }
 }
