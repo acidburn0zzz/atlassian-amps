@@ -17,14 +17,14 @@ public enum DatabaseType
 
     private final String dbType;
     // if database does not have schema, schema-name node will be removed
-    private final boolean haveSchema;
+    private final boolean hasSchema;
     private final String uriPrefix;
     private final String driverClassName;
 
-    DatabaseType(String dbType, boolean haveSchema, String uriPrefix, String driverClassName)
+    DatabaseType(String dbType, boolean hasSchema, String uriPrefix, String driverClassName)
     {
         this.dbType = dbType;
-        this.haveSchema = haveSchema;
+        this.hasSchema = hasSchema;
         this.uriPrefix = uriPrefix;
         this.driverClassName = driverClassName;
     }
@@ -59,6 +59,6 @@ public enum DatabaseType
 
     public boolean hasSchema()
     {
-        return this.haveSchema;
+        return this.hasSchema;
     }
 }
