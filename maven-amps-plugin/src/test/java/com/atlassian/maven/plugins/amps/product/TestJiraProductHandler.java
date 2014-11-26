@@ -177,12 +177,6 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void updateDatabaseTypeForDbConfigXml()throws MojoExecutionException, IOException{
-        final String dbType = "postgres";
-
-    }
-
-    @Test
     public void pluginsShouldGoIntoLocalHomeIfNoSharedHomeIsSpecified()
     {
         final File localHome = createTempDir("jira-local");
