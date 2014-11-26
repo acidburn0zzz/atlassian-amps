@@ -29,18 +29,7 @@ public enum DatabaseType
         this.driverClassName = driverClassName;
     }
 
-    /**
-     * Checks whether the URI starts with the prefix associated with the database
-     *
-     * @param uri the give URI for connecting to the database
-     * @return {@code true} if the URI is valid for this instance of data source factory
-     */
-    private boolean accept(String uri)
-    {
-        return checkNotNull(uri).trim().startsWith(uriPrefix);
-    }
-
-    public static DatabaseType produceDatabaseType(String uriPrefix, String driverClassName)
+    public static DatabaseType getDatabaseType(String uriPrefix, String driverClassName)
     {
         for (DatabaseType databaseType : values())
         {
@@ -53,14 +42,14 @@ public enum DatabaseType
     }
 
     /**
-     * get database type from database url and driver
+     * Checks whether the URI starts with the prefix associated with the database
      *
-     * @return database type
+     * @param uri the give URI for connecting to the database
+     * @return {@code true} if the URI is valid for this instance of data source factory
      */
-    public static String getDatabaseType(String url, String driver)
+    private boolean accept(String uri)
     {
-        DatabaseType databaseType = produceDatabaseType(url, driver);
-        return databaseType == null ? "" : databaseType.dbType;
+        return checkNotNull(uri).trim().startsWith(uriPrefix);
     }
 
     public String getDbType()
@@ -68,7 +57,7 @@ public enum DatabaseType
         return this.dbType;
     }
 
-    public boolean isHaveSchema()
+    public boolean hasSchema()
     {
         return this.haveSchema;
     }

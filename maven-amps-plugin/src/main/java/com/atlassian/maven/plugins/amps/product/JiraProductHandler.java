@@ -265,7 +265,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         if (ctx.getDataSources().size() > 0)
         {
             final DataSource ds = ctx.getDataSources().get(0);
-            updateDbConfigXml(homeDir, DatabaseType.produceDatabaseType(ds.getUrl(), ds.getDriver()), ds.getSchema());
+            updateDbConfigXml(homeDir, DatabaseType.getDatabaseType(ds.getUrl(), ds.getDriver()), ds.getSchema());
         }
     }
 
@@ -299,7 +299,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             }
             if (null != schemaNode && StringUtils.isNotEmpty(schema))
             {
-                if(dbType.isHaveSchema())
+                if(dbType.hasSchema())
                 {
                     schemaNode.setText(schema);
                 }

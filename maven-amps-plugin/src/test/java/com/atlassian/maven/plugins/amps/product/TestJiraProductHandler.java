@@ -142,7 +142,7 @@ public class TestJiraProductHandler
         dbConfigXml = reader.read(f);
         // Check
         assertEquals(dbType.getDbType(), getDbType(dbConfigXml));
-        if (dbType.isHaveSchema())
+        if (dbType.hasSchema())
         {
             assertTrue(schema.equals(getDbSchema(dbConfigXml)));
         }
