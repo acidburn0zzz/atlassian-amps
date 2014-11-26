@@ -311,19 +311,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             }
             if (modified)
             {
-                // write dbconfig.xml
-                FileOutputStream fos = new FileOutputStream(dbConfigXml);
-                OutputFormat format = OutputFormat.createPrettyPrint();
-                XMLWriter writer = new XMLWriter(fos, format);
-                try
-                {
-                    writer.write(dbConfigDoc);
-                }
-                finally
-                {
-                    writer.close();
-                    closeQuietly(fos);
-                }
+                writeDbConfigXml(dbConfigXml, dbConfigDoc);
             }
         }
         catch (DocumentException de)
@@ -333,6 +321,23 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         catch (IOException ie)
         {
             throw new MojoExecutionException("Unable to write dbconfig.xml", ie);
+        }
+    }
+
+    private void writeDbConfigXml(final File dbConfigXml, final Document dbConfigDoc) throws IOException
+    {
+        // write dbconfig.xml
+        FileOutputStream fos = new FileOutputStream(dbConfigXml);
+        OutputFormat format = OutputFormat.createPrettyPrint();
+        XMLWriter writer = new XMLWriter(fos, format);
+        try
+        {
+            writer.write(dbConfigDoc);
+        }
+        finally
+        {
+            writer.close();
+            closeQuietly(fos);
         }
     }
 
