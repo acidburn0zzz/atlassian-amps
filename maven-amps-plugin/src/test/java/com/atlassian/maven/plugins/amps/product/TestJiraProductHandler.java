@@ -7,7 +7,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import com.atlassian.maven.plugins.amps.DatabaseType;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.Product;
 
@@ -32,6 +31,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -96,34 +96,34 @@ public class TestJiraProductHandler
     @Test
     public void updateDBConfigXmlForOracle() throws Exception
     {
-        testUpdateDbConfigXml(DatabaseType.ORACLE);
+        testUpdateDbConfigXml(JiraDatabaseType.ORACLE);
     }
 
     @Test
     public void updateDBConfigXmlForMysql() throws Exception
     {
-        testUpdateDbConfigXml(DatabaseType.MYSQL);
+        testUpdateDbConfigXml(JiraDatabaseType.MYSQL);
     }
 
     @Test
     public void updateDBConfigXmlForPostgres() throws Exception
     {
-        testUpdateDbConfigXml(DatabaseType.POSTGRESQL);
+        testUpdateDbConfigXml(JiraDatabaseType.POSTGRESQL);
     }
 
     @Test
     public void updateDBConfigXmlForMssql() throws Exception
     {
-        testUpdateDbConfigXml(DatabaseType.MSSQL);
+        testUpdateDbConfigXml(JiraDatabaseType.MSSQL);
     }
 
     @Test
     public void updateDBConfigXmlForMssqlJTDS() throws Exception
     {
-        testUpdateDbConfigXml(DatabaseType.MSSQL_JTDS);
+        testUpdateDbConfigXml(JiraDatabaseType.MSSQL_JTDS);
     }
 
-    private void testUpdateDbConfigXml(DatabaseType dbType) throws Exception
+    private void testUpdateDbConfigXml(JiraDatabaseType dbType) throws Exception
     {
         // Create default dbconfig.xml
         JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
@@ -164,7 +164,38 @@ public class TestJiraProductHandler
         final Node schemaNode = dbConfigXml.selectSingleNode("//jira-database-config/schema-name");
         return schemaNode == null ? "" : schemaNode.getStringValue();
     }
-    
+
+    @Test
+    public void getDatabaseTypeWithNull() throws Exception
+    {
+        final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType(null, null);
+        assertNull(dbType);
+
+
+    }
+    @Test
+    public void getDatabaseTypePostgresUriAndDriver() throws Exception
+    {
+        final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType("jdbc:postgresql://localhost:5432/amps-test", "org.postgresql.Driver");
+        assertNotNull(dbType);
+        assertEquals(dbType.getDbType(), JiraDatabaseType.POSTGRESQL.getDbType());
+    }
+
+    @Test
+    public void getDatabaseTypeMssqlUriAndDriver() throws Exception
+    {
+        final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType("jdbc:sqlserver://amps-test", "com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        assertNotNull(dbType);
+        assertEquals(dbType.getDbType(), JiraDatabaseType.MSSQL.getDbType());
+    }
+
+    @Test
+    public void getDatabaseTypeMssqlUriAndAcrossDriver() throws Exception
+    {
+        final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType("jdbc:sqlserver://amps-test;user=MyUserName;password=*****;", "net.sourceforge.jtds.jdbc.Driver");
+        assertNull(dbType);
+    }
+
     @Test
     public void dbconfigXmlNotCreatedWhenAlreadyExists() throws MojoExecutionException, IOException
     {

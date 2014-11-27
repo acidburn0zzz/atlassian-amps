@@ -1,12 +1,10 @@
-package com.atlassian.maven.plugins.amps;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+package com.atlassian.maven.plugins.amps.product;
 
 /**
  * Mapping database type by database uri prefix and database driver Please refer to the JIRA database documentation at
  * the following URL: http://www.atlassian.com/software/jira/docs/latest/databases/index.html
  */
-public enum DatabaseType
+public enum JiraDatabaseType
 {
     HSQL("hsql", true, "jdbc:hsqldb", "org.hsqldb.jdbcDriver"),
     MYSQL("mysql", false, "jdbc:mysql", "com.mysql.jdbc.Driver"),
@@ -15,9 +13,9 @@ public enum DatabaseType
     MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
     MSSQL_JTDS("mssql", true, "jdbc:jtds:sqlserver", "net.sourceforge.jtds.jdbc.Driver");
 
-    public static DatabaseType getDatabaseType(String uriPrefix, String driverClassName)
+    public static JiraDatabaseType getDatabaseType(String uriPrefix, String driverClassName)
     {
-        for (DatabaseType databaseType : values())
+        for (JiraDatabaseType databaseType : values())
         {
             if (databaseType.accept(uriPrefix) && databaseType.driverClassName.equals(driverClassName))
             {
@@ -33,7 +31,7 @@ public enum DatabaseType
     private final String uriPrefix;
     private final String driverClassName;
 
-    private DatabaseType(String dbType, boolean hasSchema, String uriPrefix, String driverClassName)
+    private JiraDatabaseType(final String dbType, final boolean hasSchema, final String uriPrefix, final String driverClassName)
     {
         this.dbType = dbType;
         this.hasSchema = hasSchema;
@@ -49,7 +47,7 @@ public enum DatabaseType
      */
     private boolean accept(String uri)
     {
-        return checkNotNull(uri).trim().startsWith(uriPrefix);
+        return null != uri && uri.trim().startsWith(uriPrefix);
     }
 
     public String getDbType()

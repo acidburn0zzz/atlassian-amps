@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.atlassian.maven.plugins.amps.DataSource;
-import com.atlassian.maven.plugins.amps.DatabaseType;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
@@ -31,7 +30,6 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
@@ -266,12 +264,39 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         if (ctx.getDataSources().size() > 0)
         {
             final DataSource ds = ctx.getDataSources().get(0);
-            updateDbConfigXml(homeDir, DatabaseType.getDatabaseType(ds.getUrl(), ds.getDriver()), ds.getSchema());
+            JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType(ds.getUrl(), ds.getDriver());
+            if (null != dbType)
+            {
+                updateDbConfigXml(homeDir, dbType, ds.getSchema());
+            }
+            else
+            {
+                throw new MojoExecutionException("The DataSource configuration was not correct, review DataSource url and driver");
+            }
         }
     }
 
+    /**
+     * Update JIRA dbconfig.xml in case user provide their own database connection configuration in pom
+     * Jira database type was detected by uri/url prefix and database driver
+     * Jira database type defines database-type and schema or schema-less for specific Jira database
+     * Please refer documentation url: http://www.atlassian.com/software/jira/docs/latest/databases/index.html
+     * example:
+     * <dataSource>
+     *   <jndi>${dataSource.jndi}</jndi>
+     *   <url>${dataSource.url}</url>
+     *   <driver>${dataSource.driver}</driver>
+     *   <username>${dataSource.user}</username>
+     *   <password>${dataSource.password}</password>
+     *   <schema>${dataSource.schema}</schema>
+     * </dataSource>
+     * @param homeDir
+     * @param dbType
+     * @param schema
+     * @throws MojoExecutionException
+     */
     @VisibleForTesting
-    protected void updateDbConfigXml(final File homeDir, final DatabaseType dbType, final String schema)
+    protected void updateDbConfigXml(final File homeDir, final JiraDatabaseType dbType, final String schema)
             throws MojoExecutionException
     {
         final File dbConfigXml = new File(homeDir, FILENAME_DBCONFIG);
@@ -325,12 +350,14 @@ public class JiraProductHandler extends AbstractWebappProductHandler
                 {
                     schemaNode.setText(schema);
                 }
+                modified = true;
             }
             // mysql, oracle
             else
             {
                 // remove schema node
                 schemaNode.detach();
+                modified = true;
             }
             if (modified)
             {
