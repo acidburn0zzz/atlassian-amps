@@ -15,20 +15,6 @@ public enum DatabaseType
     MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
     MSSQL_JTDS("mssql", true, "jdbc:jtds:sqlserver", "net.sourceforge.jtds.jdbc.Driver");
 
-    private final String dbType;
-    // if database does not have schema, schema-name node will be removed
-    private final boolean hasSchema;
-    private final String uriPrefix;
-    private final String driverClassName;
-
-    DatabaseType(String dbType, boolean hasSchema, String uriPrefix, String driverClassName)
-    {
-        this.dbType = dbType;
-        this.hasSchema = hasSchema;
-        this.uriPrefix = uriPrefix;
-        this.driverClassName = driverClassName;
-    }
-
     public static DatabaseType getDatabaseType(String uriPrefix, String driverClassName)
     {
         for (DatabaseType databaseType : values())
@@ -39,6 +25,20 @@ public enum DatabaseType
             }
         }
         return null;
+    }
+
+    private final String dbType;
+    // if database does not have schema, schema-name node will be removed
+    private final boolean hasSchema;
+    private final String uriPrefix;
+    private final String driverClassName;
+
+    private DatabaseType(String dbType, boolean hasSchema, String uriPrefix, String driverClassName)
+    {
+        this.dbType = dbType;
+        this.hasSchema = hasSchema;
+        this.uriPrefix = uriPrefix;
+        this.driverClassName = driverClassName;
     }
 
     /**

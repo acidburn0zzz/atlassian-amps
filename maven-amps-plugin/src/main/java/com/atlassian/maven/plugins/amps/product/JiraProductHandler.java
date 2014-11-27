@@ -31,6 +31,7 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
@@ -290,24 +291,46 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             {
                 String currentDbType = dbTypeNode.getStringValue();
                 // check null and difference value from dbType
-                if (!currentDbType.equals(dbType))
+                if (!currentDbType.equals(dbType.getDbType()))
                 {
                     // update database type
                     modified = true;
                     dbTypeNode.setText(dbType.getDbType());
                 }
             }
-            if (null != schemaNode && StringUtils.isNotEmpty(schema))
+            // depend on database type which Jira supported schema or schema-less
+            // please refer this Jira documentation
+            // http://www.atlassian.com/software/jira/docs/latest/databases/index.html
+
+            // postgres, mssql, hsql
+            if (dbType.hasSchema())
             {
-                if(dbType.hasSchema())
+                if (StringUtils.isEmpty(schema))
                 {
-                    schemaNode.setText(schema);
+                    throw new MojoExecutionException("Database configuration missed schema");
+                }
+                if (null == schemaNode)
+                {
+                    // add schema-name node
+                    try
+                    {
+                        dbConfigDoc.selectSingleNode("//jira-database-config").getDocument().addElement("schema-name").addText(schema);
+                    }
+                    catch(NullPointerException npe)
+                    {
+                        throw new MojoExecutionException(npe.getMessage());
+                    }
                 }
                 else
                 {
-                    // remove schema node
-                    schemaNode.detach();
+                    schemaNode.setText(schema);
                 }
+            }
+            // mysql, oracle
+            else
+            {
+                // remove schema node
+                schemaNode.detach();
             }
             if (modified)
             {
@@ -316,11 +339,11 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         }
         catch (DocumentException de)
         {
-            throw new MojoExecutionException("Unable parse file dbconfig.xml", de);
+            throw new MojoExecutionException("Unable parse config file: " + FILENAME_DBCONFIG, de);
         }
         catch (IOException ie)
         {
-            throw new MojoExecutionException("Unable to write dbconfig.xml", ie);
+            throw new MojoExecutionException("Unable to write config file: " + FILENAME_DBCONFIG, ie);
         }
     }
 
@@ -400,7 +423,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         }
         catch (IOException ioe)
         {
-            throw new MojoExecutionException("Unable to create dbconfig.xml", ioe);
+            throw new MojoExecutionException("Unable to create config file: " + FILENAME_DBCONFIG, ioe);
         }
     }
 

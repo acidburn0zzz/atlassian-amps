@@ -79,7 +79,7 @@ public class TestJiraProductHandler
         JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
 
         File f = new File(tempHome, FILENAME_DBCONFIG);
-        assertTrue("The dbconfig.xml is created", f.exists());
+        assertTrue("The config file is created: " + FILENAME_DBCONFIG, f.exists());
         assertTrue("And it's a regular file", f.isFile());
 
         File dbFile = new File(tempHome, "database");
