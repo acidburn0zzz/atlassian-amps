@@ -287,6 +287,8 @@ public class JiraProductHandler extends AbstractWebappProductHandler
      * Jira database type defines database-type and schema or schema-less for specific Jira database
      * Please refer documentation url: http://www.atlassian.com/software/jira/docs/latest/databases/index.html
      * example:
+     * <pre>
+     * {@code
      * <dataSource>
      *   <jndi>${dataSource.jndi}</jndi>
      *   <url>${dataSource.url}</url>
@@ -295,6 +297,8 @@ public class JiraProductHandler extends AbstractWebappProductHandler
      *   <password>${dataSource.password}</password>
      *   <schema>${dataSource.schema}</schema>
      * </dataSource>
+     * }
+     * </pre>
      * @param homeDir
      * @param dbType
      * @param schema

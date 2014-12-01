@@ -27,6 +27,7 @@ import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLE
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.FILENAME_DBCONFIG;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.INSTALLED_PLUGINS_DIR;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.PLUGINS_DIR;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -144,11 +145,11 @@ public class TestJiraProductHandler
         assertEquals(dbType.getDbType(), getDbType(dbConfigXml));
         if (dbType.hasSchema())
         {
-            assertTrue(schema.equals(getDbSchema(dbConfigXml)));
+            assertThat("Schema has to update", schema.equals(dbConfigXml.getName()), is(true));
         }
         else
         {
-            assertFalse(schema.equals(getDbSchema(dbConfigXml)));
+            assertThat("Schema has not to update", schema.equals(getDbSchema(dbConfigXml)), is(false));
         }
     }
 
