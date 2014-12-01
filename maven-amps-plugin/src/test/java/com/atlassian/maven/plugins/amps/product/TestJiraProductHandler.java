@@ -145,7 +145,7 @@ public class TestJiraProductHandler
         assertEquals(dbType.getDbType(), getDbType(dbConfigXml));
         if (dbType.hasSchema())
         {
-            assertThat("Schema has to update", schema.equals(dbConfigXml.getName()), is(true));
+            assertThat("Schema has to update", schema.equals(getDbSchema(dbConfigXml)), is(true));
         }
         else
         {
