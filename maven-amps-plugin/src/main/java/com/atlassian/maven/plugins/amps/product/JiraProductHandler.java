@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -261,7 +262,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     {
         super.processHomeDirectory(ctx, homeDir);
         createDbConfigXmlIfNecessary(homeDir);
-        if (ctx.getDataSources().size() > 0)
+        if (ctx.getDataSources().size() == 1)
         {
             final DataSource ds = ctx.getDataSources().get(0);
             JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType(ds.getUrl(), ds.getDriver());
@@ -273,6 +274,10 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             {
                 throw new MojoExecutionException("The DataSource configuration was not correct, review DataSource url and driver");
             }
+        }
+        else if (ctx.getDataSources().size() > 1)
+        {
+            throw new MojoExecutionException("JIRA does not support multiple data sources");
         }
     }
 
@@ -304,73 +309,85 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         {
             return;
         }
+        final SAXReader reader = new SAXReader();
+        final Document dbConfigDoc;
         try
         {
-            final SAXReader reader = new SAXReader();
-            final Document dbConfigDoc = reader.read(dbConfigXml);
-            final Node dbTypeNode = dbConfigDoc.selectSingleNode("//jira-database-config/database-type");
-            final Node schemaNode = dbConfigDoc.selectSingleNode("//jira-database-config/schema-name");
-            boolean modified = false;
-            // update database type
-            if (null != dbTypeNode && StringUtils.isNotEmpty(dbTypeNode.getStringValue()))
-            {
-                String currentDbType = dbTypeNode.getStringValue();
-                // check null and difference value from dbType
-                if (!currentDbType.equals(dbType.getDbType()))
-                {
-                    // update database type
-                    modified = true;
-                    dbTypeNode.setText(dbType.getDbType());
-                }
-            }
-            // depend on database type which Jira supported schema or schema-less
-            // please refer this Jira documentation
-            // http://www.atlassian.com/software/jira/docs/latest/databases/index.html
-
-            // postgres, mssql, hsql
-            if (dbType.hasSchema())
-            {
-                if (StringUtils.isEmpty(schema))
-                {
-                    throw new MojoExecutionException("Database configuration missed schema");
-                }
-                if (null == schemaNode)
-                {
-                    // add schema-name node
-                    try
-                    {
-                        dbConfigDoc.selectSingleNode("//jira-database-config").getDocument().addElement("schema-name").addText(schema);
-                    }
-                    catch(NullPointerException npe)
-                    {
-                        throw new MojoExecutionException(npe.getMessage());
-                    }
-                }
-                else
-                {
-                    schemaNode.setText(schema);
-                }
-                modified = true;
-            }
-            // mysql, oracle
-            else
-            {
-                // remove schema node
-                schemaNode.detach();
-                modified = true;
-            }
-            if (modified)
-            {
-                writeDbConfigXml(dbConfigXml, dbConfigDoc);
-            }
+            dbConfigDoc = reader.read(dbConfigXml);
         }
         catch (DocumentException de)
         {
-            throw new MojoExecutionException("Unable parse config file: " + FILENAME_DBCONFIG, de);
+            throw new MojoExecutionException("Cannot parse database configuration xml file", de);
         }
-        catch (IOException ie)
+        catch (MalformedURLException me)
         {
-            throw new MojoExecutionException("Unable to write config file: " + FILENAME_DBCONFIG, ie);
+            throw new MojoExecutionException(me.getMessage());
+        }
+        final Node dbTypeNode = dbConfigDoc.selectSingleNode("//jira-database-config/database-type");
+        final Node schemaNode = dbConfigDoc.selectSingleNode("//jira-database-config/schema-name");
+        boolean modified = false;
+        // update database type
+        if (null != dbTypeNode && StringUtils.isNotEmpty(dbTypeNode.getStringValue()))
+        {
+            String currentDbType = dbTypeNode.getStringValue();
+            // check null and difference value from dbType
+            if (!currentDbType.equals(dbType.getDbType()))
+            {
+                // update database type
+                modified = true;
+                dbTypeNode.setText(dbType.getDbType());
+            }
+        }
+        // depend on database type which Jira supported schema or schema-less
+        // please refer this Jira documentation
+        // http://www.atlassian.com/software/jira/docs/latest/databases/index.html
+
+        // postgres, mssql, hsql
+        if (dbType.hasSchema())
+        {
+            if (StringUtils.isEmpty(schema))
+            {
+                throw new MojoExecutionException("Database configuration missed schema");
+            }
+            if (null == schemaNode)
+            {
+                // add schema-name node
+                try
+                {
+                    dbConfigDoc.selectSingleNode("//jira-database-config").getDocument().addElement("schema-name").addText(schema);
+                    modified = true;
+                }
+                catch (NullPointerException npe)
+                {
+                    throw new MojoExecutionException(npe.getMessage());
+                }
+            }
+            else
+            {
+                if(StringUtils.isNotEmpty(schemaNode.getText()) && !schema.equals(schemaNode.getText()))
+                {
+                    schemaNode.setText(schema);
+                    modified = true;
+                }
+            }
+        }
+        // mysql, oracle
+        else
+        {
+            // remove schema node
+            schemaNode.detach();
+            modified = true;
+        }
+        if (modified)
+        {
+            try
+            {
+                writeDbConfigXml(dbConfigXml, dbConfigDoc);
+            }
+            catch (IOException ioe)
+            {
+                throw new MojoExecutionException("Could not write database configuration file: " + FILENAME_DBCONFIG, ioe);
+            }
         }
     }
 
