@@ -22,6 +22,11 @@ public class DataSource
     private String url;
 
     /**
+     * database schema, such as "public", "dbo"
+     */
+    private String schema;
+
+    /**
      * Driver, such as "org.h2.Driver"
      */
     private String driver;
@@ -131,6 +136,7 @@ public class DataSource
     {
         if (this.jndi == null)                  this.jndi = defaultValues.jndi;
         if (this.url == null)                   this.url = defaultValues.url;
+        if (this.schema == null)                this.schema = defaultValues.schema;
         if (this.driver == null)                this.driver = defaultValues.driver;
         if (this.username == null)              this.username = defaultValues.username;
         if (this.password == null)              this.password = defaultValues.password;
@@ -147,6 +153,16 @@ public class DataSource
     public void setUrl(String url)
     {
         this.url = url;
+    }
+
+    public String getSchema()
+    {
+        return schema;
+    }
+
+    public void setSchema(String schema)
+    {
+        this.schema = schema;
     }
 
     public String getDriver()
