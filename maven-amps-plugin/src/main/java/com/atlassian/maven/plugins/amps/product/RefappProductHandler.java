@@ -13,6 +13,7 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -20,8 +21,10 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 public class RefappProductHandler extends AbstractWebappProductHandler
 {
 
-    public static final String ATLASSIAN_BUNDLED_PLUGINS_ZIP = "WEB-INF/classes/atlassian-bundled-plugins.zip";
-    public static final String ATLASSIAN_BUNDLED_PLUGINS_DIR = "WEB-INF/atlassian-bundled-plugins";
+    @VisibleForTesting
+    static final String ATLASSIAN_BUNDLED_PLUGINS_ZIP = "WEB-INF/classes/atlassian-bundled-plugins.zip";
+    @VisibleForTesting
+    static final String ATLASSIAN_BUNDLED_PLUGINS_DIR = "WEB-INF/atlassian-bundled-plugins";
 
     public RefappProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
