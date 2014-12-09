@@ -1,4 +1,4 @@
-package com.atlassian.maven.plugins.amps.product;
+package com.atlassian.maven.plugins.amps.product.jira;
 
 /**
  * Mapping database type by database uri prefix and database driver Please refer to the JIRA database documentation at
@@ -58,5 +58,11 @@ public enum JiraDatabaseType
     public boolean hasSchema()
     {
         return this.hasSchema;
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString();
     }
 }

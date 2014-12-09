@@ -9,6 +9,7 @@ import javax.xml.xpath.XPathFactory;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
