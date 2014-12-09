@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -18,11 +19,14 @@ import java.util.Set;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
+import com.atlassian.maven.plugins.amps.product.jira.JiraDatabase;
+import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory;
 import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
 import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
@@ -34,6 +38,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -45,6 +50,8 @@ import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
 import aQute.lib.osgi.Constants;
+
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.getJiraDatabaseFactory;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
@@ -1080,6 +1087,52 @@ public class MavenGoals
         return server + port + contextPath;
     }
 
+    public void runPreIntegrationTest(final DataSource dataSource) throws MojoExecutionException
+    {
+        final JiraDatabaseFactory factory = getJiraDatabaseFactory();
+        final JiraDatabase jiraDatabase;
+        try
+        {
+            jiraDatabase = factory.getJiraDatabase(dataSource);
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new MojoExecutionException("No implementation database class", e);
+        }
+        catch (NoSuchMethodException e)
+        {
+            throw new MojoExecutionException("No implementation database class", e);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new MojoExecutionException("No implementation database class", e);
+        }
+        catch (InvocationTargetException e)
+        {
+            throw new MojoExecutionException("No implementation database class", e);
+        }
+        catch (InstantiationException e)
+        {
+            throw new MojoExecutionException("No implementation database class", e);
+        }
+
+        Xpp3Dom configuration = jiraDatabase.getPluginConfiguration();
+        Dependency postgres = jiraDatabase.getDependency();
+        Plugin sqlMaven = plugin(
+                groupId("org.codehaus.mojo"),
+                artifactId("sql-maven-plugin"),
+                version("1.5")
+        );
+        sqlMaven.addDependency(postgres);
+        executeMojo(
+                sqlMaven,
+                goal("execute"),
+                configuration,
+                executionEnvironment()
+        );
+
+    }
+
     public void runIntegrationTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties, final File targetDirectory, final String category)
     		throws MojoExecutionException
 	{
@@ -1569,7 +1622,7 @@ public class MavenGoals
                                 element(name("artifact"),
                                         element(name("file"), file.getAbsolutePath()),
                                         element(name("type"), type)
-                                    )
+                                )
                                 )
                         ),
                 executionEnvironment());
