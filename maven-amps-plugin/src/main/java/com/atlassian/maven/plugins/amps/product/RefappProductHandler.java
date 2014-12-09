@@ -64,7 +64,7 @@ public class RefappProductHandler extends AbstractWebappProductHandler
     protected File getBundledPluginPath(Product ctx, File appDir)
     {
         // if the bundled plugin directory exists, use it, otherwise fallback to the old zip behaviour.
-        File bundleDir = new File(appDir, ATLASSIAN_BUNDLED_PLUGINS_DIR);
+        final File bundleDir = new File(appDir, ATLASSIAN_BUNDLED_PLUGINS_DIR);
 
         if (bundleDir.exists() && bundleDir.isDirectory())
         {

@@ -10,10 +10,12 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import static com.atlassian.maven.plugins.amps.product.RefappProductHandler.ATLASSIAN_BUNDLED_PLUGINS_DIR;
 import static com.atlassian.maven.plugins.amps.product.RefappProductHandler.ATLASSIAN_BUNDLED_PLUGINS_ZIP;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -24,7 +26,7 @@ public class TestRefappProductHandler
     @Before
     public void createTemporaryHomeDirectory() throws IOException
     {
-        File f = File.createTempFile("temp-refapp-", "-home");
+        final File f = File.createTempFile("temp-refapp-home-" + UUID.randomUUID(), null);
         if (!f.delete())
         {
             throw new IOException();
@@ -52,7 +54,7 @@ public class TestRefappProductHandler
     public void bundledPluginsLocationCorrectForDirectory()
     {
         final File bundledPluginsDir = new File(tempHome, ATLASSIAN_BUNDLED_PLUGINS_DIR);
-        assertTrue(bundledPluginsDir.mkdirs());
+        assertThat(bundledPluginsDir.mkdirs(), is(true));
 
         assertBundledPluginPath(tempHome, bundledPluginsDir);
     }
@@ -78,7 +80,7 @@ public class TestRefappProductHandler
         final File bundledPluginPath = productHandler.getBundledPluginPath(mockProduct, appDir);
 
         // Check
-        assertNotNull(bundledPluginPath);
-        assertEquals(expectedPath, bundledPluginPath);
+        assertThat(bundledPluginPath, notNullValue());
+        assertThat(expectedPath, equalTo(bundledPluginPath));
     }
 }
