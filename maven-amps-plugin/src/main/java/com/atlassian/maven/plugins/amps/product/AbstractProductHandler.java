@@ -233,6 +233,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         bundledPluginsDir.mkdir();
         // add bundled plugins
         final File bundledPluginsFile = getBundledPluginPath(ctx, appDir);
+
         if (bundledPluginsFile.exists())
         {
             if (bundledPluginsFile.isDirectory())
@@ -315,7 +316,50 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     abstract protected boolean supportsStaticPlugins();
     abstract protected Collection<? extends ProductArtifact> getDefaultBundledPlugins();
     abstract protected Collection<? extends ProductArtifact> getDefaultLibPlugins();
-    abstract protected File getBundledPluginPath(Product ctx, File appDir);
+
+    /**
+     * Now we support clients a way to specify their bundled plugins behavior with the two variables bundledPluginsDir and bundledPluginsFile.
+     * If either variable is not set, fallback to the old behavior (hardcoded, guess...).
+     *
+     * @return the File that is a directory or zip file.
+     * @throws MojoExecutionException when both bundledPluginsDir and bundledPluginsFile are set.
+     */
+    protected final File getBundledPluginPath(Product ctx, File appDir) throws MojoExecutionException
+    {
+        final boolean hasBundledPluginsDir = StringUtils.isNotEmpty(ctx.getBundledPluginsDir());
+        final boolean hasBundledPluginsFile = StringUtils.isNotEmpty(ctx.getBundledPluginsFile());
+        if (hasBundledPluginsDir && hasBundledPluginsFile) {
+            throw new MojoExecutionException("Both bundledPluginsDir and bundledPluginsFile are set. Either bundledPluginsDir or bundledPluginsFile is accepted.");
+        }
+
+        if (!hasBundledPluginsDir && !hasBundledPluginsFile) {
+            log.warn("Either hasBundledPluginsDir or hasBundledPluginsFile is not set. Fallback to the legacy behavior (hardcoded bundled plugins path)");
+            return getDefaultBundledPluginPath(ctx, appDir);
+        }
+
+        if (hasBundledPluginsDir) {
+            final File dir = new File(appDir, ctx.getBundledPluginsDir());
+            if (!dir.exists() || !dir.isDirectory()) {
+                throw new MojoExecutionException("bundledPluginsDir points to an non-existing place or not a directory");
+            }
+            log.debug("Bundled plugins is set as directory.");
+            return dir;
+        }
+
+        // Last case bundledPluginsFile is set.
+        final File zipFile = new File(appDir, ctx.getBundledPluginsFile());
+        if (!zipFile.exists() || !zipFile.isFile()) {
+            throw new MojoExecutionException("bundledPluginsFile points to an non-existing place or not a file");
+        }
+        log.warn("ZIP bundled plugins is considered as an old way.");
+        return zipFile;
+    }
+
+    /**
+     * This is a fallback to support legacy behavior with call to the old way (hardcoded path) in case clients do not specify
+     * bundledPluginsFile or bundledPluginsDir.
+     */
+    abstract protected File getDefaultBundledPluginPath(Product ctx, File appDir);
     abstract protected File getUserInstalledPluginsDirectory(Product product, File webappDir, File homeDir);
 
     protected String getLog4jPropertiesPath()

@@ -86,7 +86,7 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    public File getBundledPluginPath(Product ctx, File appDir)
+    public File getDefaultBundledPluginPath(Product ctx, File appDir)
     {
         return new File(appDir, "WEB-INF/classes/atlassian-bundled-plugins.zip");
     }

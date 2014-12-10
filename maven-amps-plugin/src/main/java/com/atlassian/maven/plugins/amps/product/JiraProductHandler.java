@@ -224,7 +224,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    public File getBundledPluginPath(Product ctx, File appDir)
+    public File getDefaultBundledPluginPath(Product ctx, File appDir)
     {
         // the zip became a directory in 6.3, so if the directory exists and is a directory, use it,
         // otherwise fallback to the old behaviour.
