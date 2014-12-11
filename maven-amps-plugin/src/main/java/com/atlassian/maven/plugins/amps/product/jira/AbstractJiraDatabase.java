@@ -12,12 +12,11 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 public abstract class AbstractJiraDatabase implements JiraDatabase
 {
     private DataSource dataSource;
-    private LibArtifact lib;
+    protected LibArtifact lib;
 
     public AbstractJiraDatabase(DataSource dataSource)
     {
         this.dataSource = dataSource;
-        this.lib = dataSource.getLibArtifacts().get(0);
     }
 
     public DataSource getDataSource()
@@ -28,16 +27,6 @@ public abstract class AbstractJiraDatabase implements JiraDatabase
     public void setDataSource(DataSource dataSource)
     {
         this.dataSource = dataSource;
-    }
-
-    public LibArtifact getLib()
-    {
-        return lib;
-    }
-
-    public void setLib(LibArtifact lib)
-    {
-        this.lib = lib;
     }
 
     protected abstract String dropDatabase();
@@ -63,6 +52,7 @@ public abstract class AbstractJiraDatabase implements JiraDatabase
     @Override
     public Dependency getDependency()
     {
+        this.lib = dataSource.getLibArtifacts().get(0);
         Dependency databaseDependency = new Dependency();
         databaseDependency.setGroupId(lib.getGroupId());
         databaseDependency.setArtifactId(lib.getArtifactId());
