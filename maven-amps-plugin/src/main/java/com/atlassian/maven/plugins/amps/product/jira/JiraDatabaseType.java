@@ -6,12 +6,12 @@ package com.atlassian.maven.plugins.amps.product.jira;
  */
 public enum JiraDatabaseType
 {
-    HSQL("hsql", true, "jdbc:hsqldb", "org.hsqldb.jdbcDriver"),
-    MYSQL("mysql", false, "jdbc:mysql", "com.mysql.jdbc.Driver"),
-    POSTGRESQL("postgres72", true, "jdbc:postgresql", "org.postgresql.Driver"),
-    ORACLE("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver"),
-    MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
-    MSSQL_JTDS("mssql", true, "jdbc:jtds:sqlserver", "net.sourceforge.jtds.jdbc.Driver");
+    HSQL("hsql", true, "jdbc:hsqldb", "org.hsqldb.jdbcDriver", ""),
+    MYSQL("mysql", false, "jdbc:mysql", "com.mysql.jdbc.Driver", "mysql:mysql-connector-java"),
+    POSTGRESQL("postgres72", true, "jdbc:postgresql", "org.postgresql.Driver", "org.postgresql:postgresql"),
+    ORACLE("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", ""),
+    MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", ""),
+    MSSQL_JTDS("mssql", true, "jdbc:jtds:sqlserver", "net.sourceforge.jtds.jdbc.Driver", "");
 
     public static JiraDatabaseType getDatabaseType(String uriPrefix, String driverClassName)
     {
@@ -30,13 +30,15 @@ public enum JiraDatabaseType
     private final boolean hasSchema;
     private final String uriPrefix;
     private final String driverClassName;
+    private final String libArtifact;
 
-    private JiraDatabaseType(final String dbType, final boolean hasSchema, final String uriPrefix, final String driverClassName)
+    private JiraDatabaseType(final String dbType, final boolean hasSchema, final String uriPrefix, final String driverClassName, final String libArtifact)
     {
         this.dbType = dbType;
         this.hasSchema = hasSchema;
         this.uriPrefix = uriPrefix;
         this.driverClassName = driverClassName;
+        this.libArtifact = libArtifact;
     }
 
     /**
@@ -58,6 +60,11 @@ public enum JiraDatabaseType
     public boolean hasSchema()
     {
         return this.hasSchema;
+    }
+
+    public String getLibArtifact()
+    {
+        return libArtifact;
     }
 
     @Override

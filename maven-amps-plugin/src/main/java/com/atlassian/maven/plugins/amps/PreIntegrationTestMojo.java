@@ -41,9 +41,9 @@ public class PreIntegrationTestMojo extends RunMojo
                         // determine lib artifact for jdbc
                         JiraDatabaseType databaseType = JiraDatabaseType.getDatabaseType(dataSource.getUrl(), dataSource.getDriver());
                         boolean hasDatabaseLibrary = false;
-                        for(ProductArtifact lib : pe.getProduct().getLibArtifacts())
+                        for (ProductArtifact lib : pe.getProduct().getLibArtifacts())
                         {
-                            if(databaseType.toString().toLowerCase().equals(lib.getArtifactId()))
+                            if (databaseType.getLibArtifact().equals(lib.getGroupId() + ":" + lib.getArtifactId()))
                             {
                                 hasDatabaseLibrary = true;
                                 LibArtifact jdbc = new LibArtifact();
@@ -54,7 +54,7 @@ public class PreIntegrationTestMojo extends RunMojo
                                 break;
                             }
                         }
-                        if(hasDatabaseLibrary)
+                        if (hasDatabaseLibrary)
                         {
                             goals.runPreIntegrationTest(dataSource);
                         }
