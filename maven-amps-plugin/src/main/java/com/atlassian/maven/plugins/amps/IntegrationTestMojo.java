@@ -85,7 +85,6 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
      * to run failsafe:verify at a later lifecycle stage (verify) to do cleanup in post-integration-test phase.
      * Please note that you will have to set the execution(s) for failsafe:verify yourself in the pom.xml file
      * including the 'reportsDirectory' configuration for the verify goal.
-     * @since 5.0.5
      */
     @Parameter(property = "skip.IT.verification")
     protected boolean skipITVerification = false;
