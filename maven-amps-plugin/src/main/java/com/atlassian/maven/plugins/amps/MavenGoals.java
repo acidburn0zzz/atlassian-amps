@@ -1117,13 +1117,13 @@ public class MavenGoals
         }
 
         Xpp3Dom configuration = jiraDatabase.getPluginConfiguration();
-        Dependency postgres = jiraDatabase.getDependency();
+        Dependency databaseArtifact = jiraDatabase.getDependency();
         Plugin sqlMaven = plugin(
                 groupId("org.codehaus.mojo"),
                 artifactId("sql-maven-plugin"),
                 version("1.5")
         );
-        sqlMaven.addDependency(postgres);
+        sqlMaven.addDependency(databaseArtifact);
         executeMojo(
                 sqlMaven,
                 goal("execute"),
