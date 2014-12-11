@@ -249,7 +249,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
             installPluginFile(testPlugin);
 
             // Actually run the tests
-            goals.runIntegrationTests("group-" + testGroupId, "remote", includes, excludes, systemProperties, targetDirectory, category);
+            goals.runIntegrationTests("group-" + testGroupId, "remote", includes, excludes, systemProperties, targetDirectory, category, false);
         }
         catch (Exception e)
         {

@@ -1080,7 +1080,8 @@ public class MavenGoals
         return server + port + contextPath;
     }
 
-    public void runIntegrationTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties, final File targetDirectory, final String category)
+    public void runIntegrationTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties,
+            final File targetDirectory, final String category, final boolean skipVerifyGoal)
     		throws MojoExecutionException
 	{
     	List<Element> includeElements = new ArrayList<Element>(includes.size());
@@ -1134,18 +1135,21 @@ public class MavenGoals
                 itconfig,
                 executionEnvironment()
         );
-
-        executeMojo(
-                plugin(
-                        groupId("org.apache.maven.plugins"),
-                        artifactId("maven-failsafe-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-failsafe-plugin"))
-                ),
-                goal("verify"),
-                verifyconfig,
-                executionEnvironment()
-        );
-	}
+        if (!skipVerifyGoal) {
+            executeMojo(
+                    plugin(
+                            groupId("org.apache.maven.plugins"),
+                            artifactId("maven-failsafe-plugin"),
+                            version(defaultArtifactIdToVersionMap.get("maven-failsafe-plugin"))
+                    ),
+                    goal("verify"),
+                    verifyconfig,
+                    executionEnvironment()
+            );
+        } else {
+            log.info("Skipping failsafe IT failure verification.");
+        }
+    }
 
     private void appendJunitCategoryToConfiguration(final String category, final Xpp3Dom config)
     {
