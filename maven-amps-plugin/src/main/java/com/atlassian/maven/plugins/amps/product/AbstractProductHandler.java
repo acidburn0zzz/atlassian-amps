@@ -35,9 +35,6 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 
 public abstract class AbstractProductHandler extends AmpsProductHandler
 {
-    public static final String DIR_BUNDLED_PLUGINS_GUIDE = "To switch to directory bundled plugins:"
-            + "\n - Copy all bundled plugins in to a directory."
-            + "\n - Use the parameter bundledPluginsDir to let AMPS know the directory path (the path is relative from the root of the application. E.g. /WEB-INF/my-bundled-plugins";
     private final PluginProvider pluginProvider;
 
     protected AbstractProductHandler(MavenContext context, MavenGoals goals, PluginProvider pluginProvider, ArtifactFactory artifactFactory)
@@ -336,7 +333,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         }
 
         if (!hasBundledPluginsDir && !hasBundledPluginsFile) {
-            log.warn("Either hasBundledPluginsDir or hasBundledPluginsFile is not set. Fallback to the legacy behavior (hardcoded bundled plugins path). " + DIR_BUNDLED_PLUGINS_GUIDE);
+            log.warn("Either hasBundledPluginsDir or hasBundledPluginsFile is not set. Fallback to the legacy behavior (hardcoded bundled plugins path)");
             return getDefaultBundledPluginPath(ctx, appDir);
         }
 
@@ -354,7 +351,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         if (!zipFile.exists() || !zipFile.isFile()) {
             throw new MojoExecutionException("bundledPluginsFile points to an non-existing place or not a file");
         }
-        log.warn("ZIP bundled plugins is supported for legacy purposes only. " + DIR_BUNDLED_PLUGINS_GUIDE);
+        log.warn("ZIP bundled plugins is considered as an old way.");
         return zipFile;
     }
 
