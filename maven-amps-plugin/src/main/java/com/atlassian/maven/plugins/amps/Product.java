@@ -338,10 +338,6 @@ public class Product
     // The port for the Apache JServ Protocol; defaults to the web container's default value
     private int ajpPort;
 
-    private String bundledPluginsFile;
-
-    private String bundledPluginsDir;
-
     /**
      * Creates a new product that is merged with this one, where the properties in this one override the passed
      * in product.
@@ -414,8 +410,6 @@ public class Product
         prod.setHttpsKeystorePass(httpsKeystorePass == null ? product.getHttpsKeystorePass() : httpsKeystorePass);
         prod.setHttpsKeyAlias(httpsKeyAlias == null ? product.getHttpsKeyAlias() : httpsKeyAlias);
         prod.setHttpsHttpSecure(httpsHttpSecure == null ? product.getHttpsHttpSecure() : httpsHttpSecure);
-        prod.setBundledPluginsFile(bundledPluginsFile == null ? product.getBundledPluginsFile() : bundledPluginsFile);
-        prod.setBundledPluginsDir(bundledPluginsDir == null ? product.getBundledPluginsDir() : bundledPluginsDir);
 
         return prod;
     }
@@ -1074,46 +1068,6 @@ public class Product
     public void setAjpPort(final int ajpPort)
     {
         this.ajpPort = ajpPort;
-    }
-
-    /**
-     * Return the path to zip file containing bundled plugins.
-     *
-     * @return null if no zip file path, otherwise see above.
-     */
-    public String getBundledPluginsFile()
-    {
-        return bundledPluginsFile;
-    }
-
-    /**
-     * Set the path of the zip file containing bundled plugins.
-     *
-     * @param bundledPluginsFile the path of the zip file containing bundled plugins.
-     */
-    public void setBundledPluginsFile(final String bundledPluginsFile)
-    {
-        this.bundledPluginsFile = bundledPluginsFile;
-    }
-
-    /**
-     * Return the path to the directory containing bundled plugins.
-     *
-     * @return null if no directory path, otherwise see above.
-     */
-    public String getBundledPluginsDir()
-    {
-        return bundledPluginsDir;
-    }
-
-    /**
-     * Set the path of the directory containing bundled plugins.
-     *
-     * @param bundledPluginsDir the path of the directory containing bundled plugins.
-     */
-    public void setBundledPluginsDir(final String bundledPluginsDir)
-    {
-        this.bundledPluginsDir = bundledPluginsDir;
     }
 
     @Override

@@ -413,18 +413,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     @Parameter(property = "parallel", defaultValue = "false")
     protected boolean parallel;
 
-    /**
-     * The path to the zip file containing bundled plugins.
-     */
-    @Parameter
-    private String bundledPluginsFile;
-
-    /**
-     * The path to the directory containing bundled plugins.
-     */
-    @Parameter
-    private String bundledPluginsDir;
-
 
     protected Product createDefaultProductContext() throws MojoExecutionException
     {
@@ -484,9 +472,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setPdeVersion(pdeVersion);
 
         ctx.setHttpPort(httpPort);
-
-        ctx.setBundledPluginsFile(bundledPluginsFile);
-        ctx.setBundledPluginsDir(bundledPluginsDir);
         return ctx;
     }
 

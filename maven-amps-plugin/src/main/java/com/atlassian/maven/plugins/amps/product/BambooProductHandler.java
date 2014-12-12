@@ -85,7 +85,7 @@ public class BambooProductHandler extends AbstractWebappProductHandler
         return Collections.emptyList();
     }
 
-    public File getDefaultBundledPluginPath(Product ctx, File appDir)
+    public File getBundledPluginPath(Product ctx, File appDir)
     {
         return new File(appDir, "WEB-INF/classes/atlassian-bundled-plugins.zip");
     }

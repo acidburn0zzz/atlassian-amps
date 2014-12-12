@@ -243,7 +243,7 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void bundledPluginsShouldBeUnzippedIfPresent() throws MojoExecutionException
+    public void bundledPluginsShouldBeUnzippedIfPresent()
     {
         final File bundledPluginsDir = new File(tempHome, BUNDLED_PLUGINS_UNZIPPED);
         bundledPluginsDir.mkdirs();
@@ -252,28 +252,27 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void bundledPluginsLocationCorrectFor41() throws MojoExecutionException
+    public void bundledPluginsLocationCorrectFor41()
     {
         final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_FROM_4_1);
         assertBundledPluginPath("4.1", tempHome, bundledPluginsZip);
     }
 
     @Test
-    public void bundledPluginsLocationCorrectFor40() throws MojoExecutionException
+    public void bundledPluginsLocationCorrectFor40()
     {
         final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_UPTO_4_0);
         assertBundledPluginPath("4.0", tempHome, bundledPluginsZip);
     }
 
     @Test
-    public void bundledPluginsLocationCorrectForFallback() throws MojoExecutionException
+    public void bundledPluginsLocationCorrectForFallback()
     {
         final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_FROM_4_1);
         assertBundledPluginPath("not.a.version", tempHome, bundledPluginsZip);
     }
 
     private void assertBundledPluginPath(final String version, final File appDir, final File expectedPath)
-            throws MojoExecutionException
     {
         // Set up
 
