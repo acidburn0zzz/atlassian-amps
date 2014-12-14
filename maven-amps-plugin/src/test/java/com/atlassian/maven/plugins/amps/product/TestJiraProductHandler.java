@@ -110,7 +110,7 @@ public class TestJiraProductHandler
     @Test
     public void updateDBConfigXmlForPostgres() throws Exception
     {
-        testUpdateDbConfigXml(JiraDatabaseType.POSTGRESQL);
+        testUpdateDbConfigXml(JiraDatabaseType.POSTGRES);
     }
 
     @Test
@@ -180,7 +180,7 @@ public class TestJiraProductHandler
     {
         final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType("jdbc:postgresql://localhost:5432/amps-test", "org.postgresql.Driver");
         assertNotNull(dbType);
-        assertEquals(dbType.getDbType(), JiraDatabaseType.POSTGRESQL.getDbType());
+        assertEquals(dbType.getDbType(), JiraDatabaseType.POSTGRES.getDbType());
     }
 
     @Test
