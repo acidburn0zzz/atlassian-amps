@@ -9,7 +9,7 @@ public enum JiraDatabaseType
     HSQL("hsql", true, "jdbc:hsqldb", "org.hsqldb.jdbcDriver", "org.hsqldb:hsqldb"),
     H2("h2", true, "jdbc:h2", "org.h2.Driver", "com.h2database:h2"),
     MYSQL("mysql", false, "jdbc:mysql", "com.mysql.jdbc.Driver", "mysql:mysql-connector-java"),
-    POSTGRESQL("postgres72", true, "jdbc:postgresql", "org.postgresql.Driver", "org.postgresql:postgresql"),
+    POSTGRES("postgres72", true, "jdbc:postgresql", "org.postgresql.Driver", "org.postgresql:postgresql"),
 //    ORACLE("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "com.oracle:ojdbc6"),
     ORACLE("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "cn.guoyukun.jdbc:oracle-ojdbc6"),
     MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds:jtds"),
