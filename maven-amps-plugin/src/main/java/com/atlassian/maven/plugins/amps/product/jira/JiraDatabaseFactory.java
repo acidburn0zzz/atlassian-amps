@@ -4,6 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import com.atlassian.maven.plugins.amps.DataSource;
 
+import org.apache.maven.plugin.MojoExecutionException;
+
 public final class JiraDatabaseFactory
 {
     private static JiraDatabaseFactory instance = null;
@@ -27,8 +29,7 @@ public final class JiraDatabaseFactory
         return instance;
     }
 
-    public JiraDatabase getJiraDatabase(DataSource dataSource)
-            throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException
+    public JiraDatabase getJiraDatabase(DataSource dataSource) throws MojoExecutionException
     {
         JiraDatabaseType databaseType = JiraDatabaseType.getDatabaseType(dataSource.getUrl(), dataSource.getDriver());
         if (null == databaseType)
@@ -45,9 +46,16 @@ public final class JiraDatabaseFactory
 
         String classImplName = "JiraDatabase" + databaseName + "Impl";
         // all implementation of interface JiraDatabase same this package
-        Class<?> classImpl = Class.forName(this.getClass().getPackage().getName() + "." + classImplName);
-        JiraDatabase jiraDatabase = (JiraDatabase) classImpl.getConstructor(DataSource.class).newInstance(dataSource);
-
+        final JiraDatabase jiraDatabase;
+        try
+        {
+            Class<?> classImpl = Class.forName(this.getClass().getPackage().getName() + "." + classImplName);
+            jiraDatabase = (JiraDatabase) classImpl.getConstructor(DataSource.class).newInstance(dataSource);
+        }
+        catch ( ReflectiveOperationException e)
+        {
+            throw new MojoExecutionException("Database type : " + databaseName + " has not supported yet", e);
+        }
         return jiraDatabase;
     }
 }
