@@ -12,8 +12,8 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
     private static final String DROP_DATABASE = "DROP DATABASE IF EXISTS \"%s\";";
     private static final String DROP_USER = "DROP USER IF EXISTS \"%s\";";
     private static final String CREATE_DATABASE = "CREATE DATABASE \"%s\";";
-    private static final String CREATE_USER = "CREATE ROLE \"%s\" WITH PASSWORD '%s';";
-    private static final String GRANT_PERMISSION = "ALTER DATABASE \"%s\" OWNER TO \"%s\";";
+    private static final String CREATE_USER = "CREATE USER \"%s\" WITH PASSWORD '%s' ;";
+    private static final String GRANT_PERMISSION = "GRANT ALL PRIVILEGES ON DATABASE \"%s\" TO \"%s\";";
 
     public JiraDatabasePostgresImpl(DataSource dataSource)
     {
