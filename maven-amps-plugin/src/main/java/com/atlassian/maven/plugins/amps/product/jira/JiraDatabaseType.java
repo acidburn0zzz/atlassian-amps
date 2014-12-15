@@ -13,7 +13,7 @@ public enum JiraDatabaseType
 //    ORACLE("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "com.oracle:ojdbc6"),
     ORACLE("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "cn.guoyukun.jdbc:oracle-ojdbc6"),
     MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds:jtds"),
-    MSSQL_JTDS("mssql", true, "jdbc:jtds:sqlserver", "net.sourceforge.jtds.jdbc.Driver", "net.sourceforge.jtds:jtds");
+    MSSQL_JTDS("mssql", true, "jdbc:jtds", "net.sourceforge.jtds.jdbc.Driver", "net.sourceforge.jtds:jtds");
 
     public static JiraDatabaseType getDatabaseType(String uriPrefix, String driverClassName)
     {
