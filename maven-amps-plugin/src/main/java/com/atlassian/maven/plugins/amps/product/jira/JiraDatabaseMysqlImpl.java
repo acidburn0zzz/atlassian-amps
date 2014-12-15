@@ -74,7 +74,6 @@ public class JiraDatabaseMysqlImpl extends AbstractJiraDatabase
     public Xpp3Dom getPluginConfiguration()
     {
         String sql = dropDatabase() + dropUser() + createDatabase() + createUser() + grantPermissionForUser();
-        System.out.println(":: sql : " + sql);
         Xpp3Dom pluginConfiguration = baseConfiguration();
         pluginConfiguration.addChild(
                 element(name("sqlCommand"), sql).toDom()

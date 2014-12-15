@@ -47,49 +47,47 @@ public class PreIntegrationTestMojo extends RunMojo
                 if (ProductHandlerFactory.JIRA.equals(pe.getProduct().getId()) && isClearDatabase)
                 {
                     List<DataSource> dataSources = pe.getProduct().getDataSources();
-                    if (dataSources.size() == 1)
+                    switch (dataSources.size())
                     {
-                        DataSource dataSource = dataSources.get(0);
-                        JiraDatabaseType databaseType = JiraDatabaseType.getDatabaseType(dataSource.getUrl(), dataSource.getDriver());
-                        if (null == databaseType)
-                        {
-                            throw new MojoExecutionException("Could not detect database type, please check your database driver and database url which amps supported");
-                        }
-                        // need to be clever here: add database artifact for maven-sql-plugin to execute sql
-                        // if we have configured database library in product artifacts then we have 2 solutions:
-                        // 1. check groupId, artifactId of all product's libraries contain
-                        // our database type name: postgres, mysql, mssql, oracle then put to dataSource libArtifact
-                        // 2. add all of product artifacts to dependencies (safety but redundant the others product libraries)
-                        // fail-back we add default database library by detected database type above when: not config product artifacts
-                        // or product's artifacts groupId, artifactId does not contain database name
-                        boolean hasDatabaseLibrary = false;
-                        if (null != pe.getProduct().getLibArtifacts() && pe.getProduct().getLibArtifacts().size() > 0)
-                        {
-                            for (ProductArtifact pa : pe.getProduct().getLibArtifacts())
+                        case 1:
+                            DataSource dataSource = dataSources.get(0);
+                            JiraDatabaseType databaseType = JiraDatabaseType.getDatabaseType(dataSource.getUrl(), dataSource.getDriver());
+                            if (null == databaseType)
                             {
-                                if (pa.getGroupId().contains(databaseType.toString().toLowerCase())
-                                        || pa.getArtifactId().contains(databaseType.toString().toLowerCase()))
+                                throw new MojoExecutionException("Could not detect database type, please check your database driver and database url which amps supported");
+                            }
+                            // need to be clever here: add database artifact for maven-sql-plugin to execute sql
+                            // if we have configured database library in product artifacts then we have 2 solutions:
+                            // 1. check groupId, artifactId of all product's libraries contain
+                            // our database type name: postgres, mysql, mssql, oracle then put to dataSource libArtifact
+                            // 2. add all of product artifacts to dependencies (safety but redundant the others product libraries)
+                            // fail-back we add default database library by detected database type above when: not config product artifacts
+                            // or product's artifacts groupId, artifactId does not contain database name
+                            boolean hasDatabaseLibrary = false;
+                            if (null != pe.getProduct().getLibArtifacts() && pe.getProduct().getLibArtifacts().size() > 0)
+                            {
+                                for (ProductArtifact pa : pe.getProduct().getLibArtifacts())
                                 {
-                                    hasDatabaseLibrary = true;
-                                    dataSource.setLibArtifacts(ImmutableList.of(new LibArtifact(pa.getGroupId(), pa.getArtifactId(), pa.getVersion())));
-                                    break;
+                                    if (pa.getGroupId().contains(databaseType.toString().toLowerCase())
+                                            || pa.getArtifactId().contains(databaseType.toString().toLowerCase()))
+                                    {
+                                        hasDatabaseLibrary = true;
+                                        dataSource.setLibArtifacts(ImmutableList.of(new LibArtifact(pa.getGroupId(), pa.getArtifactId(), pa.getVersion())));
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if(!hasDatabaseLibrary)
-                        {
-                            // add default database artifact
-                            dataSource.setLibArtifacts(ImmutableList.of(defaultDatabaseLibrary.get(databaseType.toString())));
-                        }
-                        goals.runPreIntegrationTest(dataSource);
-                    }
-                    else if (dataSources.size() > 1)
-                    {
-                        throw new MojoExecutionException("Could not support multiple dataSource");
-                    }
-                    else
-                    {
-                        throw new MojoExecutionException("Missing configuration dataSource");
+                            if (!hasDatabaseLibrary)
+                            {
+                                // add default database artifact
+                                dataSource.setLibArtifacts(ImmutableList.of(defaultDatabaseLibrary.get(databaseType.toString())));
+                            }
+                            goals.runPreIntegrationTest(dataSource);
+                            break;
+                        case 0:
+                            throw new MojoExecutionException("Missing configuration dataSource");
+                        default:
+                            throw new MojoExecutionException("Could not support multiple dataSource");
                     }
                 }
             }
