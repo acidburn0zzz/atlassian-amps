@@ -28,13 +28,12 @@ import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLE
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.FILENAME_DBCONFIG;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.INSTALLED_PLUGINS_DIR;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.PLUGINS_DIR;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -180,7 +179,7 @@ public class TestJiraProductHandler
     {
         final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType("jdbc:postgresql://localhost:5432/amps-test", "org.postgresql.Driver");
         assertNotNull(dbType);
-        assertEquals(dbType.getDbType(), JiraDatabaseType.POSTGRES.getDbType());
+        assertThat("Database type must be postgres72", dbType.getDbType(), equalTo(JiraDatabaseType.POSTGRES.getDbType()));
     }
 
     @Test
