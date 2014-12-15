@@ -14,7 +14,7 @@ public class JiraDatabaseTest
     public void postgresDatabaseName() throws Exception
     {
         final DataSource dataSource = mock(DataSource.class);
-        final JiraDatabasePostgresqlImpl postgres = new JiraDatabasePostgresqlImpl(dataSource);
+        final JiraDatabasePostgresImpl postgres = new JiraDatabasePostgresImpl(dataSource);
         assertThat("database name should be : ddd", postgres.getDatabaseName("abc:ddd"), equalTo("ddd"));
         assertThat("database name should be : eeee", postgres.getDatabaseName("jdbc:postgresql://host/eeee"), equalTo("eeee"));
         assertThat("database name should be : fff", postgres.getDatabaseName("jdbc:postgresql://host:port/fff"), equalTo("fff"));

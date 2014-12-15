@@ -7,7 +7,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
-public class JiraDatabasePostgresqlImpl extends AbstractJiraDatabase
+public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
 {
     private static final String DROP_DATABASE = "DROP DATABASE IF EXISTS \"%s\";";
     private static final String DROP_USER = "DROP USER IF EXISTS \"%s\";";
@@ -15,7 +15,7 @@ public class JiraDatabasePostgresqlImpl extends AbstractJiraDatabase
     private static final String CREATE_USER = "CREATE ROLE \"%s\" WITH PASSWORD '%s';";
     private static final String GRANT_PERMISSION = "ALTER DATABASE \"%s\" OWNER TO \"%s\";";
 
-    public JiraDatabasePostgresqlImpl(DataSource dataSource)
+    public JiraDatabasePostgresImpl(DataSource dataSource)
     {
         super(dataSource);
     }
