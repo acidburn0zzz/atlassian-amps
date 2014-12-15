@@ -52,9 +52,28 @@ public final class JiraDatabaseFactory
             Class<?> classImpl = Class.forName(this.getClass().getPackage().getName() + "." + classImplName);
             jiraDatabase = (JiraDatabase) classImpl.getConstructor(DataSource.class).newInstance(dataSource);
         }
-        catch ( ReflectiveOperationException e)
+        catch (InstantiationException e)
         {
-            throw new MojoExecutionException("Database type : " + databaseName + " has not supported yet", e);
+            throw new MojoExecutionException("Database type " + databaseName + " has not supported yet", e);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new MojoExecutionException("Database type " + databaseName + " has not supported yet", e);
+
+        }
+        catch (InvocationTargetException e)
+        {
+            throw new MojoExecutionException("Database type " + databaseName + " has not supported yet", e);
+
+        }
+        catch (NoSuchMethodException e)
+        {
+            throw new MojoExecutionException("Database type " + databaseName + " has not supported yet", e);
+
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new MojoExecutionException("Database type " + databaseName + " has not supported yet", e);
         }
         return jiraDatabase;
     }
