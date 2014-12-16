@@ -13,12 +13,19 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.maven.artifact.factory.ArtifactFactory;
 
 public class RefappProductHandler extends AbstractWebappProductHandler
 {
+
+    @VisibleForTesting
+    static final String ATLASSIAN_BUNDLED_PLUGINS_ZIP = "WEB-INF/classes/atlassian-bundled-plugins.zip";
+    @VisibleForTesting
+    static final String ATLASSIAN_BUNDLED_PLUGINS_DIR = "WEB-INF/atlassian-bundled-plugins";
+
     public RefappProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
         super(context, goals, new RefappPluginProvider(),artifactFactory);
@@ -56,7 +63,14 @@ public class RefappProductHandler extends AbstractWebappProductHandler
     @Override
     protected File getBundledPluginPath(Product ctx, File appDir)
     {
-        return new File(appDir, "WEB-INF/classes/atlassian-bundled-plugins.zip");
+        // if the bundled plugin directory exists, use it, otherwise fallback to the old zip behaviour.
+        final File bundleDir = new File(appDir, ATLASSIAN_BUNDLED_PLUGINS_DIR);
+
+        if (bundleDir.exists() && bundleDir.isDirectory())
+        {
+            return bundleDir;
+        }
+        return new File(appDir, ATLASSIAN_BUNDLED_PLUGINS_ZIP);
     }
 
     @Override
