@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-product-plugins</artifactId>
-        <version>5.0.5-SNAPSHOT</version>
+        <version>5.0.11-SNAPSHOT</version>
     </parent>
 
     <groupId>com.atlassian.maven.plugins</groupId>
@@ -51,7 +51,7 @@
                 generateManifestWithNoInstructions, generateObr, integrationTest,
                 <!-- Commented out until Bamboo doesn't hang when multiple instances are used-->
                 <!-- integrationTestWithTestGroup, -->
-                jarWithExistingManifest, run, runParallel, stop
+                jarWithExistingManifest, run, runParallel, stop, nexus_staging,
                 unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
                 validateManifestWithValidManifest
                 </tests>

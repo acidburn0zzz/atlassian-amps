@@ -1,0 +1,37 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.atlassian.amps.it</groupId>
+    <artifactId>maven-amps-plugin-compress-resources-test</artifactId>
+    <version>testing</version>
+    <name>TestCompressResourcesWithIncludeParam</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>maven-${shitty.product}-plugin</artifactId>
+                <version>testing</version>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>js_.js</include>
+                    <include>test-compressed.xml</include>
+                    <include>foo.css.js-ext.jsp</include>
+                </includes>
+                <excludes>
+                    <exclude>foo.css</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources/css</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+</project>

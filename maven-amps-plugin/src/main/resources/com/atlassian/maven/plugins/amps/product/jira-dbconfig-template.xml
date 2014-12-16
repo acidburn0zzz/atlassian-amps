@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!-- only neeeded for older versions of JIRA; 7.0 onwards will have JiraDS.properties -->
 <jira-database-config>
   <name>defaultDS</name>
   <database-type>hsql</database-type>

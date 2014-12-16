@@ -16,12 +16,11 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
 /**
- * Run the integration tests against the webapp
+ * Run the integration tests against the webapp.
  */
 @Mojo(name = "integration-test", requiresDependencyResolution = ResolutionScope.TEST)
 public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 {
-
     /**
      * Pattern for to use to find integration tests.  Only used if no test groups are defined.
      */
@@ -80,6 +79,15 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
      */
     @Parameter
     protected String category;
+    
+    /**
+     * By default this goal performs both failsafe:integration-test and failsafe:verify goals. Set this to true if you want
+     * to run failsafe:verify at a later lifecycle stage (verify) to do cleanup in post-integration-test phase.
+     * Please note that you will have to set the execution(s) for failsafe:verify yourself in the pom.xml file
+     * including the 'reportsDirectory' configuration for the verify goal.
+     */
+    @Parameter(property = "skip.IT.verification")
+    protected boolean skipITVerification = false;
 
     protected void doExecute() throws MojoExecutionException
     {
@@ -155,7 +163,6 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
     {
         Set<String> ids = new HashSet<String>();
 
-        //ids.addAll(ProductHandlerFactory.getIds());
         for (TestGroup group : getTestGroups())
         {
             ids.add(group.getId());
@@ -163,8 +170,6 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 
         return ids;
     }
-
-
 
     private void runTestsForTestGroup(String testGroupId, MavenGoals goals, String pluginJar, Map<String,Object> systemProperties) throws MojoExecutionException
     {
@@ -239,18 +244,13 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
             putIfNotOverridden(systemProperties, "homedir." + product.getInstanceId(), productHandler.getHomeDirectory(product).getAbsolutePath());
             putIfNotOverridden(systemProperties, "homedir", productHandler.getHomeDirectory(product).getAbsolutePath());
 
-            systemProperties.putAll(getProductFunctionalTestProperties(product));
+            if (product.isInstallPlugin())
+            {
+                systemProperties.putAll(getProductFunctionalTestProperties(product));
+            }
         }
         putIfNotOverridden(systemProperties, "testGroup", testGroupId);
         systemProperties.putAll(getTestGroupSystemProperties(testGroupId));
-
-        /*
-        Commenting out the parallel check so we ALWAYS wait until the products are started
-         */
-        /*if (parallel)
-        {
-            waitForProducts(productExecutions, true);
-        }*/
 
         if (!noWebapp)
         {
@@ -258,7 +258,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         }
 
         // Actually run the tests
-        goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory, category);
+        goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory, category, skipITVerification);
 
         // Shut all products down
         if (!noWebapp)
@@ -355,7 +355,6 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         }
         return Collections.singletonList(functionalTestPattern);
     }
-
 
     private List<String> getExcludesForTestGroup(String testGroupId)
     {

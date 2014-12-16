@@ -1,19 +1,10 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
@@ -24,6 +15,19 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 
@@ -51,6 +55,23 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
     protected String testGroup;
 
     /**
+     * When this property is set to {@literal true}, Mojo will be executed on the last project in the Reactor
+     */
+    @Parameter(property = "runLastProject", required = true, defaultValue = "false")
+    protected boolean runLastProject;
+
+    /**
+     * When there is {@literal runProject} property set, Mojo will be executed on project with specified artifact's ID.
+     * <p>Example:
+     * <ul>
+     *     <li><code>mvn amps:run -DrunProject=my-project</code></li>
+     * </ul>
+     * </p>
+     */
+    @Parameter(property = "runProject", required = false)
+    protected String runProject;
+
+    /**
      * Excluded instances from the execution. Only useful when Studio brings in all instances and you want to run only one.
      * List of comma separated instanceIds, or {@literal *}/instanceId to exclude all but one product.
      * <p>
@@ -72,6 +93,13 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
 
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
+
+        if (!shouldExecute())
+        {
+            getLog().info("Skipping execution");
+            return;
+        }
+
         getUpdateChecker().check();
 
         getAmpsPluginVersionChecker().checkAmpsVersionInPom(getSdkVersion(),getMavenContext().getProject());
@@ -349,4 +377,36 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
         }
 
     }
+
+    /**
+     * <p>Determines whether Mojo should be executed. By default it won't affect execution but it can be influenced by
+     * {@link com.atlassian.maven.plugins.amps.RunMojo#runLastProject} and {@link com.atlassian.maven.plugins.amps.RunMojo#runProject} properties</p>
+     *
+     * @see com.atlassian.maven.plugins.amps.RunMojo#runLastProject
+     * @see com.atlassian.maven.plugins.amps.RunMojo#runProject
+     *
+     * @return <code>true</code> when this execution not should be skipped, <code>false</code> otherwise
+     */
+    protected boolean shouldExecute()
+    {
+        final MavenContext mavenContext = getMavenContext();
+        final MavenProject currentProject = mavenContext.getProject();
+
+        getLog().debug(String.format("Current project ID: %s, runLastProject=%b, runProject=%s", currentProject.getArtifactId(), runLastProject, runProject));
+
+        //check explicit runProject setup
+        if (StringUtils.isNotBlank(runProject))
+        {
+            return StringUtils.equalsIgnoreCase(runProject, currentProject.getArtifactId());
+        }
+
+        //otherwise respect runLastProject
+        if (!runLastProject)
+        {
+            return true;
+        }
+        final List<MavenProject> reactor = mavenContext.getReactor();
+        return reactor == null || Iterables.getLast(reactor, currentProject).equals(currentProject);
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,6 +147,36 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     @Parameter(property = "version.override.path")
     private String versionOverridesPath;
     
+    /**
+     * Project source files encoding. Along with explicit definition in the plugin
+     * configuration property inherits value from the build section (for maven 3.x)
+     * <pre>
+     * &#60;project&#62;
+     *   ...
+     *   &#60;build&#62;
+     *      ...
+     *      &#60;sourceEncoding&#62;UTF-8&#60;/sourceEncoding&#62;
+     *      ....
+     *   &#60;/build&#62;
+     *   ...
+     *  &#60;/project&#62;
+     * </pre>
+     * 
+     * For maven 2.x value inherits from the global property 'project.build.sourceEncoding':
+     * <pre>
+     * &#60;project&#62;
+     *  ...
+     *   &#60;properties&#62;
+     *       &#60;project.build.sourceEncoding&#62;UTF-8&#60;/project.build.sourceEncoding&#62;
+     *       ...
+     *   &#60;/properties&#62;
+     *   ...
+     *  &#60;/project&#62;
+     * </pre>
+     */
+    @Parameter(property = "encoding", defaultValue = "${project.build.sourceEncoding}")
+    protected String encoding;
+
     protected MavenContext getMavenContext()
     {
         if (mavenContext == null)

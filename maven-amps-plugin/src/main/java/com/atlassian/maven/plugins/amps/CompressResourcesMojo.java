@@ -1,5 +1,9 @@
 package com.atlassian.maven.plugins.amps;
 
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -30,7 +34,28 @@ public class CompressResourcesMojo extends AbstractAmpsMojo
     {
         if (compressResources)
         {
-            getMavenGoals().compressResources(compressJs, compressCss, closureJsCompiler);
+            final Charset cs; 
+            if (encoding == null)
+            {
+                cs = Charset.defaultCharset();
+                getLog().warn( "File encoding has not been set, using platform encoding " + cs.name() + ", i.e. build is platform dependent!" );
+            }
+            else
+            {
+                try
+                {
+                    cs = Charset.forName(encoding);
+                }
+                catch (IllegalCharsetNameException ex)
+                {
+                    throw new MojoExecutionException("Failed to resolve charset: "+encoding, ex);
+                }
+                catch (UnsupportedCharsetException ex)
+                {
+                    throw new MojoExecutionException("Failed to resolve charset: "+encoding, ex);
+                }
+            }
+            getMavenGoals().compressResources(compressJs, compressCss, closureJsCompiler, cs);
         }
         else
         {

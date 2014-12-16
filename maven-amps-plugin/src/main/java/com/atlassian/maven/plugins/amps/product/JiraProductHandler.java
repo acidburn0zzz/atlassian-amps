@@ -1,5 +1,9 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.net.MalformedURLException;
+import java.util.Properties;
 import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
@@ -10,8 +14,15 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Node;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +37,7 @@ import java.util.Map;
 import static com.atlassian.maven.plugins.amps.util.ConfigFileUtils.RegexReplacement;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static java.lang.String.format;
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class JiraProductHandler extends AbstractWebappProductHandler
@@ -44,6 +56,13 @@ public class JiraProductHandler extends AbstractWebappProductHandler
 
     @VisibleForTesting
     static final String BUNDLED_PLUGINS_UPTO_4_0 = "WEB-INF/classes/com/atlassian/jira/plugin/atlassian-bundled-plugins.zip";
+
+    @VisibleForTesting
+    static final String FILENAME_DBCONFIG = "dbconfig.xml";
+
+    private static final String JIRADS_PROPERTIES_FILE = "JiraDS.properties";
+
+    private static final String JIRA_HOME_PLACEHOLDER = "${jirahome}";
 
     private static void checkNotFile(final File sharedHomeDir)
     {
@@ -104,6 +123,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         return 8442;
     }
 
+    // only neeeded for older versions of JIRA; 7.0 onwards will have JiraDS.properties
     protected static File getHsqlDatabaseFile(final File homeDirectory)
     {
         return new File(homeDirectory, "database");
@@ -129,8 +149,34 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     protected DataSource getDefaultDataSource(Product ctx)
     {
         DataSource dataSource = new DataSource();
+
+        final String jiraHome = fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath());
+
+        final File dsPropsFile = new File(getHomeDirectory(ctx), JIRADS_PROPERTIES_FILE);
+        if (dsPropsFile.exists())
+        {
+            final Properties dsProps = new Properties();
+            try
+            {
+                // read properties from the JiraDS.properties
+                dsProps.load(new FileInputStream(dsPropsFile));
+                dataSource.setJndi(dsProps.getProperty("jndi"));
+                dataSource.setUrl(dsProps.getProperty("url").replace(JIRA_HOME_PLACEHOLDER, jiraHome));
+                dataSource.setDriver(dsProps.getProperty("driver-class"));
+                dataSource.setUsername(dsProps.getProperty("username"));
+                dataSource.setPassword(dsProps.getProperty("password"));
+                return dataSource;
+            }
+            catch (IOException e)
+            {
+                // nothing we can do here; fall back to defaults
+                log.warn("failed to read " + dsPropsFile.getAbsolutePath(), e);
+            }
+        }
+
+        // legacy JIRA without JiraDS.properties; still uses HSQL
         dataSource.setJndi("jdbc/JiraDS");
-        dataSource.setUrl(format("jdbc:hsqldb:%s/database", fixWindowsSlashes(getHomeDirectory(ctx).getAbsolutePath())));
+        dataSource.setUrl(format("jdbc:hsqldb:%s/database", jiraHome));
         dataSource.setDriver("org.hsqldb.jdbcDriver");
         dataSource.setType("javax.sql.DataSource");
         dataSource.setUsername("sa");
@@ -219,6 +265,154 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     {
         super.processHomeDirectory(ctx, homeDir);
         createDbConfigXmlIfNecessary(homeDir);
+        if (ctx.getDataSources().size() == 1)
+        {
+            final DataSource ds = ctx.getDataSources().get(0);
+            JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType(ds.getUrl(), ds.getDriver());
+            if (null != dbType)
+            {
+                updateDbConfigXml(homeDir, dbType, ds.getSchema());
+            }
+            else
+            {
+                throw new MojoExecutionException("The DataSource configuration was not correct, review DataSource url and driver");
+            }
+        }
+        else if (ctx.getDataSources().size() > 1)
+        {
+            throw new MojoExecutionException("JIRA does not support multiple data sources");
+        }
+    }
+
+    /**
+     * Update JIRA dbconfig.xml in case user provide their own database connection configuration in pom
+     * Jira database type was detected by uri/url prefix and database driver
+     * Jira database type defines database-type and schema or schema-less for specific Jira database
+     * Please refer documentation url: http://www.atlassian.com/software/jira/docs/latest/databases/index.html
+     * example:
+     * <pre>
+     * {@code
+     * <dataSource>
+     *   <jndi>${dataSource.jndi}</jndi>
+     *   <url>${dataSource.url}</url>
+     *   <driver>${dataSource.driver}</driver>
+     *   <username>${dataSource.user}</username>
+     *   <password>${dataSource.password}</password>
+     *   <schema>${dataSource.schema}</schema>
+     * </dataSource>
+     * }
+     * </pre>
+     * @param homeDir
+     * @param dbType
+     * @param schema
+     * @throws MojoExecutionException
+     */
+    @VisibleForTesting
+    protected void updateDbConfigXml(final File homeDir, final JiraDatabaseType dbType, final String schema)
+            throws MojoExecutionException
+    {
+        final File dbConfigXml = new File(homeDir, FILENAME_DBCONFIG);
+        if (!dbConfigXml.exists() || dbType == null)
+        {
+            return;
+        }
+        final SAXReader reader = new SAXReader();
+        final Document dbConfigDoc;
+        try
+        {
+            dbConfigDoc = reader.read(dbConfigXml);
+        }
+        catch (DocumentException de)
+        {
+            throw new MojoExecutionException("Cannot parse database configuration xml file", de);
+        }
+        catch (MalformedURLException me)
+        {
+            throw new MojoExecutionException(me.getMessage());
+        }
+        final Node dbTypeNode = dbConfigDoc.selectSingleNode("//jira-database-config/database-type");
+        final Node schemaNode = dbConfigDoc.selectSingleNode("//jira-database-config/schema-name");
+        boolean modified = false;
+        // update database type
+        if (null != dbTypeNode && StringUtils.isNotEmpty(dbTypeNode.getStringValue()))
+        {
+            String currentDbType = dbTypeNode.getStringValue();
+            // check null and difference value from dbType
+            if (!currentDbType.equals(dbType.getDbType()))
+            {
+                // update database type
+                modified = true;
+                dbTypeNode.setText(dbType.getDbType());
+            }
+        }
+        // depend on database type which Jira supported schema or schema-less
+        // please refer this Jira documentation
+        // http://www.atlassian.com/software/jira/docs/latest/databases/index.html
+
+        // postgres, mssql, hsql
+        if (dbType.hasSchema())
+        {
+            if (StringUtils.isEmpty(schema))
+            {
+                throw new MojoExecutionException("Database configuration missed schema");
+            }
+            if (null == schemaNode)
+            {
+                // add schema-name node
+                try
+                {
+                    dbConfigDoc.selectSingleNode("//jira-database-config").getDocument().addElement("schema-name").addText(schema);
+                    modified = true;
+                }
+                catch (NullPointerException npe)
+                {
+                    throw new MojoExecutionException(npe.getMessage());
+                }
+            }
+            else
+            {
+                if(StringUtils.isNotEmpty(schemaNode.getText()) && !schema.equals(schemaNode.getText()))
+                {
+                    schemaNode.setText(schema);
+                    modified = true;
+                }
+            }
+        }
+        // mysql, oracle
+        else
+        {
+            // remove schema node
+            schemaNode.detach();
+            modified = true;
+        }
+        if (modified)
+        {
+            try
+            {
+                writeDbConfigXml(dbConfigXml, dbConfigDoc);
+            }
+            catch (IOException ioe)
+            {
+                throw new MojoExecutionException("Could not write database configuration file: " + FILENAME_DBCONFIG, ioe);
+            }
+        }
+    }
+
+    private void writeDbConfigXml(final File dbConfigXml, final Document dbConfigDoc) throws IOException
+    {
+        // write dbconfig.xml
+        FileOutputStream fos = new FileOutputStream(dbConfigXml);
+        OutputFormat format = OutputFormat.createPrettyPrint();
+        XMLWriter writer = new XMLWriter(fos, format);
+        try
+        {
+            writer.write(dbConfigDoc);
+        }
+        finally
+        {
+            writer.close();
+            closeQuietly(fos);
+        }
     }
 
     @Override
@@ -250,13 +444,14 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         List<File> configFiles = super.getConfigFiles(product, homeDir);
         configFiles.add(new File(homeDir, "database.log"));
         configFiles.add(new File(homeDir, "database.script"));
-        configFiles.add(new File(homeDir, "dbconfig.xml"));
+        configFiles.add(new File(homeDir, FILENAME_DBCONFIG));
         return configFiles;
     }
 
+    // only neeeded for older versions of JIRA; 7.0 onwards will have JiraDS.properties
     static void createDbConfigXmlIfNecessary(File homeDir) throws MojoExecutionException
     {
-        File dbConfigXml = new File(homeDir, "dbconfig.xml");
+        File dbConfigXml = new File(homeDir, FILENAME_DBCONFIG);
         if (dbConfigXml.exists())
         {
             return;
@@ -279,7 +474,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         }
         catch (IOException ioe)
         {
-            throw new MojoExecutionException("Unable to create dbconfig.xml", ioe);
+            throw new MojoExecutionException("Unable to create config file: " + FILENAME_DBCONFIG, ioe);
         }
     }
 

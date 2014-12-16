@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-product-plugins</artifactId>
-        <version>5.0.5-SNAPSHOT</version>
+        <version>5.0.11-SNAPSHOT</version>
     </parent>
 
     <groupId>com.atlassian.maven.plugins</groupId>
@@ -64,7 +64,7 @@
                 generateManifestWithNoInstructions, generateObr, libArtifact
                 <!-- Commenting out tests that start fecru until AMPS-312 is fixed -->
                 <!-- cli, integrationTest, integrationTestWithTestGroup, run, stop -->
-                jarWithExistingManifest,  
+                jarWithExistingManifest,  nexus_staging,
                 unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
                 validateManifestWithValidManifest, libArtifacts
                 </tests>

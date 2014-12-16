@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-product-plugins</artifactId>
-        <version>5.0.5-SNAPSHOT</version>
+        <version>5.0.11-SNAPSHOT</version>
     </parent>
 
     <groupId>com.atlassian.maven.plugins</groupId>
@@ -51,7 +51,7 @@
                 filterPluginDescriptorWithPluginDescriptor, generateManifestWithInstructions,
                 generateManifestWithNoInstructions, generateManifestWithNoInstructionsButIsAtlassianPlugin,
                 generateManifestWithNoInstructionsNorIsAtlassianPlugin, generateObr, integrationTest,
-                integrationTestWithTestGroup,
+                integrationTestWithTestGroup, nexus_staging,
                 jarWithExistingManifest, run, runParallel, runWithTestGroup, 
                 unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
                 validateManifestWithValidManifest

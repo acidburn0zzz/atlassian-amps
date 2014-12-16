@@ -1,10 +1,6 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.util.List;
-
-import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -13,6 +9,8 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
+import java.util.List;
 
 /**
  * Debug the webapp
@@ -37,6 +35,12 @@ public class DebugMojo extends RunMojo
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
+        if (!shouldExecute())
+        {
+            getLog().info("Skipping execution");
+            return;
+        }
+
         getUpdateChecker().check();
 
         getAmpsPluginVersionChecker().checkAmpsVersionInPom(getSdkVersion(),getMavenContext().getProject());
