@@ -1,10 +1,10 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
-import java.lang.reflect.InvocationTargetException;
-
 import com.atlassian.maven.plugins.amps.DataSource;
 
 import org.apache.maven.plugin.MojoExecutionException;
+
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.getDatabaseType;
 
 public final class JiraDatabaseFactory
 {
@@ -14,66 +14,40 @@ public final class JiraDatabaseFactory
     {
     }
 
-    public static JiraDatabaseFactory getJiraDatabaseFactory()
+    public static synchronized JiraDatabaseFactory getJiraDatabaseFactory()
     {
         if (null == instance)
         {
-            synchronized (JiraDatabaseFactory.class)
-            {
-                if (null == instance)
-                {
-                    instance = new JiraDatabaseFactory();
-                }
-            }
+            instance = new JiraDatabaseFactory();
         }
         return instance;
     }
 
     public JiraDatabase getJiraDatabase(DataSource dataSource) throws MojoExecutionException
     {
-        JiraDatabaseType databaseType = JiraDatabaseType.getDatabaseType(dataSource.getUrl(), dataSource.getDriver());
+        final JiraDatabaseType databaseType = getDatabaseType(dataSource.getUrl(), dataSource.getDriver());
+        final JiraDatabase jiraDatabase;
         if (null == databaseType)
         {
             return null;
         }
-        String databaseTypeName = databaseType.toString();
-        // same sql syntax
-        if(JiraDatabaseType.MSSQL_JTDS.toString().equals(databaseTypeName))
+        switch (databaseType)
         {
-            databaseTypeName = JiraDatabaseType.MSSQL.toString();
-        }
-        String databaseName = databaseTypeName.substring(0, 1) + databaseTypeName.substring(1).toLowerCase();
-
-        String classImplName = "JiraDatabase" + databaseName + "Impl";
-        // all implementation of interface JiraDatabase same this package
-        final JiraDatabase jiraDatabase;
-        try
-        {
-            Class<?> classImpl = Class.forName(this.getClass().getPackage().getName() + "." + classImplName);
-            jiraDatabase = (JiraDatabase) classImpl.getConstructor(DataSource.class).newInstance(dataSource);
-        }
-        catch (InstantiationException e)
-        {
-            throw new MojoExecutionException("Database type " + databaseName + " has not supported yet", e);
-        }
-        catch (IllegalAccessException e)
-        {
-            throw new MojoExecutionException("Database type " + databaseName + " has not supported yet", e);
-
-        }
-        catch (InvocationTargetException e)
-        {
-            throw new MojoExecutionException("Database type " + databaseName + " has not supported yet", e);
-
-        }
-        catch (NoSuchMethodException e)
-        {
-            throw new MojoExecutionException("Database type " + databaseName + " has not supported yet", e);
-
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new MojoExecutionException("Database type " + databaseName + " has not supported yet", e);
+            case POSTGRES:
+                jiraDatabase = new JiraDatabasePostgresImpl(dataSource);
+                break;
+            case MYSQL:
+                jiraDatabase = new JiraDatabaseMysqlImpl(dataSource);
+                break;
+            case ORACLE:
+                jiraDatabase = new JiraDatabaseOracleImpl(dataSource);
+                break;
+            case MSSQL:
+            case MSSQL_JTDS:
+                jiraDatabase = new JiraDatabaseMssqlImpl(dataSource);
+                break;
+            default:
+                jiraDatabase = null;
         }
         return jiraDatabase;
     }
