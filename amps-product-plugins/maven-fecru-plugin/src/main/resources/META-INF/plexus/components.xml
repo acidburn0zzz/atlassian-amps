@@ -42,6 +42,9 @@
                                 com.atlassian.maven.plugins:maven-fecru-plugin:validate-test-manifest,
                                 com.atlassian.maven.plugins:maven-fecru-plugin:test-jar
                             </package>
+                            <pre-integration-test>
+                                com.atlassian.maven.plugins:maven-fecru-plugin:pre-integration-test
+                            </pre-integration-test>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-fecru-plugin:integration-test
                             </integration-test>
