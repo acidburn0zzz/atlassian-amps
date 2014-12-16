@@ -1,5 +1,8 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.atlassian.maven.plugins.amps.LibArtifact;
 import com.atlassian.maven.plugins.amps.DataSource;
 import org.apache.maven.model.Dependency;
@@ -50,13 +53,21 @@ public abstract class AbstractJiraDatabase implements JiraDatabase
     protected abstract String getDatabaseName(String url);
 
     @Override
-    public Dependency getDependency()
+    public List<Dependency> getDependencies()
     {
-        this.lib = dataSource.getLibArtifacts().get(0);
-        Dependency databaseDependency = new Dependency();
-        databaseDependency.setGroupId(lib.getGroupId());
-        databaseDependency.setArtifactId(lib.getArtifactId());
-        databaseDependency.setVersion(lib.getVersion());
-        return databaseDependency;
+        if (null == dataSource.getLibArtifacts() || dataSource.getLibArtifacts().size() == 0)
+        {
+            return null;
+        }
+        List<Dependency> dependencies = new ArrayList<Dependency>();
+        for(LibArtifact libArtifact: dataSource.getLibArtifacts())
+        {
+            Dependency dependency = new Dependency();
+            dependency.setGroupId(libArtifact.getGroupId());
+            dependency.setArtifactId(libArtifact.getArtifactId());
+            dependency.setVersion(libArtifact.getVersion());
+            dependencies.add(dependency);
+        }
+        return dependencies;
     }
 }

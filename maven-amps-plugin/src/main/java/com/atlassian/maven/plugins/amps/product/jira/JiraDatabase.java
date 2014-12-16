@@ -1,5 +1,7 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
+import java.util.List;
+
 import org.apache.maven.model.Dependency;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -17,5 +19,5 @@ public interface JiraDatabase
      * create database library dependency for sql-maven-plugin connect to database
      * @return dependency
      */
-    Dependency getDependency();
+    List<Dependency> getDependencies();
 }

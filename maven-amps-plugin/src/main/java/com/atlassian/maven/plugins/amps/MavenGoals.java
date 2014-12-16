@@ -1157,13 +1157,13 @@ public class MavenGoals
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
         final Xpp3Dom configuration = jiraDatabase.getPluginConfiguration();
-        final Dependency lib = jiraDatabase.getDependency();
+        final List<Dependency> libs = jiraDatabase.getDependencies();
         final Plugin sqlMaven = plugin(
                 groupId("org.codehaus.mojo"),
                 artifactId("sql-maven-plugin"),
                 version("1.5")
         );
-        sqlMaven.addDependency(lib);
+        sqlMaven.getDependencies().addAll(libs);
         executeMojo(
                 sqlMaven,
                 goal("execute"),
