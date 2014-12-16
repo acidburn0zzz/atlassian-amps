@@ -6,7 +6,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
- * Run the webapp
+ * Dispatches pre-integration-test to the appropriate amps product-specific
  */
 @Mojo (name = "pre-integration-test", requiresDependencyResolution = ResolutionScope.TEST)
 @Execute (phase = LifecyclePhase.PRE_INTEGRATION_TEST)
