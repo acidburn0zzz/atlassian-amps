@@ -31,8 +31,8 @@ public class TestRefappProductHandler
     @Test
     public void bundledPluginsLocationCorrectForFallback()
     {
-        final File bundledPluginsDir = new File(tempHome.getRoot(), ATLASSIAN_BUNDLED_PLUGINS_ZIP);
-        assertBundledPluginPath(tempHome.getRoot(), bundledPluginsDir);
+        final File bundledPluginsZip = new File(tempHome.getRoot(), ATLASSIAN_BUNDLED_PLUGINS_ZIP);
+        assertBundledPluginPath(tempHome.getRoot(), bundledPluginsZip);
     }
 
     private void assertBundledPluginPath(final File appDir, final File expectedPath)
