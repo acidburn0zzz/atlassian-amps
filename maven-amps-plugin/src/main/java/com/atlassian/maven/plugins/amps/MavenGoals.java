@@ -123,7 +123,7 @@ public class MavenGoals
                 put("maven-surefire-plugin", overrides.getProperty("maven-surefire-plugin","2.12.4"));
                 put("maven-failsafe-plugin", overrides.getProperty("maven-failsafe-plugin","2.12.4"));
                 put("maven-exec-plugin", overrides.getProperty("maven-exec-plugin","1.2.1"));
-
+                put("sql-maven-plugin", overrides.getProperty("sql-maven-plugin", "1.5"));
             }};
     }
 
@@ -1161,7 +1161,7 @@ public class MavenGoals
         final Plugin sqlMaven = plugin(
                 groupId("org.codehaus.mojo"),
                 artifactId("sql-maven-plugin"),
-                version("1.5")
+                version(defaultArtifactIdToVersionMap.get("sql-maven-plugin"))
         );
         sqlMaven.getDependencies().addAll(libs);
         executeMojo(
