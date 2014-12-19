@@ -6,6 +6,7 @@ import java.util.List;
 import com.atlassian.maven.plugins.amps.LibArtifact;
 import com.atlassian.maven.plugins.amps.DataSource;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
@@ -32,11 +33,11 @@ public abstract class AbstractJiraDatabase implements JiraDatabase
         this.dataSource = dataSource;
     }
 
-    protected abstract String dropDatabase();
-    protected abstract String createDatabase();
+    protected abstract String dropDatabase() throws MojoExecutionException;
+    protected abstract String createDatabase() throws MojoExecutionException;
     protected abstract String dropUser();
     protected abstract String createUser();
-    protected abstract String grantPermissionForUser();
+    protected abstract String grantPermissionForUser() throws MojoExecutionException;
 
     protected Xpp3Dom baseConfiguration()
     {
@@ -50,7 +51,7 @@ public abstract class AbstractJiraDatabase implements JiraDatabase
         );
     }
 
-    protected abstract String getDatabaseName(String url);
+    protected abstract String getDatabaseName(String url) throws MojoExecutionException;
 
     @Override
     public List<Dependency> getDependencies()

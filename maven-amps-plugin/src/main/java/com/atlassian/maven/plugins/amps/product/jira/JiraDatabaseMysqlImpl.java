@@ -1,7 +1,13 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.DriverPropertyInfo;
+import java.sql.SQLException;
+
 import com.atlassian.maven.plugins.amps.DataSource;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -22,7 +28,7 @@ public class JiraDatabaseMysqlImpl extends AbstractJiraDatabase
     }
 
     @Override
-    protected String dropDatabase()
+    protected String dropDatabase() throws MojoExecutionException
     {
         return String.format(DROP_DATABASE, getDatabaseName(getDataSource().getUrl()));
     }
@@ -34,7 +40,7 @@ public class JiraDatabaseMysqlImpl extends AbstractJiraDatabase
     }
 
     @Override
-    protected String createDatabase()
+    protected String createDatabase() throws MojoExecutionException
     {
         return String.format(CREATE_DATABASE, getDatabaseName(getDataSource().getUrl()));
     }
@@ -46,7 +52,7 @@ public class JiraDatabaseMysqlImpl extends AbstractJiraDatabase
     }
 
     @Override
-    protected String grantPermissionForUser()
+    protected String grantPermissionForUser() throws MojoExecutionException
     {
         return String.format(GRANT_PERMISSION, getDatabaseName(getDataSource().getUrl()), getDataSource().getUsername());
     }
@@ -59,19 +65,40 @@ public class JiraDatabaseMysqlImpl extends AbstractJiraDatabase
      * @return database name
      */
     @Override
-    protected String getDatabaseName(final String url)
+    protected String getDatabaseName(String url) throws MojoExecutionException
     {
-        String databaseName;
-        databaseName = url.substring(url.lastIndexOf("/") + 1);
-        if (databaseName.contains("?"))
+        try
         {
-            databaseName = databaseName.substring(0, databaseName.indexOf("?"));
+            Class.forName(getDataSource().getDriver());
         }
-        return databaseName;
+        catch (ClassNotFoundException e)
+        {
+            throw new MojoExecutionException("Could not load Mysql database library to classpath");
+        }
+        try
+        {
+            Driver driver = DriverManager.getDriver(url);
+            DriverPropertyInfo[] driverPropertyInfos = driver.getPropertyInfo(url, null);
+            if (null != driverPropertyInfos)
+            {
+                for(DriverPropertyInfo driverPropertyInfo : driverPropertyInfos)
+                {
+                    if ("DBNAME".equals(driverPropertyInfo.name))
+                    {
+                        return driverPropertyInfo.value;
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new MojoExecutionException("");
+        }
+        return null;
     }
 
     @Override
-    public Xpp3Dom getPluginConfiguration()
+    public Xpp3Dom getPluginConfiguration() throws MojoExecutionException
     {
         String sql = dropDatabase() + dropUser() + createDatabase() + createUser() + grantPermissionForUser();
         Xpp3Dom pluginConfiguration = baseConfiguration();

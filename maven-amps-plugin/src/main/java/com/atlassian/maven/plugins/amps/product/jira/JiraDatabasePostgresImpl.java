@@ -1,7 +1,13 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.DriverPropertyInfo;
+import java.sql.SQLException;
+
 import com.atlassian.maven.plugins.amps.DataSource;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -21,7 +27,7 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
     }
 
     @Override
-    protected String dropDatabase()
+    protected String dropDatabase() throws MojoExecutionException
     {
         return String.format(DROP_DATABASE, getDatabaseName(getDataSource().getUrl()));
     }
@@ -33,7 +39,7 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
     }
 
     @Override
-    protected String createDatabase()
+    protected String createDatabase() throws MojoExecutionException
     {
         return String.format(CREATE_DATABASE, getDatabaseName(getDataSource().getUrl()));
     }
@@ -45,7 +51,7 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
     }
 
     @Override
-    protected String grantPermissionForUser()
+    protected String grantPermissionForUser() throws MojoExecutionException
     {
         return String.format(GRANT_PERMISSION, getDatabaseName(getDataSource().getUrl()), getDataSource().getUsername());
     }
@@ -58,22 +64,40 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
      * @return database name
      */
     @Override
-    protected String getDatabaseName(String url)
+    protected String getDatabaseName(String url) throws MojoExecutionException
     {
-        String databaseName = "";
-        if (!url.contains("/"))
+        try
         {
-            databaseName = url.substring(url.lastIndexOf(":") + 1);
+            Class.forName(getDataSource().getDriver());
         }
-        else
+        catch (ClassNotFoundException e)
         {
-            databaseName = url.substring(url.lastIndexOf("/") + 1);
+            throw new MojoExecutionException("Could not load Postgresql database library to classpath");
         }
-        return databaseName;
+        try
+        {
+            Driver driver = DriverManager.getDriver(url);
+            DriverPropertyInfo[] driverPropertyInfos = driver.getPropertyInfo(url, null);
+            if (null != driverPropertyInfos)
+            {
+                for(DriverPropertyInfo driverPropertyInfo : driverPropertyInfos)
+                {
+                    if ("PGDBNAME".equals(driverPropertyInfo.name))
+                    {
+                        return driverPropertyInfo.value;
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new MojoExecutionException("");
+        }
+        return null;
     }
 
     @Override
-    public Xpp3Dom getPluginConfiguration()
+    public Xpp3Dom getPluginConfiguration() throws MojoExecutionException
     {
         String sql = dropDatabase() + dropUser() + createDatabase() + createUser() + grantPermissionForUser();
         Xpp3Dom pluginConfiguration = baseConfiguration();
