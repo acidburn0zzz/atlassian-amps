@@ -9,6 +9,7 @@ import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
@@ -17,9 +18,19 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 @Mojo (name = "pre-integration-test", requiresDependencyResolution = ResolutionScope.TEST)
 public class PreIntegrationTestMojo extends RunMojo
 {
+    @Parameter (property = "maven.test.skip", defaultValue = "false")
+    private boolean testsSkip;
+
+    @Parameter(property = "skipTests", defaultValue = "false")
+    private boolean skipTests;
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
+        if (testsSkip || skipTests)
+        {
+            getLog().info("Pre integration tests skipped");
+            return;
+        }
         final MavenGoals goals = getMavenGoals();
         final List<ProductExecution> productExecutions = getProductExecutions();
         if (null != productExecutions)
