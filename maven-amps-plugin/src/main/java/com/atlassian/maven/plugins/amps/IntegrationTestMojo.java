@@ -79,6 +79,15 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
      */
     @Parameter
     protected String category;
+    
+    /**
+     * By default this goal performs both failsafe:integration-test and failsafe:verify goals. Set this to true if you want
+     * to run failsafe:verify at a later lifecycle stage (verify) to do cleanup in post-integration-test phase.
+     * Please note that you will have to set the execution(s) for failsafe:verify yourself in the pom.xml file
+     * including the 'reportsDirectory' configuration for the verify goal.
+     */
+    @Parameter(property = "skip.IT.verification")
+    protected boolean skipITVerification = false;
 
     protected void doExecute() throws MojoExecutionException
     {
@@ -249,7 +258,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         }
 
         // Actually run the tests
-        goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory, category);
+        goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory, category, skipITVerification);
 
         // Shut all products down
         if (!noWebapp)
