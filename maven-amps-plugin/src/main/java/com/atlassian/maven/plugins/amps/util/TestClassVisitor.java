@@ -6,21 +6,22 @@ import com.atlassian.plugins.osgi.test.AtlassianPluginsTestRunner;
 import org.apache.commons.lang.StringUtils;
 import org.junit.runner.RunWith;
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.EmptyVisitor;
 
 /**
  * @since version
  */
-public class TestClassVisitor extends EmptyVisitor
+public class TestClassVisitor extends ClassVisitor
 {
     private boolean isWiredTestClass;
     private boolean inITPackage;
-    private String normalClassName;
     private String applicationFilter;
 
     public TestClassVisitor()
     {
+        super(Opcodes.ASM5);
         this.isWiredTestClass = false;
         this.inITPackage = false;
         this.applicationFilter = "";
@@ -29,7 +30,7 @@ public class TestClassVisitor extends EmptyVisitor
     @Override
     public void visit(final int version, final int access, final String name, final String signature, final String superName, final String[] interfaces)
     {
-        this.normalClassName = normalize(name);
+        String normalClassName = normalize(name);
 
         if (normalClassName.startsWith("it."))
         {
@@ -90,8 +91,13 @@ public class TestClassVisitor extends EmptyVisitor
         return applicationFilter;
     }
 
-    private class RunWithAnnotationVisitor extends EmptyVisitor
+    private class RunWithAnnotationVisitor extends AnnotationVisitor
     {
+
+        public RunWithAnnotationVisitor()
+        {
+            super(Opcodes.ASM5);
+        }
 
         @Override
         public void visit(String name, Object value)
@@ -108,8 +114,14 @@ public class TestClassVisitor extends EmptyVisitor
         }
     }
 
-    private class ApplicationAnnotationVisitor extends EmptyVisitor
+    private class ApplicationAnnotationVisitor extends AnnotationVisitor
     {
+
+        public ApplicationAnnotationVisitor()
+        {
+            super(Opcodes.ASM5);
+        }
+
         @Override
         public void visit(String name, Object value)
         {

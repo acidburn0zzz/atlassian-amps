@@ -4,7 +4,13 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.atlassian.plugins.codegen.annotations.*;
+import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.StashPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreatorRegistry;
 
@@ -13,9 +19,10 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.commons.EmptyVisitor;
+import org.objectweb.asm.Opcodes;
 
 /**
  * @since 3.6
@@ -67,11 +74,16 @@ public class ModuleCreatorAnnotationParser extends AbstractAnnotationParser
                 .setContextClassLoader(oldLoader);
     }
 
-    public class ModuleClassVisitor extends EmptyVisitor
+    public class ModuleClassVisitor extends ClassVisitor
     {
 
         private String visitedClassname;
         private boolean isModuleCreator;
+
+        public ModuleClassVisitor()
+        {
+            super(Opcodes.ASM5);
+        }
 
         @Override
         public void visit(final int version, final int access, final String name, final String signature, final String superName, final String[] interfaces)
@@ -92,7 +104,7 @@ public class ModuleCreatorAnnotationParser extends AbstractAnnotationParser
 
             if (normalize(superName).equals("java.lang.Object"))
             {
-                return hasInterface;
+                return false;
             }
 
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -149,13 +161,14 @@ public class ModuleCreatorAnnotationParser extends AbstractAnnotationParser
             return null;
         }
 
-        private class ProductCreatorAnnotationVisitor extends EmptyVisitor
+        private class ProductCreatorAnnotationVisitor extends AnnotationVisitor
         {
 
             private String annotationName;
 
-            private ProductCreatorAnnotationVisitor(String annotationName)
+            private ProductCreatorAnnotationVisitor(final String annotationName)
             {
+                super(Opcodes.ASM5);
                 this.annotationName = annotationName;
             }
 
