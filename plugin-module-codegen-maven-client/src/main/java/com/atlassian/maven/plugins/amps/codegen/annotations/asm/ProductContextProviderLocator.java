@@ -10,9 +10,9 @@ import com.atlassian.plugins.codegen.modules.PluginModuleCreatorRegistry;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.maven.plugin.logging.Log;
-import org.objectweb.asm.*;
-import org.objectweb.asm.commons.EmptyVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Opcodes;
 
 /**
  * @since 3.6
@@ -31,7 +31,6 @@ public class ProductContextProviderLocator extends AbstractAnnotationParser
         productContextPackages.put(PluginModuleCreatorRegistry.REFAPP, "com.atlassian.jira.plugin.webfragment.contextproviders");
     }
 
-    private Log log;
     private String productId;
     private Map<String, String> contextRegistry;
 
@@ -56,11 +55,16 @@ public class ProductContextProviderLocator extends AbstractAnnotationParser
         parse(basePackage, new ContextProviderClassVisitor());
     }
 
-    public class ContextProviderClassVisitor extends EmptyVisitor
+    public class ContextProviderClassVisitor extends ClassVisitor
     {
 
         private String visitedClassname;
         private boolean isContextProvider;
+
+        public ContextProviderClassVisitor()
+        {
+            super(Opcodes.ASM5);
+        }
 
         @Override
         public void visit(final int version, final int access, final String name, final String signature, final String superName, final String[] interfaces)
@@ -94,7 +98,7 @@ public class ProductContextProviderLocator extends AbstractAnnotationParser
 
             if (normalize(superName).equals("java.lang.Object"))
             {
-                return hasInterface;
+                return false;
             }
 
             ClassLoader classLoader = Thread.currentThread()
@@ -109,7 +113,6 @@ public class ProductContextProviderLocator extends AbstractAnnotationParser
                 {
 
                     ClassReader classReader = new ClassReader(is);
-                    String[] interfaces = classReader.getInterfaces();
                     hasInterface = ArrayUtils.contains(classReader.getInterfaces(), interfaceName);
                     if (!hasInterface)
                     {
@@ -127,22 +130,5 @@ public class ProductContextProviderLocator extends AbstractAnnotationParser
             return hasInterface;
         }
 
-        @Override
-        public AnnotationVisitor visitAnnotation(String annotationName, boolean isVisible)
-        {
-            return null;
-        }
-
-        @Override
-        public MethodVisitor visitMethod(int i, String s, String s1, String s2, String[] strings)
-        {
-            return null;
-        }
-
-        @Override
-        public FieldVisitor visitField(int i, String s, String s1, String s2, Object o)
-        {
-            return null;
-        }
     }
 }
