@@ -21,7 +21,7 @@ final File projectPluginDescriptor = new File(projectDir, 'src/main/resources/at
 assert projectPluginDescriptor.exists(), "The project's plugin descriptor should have been created at $projectPluginDescriptor"
 
 def pluginXml = new XmlParser().parse(projectPluginDescriptor)
-assert pluginXml.'@key' == '${project.groupId}.${project.artifactId}', "Unexpected ${pluginXml.'@key'}"
+assert pluginXml.'@key' == '${atlassian.plugin.key}', "Unexpected ${pluginXml.'@key'}"
 assert pluginXml.'@name' == '${project.name}'
 assert pluginXml.'@plugins-version' == '2'
 assert pluginXml.'plugin-info'.description.text() == '${project.description}'
