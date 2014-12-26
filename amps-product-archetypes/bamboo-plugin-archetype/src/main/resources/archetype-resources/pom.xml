@@ -24,6 +24,8 @@
         <bamboo.data.version>\${bambooDataVersion}</bamboo.data.version>
         <amps.version>${project.version}</amps.version>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
+        <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
+        <atlassian.plugin.key>\${project.groupId}.\${project.artifactId}</atlassian.plugin.key>
     </properties>
 
     <dependencies>
@@ -71,6 +73,26 @@
                 <configuration>
                     <productVersion>\${dollar}{bamboo.version}</productVersion>
                     <productDataVersion>\${dollar}{bamboo.data.version}</productDataVersion>
+                    <instructions>
+                        <!--
+                            It is critical to provide correct plugin key (matches with the key atlassian-plugin.xml)
+                              otherwise Atlassian Plugins system won't treat bundle as transformless plugin
+                         -->
+                        <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
+
+                        <!-- Add package to export here -->
+                        <Export-Package>
+                            ${package},
+                        </Export-Package>
+
+                        <!-- Add pacakage import here -->
+                        <Import-Package>
+                            com.atlassian.sal.api;version="[2.7, 4.0)"
+                        </Import-Package>
+
+                        <!-- Spring context to be support inside plugin -->
+                        <Spring-Context>*;timeout=60</Spring-Context>
+                    </instructions>
                 </configuration>
             </plugin>
           

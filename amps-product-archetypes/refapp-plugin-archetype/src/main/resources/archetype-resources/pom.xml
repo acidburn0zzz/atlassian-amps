@@ -101,9 +101,7 @@
 
                         <!-- Add pacakage import here -->
                         <Import-Package>
-                            javax.servlet;version="[2.4, 3.0)",
-                            javax.servlet.http;version="[2.4, 3.0)",
-                            com.atlassian.sal.api;version="[2.7, 3.0)"
+                            com.atlassian.sal.api;version="[2.7, 4.0)"
                         </Import-Package>
 
                         <!-- Spring context to be support inside plugin -->
