@@ -17,11 +17,18 @@ assert project[pom.artifactId].text() == 'amps-it-create'
 assert project[pom.version].text() == '1.0'
 assert project[pom.packaging].text() == 'atlassian-plugin'
 
+
+// Verify that the generated plugin has the configuration as transformless (Atlassian-Plugin-Key exist and correct).
+def ampsPlugin = project[pom.build][pom.plugins][pom.plugin].find { it[pom.artifactId].text() == "maven-$thisProduct-plugin" }
+def pluginKey = ampsPlugin[pom.configuration][pom.instructions][pom.'Atlassian-Plugin-Key'].text()
+assert pluginKey == '${atlassian.plugin.key}', "Unexpected ${pluginKey}"
+
 final File projectPluginDescriptor = new File(projectDir, 'src/main/resources/atlassian-plugin.xml')
 assert projectPluginDescriptor.exists(), "The project's plugin descriptor should have been created at $projectPluginDescriptor"
 
 def pluginXml = new XmlParser().parse(projectPluginDescriptor)
-assert pluginXml.'@key' == '${atlassian.plugin.key}', "Unexpected ${pluginXml.'@key'}"
+// The key should be the same with the one in pom.xml
+assert pluginXml.'@key' == pluginKey, "Unexpected ${pluginXml.'@key'}"
 assert pluginXml.'@name' == '${project.name}'
 assert pluginXml.'@plugins-version' == '2'
 assert pluginXml.'plugin-info'.description.text() == '${project.description}'
