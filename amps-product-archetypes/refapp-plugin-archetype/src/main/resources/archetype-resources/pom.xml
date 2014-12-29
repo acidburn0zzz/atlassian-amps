@@ -83,10 +83,10 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-refapp-plugin</artifactId>
-                <version>\${dollar}{amps.version}</version>
+                <version>\${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <productVersion>\${dollar}{refapp.version}</productVersion>
+                    <productVersion>\${refapp.version}</productVersion>
                     <instructions>
                         <!--
                             It is critical to provide correct plugin key (matches with the key atlassian-plugin.xml)
