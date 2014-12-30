@@ -8,12 +8,12 @@ import com.atlassian.plugins.codegen.annotations.asm.AbstractAnnotationParser;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.maven.plugin.logging.Log;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.commons.EmptyVisitor;
+import org.objectweb.asm.Opcodes;
 
 /**
  * @since 3.6
@@ -22,7 +22,6 @@ public class CustomFieldTypeLocator extends AbstractAnnotationParser
 {
     public static final String JIRA_FIELDS_PACKAGE = "com.atlassian.jira.issue.customfields.impl";
 
-    private Log log;
     private Map<String, String> fieldTypeRegistry;
 
     public CustomFieldTypeLocator(Map<String, String> fieldTypeRegistry)
@@ -40,11 +39,16 @@ public class CustomFieldTypeLocator extends AbstractAnnotationParser
         parse(basePackage, new FieldClassVisitor());
     }
 
-    public class FieldClassVisitor extends EmptyVisitor
+    public class FieldClassVisitor extends ClassVisitor
     {
 
         private String visitedClassname;
         private boolean isCustomFieldType;
+
+        public FieldClassVisitor()
+        {
+            super(Opcodes.ASM5);
+        }
 
         @Override
         public void visit(final int version, final int access, final String name, final String signature, final String superName, final String[] interfaces)
@@ -74,7 +78,7 @@ public class CustomFieldTypeLocator extends AbstractAnnotationParser
 
             if (normalize(superName).equals("java.lang.Object"))
             {
-                return hasInterface;
+                return false;
             }
 
             ClassLoader classLoader = Thread.currentThread()
@@ -89,7 +93,6 @@ public class CustomFieldTypeLocator extends AbstractAnnotationParser
                 {
 
                     ClassReader classReader = new ClassReader(is);
-                    String[] interfaces = classReader.getInterfaces();
                     hasInterface = ArrayUtils.contains(classReader.getInterfaces(), interfaceName);
                     if (!hasInterface)
                     {

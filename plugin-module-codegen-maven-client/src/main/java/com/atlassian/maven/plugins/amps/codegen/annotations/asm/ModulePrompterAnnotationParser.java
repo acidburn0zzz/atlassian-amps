@@ -14,7 +14,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.objectweb.asm.*;
-import org.objectweb.asm.commons.EmptyVisitor;
 
 /**
  * @since 3.6
@@ -54,11 +53,16 @@ public class ModulePrompterAnnotationParser extends AbstractAnnotationParser
                 .setContextClassLoader(oldLoader);
     }
 
-    public class PropmpterClassVisitor extends EmptyVisitor
+    public class PropmpterClassVisitor extends ClassVisitor
     {
 
         private String visitedClassname;
         private boolean isModulePrompter;
+
+        public PropmpterClassVisitor()
+        {
+            super(Opcodes.ASM5);
+        }
 
         @Override
         public void visit(final int version, final int access, final String name, final String signature, final String superName, final String[] interfaces)
@@ -97,7 +101,7 @@ public class ModulePrompterAnnotationParser extends AbstractAnnotationParser
 
             if (normalize(superName).equals("java.lang.Object"))
             {
-                return hasInterface;
+                return false;
             }
 
             ClassLoader classLoader = Thread.currentThread()
@@ -137,7 +141,7 @@ public class ModulePrompterAnnotationParser extends AbstractAnnotationParser
             if (isModulePrompter && ModuleCreatorClass.class.getName()
                     .equals(normalizedName))
             {
-                return new ModuleCreatorClassAnnotationVisitor(normalizedName);
+                return new ModuleCreatorClassAnnotationVisitor();
             }
 
             return null;
@@ -156,14 +160,12 @@ public class ModulePrompterAnnotationParser extends AbstractAnnotationParser
             return null;
         }
 
-        private class ModuleCreatorClassAnnotationVisitor extends EmptyVisitor
+        private class ModuleCreatorClassAnnotationVisitor extends AnnotationVisitor
         {
 
-            private String annotationName;
-
-            private ModuleCreatorClassAnnotationVisitor(String annotationName)
+            private ModuleCreatorClassAnnotationVisitor()
             {
-                this.annotationName = annotationName;
+                super(Opcodes.ASM5);
             }
 
             @Override
@@ -199,11 +201,6 @@ public class ModulePrompterAnnotationParser extends AbstractAnnotationParser
                 super.visitEnd();
             }
         }
-    }
-
-    public Prompter getMavenPrompter()
-    {
-        return mavenPrompter;
     }
 
     public void setMavenPrompter(Prompter mavenPrompter)

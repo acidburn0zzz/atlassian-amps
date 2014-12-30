@@ -108,7 +108,7 @@ public class MavenGoals
                 put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.4.7"));
                 put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.2"));
                 put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
-                put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","2.3.7"));
+                put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","2.5.3"));
                 put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.3.0"));
                 put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","1.7"));
                 put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.3"));
@@ -1085,7 +1085,8 @@ public class MavenGoals
         return server + port + contextPath;
     }
 
-    public void runIntegrationTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties, final File targetDirectory, final String category)
+    public void runIntegrationTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties,
+            final File targetDirectory, final String category, final boolean skipVerifyGoal)
     		throws MojoExecutionException
 	{
     	List<Element> includeElements = new ArrayList<Element>(includes.size());
@@ -1139,18 +1140,21 @@ public class MavenGoals
                 itconfig,
                 executionEnvironment()
         );
-
-        executeMojo(
-                plugin(
-                        groupId("org.apache.maven.plugins"),
-                        artifactId("maven-failsafe-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-failsafe-plugin"))
-                ),
-                goal("verify"),
-                verifyconfig,
-                executionEnvironment()
-        );
-	}
+        if (!skipVerifyGoal) {
+            executeMojo(
+                    plugin(
+                            groupId("org.apache.maven.plugins"),
+                            artifactId("maven-failsafe-plugin"),
+                            version(defaultArtifactIdToVersionMap.get("maven-failsafe-plugin"))
+                    ),
+                    goal("verify"),
+                    verifyconfig,
+                    executionEnvironment()
+            );
+        } else {
+            log.info("Skipping failsafe IT failure verification.");
+        }
+    }
 
     public void runPreIntegrationTest(final DataSource dataSource) throws MojoExecutionException
     {
