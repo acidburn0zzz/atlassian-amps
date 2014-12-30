@@ -1,6 +1,7 @@
-package ${package};
+package ${package}.impl;
 
 import com.atlassian.sal.api.ApplicationProperties;
+import ${package}.api.MyPluginComponent;
 
 public class MyPluginComponentImpl implements MyPluginComponent
 {
