@@ -5,7 +5,6 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import com.yahoo.platform.yui.compressor.CssCompressor;

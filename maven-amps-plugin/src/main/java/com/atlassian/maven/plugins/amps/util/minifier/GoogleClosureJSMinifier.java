@@ -7,7 +7,6 @@ import com.google.javascript.jscomp.Compiler;
 import org.apache.maven.plugin.logging.Log;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @since version
