@@ -14,9 +14,10 @@ import java.util.Map;
  */
 public class GoogleClosureJSMinifier
 {
-    public static String compile(String code, HashMap<String,String> closureOptions, Log log) {
-        Compiler compiler = new Compiler();
+    private static CompilerOptions options;
 
+    public static void setOptions(HashMap<String,String> closureOptions, Log log)
+    {
         GoogleClosureOptionsHandler googleClosureOptionsHandler = new GoogleClosureOptionsHandler(log);
         if(closureOptions != null && !closureOptions.isEmpty()) {
             for(String optionName : closureOptions.keySet())
@@ -25,8 +26,11 @@ public class GoogleClosureJSMinifier
             }
         }
 
-        CompilerOptions options = googleClosureOptionsHandler.getCompilerOptions();
+        options = googleClosureOptionsHandler.getCompilerOptions();
+    }
 
+    public static String compile(String code) {
+        Compiler compiler = new Compiler();
         CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
 
         JSSourceFile extern = JSSourceFile.fromCode("externs.js","function alert(x) {}");

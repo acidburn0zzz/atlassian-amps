@@ -34,6 +34,7 @@ public class ResourcesMinifier
 
     public static void minify(List<Resource> resources, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Log log, HashMap<String,String> closureOptions) throws MojoExecutionException
     {
+        GoogleClosureJSMinifier.setOptions(closureOptions, log);
         if(null == INSTANCE)
         {
             INSTANCE = new ResourcesMinifier();
@@ -241,7 +242,7 @@ public class ResourcesMinifier
         {
             FileUtils.forceMkdir(destFile.getParentFile());
             String source = FileUtils.readFileToString(sourceFile, cs);
-            String min = GoogleClosureJSMinifier.compile(source, closureOptions, log);
+            String min = GoogleClosureJSMinifier.compile(source);
             FileUtils.writeStringToFile(destFile, min, cs);
         }
         catch (IOException e)
