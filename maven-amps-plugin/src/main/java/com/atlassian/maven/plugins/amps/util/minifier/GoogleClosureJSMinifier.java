@@ -4,16 +4,29 @@ import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.Compiler;
+import org.apache.maven.plugin.logging.Log;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @since version
  */
 public class GoogleClosureJSMinifier
 {
-    public static String compile(String code) {
+    public static String compile(String code, HashMap<String,String> closureOptions, Log log) {
         Compiler compiler = new Compiler();
 
-        CompilerOptions options = new CompilerOptions();
+        GoogleClosureOptionsHandler googleClosureOptionsHandler = new GoogleClosureOptionsHandler(log);
+        if(closureOptions != null && !closureOptions.isEmpty()) {
+            for(String optionName : closureOptions.keySet())
+            {
+                googleClosureOptionsHandler.setOption(optionName, closureOptions.get(optionName));
+            }
+        }
+
+        CompilerOptions options = googleClosureOptionsHandler.getCompilerOptions();
+
         CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
 
         JSSourceFile extern = JSSourceFile.fromCode("externs.js","function alert(x) {}");

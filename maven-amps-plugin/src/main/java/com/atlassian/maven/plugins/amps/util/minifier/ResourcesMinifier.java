@@ -3,7 +3,9 @@ package com.atlassian.maven.plugins.amps.util.minifier;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import com.yahoo.platform.yui.compressor.CssCompressor;
@@ -30,20 +32,20 @@ public class ResourcesMinifier
     {
     }
 
-    public static void minify(List<Resource> resources, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Log log) throws MojoExecutionException
+    public static void minify(List<Resource> resources, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Log log, HashMap<String,String> closureOptions) throws MojoExecutionException
     {
         if(null == INSTANCE)
         {
             INSTANCE = new ResourcesMinifier();
         }
-        
+
         for(Resource resource : resources)
         {
-            INSTANCE.processResource(resource,outputDir,compressJs, compressCss, useClosureForJs, cs, log);
+            INSTANCE.processResource(resource,outputDir,compressJs, compressCss, useClosureForJs, cs, log, closureOptions);
         }
     }
     
-    public void processResource(Resource resource, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Log log) throws MojoExecutionException
+    public void processResource(Resource resource, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Log log, HashMap<String,String> closureOptions) throws MojoExecutionException
     {
         File destDir = outputDir;
         if(StringUtils.isNotBlank(resource.getTargetPath()))
@@ -60,7 +62,7 @@ public class ResourcesMinifier
 
         if(compressJs)
         {
-            processJs(resourceDir,destDir,resource.getIncludes(),resource.getExcludes(),useClosureForJs,cs,log);
+            processJs(resourceDir,destDir,resource.getIncludes(),resource.getExcludes(),useClosureForJs,cs,log,closureOptions);
         }
         
         if(compressCss)
@@ -130,7 +132,7 @@ public class ResourcesMinifier
         log.info(numberOfMinifiedFile +" XML file(s) were minified into target directory " + destDir.getAbsolutePath());
     }
 
-    public void processJs(File resourceDir, File destDir, List<String> includes, List<String> excludes, boolean useClosure, Charset cs, Log log) throws MojoExecutionException
+    public void processJs(File resourceDir, File destDir, List<String> includes, List<String> excludes, boolean useClosure, Charset cs, Log log, HashMap<String,String> closureOptions) throws MojoExecutionException
     {
         if(useClosure)
         {
@@ -177,7 +179,7 @@ public class ResourcesMinifier
                 log.debug("compressing to " + destFile.getAbsolutePath());
                 if(useClosure)
                 {
-                    closureJsCompile(sourceFile, destFile, cs);
+                    closureJsCompile(sourceFile, destFile, cs, closureOptions, log);
                 }
                 else
                 {
@@ -233,13 +235,13 @@ public class ResourcesMinifier
         log.info(numberOfMinifiedFile + " CSS file(s) were minified into target directory " + destDir.getAbsolutePath());
     }
 
-    private void closureJsCompile(File sourceFile, File destFile, Charset cs) throws MojoExecutionException
+    private void closureJsCompile(File sourceFile, File destFile, Charset cs, HashMap<String,String> closureOptions, Log log) throws MojoExecutionException
     {
         try
         {
             FileUtils.forceMkdir(destFile.getParentFile());
             String source = FileUtils.readFileToString(sourceFile, cs);
-            String min = GoogleClosureJSMinifier.compile(source);
+            String min = GoogleClosureJSMinifier.compile(source, closureOptions, log);
             FileUtils.writeStringToFile(destFile, min, cs);
         }
         catch (IOException e)

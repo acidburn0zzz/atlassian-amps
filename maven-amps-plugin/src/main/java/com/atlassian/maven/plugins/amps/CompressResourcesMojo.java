@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.HashMap;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -30,6 +31,8 @@ public class CompressResourcesMojo extends AbstractAmpsMojo
     @Parameter(defaultValue = "true")
     private boolean compressCss;
 
+    @Parameter
+    private HashMap <String,String> closureOptions;
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         if (compressResources)
@@ -55,7 +58,7 @@ public class CompressResourcesMojo extends AbstractAmpsMojo
                     throw new MojoExecutionException("Failed to resolve charset: "+encoding, ex);
                 }
             }
-            getMavenGoals().compressResources(compressJs, compressCss, closureJsCompiler, cs);
+            getMavenGoals().compressResources(compressJs, compressCss, closureJsCompiler, cs, closureOptions);
         }
         else
         {
