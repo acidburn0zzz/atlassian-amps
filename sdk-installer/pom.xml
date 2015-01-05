@@ -107,6 +107,179 @@
         </profile>
 
         <profile>
+            <id>installer-linux-deb</id>
+            <build>
+                <finalName>atlassian-plugin-sdk</finalName>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>${buildhelper.version}</version>
+                        <executions>
+                            <execution>
+                                <id>parse-deb-version</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>parse-version</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>timestamp-property</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>timestamp-property</goal>
+                                </goals>
+                                <configuration>
+                                    <name>snap.ts</name>
+                                    <pattern>yyyyMMddHHmmss</pattern>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>deb-version</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>regex-property</goal>
+                                </goals>
+                                <configuration>
+                                    <name>deb.version</name>
+                                    <value>${project.version}</value>
+                                    <regex>-SNAPSHOT</regex>
+                                    <replacement>~${snap.ts}</replacement>
+                                    <failIfNoMatch>false</failIfNoMatch>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>attach-linux-installers</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>attach-artifact</goal>
+                                </goals>
+                                <configuration>
+                                    <artifacts>
+                                        <artifact>
+                                            <file>${project.build.directory}/atlassian-plugin-sdk-${deb.version}.deb</file>
+                                            <type>deb</type>
+                                        </artifact>
+                                    </artifacts>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-for-deb</id>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>atlassian-plugin-sdk</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>tar.gz</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/deb-work/usr/share/</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-deb</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <finalName>deb-work</finalName>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <attach>false</attach>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/assembly-deb.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.1</version>
+                        <executions>
+                            <execution>
+                                <id>native-deb</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <executable>${project.basedir}/deb-builder.sh</executable>
+                                    <outputFile>${project.build.directory}/dpkg-out.txt</outputFile>
+                                    <arguments>
+                                        <argument>${project.version}</argument>
+                                        <argument>${deb.version}</argument>
+                                    </arguments>
+                                </configuration>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!--<plugin>-->
+                        <!--<groupId>org.apache.maven.plugins</groupId>-->
+                        <!--<artifactId>maven-antrun-plugin</artifactId>-->
+                        <!--<version>1.6</version>-->
+                        <!--<dependencies>-->
+                            <!--<dependency>-->
+                                <!--<groupId>org.apache.ant</groupId>-->
+                                <!--<artifactId>ant-jsch</artifactId>-->
+                                <!--<version>1.8.2</version>-->
+                            <!--</dependency>-->
+                            <!--<dependency>-->
+                                <!--<groupId>jsch</groupId>-->
+                                <!--<artifactId>jsch</artifactId>-->
+                                <!--<version>0.1.44</version>-->
+                            <!--</dependency>-->
+                        <!--</dependencies>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>upload-to-linux-repos</id>-->
+                                <!--<phase>deploy</phase>-->
+                                <!--<goals>-->
+                                    <!--<goal>run</goal>-->
+                                <!--</goals>-->
+                                <!--<configuration>-->
+                                    <!--<target unless="no.installer.deploy">-->
+                                        <!--<scp todir="${sdk.scp.user}@${sdk.scp.host}:/var/packages/incoming" port="22" trust="true" verbose="true" keyfile="${sdk.scp.key}">-->
+                                            <!--<fileset dir="${project.build.directory}" casesensitive="yes">-->
+                                                <!--<include name="**/*.deb" />-->
+                                                <!--<include name="**/*.rpm" />-->
+                                            <!--</fileset>-->
+                                        <!--</scp>-->
+                                        <!--<sshexec host="${sdk.scp.host}" username="${sdk.scp.user}" keyfile="${sdk.scp.key}" command="chgrp developer-relations /var/packages/incoming/*" />-->
+                                        <!--<sshexec host="${sdk.scp.host}" username="${sdk.scp.user}" keyfile="${sdk.scp.key}" command="chmod 774 /var/packages/incoming/*" />-->
+                                    <!--</target>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
             <id>installer-linux</id>
             <build>
                 <finalName>atlassian-plugin-sdk</finalName>
