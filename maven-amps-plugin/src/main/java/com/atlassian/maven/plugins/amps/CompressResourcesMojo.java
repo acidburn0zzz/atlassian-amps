@@ -3,7 +3,7 @@ package com.atlassian.maven.plugins.amps;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -31,8 +31,14 @@ public class CompressResourcesMojo extends AbstractAmpsMojo
     @Parameter(defaultValue = "true")
     private boolean compressCss;
 
+    /**
+     * Options to pass to the closure compiler.  See http://javadoc.closure-compiler.googlecode.com/git/com/google/javascript/jscomp/CompilerOptions.html.  AMPS currently supports configuration of:
+     * <ul>
+     *     <li>languageIn</li>
+     * </ul>
+     */
     @Parameter
-    private HashMap <String,String> closureOptions;
+    private Map<String,String> closureOptions;
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         if (compressResources)

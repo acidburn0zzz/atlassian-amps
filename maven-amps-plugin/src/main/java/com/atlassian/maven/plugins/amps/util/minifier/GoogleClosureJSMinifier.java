@@ -6,7 +6,7 @@ import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.Compiler;
 import org.apache.maven.plugin.logging.Log;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @since version
@@ -15,7 +15,7 @@ public class GoogleClosureJSMinifier
 {
     private static CompilerOptions options;
 
-    public static void setOptions(HashMap<String,String> closureOptions, Log log)
+    public static void setOptions(Map<String,String> closureOptions, Log log)
     {
         GoogleClosureOptionsHandler googleClosureOptionsHandler = new GoogleClosureOptionsHandler(log);
         if(closureOptions != null && !closureOptions.isEmpty()) {
