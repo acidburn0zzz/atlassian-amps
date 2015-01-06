@@ -265,7 +265,6 @@
                                         <!--<scp todir="${sdk.scp.user}@${sdk.scp.host}:/var/packages/incoming" port="22" trust="true" verbose="true" keyfile="${sdk.scp.key}">-->
                                             <!--<fileset dir="${project.build.directory}" casesensitive="yes">-->
                                                 <!--<include name="**/*.deb" />-->
-                                                <!--<include name="**/*.rpm" />-->
                                             <!--</fileset>-->
                                         <!--</scp>-->
                                         <!--<sshexec host="${sdk.scp.host}" username="${sdk.scp.user}" keyfile="${sdk.scp.key}" command="chgrp developer-relations /var/packages/incoming/*" />-->
