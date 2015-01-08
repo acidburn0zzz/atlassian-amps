@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import com.yahoo.platform.yui.compressor.CssCompressor;
@@ -30,13 +31,14 @@ public class ResourcesMinifier
     {
     }
 
-    public static void minify(List<Resource> resources, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Log log) throws MojoExecutionException
+    public static void minify(List<Resource> resources, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Log log, Map<String,String> closureOptions) throws MojoExecutionException
     {
+        GoogleClosureJSMinifier.setOptions(closureOptions, log);
         if(null == INSTANCE)
         {
             INSTANCE = new ResourcesMinifier();
         }
-        
+
         for(Resource resource : resources)
         {
             INSTANCE.processResource(resource,outputDir,compressJs, compressCss, useClosureForJs, cs, log);
@@ -177,7 +179,7 @@ public class ResourcesMinifier
                 log.debug("compressing to " + destFile.getAbsolutePath());
                 if(useClosure)
                 {
-                    closureJsCompile(sourceFile, destFile, cs);
+                    closureJsCompile(sourceFile, destFile, cs, log);
                 }
                 else
                 {
@@ -233,7 +235,7 @@ public class ResourcesMinifier
         log.info(numberOfMinifiedFile + " CSS file(s) were minified into target directory " + destDir.getAbsolutePath());
     }
 
-    private void closureJsCompile(File sourceFile, File destFile, Charset cs) throws MojoExecutionException
+    private void closureJsCompile(File sourceFile, File destFile, Charset cs, Log log) throws MojoExecutionException
     {
         try
         {
