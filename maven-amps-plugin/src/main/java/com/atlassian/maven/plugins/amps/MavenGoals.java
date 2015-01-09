@@ -34,6 +34,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -104,6 +105,7 @@ public class MavenGoals
                 put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.2"));
                 put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
                 put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","2.5.3"));
+                put("bndlib", overrides.getProperty("bndlib","2.4.0"));
                 put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.3.0"));
                 put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","1.7"));
                 put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.3"));
@@ -988,27 +990,27 @@ public class MavenGoals
         String actualShutdownTimeout = webappContext.getSynchronousStartup() ? "0" : String.valueOf(webappContext.getShutdownTimeout());
 
         executeMojoExcludeProductCargoConfig(
-        cargo(webappContext),
-        goal("stop"),
-        configuration(
-             element(name("container"),
-                     element(name("containerId"), container.getId()),
-                     element(name("type"), container.getType()),
-                     element(name("timeout"), actualShutdownTimeout),
-                     // org.codehaus.cargo
-                     element(name("home"), container.getInstallDirectory(getBuildDirectory()))
-             ),
-             element(name("configuration"),
-                     // org.twdata.maven
-                     element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId)),
+                cargo(webappContext),
+                goal("stop"),
+                configuration(
+                        element(name("container"),
+                                element(name("containerId"), container.getId()),
+                                element(name("type"), container.getType()),
+                                element(name("timeout"), actualShutdownTimeout),
+                                // org.codehaus.cargo
+                                element(name("home"), container.getInstallDirectory(getBuildDirectory()))
+                        ),
+                        element(name("configuration"),
+                                // org.twdata.maven
+                                element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId)),
                      /*,
                      // we don't need that atm. since timeout is 0 for org.codehaus.cargo
                       */
-                     //hoping this will fix AMPS-987
-                     element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext))
-             )
-        ),
-        executionEnvironment()
+                                //hoping this will fix AMPS-987
+                                element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext))
+                        )
+                ),
+                executionEnvironment()
         );
     }
 
@@ -1361,12 +1363,20 @@ public class MavenGoals
         {
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
+        // AMPS-1211: maven-bundle-plugin 2.5.3 broke manifest. Add bndlib dependency for work around solution
+        final Plugin bndPlugin = plugin(
+                groupId("org.apache.felix"),
+                artifactId("maven-bundle-plugin"),
+                version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
+        );
+        final Dependency bndLib = new Dependency();
+        bndLib.setGroupId(groupId("biz.aQute.bnd"));
+        bndLib.setArtifactId(artifactId("bndlib"));
+        bndLib.setVersion(defaultArtifactIdToVersionMap.get("bndlib"));
+        bndPlugin.addDependency(bndLib);
+
         executeMojo(
-                plugin(
-                        groupId("org.apache.felix"),
-                        artifactId("maven-bundle-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
-                ),
+                bndPlugin,
                 goal("manifest"),
                 configuration(
                         element(name("supportedProjectTypes"),
@@ -1397,12 +1407,20 @@ public class MavenGoals
         {
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
+        // AMPS-1211: maven-bundle-plugin 2.5.3 broke manifest. Add bndlib dependency for work around solution
+        final Plugin bndPlugin = plugin(
+                groupId("org.apache.felix"),
+                artifactId("maven-bundle-plugin"),
+                version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
+        );
+        final Dependency bndLib = new Dependency();
+        bndLib.setGroupId(groupId("biz.aQute.bnd"));
+        bndLib.setArtifactId(artifactId("bndlib"));
+        bndLib.setVersion(defaultArtifactIdToVersionMap.get("bndlib"));
+        bndPlugin.addDependency(bndLib);
+
         executeMojo(
-                plugin(
-                        groupId("org.apache.felix"),
-                        artifactId("maven-bundle-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
-                ),
+                bndPlugin,
                 goal("manifest"),
                 configuration(
                         element(name("manifestLocation"),"${project.build.testOutputDirectory}/META-INF"),
@@ -1525,12 +1543,19 @@ public class MavenGoals
 
     public void generateObrXml(File dep, File obrXml) throws MojoExecutionException
     {
+        // AMPS-1211: maven-bundle-plugin 2.5.3 broke manifest. Add bndlib dependency for work around solution
+        final Plugin bndPlugin = plugin(
+                groupId("org.apache.felix"),
+                artifactId("maven-bundle-plugin"),
+                version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
+        );
+        final Dependency bndLib = new Dependency();
+        bndLib.setGroupId(groupId("biz.aQute.bnd"));
+        bndLib.setArtifactId(artifactId("bndlib"));
+        bndLib.setVersion(defaultArtifactIdToVersionMap.get("bndlib"));
+        bndPlugin.addDependency(bndLib);
         executeMojo(
-                plugin(
-                        groupId("org.apache.felix"),
-                        artifactId("maven-bundle-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
-                ),
+                bndPlugin,
                 goal("install-file"),
                 configuration(
                         element(name("obrRepository"), obrXml.getPath()),
