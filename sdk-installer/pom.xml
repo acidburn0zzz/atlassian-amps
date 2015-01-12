@@ -142,7 +142,7 @@
                                 </goals>
                                 <configuration>
                                     <name>deb.version</name>
-                                    <value>${project.version}</value>
+                                    <value>${release.sdk.version}</value>
                                     <regex>-SNAPSHOT</regex>
                                     <replacement>~${snap.ts}</replacement>
                                     <failIfNoMatch>false</failIfNoMatch>
@@ -181,7 +181,7 @@
                                         <artifactItem>
                                             <groupId>${project.groupId}</groupId>
                                             <artifactId>atlassian-plugin-sdk</artifactId>
-                                            <version>${project.version}</version>
+                                            <version>${release.sdk.version}</version>
                                             <type>tar.gz</type>
                                             <overWrite>true</overWrite>
                                             <outputDirectory>${project.build.directory}/deb-work/usr/share/</outputDirectory>
@@ -226,7 +226,7 @@
                                     <executable>${project.basedir}/deb-builder.sh</executable>
                                     <outputFile>${project.build.directory}/dpkg-out.txt</outputFile>
                                     <arguments>
-                                        <argument>${project.version}</argument>
+                                        <argument>${release.sdk.version}</argument>
                                         <argument>${deb.version}</argument>
                                     </arguments>
                                 </configuration>
@@ -858,5 +858,6 @@
         <sdk.scp.user>${user.name}</sdk.scp.user>
         <sdk.scp.host>plugin-sdk-repo-fe.internal.atlassian.com</sdk.scp.host>
         <sdk.scp.key>${user.home}/.ssh/id_rsa</sdk.scp.key>
+        <release.sdk.version>${project.version}</release.sdk.version>
     </properties>
 </project>
