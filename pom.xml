@@ -8,7 +8,7 @@
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>5.0.13-SNAPSHOT</version>
+    <version>5.0.13</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
@@ -27,7 +27,7 @@
         <connection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</connection>
         <developerConnection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</developerConnection>
         <url>https://bitbucket.org/atlassian/amps</url>
-      <tag>HEAD</tag>
+      <tag>atlassian-amps-parent-5.0.13</tag>
   </scm>
 
     <issueManagement>
