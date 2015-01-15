@@ -13,8 +13,13 @@ import javax.inject.Named;
 public class MyPluginComponentImpl implements MyPluginComponent
 {
     @ComponentImport
+    private final ApplicationProperties applicationProperties;
+
     @Inject
-    private ApplicationProperties applicationProperties;
+    public MyPluginComponentImpl(final ApplicationProperties applicationProperties)
+    {
+        this.applicationProperties = applicationProperties;
+    }
 
     public String getName()
     {
