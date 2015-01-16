@@ -1,8 +1,8 @@
 package ut.${package};
 
 import org.junit.Test;
-import ${package}.MyPluginComponent;
-import ${package}.MyPluginComponentImpl;
+import ${package}.api.MyPluginComponent;
+import ${package}.impl.MyPluginComponentImpl;
 
 import static org.junit.Assert.assertEquals;
 

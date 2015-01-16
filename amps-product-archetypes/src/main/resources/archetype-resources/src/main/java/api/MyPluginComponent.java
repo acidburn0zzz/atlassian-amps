@@ -1,4 +1,4 @@
-package ${package};
+package ${package}.api;
 
 public interface MyPluginComponent
 {
