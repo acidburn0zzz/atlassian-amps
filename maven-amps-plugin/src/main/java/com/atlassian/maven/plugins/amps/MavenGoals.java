@@ -109,6 +109,7 @@ public class MavenGoals
                 put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.2"));
                 put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
                 put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","2.5.3"));
+                put("bndlib", overrides.getProperty("bndlib","2.4.0"));
                 put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.3.0"));
                 put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","1.7"));
                 put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.3"));
@@ -518,9 +519,9 @@ public class MavenGoals
         }
     }
 
-    public void compressResources(boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs) throws MojoExecutionException
+    public void compressResources(boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Map<String,String> closureOptions) throws MojoExecutionException
     {
-        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), new File(ctx.getProject().getBuild().getOutputDirectory()), compressJs, compressCss, useClosureForJs, cs, log);
+        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), new File(ctx.getProject().getBuild().getOutputDirectory()), compressJs, compressCss, useClosureForJs, cs, log, closureOptions);
         /*
         executeMojo(
                 plugin(
@@ -805,6 +806,23 @@ public class MavenGoals
         }
 
         return configuration(nonNullElements.toArray(new Element[nonNullElements.size()]));
+    }
+
+    private Plugin bndPlugin()
+    {
+        log.info("using maven-bundle-plugin v" + pluginArtifactIdToVersionMap.get("maven-bundle-plugin"));
+        // AMPS-1211: maven-bundle-plugin 2.5.3 broke manifest. Add bndlib dependency for work around solution
+        final Plugin bndPlugin = plugin(
+                groupId("org.apache.felix"),
+                artifactId("maven-bundle-plugin"),
+                version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
+        );
+        final Dependency bndLib = new Dependency();
+        bndLib.setGroupId(groupId("biz.aQute.bnd"));
+        bndLib.setArtifactId(artifactId("bndlib"));
+        bndLib.setVersion(defaultArtifactIdToVersionMap.get("bndlib"));
+        bndPlugin.addDependency(bndLib);
+        return bndPlugin;
     }
 
     /**
@@ -1387,11 +1405,7 @@ public class MavenGoals
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
         executeMojo(
-                plugin(
-                        groupId("org.apache.felix"),
-                        artifactId("maven-bundle-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
-                ),
+                bndPlugin(),
                 goal("manifest"),
                 configuration(
                         element(name("supportedProjectTypes"),
@@ -1423,11 +1437,7 @@ public class MavenGoals
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
         executeMojo(
-                plugin(
-                        groupId("org.apache.felix"),
-                        artifactId("maven-bundle-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
-                ),
+                bndPlugin(),
                 goal("manifest"),
                 configuration(
                         element(name("manifestLocation"),"${project.build.testOutputDirectory}/META-INF"),
@@ -1551,11 +1561,7 @@ public class MavenGoals
     public void generateObrXml(File dep, File obrXml) throws MojoExecutionException
     {
         executeMojo(
-                plugin(
-                        groupId("org.apache.felix"),
-                        artifactId("maven-bundle-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
-                ),
+                bndPlugin(),
                 goal("install-file"),
                 configuration(
                         element(name("obrRepository"), obrXml.getPath()),
