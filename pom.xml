@@ -88,7 +88,7 @@
                 <version>${guava.osgi.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.postgresql</groupId>
+                <groupId>postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgres.version}</version>
             </dependency>
@@ -400,7 +400,7 @@
         <stash.data.version>2.4.1</stash.data.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <maven.cli.version>1.0.11</maven.cli.version>
-        <postgres.version>9.1-901-1.jdbc4</postgres.version>
+        <postgres.version>9.0-801.jdbc4</postgres.version>
         <mysql.version>5.1.32</mysql.version>
         <oracle.version>11.2.0.2.0</oracle.version>
         <jtds.version>1.2.4</jtds.version>
