@@ -28,7 +28,7 @@ public class JiraDatabaseTest
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getDriver()).thenReturn("org.postgresql.Driver");
         final JiraDatabasePostgresImpl postgres = new JiraDatabasePostgresImpl(dataSource);
-        assertThat("database name should be : ddd", postgres.getDatabaseName("jdbc:postgresql:database"), equalTo("database"));
+        assertThat("database name should be : ddd", postgres.getDatabaseName("jdbc:postgresql:ddd"), equalTo("ddd"));
         assertThat("database name should be : eeee", postgres.getDatabaseName("jdbc:postgresql://host/eeee"), equalTo("eeee"));
         assertThat("database name should be : fff", postgres.getDatabaseName("jdbc:postgresql://host:6969/fff"), equalTo("fff"));
         assertThat("database name should be : ttttt", postgres.getDatabaseName("jdbc:postgresql://localhost:6969/ttttt?user=aaa&password=bbb&uuuuu=ppp"), equalTo("ttttt"));
