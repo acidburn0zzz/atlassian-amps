@@ -1,6 +1,0 @@
--s
-${project.build.directory}/it/settings.xml
--Dproduct.version=${product.version}
--Dproduct.data.version=${product.data.version}
--Dproduct.database.type=${product.database.type}
--Dpostgres.version=9.3-1102-jdbc41
