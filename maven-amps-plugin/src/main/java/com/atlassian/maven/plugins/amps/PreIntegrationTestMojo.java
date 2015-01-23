@@ -68,14 +68,14 @@ public class PreIntegrationTestMojo extends RunMojo
                             goals.runPreIntegrationTest(dataSource);
                             break;
                         case 0:
-                            throw new MojoExecutionException("Missing configuration dataSource");
+                            getLog().info("Missing configuration dataSource for pre-integration-test");
                         default:
                             getLog().info("Multiple dataSources does not support. Configuration has: " + dataSources.size() + " dataSources below");
                             for (DataSource dbSource : dataSources)
                             {
                                 getLog().info("Database URL: " + dbSource.getUrl());
                             }
-                            throw new MojoExecutionException("Could not support multiple dataSource");
+                            getLog().info("Could not support multiple dataSource");
                     }
                 }
             }
