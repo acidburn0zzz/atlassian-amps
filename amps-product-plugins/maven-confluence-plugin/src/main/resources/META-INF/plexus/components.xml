@@ -42,6 +42,9 @@
                                 com.atlassian.maven.plugins:maven-confluence-plugin:validate-test-manifest,
                                 com.atlassian.maven.plugins:maven-confluence-plugin:test-jar
                             </package>
+                            <pre-integration-test>
+                                com.atlassian.maven.plugins:maven-confluence-plugin:pre-integration-test
+                            </pre-integration-test>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-confluence-plugin:integration-test
                             </integration-test>

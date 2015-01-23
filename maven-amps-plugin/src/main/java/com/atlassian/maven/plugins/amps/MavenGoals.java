@@ -18,6 +18,8 @@ import java.util.Set;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
+import com.atlassian.maven.plugins.amps.product.jira.JiraDatabase;
+import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory;
 import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
 import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
@@ -46,6 +48,8 @@ import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
 import aQute.lib.osgi.Constants;
+
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.getJiraDatabaseFactory;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
@@ -120,7 +124,7 @@ public class MavenGoals
                 put("maven-surefire-plugin", overrides.getProperty("maven-surefire-plugin","2.12.4"));
                 put("maven-failsafe-plugin", overrides.getProperty("maven-failsafe-plugin","2.12.4"));
                 put("maven-exec-plugin", overrides.getProperty("maven-exec-plugin","1.2.1"));
-
+                put("sql-maven-plugin", overrides.getProperty("sql-maven-plugin", "1.5"));
             }};
     }
 
@@ -1010,22 +1014,20 @@ public class MavenGoals
         cargo(webappContext),
         goal("stop"),
         configuration(
-             element(name("container"),
-                     element(name("containerId"), container.getId()),
-                     element(name("type"), container.getType()),
-                     element(name("timeout"), actualShutdownTimeout),
-                     // org.codehaus.cargo
-                     element(name("home"), container.getInstallDirectory(getBuildDirectory()))
-             ),
-             element(name("configuration"),
-                     // org.twdata.maven
-                     element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId)),
-                     /*,
-                     // we don't need that atm. since timeout is 0 for org.codehaus.cargo
-                      */
-                     //hoping this will fix AMPS-987
-                     element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext))
-             )
+                element(name("container"),
+                        element(name("containerId"), container.getId()),
+                        element(name("type"), container.getType()),
+                        element(name("timeout"), actualShutdownTimeout),
+                        // org.codehaus.cargo
+                        element(name("home"), container.getInstallDirectory(getBuildDirectory()))
+                ),
+                element(name("configuration"),
+                        // org.twdata.maven
+                        element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId)),
+                        //we don't need that atm. since timeout is 0 for org.codehaus.cargo
+                        //hoping this will fix AMPS-987
+                        element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext))
+                )
         ),
         executionEnvironment()
         );
@@ -1168,6 +1170,26 @@ public class MavenGoals
         } else {
             log.info("Skipping failsafe IT failure verification.");
         }
+    }
+
+    public void runPreIntegrationTest(final DataSource dataSource) throws MojoExecutionException
+    {
+        final JiraDatabaseFactory factory = getJiraDatabaseFactory();
+        final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
+        final Xpp3Dom configuration = jiraDatabase.getPluginConfiguration();
+        final List<Dependency> libs = jiraDatabase.getDependencies();
+        final Plugin sqlMaven = plugin(
+                groupId("org.codehaus.mojo"),
+                artifactId("sql-maven-plugin"),
+                version(defaultArtifactIdToVersionMap.get("sql-maven-plugin"))
+        );
+        sqlMaven.getDependencies().addAll(libs);
+        executeMojo(
+                sqlMaven,
+                goal("execute"),
+                configuration,
+                executionEnvironment()
+        );
     }
 
     private void appendJunitCategoryToConfiguration(final String category, final Xpp3Dom config)
