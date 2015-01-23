@@ -19,6 +19,7 @@ import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 
 import com.google.common.annotations.VisibleForTesting;

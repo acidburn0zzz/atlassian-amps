@@ -92,6 +92,22 @@ public class DataSource
      */
     private List<LibArtifact> libArtifacts = Lists.newArrayList();
 
+    /**
+     * using for drop/create schema/database
+     * you can not drop your current connected database
+     */
+    private String defaultDatabase;
+
+    /**
+     * Database system user can drop/create schema/database/user
+     */
+    private String systemUsername;
+
+    /**
+     * Password of database system user. May be empty.
+     */
+    private String systemPassword;
+
     public DataSource()
     {
         // Default constructor
@@ -250,6 +266,37 @@ public class DataSource
         this.cargoString = cargoString;
     }
 
+
+    public String getDefaultDatabase()
+    {
+        return defaultDatabase;
+    }
+
+    public void setDefaultDatabase(String defaultDatabase)
+    {
+        this.defaultDatabase = defaultDatabase;
+    }
+
+    public String getSystemUsername()
+    {
+        return systemUsername;
+    }
+
+    public void setSystemUsername(String systemUsername)
+    {
+        this.systemUsername = systemUsername;
+    }
+
+    public String getSystemPassword()
+    {
+        return systemPassword;
+    }
+
+    public void setSystemPassword(String systemPassword)
+    {
+        this.systemPassword = systemPassword;
+    }
+
     @Override
     public String toString()
     {
@@ -258,5 +305,4 @@ public class DataSource
                 + libArtifacts + "]";
     }
 
-    
 }
