@@ -1011,27 +1011,25 @@ public class MavenGoals
         String actualShutdownTimeout = webappContext.getSynchronousStartup() ? "0" : String.valueOf(webappContext.getShutdownTimeout());
 
         executeMojoExcludeProductCargoConfig(
-            cargo(webappContext),
-            goal("stop"),
-            configuration(
-                    element(name("container"),
-                            element(name("containerId"), container.getId()),
-                            element(name("type"), container.getType()),
-                            element(name("timeout"), actualShutdownTimeout),
-                            // org.codehaus.cargo
-                            element(name("home"), container.getInstallDirectory(getBuildDirectory()))
-                    ),
-                    element(name("configuration"),
-                            // org.twdata.maven
-                            element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId)),
-                             /*,
-                             we don't need that atm. since timeout is 0 for org.codehaus.cargo
-                              */
-                            //hoping this will fix AMPS-987
-                            element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext))
-                    )
-            ),
-            executionEnvironment()
+        cargo(webappContext),
+        goal("stop"),
+        configuration(
+                element(name("container"),
+                        element(name("containerId"), container.getId()),
+                        element(name("type"), container.getType()),
+                        element(name("timeout"), actualShutdownTimeout),
+                        // org.codehaus.cargo
+                        element(name("home"), container.getInstallDirectory(getBuildDirectory()))
+                ),
+                element(name("configuration"),
+                        // org.twdata.maven
+                        element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId)),
+                        //we don't need that atm. since timeout is 0 for org.codehaus.cargo
+                        //hoping this will fix AMPS-987
+                        element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext))
+                )
+        ),
+        executionEnvironment()
         );
     }
 
