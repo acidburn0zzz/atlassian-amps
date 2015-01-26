@@ -21,8 +21,12 @@ public class PreIntegrationTestMojo extends RunMojo
     @Parameter (property = "maven.test.skip", defaultValue = "false")
     private boolean testsSkip;
 
-    @Parameter(property = "skipTests", defaultValue = "false")
+    @Parameter (property = "skipTests", defaultValue = "false")
     private boolean skipTests;
+
+    @Parameter (property = "db.dump.file.path")
+    private String dumpFilePath;
+
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
@@ -65,7 +69,7 @@ public class PreIntegrationTestMojo extends RunMojo
                             {
                                 dataSource.getLibArtifacts().add(new LibArtifact(productArtifact.getGroupId(), productArtifact.getArtifactId(), productArtifact.getVersion()));
                             }
-                            goals.runPreIntegrationTest(dataSource);
+                            goals.runPreIntegrationTest(dataSource, dumpFilePath);
                             break;
                         case 0:
                             getLog().info("Missing configuration dataSource for pre-integration-test");

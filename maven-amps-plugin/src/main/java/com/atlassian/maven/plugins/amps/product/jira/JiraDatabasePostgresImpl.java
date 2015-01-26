@@ -21,7 +21,7 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
     private static final String DROP_USER = "DROP USER IF EXISTS \"%s\";";
     private static final String CREATE_DATABASE = "CREATE DATABASE \"%s\";";
     private static final String CREATE_USER = "CREATE USER \"%s\" WITH PASSWORD '%s' ;";
-    private static final String GRANT_PERMISSION = "GRANT ALL PRIVILEGES ON DATABASE \"%s\" TO \"%s\";";
+    private static final String GRANT_PERMISSION = "ALTER ROLE \"%s\" superuser;";
 
     public JiraDatabasePostgresImpl(DataSource dataSource)
     {
@@ -55,7 +55,7 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
     @Override
     protected String grantPermissionForUser() throws MojoExecutionException
     {
-        return String.format(GRANT_PERMISSION, getDatabaseName(getDataSource().getUrl()), getDataSource().getUsername());
+        return String.format(GRANT_PERMISSION, getDataSource().getUsername());
     }
 
     /**
@@ -115,7 +115,7 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
     public Xpp3Dom getPluginConfiguration() throws MojoExecutionException
     {
         String sql = dropDatabase() + dropUser() + createDatabase() + createUser() + grantPermissionForUser();
-        Xpp3Dom pluginConfiguration = baseConfiguration();
+        Xpp3Dom pluginConfiguration = systemDatabaseConfiguration();
         pluginConfiguration.addChild(
                 element(name("sqlCommand"), sql).toDom()
         );

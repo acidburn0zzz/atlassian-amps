@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.atlassian.maven.plugins.amps.LibArtifact;
 import com.atlassian.maven.plugins.amps.DataSource;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -39,13 +40,25 @@ public abstract class AbstractJiraDatabase implements JiraDatabase
     protected abstract String createUser();
     protected abstract String grantPermissionForUser() throws MojoExecutionException;
 
-    protected Xpp3Dom baseConfiguration()
+    protected Xpp3Dom systemDatabaseConfiguration()
     {
         return configuration(
                 element(name("driver") , dataSource.getDriver()),
                 element(name("url"), dataSource.getDefaultDatabase()),
                 element(name("username"), dataSource.getSystemUsername()),
                 element(name("password"), dataSource.getSystemPassword()),
+                // we need commit transaction for drop database and then create them again
+                element(name("autocommit"), "true")
+        );
+    }
+
+    protected Xpp3Dom productDatabaseConfiguration()
+    {
+        return configuration(
+                element(name("driver") , dataSource.getDriver()),
+                element(name("url"), dataSource.getUrl()),
+                element(name("username"), dataSource.getUsername()),
+                element(name("password"), dataSource.getPassword()),
                 // we need commit transaction for drop database and then create them again
                 element(name("autocommit"), "true")
         );
@@ -70,5 +83,16 @@ public abstract class AbstractJiraDatabase implements JiraDatabase
             dependencies.add(dependency);
         }
         return dependencies;
+    }
+
+    @Override
+    public Xpp3Dom getConfigImportFile(String dumpFilePath)
+    {
+        Xpp3Dom pluginConfiguration = productDatabaseConfiguration();
+        pluginConfiguration.addChild(
+                element(name("srcFiles"),
+                        element(name("srcFile"), dumpFilePath)).toDom()
+        );
+        return pluginConfiguration;
     }
 }

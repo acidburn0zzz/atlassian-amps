@@ -63,7 +63,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
     public Xpp3Dom getPluginConfiguration()
     {
         String sql = dropDatabase() + dropUser() + createDatabase() + createUser() + grantPermissionForUser();
-        Xpp3Dom pluginConfiguration = baseConfiguration();
+        Xpp3Dom pluginConfiguration = systemDatabaseConfiguration();
         pluginConfiguration.addChild(
                 element(name("sqlCommand"), sql).toDom()
         );

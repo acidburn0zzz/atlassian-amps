@@ -1172,11 +1172,11 @@ public class MavenGoals
         }
     }
 
-    public void runPreIntegrationTest(final DataSource dataSource) throws MojoExecutionException
+    public void runPreIntegrationTest(final DataSource dataSource, final String dumpFilePath) throws MojoExecutionException
     {
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
-        final Xpp3Dom configuration = jiraDatabase.getPluginConfiguration();
+        final Xpp3Dom configDropCreateSchema = jiraDatabase.getPluginConfiguration();
         final List<Dependency> libs = jiraDatabase.getDependencies();
         final Plugin sqlMaven = plugin(
                 groupId("org.codehaus.mojo"),
@@ -1184,10 +1184,19 @@ public class MavenGoals
                 version(defaultArtifactIdToVersionMap.get("sql-maven-plugin"))
         );
         sqlMaven.getDependencies().addAll(libs);
+        // drop && create database schema
         executeMojo(
                 sqlMaven,
                 goal("execute"),
-                configuration,
+                configDropCreateSchema,
+                executionEnvironment()
+        );
+        final Xpp3Dom configImportDumpFile = jiraDatabase.getConfigImportFile(dumpFilePath);
+        // import database dump file
+        executeMojo(
+                sqlMaven,
+                goal("execute"),
+                configImportDumpFile,
                 executionEnvironment()
         );
     }
