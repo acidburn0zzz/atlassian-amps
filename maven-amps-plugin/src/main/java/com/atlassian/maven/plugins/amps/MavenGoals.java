@@ -100,7 +100,7 @@ public class MavenGoals
     private Map<String,String> getArtifactIdToVersionMap(MavenContext ctx)
     {
         final Properties overrides = ctx.getVersionOverrides();
-        
+
         return new HashMap<String, String>()
         {{
                 //overrides.getProperty(JUNIT_ARTIFACT_ID,"
@@ -566,7 +566,7 @@ public class MavenGoals
 
         XmlCompressor compressor = new XmlCompressor();
         File pluginXmlFile = new File(ctx.getProject().getBuild().getOutputDirectory(), "atlassian-plugin.xml");
-        
+
         if (pluginXmlFile.exists())
         {
             try
@@ -1191,14 +1191,17 @@ public class MavenGoals
                 configDropCreateSchema,
                 executionEnvironment()
         );
-        final Xpp3Dom configImportDumpFile = jiraDatabase.getConfigImportFile(dumpFilePath);
-        // import database dump file
-        executeMojo(
-                sqlMaven,
-                goal("execute"),
-                configImportDumpFile,
-                executionEnvironment()
-        );
+        if (StringUtils.isNotEmpty(dumpFilePath))
+        {
+            final Xpp3Dom configImportDumpFile = jiraDatabase.getConfigImportFile(dumpFilePath);
+            // import database dump file
+            executeMojo(
+                    sqlMaven,
+                    goal("execute"),
+                    configImportDumpFile,
+                    executionEnvironment()
+            );
+        }
     }
 
     private void appendJunitCategoryToConfiguration(final String category, final Xpp3Dom config)
