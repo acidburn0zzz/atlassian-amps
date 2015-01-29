@@ -108,6 +108,12 @@ public class DataSource
      */
     private String systemPassword;
 
+    /**
+     * Dump file path use for import data.
+     * AMPS is using JDBC for against crossed-database so this import file have to be standard SQL
+     */
+    private String dumpFilePath;
+
     public DataSource()
     {
         // Default constructor
@@ -295,6 +301,16 @@ public class DataSource
     public void setSystemPassword(String systemPassword)
     {
         this.systemPassword = systemPassword;
+    }
+
+    public String getDumpFilePath()
+    {
+        return dumpFilePath;
+    }
+
+    public void setDumpFilePath(String dumpFilePath)
+    {
+        this.dumpFilePath = dumpFilePath;
     }
 
     @Override
