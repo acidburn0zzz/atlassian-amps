@@ -297,7 +297,7 @@
                                 </goals>
                                 <configuration>
                                     <name>rpm.ts.version</name>
-                                    <value>${project.version}</value>
+                                    <value>${release.sdk.version}</value>
                                     <regex>-SNAPSHOT</regex>
                                     <replacement>_${snap.ts}_SNAPSHOT</replacement>
                                     <failIfNoMatch>false</failIfNoMatch>
@@ -350,7 +350,7 @@
                                         <artifactItem>
                                             <groupId>${project.groupId}</groupId>
                                             <artifactId>atlassian-plugin-sdk</artifactId>
-                                            <version>${project.version}</version>
+                                            <version>${release.sdk.version}</version>
                                             <type>tar.gz</type>
                                             <overWrite>true</overWrite>
                                             <outputDirectory>${project.build.directory}/rpm-work/unzip/usr/share/</outputDirectory>
@@ -395,7 +395,7 @@
                                     <executable>${project.basedir}/rpm-builder.sh</executable>
                                     <outputFile>${project.build.directory}/rpm-out.txt</outputFile>
                                     <arguments>
-                                        <argument>${project.version}</argument>
+                                        <argument>${release.sdk.version}</argument>
                                         <argument>${rpm.version}</argument>
                                     </arguments>
                                 </configuration>
