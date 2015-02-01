@@ -42,6 +42,9 @@
                                 com.atlassian.maven.plugins:maven-jira-plugin:validate-test-manifest,
                                 com.atlassian.maven.plugins:maven-jira-plugin:test-jar
                             </package>
+                            <pre-integration-test>
+                                com.atlassian.maven.plugins:maven-jira-plugin:pre-integration-test
+                            </pre-integration-test>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-jira-plugin:integration-test
                             </integration-test>

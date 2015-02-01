@@ -1,4 +1,4 @@
-package com.atlassian.maven.plugins.amps.product;
+package com.atlassian.maven.plugins.amps.product.jira;
 
 /**
  * Mapping database type by database uri prefix and database driver Please refer to the JIRA database documentation at
@@ -6,12 +6,13 @@ package com.atlassian.maven.plugins.amps.product;
  */
 public enum JiraDatabaseType
 {
-    HSQL("hsql", true, "jdbc:hsqldb", "org.hsqldb.jdbcDriver"),
-    MYSQL("mysql", false, "jdbc:mysql", "com.mysql.jdbc.Driver"),
-    POSTGRESQL("postgres72", true, "jdbc:postgresql", "org.postgresql.Driver"),
-    ORACLE("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver"),
-    MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
-    MSSQL_JTDS("mssql", true, "jdbc:jtds:sqlserver", "net.sourceforge.jtds.jdbc.Driver");
+    HSQL("hsql", true, "jdbc:hsqldb", "org.hsqldb.jdbcDriver", "org.hsqldb:hsqldb"),
+    H2("h2", true, "jdbc:h2", "org.h2.Driver", "com.h2database:h2"),
+    MYSQL("mysql", false, "jdbc:mysql", "com.mysql.jdbc.Driver", "mysql:mysql-connector-java"),
+    POSTGRES("postgres72", true, "jdbc:postgresql", "org.postgresql.Driver", "org.postgresql:postgresql"),
+    ORACLE("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "com.oracle:ojdbc6"),
+    MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds:jtds"),
+    MSSQL_JTDS("mssql", true, "jdbc:jtds", "net.sourceforge.jtds.jdbc.Driver", "net.sourceforge.jtds:jtds");
 
     public static JiraDatabaseType getDatabaseType(String uriPrefix, String driverClassName)
     {
@@ -30,13 +31,15 @@ public enum JiraDatabaseType
     private final boolean hasSchema;
     private final String uriPrefix;
     private final String driverClassName;
+    private final String libArtifact;
 
-    private JiraDatabaseType(final String dbType, final boolean hasSchema, final String uriPrefix, final String driverClassName)
+    private JiraDatabaseType(final String dbType, final boolean hasSchema, final String uriPrefix, final String driverClassName, final String libArtifact)
     {
         this.dbType = dbType;
         this.hasSchema = hasSchema;
         this.uriPrefix = uriPrefix;
         this.driverClassName = driverClassName;
+        this.libArtifact = libArtifact;
     }
 
     /**
@@ -58,5 +61,16 @@ public enum JiraDatabaseType
     public boolean hasSchema()
     {
         return this.hasSchema;
+    }
+
+    public String getLibArtifact()
+    {
+        return libArtifact;
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString();
     }
 }

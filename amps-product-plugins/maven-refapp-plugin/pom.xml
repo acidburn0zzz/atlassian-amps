@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-product-plugins</artifactId>
-        <version>5.0.11-SNAPSHOT</version>
+        <version>5.0.15-SNAPSHOT</version>
     </parent>
 
     <groupId>com.atlassian.maven.plugins</groupId>
@@ -35,6 +35,7 @@
                 <shitty.product>refapp</shitty.product>
                 <product.version>${refapp.version}</product.version>
                 <product.data.version>${refapp.data.version}</product.data.version>
+                <product.database.type>no-database-type</product.database.type>
             </properties>
         </profile>
     </profiles>
