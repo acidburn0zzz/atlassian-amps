@@ -354,17 +354,10 @@
             </properties>
         </profile>
         <profile>
-            <id>installer-linux-deb</id>
+            <id>installer-linux</id>
             <properties>
-                <release.profiles>release,installer-linux-deb</release.profiles>
-                <release.arguments>-Pinstaller-linux-deb</release.arguments>
-            </properties>
-        </profile>
-        <profile>
-            <id>installer-linux-rpm</id>
-            <properties>
-                <release.profiles>release,installer-linux-rpm</release.profiles>
-                <release.arguments>-Pinstaller-linux-rpm</release.arguments>
+                <release.profiles>release,installer-linux</release.profiles>
+                <release.arguments>-Pinstaller-linux</release.arguments>
             </properties>
         </profile>
     </profiles>
