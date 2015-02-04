@@ -36,7 +36,7 @@
 
     <ciManagement>
         <system>Bamboo</system>
-        <url>https://extranet-bamboo.internal.atlassian.com/browse/AMPS</url>
+        <url>https://ecosystem-bamboo.internal.atlassian.com/browse/AMPS</url>
     </ciManagement>
 
     <modules>
