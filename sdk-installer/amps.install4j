@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<install4j version="5.1.15" transformSequenceNumber="4">
+  <directoryPresets config="./images/win" />
+  <application name="atlassian-plugin-sdk-${compiler:project.version}" distributionSourceDir="" applicationId="0881-0243-3833-7987" mediaDir="${compiler:project.build.directory}" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.version}-${compiler:sys.platform}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="atlassian-plugin-sdk" publisher="Atlassian" publisherWeb="https://www.atlassia.com/" version="${compiler:project.version}" allPathsRelative="true" backupOnSave="false" autoSave="true" convertDotsToUnderscores="false" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
+    <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
+      <principalLanguage id="en" customLocalizationFile="./messages/messages_en.utf8" />
+      <additionalLanguages />
+    </languages>
+    <searchSequence>
+      <registry />
+      <envVar name="JAVA_HOME" />
+      <envVar name="JDK_HOME" />
+    </searchSequence>
+    <variables>
+      <variable name="project.version" value="5.0.14" description="" category="" />
+      <variable name="keystore.home" value="" description="" category="" />
+      <variable name="install4j.home" value="" description="" category="" />
+      <variable name="install.execution.mode" value="gui" description="" category="" />
+      <variable name="project.build.directory" value="" description="" category="" />
+      <variable name="sdk.unzip.directory" value="" description="" category="" />
+    </variables>
+    <mergedProjects />
+    <codeSigning macEnabled="false" macPkcs12File="./classes/amps-certs.p12" windowsEnabled="true" windowsKeySource="pvkAndSpc" windowsPvkFile="${compiler:keystore.home}/private.pvk" windowsSpcFile="${compiler:keystore.home}/atlassian.spc" windowsPkcs12File="" />
+  </application>
+  <files keepModificationTimes="false" missingFilesStrategy="warn" globalExcludeSuffixes="" defaultOverwriteMode="4" defaultUninstallMode="0" launcherOverwriteMode="3" defaultFileMode="644" defaultDirMode="755">
+    <filesets />
+    <roots />
+    <mountPoints>
+      <mountPoint id="135" root="" location="" mode="755" />
+    </mountPoints>
+    <entries>
+      <dirEntry mountPoint="135" file="${compiler:sdk.unzip.directory}" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="atlassian-plugin-sdk-5.0.15-SNAPSHOT" excludeSuffixes="" dirMode="755" overrideDirMode="false">
+        <exclude />
+      </dirEntry>
+    </entries>
+    <components />
+  </files>
+  <launchers />
+  <installerGui installerType="1" addOnAppId="" suggestPreviousLocations="true" autoUpdateDescriptorUrl="" useAutoUpdateBaseUrl="false" autoUpdateBaseUrl="">
+    <customCode />
+    <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
+      <commentFiles />
+      <customAttributes />
+    </autoUpdate>
+    <applications>
+      <application name="" id="installer" customizedId="" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" fileset="" customIcnsFile="" customIcoFile="./images/win/sdk-win-icon.ico" macEntitlementsFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
+        <serializedBean>
+          <java class="java.beans.XMLDecoder">
+            <object class="com.install4j.runtime.beans.applications.InstallerApplication">
+              <void property="customIconImageFiles">
+                <void method="add">
+                  <object class="com.install4j.api.beans.ExternalFile">
+                    <string>./images/win/sidebar-sdk-installer.png</string>
+                  </object>
+                </void>
+              </void>
+              <void property="useCustomIcon">
+                <boolean>true</boolean>
+              </void>
+            </object>
+          </java>
+        </serializedBean>
+        <launcherIds />
+        <variables />
+        <startup>
+          <screen name="" id="1" customizedId="" beanClass="com.install4j.runtime.beans.screens.StartupScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.StartupScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <group name="Setup Installer" id="126" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.groups.ActionGroup" />
+                  </java>
+                </serializedBean>
+                <beans>
+                  <action name="" id="13" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction">
+                          <void property="failIfNotObtainedMac">
+                            <boolean>false</boolean>
+                          </void>
+                          <void property="failIfNotObtainedWin">
+                            <boolean>false</boolean>
+                          </void>
+                          <void property="obtainIfNormalWin">
+                            <boolean>true</boolean>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>return !context.isUnattended(); // don't ask for priviligies in unattended mode</condition>
+                  </action>
+                  <action name="Check if installation has been elevated" id="134" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="Admin warning" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                          <void property="script">
+                            <object class="com.install4j.api.beans.ScriptProperty">
+                              <void property="value">
+                                <string>boolean hasFullAdminRights = false;
+
+// On MacOS we do not install Stash as a service
+if (!Util.isMacOS())
+{
+    hasFullAdminRights = Util.hasFullAdminRights();
+}
+
+context.setVariable("install.elevation", hasFullAdminRights); // if the process has been elevated
+context.setVariable("app.install.service", hasFullAdminRights); // if we should install as a service
+return true;</string>
+                              </void>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>return !context.isUnattended(); // don't ask for priviligies in unattended mode</condition>
+                  </action>
+                  <action name="Set installation directory variable" id="128" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetVariableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="3" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.SetVariableAction">
+                          <void property="script">
+                            <object class="com.install4j.api.beans.ScriptProperty">
+                              <void property="value">
+                                <string>String userHome = (String) context.getVariable("sys.userHome");
+
+if (Util.isMacOS())
+{
+    return userHome + File.separator + "Atlassian" + File.separator
+    + context.getCompilerVariable("sys.shortName");
+}
+
+if (Util.hasFullAdminRights())
+{
+    if (Util.isWindows())
+    {
+        return new File(File.separator + "Atlassian" + File.separator + context.getCompilerVariable("sys.shortName")).getAbsolutePath();
+    }
+    else if (new File("/opt").exists())
+    {
+        return File.separator + "opt" + File.separator + "atlassian" + File.separator
+        + context.getCompilerVariable("sys.shortName").toLowerCase();
+    }
+}
+else
+{
+    if (Util.isWindows() || Util.isMacOS())
+    {
+        return userHome + File.separator + "Atlassian" + File.separator
+        + context.getCompilerVariable("sys.shortName");
+    } else
+    {
+        return userHome + File.separator + "atlassian" + File.separator
+        + context.getCompilerVariable("sys.shortName").toLowerCase();
+    }
+}
+return "";</string>
+                              </void>
+                            </object>
+                          </void>
+                          <void property="variableName">
+                            <string>sys.installationDir</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>return !context.isUnattended();</condition>
+                  </action>
+                  <action name="Set home directory variable" id="125" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetVariableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="3" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.SetVariableAction">
+                          <void property="script">
+                            <object class="com.install4j.api.beans.ScriptProperty">
+                              <void property="value">
+                                <string>String userHome = (String) context.getVariable("sys.userHome");
+
+if (Util.isMacOS())
+{
+    return userHome + File.separator + "Atlassian" + File.separator
+    + context.getCompilerVariable("sys.shortName");
+}
+
+if (Util.hasFullAdminRights())
+{
+    if (Util.isWindows())
+    {
+        return new File(File.separator + "Atlassian" + File.separator + context.getCompilerVariable("sys.shortName")).getAbsolutePath();
+    }
+} 
+else
+{
+    if (Util.isWindows())
+    {
+        return userHome + File.separator + "Atlassian" + File.separator + context.getCompilerVariable("sys.shortName");
+    }
+}
+return "";</string>
+                              </void>
+                            </object>
+                          </void>
+                          <void property="variableName">
+                            <string>app.defaultSDKHome</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Set defaults Installation values" id="133" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                          <void property="script">
+                            <object class="com.install4j.api.beans.ScriptProperty">
+                              <void property="value">
+                                <string>if (context.getVariable("app.sdkHome") == null)
+{
+    String defaultHomeDir = (String) context.getVariable("app.defaultSdkHome"); // default home is set in the previous actions
+    context.setVariable("app.sdkHome", defaultHomeDir); // we use 'app.stashHome' in the Install actions
+}
+
+// Start Menu Item (Windows only)
+context.setVariable("app.programGroupName", context.getCompilerVariable("sys.shortName"));
+
+return true;</string>
+                              </void>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                </beans>
+              </group>
+            </actions>
+            <formComponents />
+          </screen>
+        </startup>
+        <screens>
+          <screen name="" id="2" customizedId="" beanClass="com.install4j.runtime.beans.screens.WelcomeScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.WelcomeScreen">
+                  <void property="updateCheck">
+                    <boolean>false</boolean>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <group name="Installation Questions" id="127" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.groups.ScreenGroup">
+                  <void property="conditionExpression">
+                    <object class="com.install4j.api.beans.ScriptProperty">
+                      <void property="value">
+                        <string>!context.isUnattended()</string>
+                      </void>
+                    </object>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <beans>
+              <screen name="" id="4" customizedId="" beanClass="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.screens.InstallationDirectoryScreen">
+                      <void property="existingDirWarning">
+                        <boolean>false</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+                <validation>File installationDir = null;
+try {
+    // Resolve the canonical path to remove any possible './' or '../' from the path
+    installationDir = context.getInstallationDirectory().getCanonicalFile();
+} catch (IOException e) {
+    // IOException would be rare but it could happen as canonical paths may require system interaction to be resolved
+    installationDir = context.getInstallationDirectory();
+}
+if (installationDir.getAbsolutePath().contains(" ")) {
+    Util.showErrorMessage(context.getMessage("sdk.installer.error.spaces.installation.dir") + ":" + installationDir.getAbsolutePath());
+    return false;
+}
+return true;</validation>
+                <preActivation />
+                <postActivation />
+                <actions />
+                <formComponents />
+              </screen>
+              <screen name="SDK Home location" id="123" customizedId="" beanClass="com.install4j.runtime.beans.screens.CustomizableDirectoryScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.screens.CustomizableDirectoryScreen">
+                      <void property="allowEmpty">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="infoText">
+                        <string>${i18n:sdk.installer.home.directory.info.text}</string>
+                      </void>
+                      <void property="initialDirectory">
+                        <string>${installer:app.defaultSDKHome}</string>
+                      </void>
+                      <void property="onlyWritable">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="subTitle">
+                        <string>${i18n:sdk.installer.home.directory.screen.subtitle}</string>
+                      </void>
+                      <void property="title">
+                        <string>${i18n:sdk.installer.home.directory.screen.title}</string>
+                      </void>
+                      <void property="variableName">
+                        <string>app.sdkHome</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+                <validation>String sdkHome = null;
+try {
+    // Resolve the canonical path to remove any possible './' or '../' from the path
+    sdkHome = new File((String) context.getVariable("app.sdkHome")).getCanonicalPath();
+} catch (IOException e) {
+    // IOException would be rare but it could happen as canonical paths may require system interaction to be resolved
+    sdkHome =  (String) context.getVariable("app.sdkHome");
+}
+
+if (sdkHome.contains(" ")) {
+    Util.showErrorMessage(context.getMessage("sdk.installer.error.spaces.installation.dir"));
+    return false;
+}
+
+return true;</validation>
+                <preActivation>if (context.isConsole()) {
+    Util.showMessage(context.getMessage("configure.installation.home.directory.screen.subtitle.console", new String[] {context.getCompilerVariable("sys.shortName")}));
+}</preActivation>
+                <postActivation />
+                <actions />
+                <formComponents />
+              </screen>
+              <group name="Windows" id="129" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.groups.ScreenGroup">
+                      <void property="conditionExpression">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>return Util.isWindows();</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <beans>
+                  <screen name="Select a Start Menu program group" id="130" customizedId="" beanClass="com.install4j.runtime.beans.screens.CustomizableProgramGroupScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.screens.CustomizableProgramGroupScreen">
+                          <void property="initialProgramGroup">
+                            <string>${compiler:sys.shortName}</string>
+                          </void>
+                          <void property="showWarningIfExists">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="subTitle">
+                            <string>Atlassian Plugin SDK</string>
+                          </void>
+                          <void property="title">
+                            <string>${i18n:menu.create.group}</string>
+                          </void>
+                          <void property="variableName">
+                            <string>app.programGroupName</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>String defaultStartMenuEntry = (String) context.getVariable("sys.programsDir") + "\\" + (String) context.getCompilerVariable("sys.shortName");
+return new File(defaultStartMenuEntry).exists();</condition>
+                    <validation />
+                    <preActivation />
+                    <postActivation />
+                    <actions />
+                    <formComponents />
+                  </screen>
+                </beans>
+              </group>
+            </beans>
+          </group>
+          <screen name="" id="8" customizedId="" beanClass="com.install4j.runtime.beans.screens.InstallationScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="true" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.InstallationScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="Create Home Directory" id="131" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                      <void property="script">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>File homeDir = new File((String)context.getVariable("app.sdkHome"));
+
+return homeDir.mkdirs();</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="9" customizedId="" beanClass="com.install4j.runtime.beans.actions.InstallFilesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="${i18n:FileCorrupted}">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.InstallFilesAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Set JAVA_HOME variable" id="132" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetVariableAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.SetVariableAction">
+                      <void property="script">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>return (String) context.getVariable("sys.preferredJre");</string>
+                          </void>
+                        </object>
+                      </void>
+                      <void property="variableName">
+                        <string>java.home</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="10" customizedId="" beanClass="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction">
+                      <void property="uninstallerMenuName">
+                        <string>${i18n:UninstallerMenuEntry(${compiler:sys.fullName})}</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition>!context.getBooleanVariable("sys.programGroupDisabled")</condition>
+              </action>
+              <action name="" id="11" customizedId="" beanClass="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction">
+                      <void property="itemName">
+                        <string>${compiler:sys.fullName} ${compiler:sys.version}</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="121" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.ModifyEnvironmentVariableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.misc.ModifyEnvironmentVariableAction">
+                      <void property="value">
+                        <string>${installer:app.sdkHome}</string>
+                      </void>
+                      <void property="variableName">
+                        <string>ATLAS_HOME</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="122" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.ModifyEnvironmentVariableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.misc.ModifyEnvironmentVariableAction">
+                      <void property="value">
+                        <string>${installer:app.sdkHome}\bin</string>
+                      </void>
+                      <void property="variableName">
+                        <string>Path</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+          <screen name="" id="12" customizedId="" beanClass="com.install4j.runtime.beans.screens.FinishedScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="true" wizardIndexChangeType="unchanged" wizardIndexKey="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.FinishedScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+        </screens>
+      </application>
+      <application name="" id="uninstaller" customizedId="" beanClass="com.install4j.runtime.beans.applications.UninstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" fileset="" customIcnsFile="" customIcoFile="" macEntitlementsFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
+        <serializedBean>
+          <java class="java.beans.XMLDecoder">
+            <object class="com.install4j.runtime.beans.applications.UninstallerApplication" />
+          </java>
+        </serializedBean>
+        <launcherIds />
+        <variables />
+        <startup>
+          <screen name="" id="14" customizedId="" beanClass="com.install4j.runtime.beans.screens.StartupScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.StartupScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="" id="20" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="21" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RequireInstallerPrivilegesAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.misc.RequireInstallerPrivilegesAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+        </startup>
+        <screens>
+          <screen name="" id="15" customizedId="" beanClass="com.install4j.runtime.beans.screens.UninstallWelcomeScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallWelcomeScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="16" customizedId="" beanClass="com.install4j.runtime.beans.screens.UninstallationScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallationScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="" id="17" customizedId="" beanClass="com.install4j.runtime.beans.actions.UninstallFilesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.UninstallFilesAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+          <screen name="" id="19" customizedId="" beanClass="com.install4j.runtime.beans.screens.UninstallFailureScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="true" wizardIndexChangeType="unchanged" wizardIndexKey="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallFailureScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="18" customizedId="" beanClass="com.install4j.runtime.beans.screens.UninstallSuccessScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="true" wizardIndexChangeType="unchanged" wizardIndexKey="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallSuccessScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+        </screens>
+      </application>
+    </applications>
+  </installerGui>
+  <mediaSets>
+    <windows name="Windows" id="26" customizedId="" mediaFileName="" installDir="${compiler:sys.publisher}" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="true" customInstallBaseDir="" contentFilesType="1" downloadURL="" verifyIntegrity="true">
+      <excludedLaunchers />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude />
+      <variables />
+      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
+        <commentFiles />
+        <customAttributes />
+      </autoUpdate>
+      <excludedComponents />
+      <includedDownloadableComponents />
+    </windows>
+  </mediaSets>
+  <buildIds buildAll="true" />
+  <buildOptions verbose="true" faster="false" disableSigning="false" debug="false" />
+</install4j>
+

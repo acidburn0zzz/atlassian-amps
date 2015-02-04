@@ -107,6 +107,115 @@
         </profile>
 
         <profile>
+            <id>installer-win-install4j</id>
+            <build>
+                <finalName>atlassian-plugin-sdk</finalName>
+
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-atlassian-keystore</id>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.atlassian.keystore</groupId>
+                                            <artifactId>atlassian-keystore</artifactId>
+                                            <version>1.3</version>
+                                            <outputDirectory>${keystore.location}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>unpack-for-windows</id>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>atlassian-plugin-sdk</artifactId>
+                                            <version>${release.sdk.version}</version>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/win-unzip</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.sonatype.install4j</groupId>
+                        <artifactId>install4j-maven-plugin</artifactId>
+                        <version>1.0.7</version>
+                        <executions>
+                            <execution>
+                                <id>install4j-windows</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <configuration>
+                                    <home>${install4j.home}</home>
+                                    <projectFile>${project.basedir}/amps.install4j</projectFile>
+                                    <mediaTypes>${install4j.mediaTypes}</mediaTypes>
+                                    <release>${release.sdk.version}</release>
+                                    <winKeystorePassword>${windows.keystore.password}</winKeystorePassword>
+                                    <variables>
+                                        <keystore.home>${keystore.location}/keystore/secure</keystore.home>
+                                        <project.version>${release.sdk.version}</project.version>
+                                        <project.build.directory>${project.build.directory}</project.build.directory>
+                                        <sdk.unzip.directory>${project.build.directory}/win-unzip/atlassian-plugin-sdk-${release.sdk.version}</sdk.unzip.directory>
+                                    </variables>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>${buildhelper.version}</version>
+                        <executions>
+                            <execution>
+                                <id>parse-win-version</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>parse-version</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>attach-win-installer</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>attach-artifact</goal>
+                                </goals>
+                                <configuration>
+                                    <artifacts>
+                                        <artifact>
+                                            <file>${project.build.directory}/media/atlassian-plugin-sdk-${release.sdk.version}-windows.exe</file>
+                                            <type>exe</type>
+                                        </artifact>
+                                    </artifacts>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
             <id>installer-linux</id>
             <build>
                 <finalName>atlassian-plugin-sdk</finalName>
@@ -512,6 +621,9 @@
     </profiles>
     <properties>
         <installbuilder.builder>/tools/installbuilder/bin/builder</installbuilder.builder>
+        <keystore.location>${project.build.directory}/atlassian-keystore</keystore.location>
+        <install4j.mediaTypes>windows</install4j.mediaTypes>
+        <install4j.home>/Applications/install4j_51</install4j.home>
         <buildhelper.version>1.7</buildhelper.version>
         <sdk.scp.user>${user.name}</sdk.scp.user>
         <sdk.scp.host>plugin-sdk-repo-fe.internal.atlassian.com</sdk.scp.host>
