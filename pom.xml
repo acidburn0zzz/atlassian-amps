@@ -24,8 +24,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</developerConnection>
+        <connection>scm:git:git@bitbucket.org:atlassian/amps.git</connection>
+        <developerConnection>scm:git:git@bitbucket.org:atlassian/amps.git</developerConnection>
         <url>https://bitbucket.org/atlassian/amps</url>
       <tag>HEAD</tag>
   </scm>
@@ -37,7 +37,7 @@
 
     <ciManagement>
         <system>Bamboo</system>
-        <url>https://extranet-bamboo.internal.atlassian.com/browse/AMPS</url>
+        <url>https://ecosystem-bamboo.internal.atlassian.com/browse/AMPS</url>
     </ciManagement>
 
     <modules>
@@ -86,6 +86,26 @@
                 <groupId>com.googlecode.guava-osgi</groupId>
                 <artifactId>guava-osgi</artifactId>
                 <version>${guava.osgi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgres.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc6</artifactId>
+                <version>${oracle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sourceforge.jtds</groupId>
+                <artifactId>jtds</artifactId>
+                <version>${jtds.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -381,6 +401,10 @@
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.6</atlassian.spring.scanner.version>
         <maven.cli.version>1.0.11</maven.cli.version>
+        <postgres.version>9.0-801.jdbc4</postgres.version>
+        <mysql.version>5.1.32</mysql.version>
+        <oracle.version>11.2.0.2.0</oracle.version>
+        <jtds.version>1.2.4</jtds.version>
         <release.profiles>release,installer-win,installer-linux,installer-osx</release.profiles>
         <release.arguments>-Pinstaller-win,installer-osx,installer-linux</release.arguments>
     </properties>

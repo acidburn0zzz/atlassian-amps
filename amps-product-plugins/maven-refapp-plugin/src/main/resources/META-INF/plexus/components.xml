@@ -36,6 +36,9 @@
                                 com.atlassian.maven.plugins:maven-refapp-plugin:generate-obr-artifact,
                                 com.atlassian.maven.plugins:maven-refapp-plugin:test-jar
                             </package>
+                            <pre-integration-test>
+                                com.atlassian.maven.plugins:maven-refapp-plugin:pre-integration-test
+                            </pre-integration-test>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-refapp-plugin:integration-test
                             </integration-test>

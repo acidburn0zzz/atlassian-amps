@@ -44,6 +44,7 @@
                 <shitty.product>confluence</shitty.product>
                 <product.version>${confluence.version}</product.version>
                 <product.data.version>${confluence.data.version}</product.data.version>
+                <product.database.type>no-database-type</product.database.type>
             </properties>
         </profile>
     </profiles>

@@ -33,6 +33,9 @@
                                 com.atlassian.maven.plugins:maven-stash-plugin:generate-obr-artifact,
                                 com.atlassian.maven.plugins:maven-stash-plugin:test-jar
                             </package>
+                            <pre-integration-test>
+                                com.atlassian.maven.plugins:maven-stash-plugin:pre-integration-test
+                            </pre-integration-test>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-stash-plugin:integration-test
                             </integration-test>
