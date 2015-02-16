@@ -26,7 +26,8 @@
                                 com.atlassian.maven.plugins:maven-refapp-plugin:generate-rest-docs
                             </process-classes>
                             <process-test-resources>
-                                org.apache.maven.plugins:maven-resources-plugin:testResources
+                                org.apache.maven.plugins:maven-resources-plugin:testResources,
+                                com.atlassian.maven.plugins:maven-jira-plugin:generate-test-manifest
                             </process-test-resources>
                             <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
                             <test>com.atlassian.maven.plugins:maven-refapp-plugin:unit-test</test>
