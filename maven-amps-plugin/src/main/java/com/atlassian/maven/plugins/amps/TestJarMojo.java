@@ -68,7 +68,7 @@ public class TestJarMojo extends AbstractAmpsMojo
                            "Bundle-SymbolicName: " + symbolicName + "\n" +
                            "Bundle-Version: 1.0\n" +
                            "Bundle-Name: " + finalName + "-tests\n" +
-                           "DynamicImport-Package: *\n" +
+                           "DynamicImport-Package: *\n" + 
                            "Atlassian-Plugin-Key: " + symbolicName + "\n"
                     );
                 }
