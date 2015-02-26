@@ -9,9 +9,6 @@
                     <lifecycle>
                         <id>default</id>
                         <phases>
-                            <generate-resources>
-                                com.atlassian.maven.plugins:maven-crowd-plugin:copy-bundled-dependencies
-                            </generate-resources>
                             <process-resources>
                                 com.atlassian.maven.plugins:maven-crowd-plugin:compress-resources,
                                 org.apache.maven.plugins:maven-resources-plugin:resources,
@@ -19,19 +16,20 @@
                             </process-resources>
                             <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
                             <process-classes>
-                                com.atlassian.maven.plugins:maven-crowd-plugin:generate-manifest,
                                 com.atlassian.maven.plugins:maven-crowd-plugin:generate-rest-docs
                             </process-classes>
-                            <generate-test-resources>
-                                com.atlassian.maven.plugins:maven-crowd-plugin:copy-test-bundled-dependencies
-                            </generate-test-resources>
                             <process-test-resources>
                                 org.apache.maven.plugins:maven-resources-plugin:testResources
                                 ,com.atlassian.maven.plugins:maven-crowd-plugin:filter-test-plugin-descriptor
-                                ,com.atlassian.maven.plugins:maven-crowd-plugin:generate-test-manifest
                             </process-test-resources>
                             <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
                             <test>com.atlassian.maven.plugins:maven-crowd-plugin:unit-test</test>
+                            <prepare-package>
+                                com.atlassian.maven.plugins:maven-crowd-plugin:copy-bundled-dependencies,
+                                com.atlassian.maven.plugins:maven-crowd-plugin:copy-test-bundled-dependencies,
+                                com.atlassian.maven.plugins:maven-crowd-plugin:generate-manifest,
+                                com.atlassian.maven.plugins:maven-crowd-plugin:generate-test-manifest
+                            </prepare-package>
                             <package>
                                 com.atlassian.maven.plugins:maven-crowd-plugin:validate-manifest,
                                 com.atlassian.maven.plugins:maven-crowd-plugin:jar,
