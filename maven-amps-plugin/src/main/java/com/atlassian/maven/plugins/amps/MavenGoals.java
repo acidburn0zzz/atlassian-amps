@@ -431,7 +431,7 @@ public class MavenGoals
                         element(name("excludeScope"), "provided"),
                         element(name("excludeScope"), "test"),
                         element(name("includeTypes"), "jar"),
-                        element(name("overwriteFiles"), "false"),
+                        //element(name("overwriteFiles"), "false"),
                         element(name("excludes"), "META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF, META-INF/spring/*"),
                         element(name("outputDirectory"), "${project.build.outputDirectory}")
                 ),
