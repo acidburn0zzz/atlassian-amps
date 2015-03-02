@@ -28,5 +28,10 @@ public interface JiraDatabase
      * http://mojo.codehaus.org/sql-maven-plugin/index.html
      * @return configuration
      */
-    Xpp3Dom getConfigImportFile(String dumpFilePath);
+    Xpp3Dom getConfigImportFile();
+
+    /**
+     * create exec-maven-plugin configuration to execute specific database tool
+     */
+    Xpp3Dom getConfigDatabaseTool() throws MojoExecutionException;
 }

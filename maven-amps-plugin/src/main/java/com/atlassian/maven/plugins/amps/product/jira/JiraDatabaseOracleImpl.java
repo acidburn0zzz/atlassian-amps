@@ -1,9 +1,12 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
 import com.atlassian.maven.plugins.amps.DataSource;
+import com.atlassian.maven.plugins.amps.product.ImportMethod;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
@@ -58,6 +61,22 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
         return getDataSource().getSchema();
     }
 
+    @Override
+    public Xpp3Dom getConfigDatabaseTool() throws MojoExecutionException
+    {
+        Xpp3Dom configDatabaseTool = null;
+        if (ImportMethod.IMPDB.toString().equals(getDataSource().getImportMethod()))
+        {
+            configDatabaseTool = configuration(
+                    element(name("executable"), "impdp"),
+                    element(name("arguments"),
+                            element(name("argument"), "DUMPFILE=" + getDataSource().getDumpFilePath()),
+                            element(name("argument"), "DIRECTORY=" + getDataSource().getUsername())
+                    )
+            );
+        }
+        return configDatabaseTool;
+    }
 
     @Override
     public Xpp3Dom getPluginConfiguration()

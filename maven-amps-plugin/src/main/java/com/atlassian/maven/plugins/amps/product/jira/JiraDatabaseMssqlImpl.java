@@ -6,10 +6,12 @@ import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 
 import com.atlassian.maven.plugins.amps.DataSource;
+import com.atlassian.maven.plugins.amps.product.ImportMethod;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
@@ -54,6 +56,24 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
     protected String grantPermissionForUser() throws MojoExecutionException
     {
         return String.format(GRANT_PERMISSION, getDatabaseName(getDataSource().getUrl()), getDataSource().getUsername());
+    }
+
+    @Override
+    public Xpp3Dom getConfigDatabaseTool() throws MojoExecutionException
+    {
+        Xpp3Dom configDatabaseTool = null;
+        if (ImportMethod.SQLCMD.toString().equals(getDataSource().getImportMethod()))
+        {
+            configDatabaseTool = configuration(
+                    element(name("executable"), "sqlcmd"),
+                    element(name("arguments"),
+                            element(name("argument"), "-E"),
+                            element(name("argument"), "-S default_server"),
+                            element(name("argument"), "-Q \"RESTORE DATABASE ["+ getDatabaseName(getDataSource().getUrl()) +"] FROM DISK='"+ getDataSource().getDumpFilePath() +"'\"")
+                    )
+            );
+        }
+        return configDatabaseTool;
     }
 
     /**

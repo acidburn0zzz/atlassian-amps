@@ -114,6 +114,15 @@ public class DataSource
      */
     private String dumpFilePath;
 
+    /**
+     * Import method define appropriate way to make import
+     * sql : AMPS will use JDBC to import SQL dump file, file must contain standard SQL
+     * psql: AMPS will use Postgres psql to import SQL dump file. Eg: psql -f jira_63_postgres91_dump.sql -U jira_user jiradb
+     * impdp: AMPS will use Oracle impdp to import dump file. Eg: impdp jira_user/jira_pwd directory=data_pump_dir DUMPFILE=<dumpFilePath>
+     * sqlcmd: AMPS will user SQL Server sqlcmd to restore backup file. Eg: sqlcmd -s localhost -Q "RESTORE DATABASE JIRA FROM DISK='d:\jira_63_sqlserver_2008.bak'"
+     */
+    private String importMethod = "sql";
+
     public DataSource()
     {
         // Default constructor
@@ -311,6 +320,16 @@ public class DataSource
     public void setDumpFilePath(String dumpFilePath)
     {
         this.dumpFilePath = dumpFilePath;
+    }
+
+    public String getImportMethod()
+    {
+        return importMethod;
+    }
+
+    public void setImportMethod(String importMethod)
+    {
+        this.importMethod = importMethod;
     }
 
     @Override

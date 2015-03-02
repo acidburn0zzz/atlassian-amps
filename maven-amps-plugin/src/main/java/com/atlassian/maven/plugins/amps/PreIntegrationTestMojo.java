@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps;
 
 import java.util.List;
 
+import com.atlassian.maven.plugins.amps.product.ImportMethod;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 
@@ -27,6 +28,9 @@ public class PreIntegrationTestMojo extends RunMojo
 
     @Parameter (property = "db.dump.file.path")
     private String dumpFilePath;
+
+    @Parameter (property = "import.method")
+    private String importMethod;
 
     @Parameter (property = "db.default.database")
     private String defaultDatabase;
@@ -79,7 +83,7 @@ public class PreIntegrationTestMojo extends RunMojo
                             {
                                 dataSource.getLibArtifacts().add(new LibArtifact(productArtifact.getGroupId(), productArtifact.getArtifactId(), productArtifact.getVersion()));
                             }
-
+                            getLog().info("Import method: " + importMethod);
                             populateDatasourceParameter(dataSource);
                             goals.runPreIntegrationTest(dataSource, dataSource.getDumpFilePath());
                             break;
@@ -115,6 +119,15 @@ public class PreIntegrationTestMojo extends RunMojo
         if (StringUtils.isNotEmpty(dumpFilePath))
         {
             dataSource.setDumpFilePath(dumpFilePath);
+        }
+        if (StringUtils.isNotEmpty(importMethod))
+        {
+            dataSource.setImportMethod(importMethod);
+        }
+        else
+        {
+            // default is import standard sql
+            dataSource.setImportMethod(ImportMethod.SQL.toString());
         }
     }
 }

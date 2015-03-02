@@ -86,13 +86,19 @@ public abstract class AbstractJiraDatabase implements JiraDatabase
     }
 
     @Override
-    public Xpp3Dom getConfigImportFile(String dumpFilePath)
+    public Xpp3Dom getConfigImportFile()
     {
         Xpp3Dom pluginConfiguration = productDatabaseConfiguration();
         pluginConfiguration.addChild(
                 element(name("srcFiles"),
-                        element(name("srcFile"), dumpFilePath)).toDom()
+                        element(name("srcFile"), getDataSource().getDumpFilePath())).toDom()
         );
         return pluginConfiguration;
+    }
+
+    @Override
+    public Xpp3Dom getConfigDatabaseTool() throws MojoExecutionException
+    {
+        return null;
     }
 }

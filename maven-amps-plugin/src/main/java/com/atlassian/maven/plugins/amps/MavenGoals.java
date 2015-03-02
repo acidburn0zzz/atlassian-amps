@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
+import com.atlassian.maven.plugins.amps.product.ImportMethod;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabase;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory;
 import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
@@ -1193,14 +1194,39 @@ public class MavenGoals
         );
         if (StringUtils.isNotEmpty(dumpFilePath))
         {
-            final Xpp3Dom configImportDumpFile = jiraDatabase.getConfigImportFile(dumpFilePath);
-            // import database dump file
-            executeMojo(
-                    sqlMaven,
-                    goal("execute"),
-                    configImportDumpFile,
-                    executionEnvironment()
-            );
+            File dumpFile = new File(dumpFilePath);
+            if(!dumpFile.exists() || !dumpFile.isFile())
+            {
+                throw new MojoExecutionException("SQL dump file does not exist: " + dumpFilePath);
+            }
+            if(ImportMethod.SQL.toString().equals(dataSource.getImportMethod()))
+            {
+                // jdbc against database
+                final Xpp3Dom configImportDumpFile = jiraDatabase.getConfigImportFile();
+                // import database dump file
+                executeMojo(
+                        sqlMaven,
+                        goal("execute"),
+                        configImportDumpFile,
+                        executionEnvironment()
+                );
+            }
+            else
+            {
+                // execute database tool to import/restore data
+                final Plugin execMaven = plugin(
+                        groupId("org.codehaus.mojo"),
+                        artifactId("exec-maven-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-exec-plugin"))
+                );
+                executeMojo(
+                        execMaven,
+                        goal("exec"),
+                        jiraDatabase.getConfigDatabaseTool(),
+                        executionEnvironment()
+                );
+            }
+
         }
     }
 
