@@ -10,7 +10,6 @@
                 <lifecycles>
                     <lifecycle>
                         <id>default</id>
-
                         <phases>
                             <process-resources>
                                 com.atlassian.maven.plugins:maven-fecru-plugin:compress-resources,
@@ -22,7 +21,7 @@
                                 com.atlassian.maven.plugins:maven-fecru-plugin:generate-rest-docs
                             </process-classes>
                             <process-test-resources>
-                                org.apache.maven.plugins:maven-resources-plugin:testResource,
+                                org.apache.maven.plugins:maven-resources-plugin:testResources,
                                 com.atlassian.maven.plugins:maven-fecru-plugin:filter-test-plugin-descriptor
                             </process-test-resources>
                             <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>

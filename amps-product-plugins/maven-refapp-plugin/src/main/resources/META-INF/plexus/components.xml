@@ -10,7 +10,6 @@
                 <lifecycles>
                     <lifecycle>
                         <id>default</id>
-
                         <phases>
                             <process-resources>
                                 com.atlassian.maven.plugins:maven-refapp-plugin:compress-resources,
