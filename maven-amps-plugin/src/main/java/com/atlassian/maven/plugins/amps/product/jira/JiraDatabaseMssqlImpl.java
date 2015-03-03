@@ -67,8 +67,7 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
             configDatabaseTool = configuration(
                     element(name("executable"), "sqlcmd"),
                     element(name("arguments"),
-                            element(name("argument"), "-E"),
-                            element(name("argument"), "-S default_server"),
+                            element(name("argument"), "-s localhost"),
                             element(name("argument"), "-Q \"RESTORE DATABASE ["+ getDatabaseName(getDataSource().getUrl()) +"] FROM DISK='"+ getDataSource().getDumpFilePath() +"'\"")
                     )
             );

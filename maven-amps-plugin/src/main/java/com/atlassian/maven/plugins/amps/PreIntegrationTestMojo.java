@@ -85,7 +85,7 @@ public class PreIntegrationTestMojo extends RunMojo
                             }
                             getLog().info("Import method: " + importMethod);
                             populateDatasourceParameter(dataSource);
-                            goals.runPreIntegrationTest(dataSource, dataSource.getDumpFilePath());
+                            goals.runPreIntegrationTest(dataSource);
                             break;
                         case 0:
                             getLog().info("Missing configuration dataSource for pre-integration-test");

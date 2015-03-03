@@ -1173,8 +1173,9 @@ public class MavenGoals
         }
     }
 
-    public void runPreIntegrationTest(final DataSource dataSource, final String dumpFilePath) throws MojoExecutionException
+    public void runPreIntegrationTest(final DataSource dataSource) throws MojoExecutionException
     {
+        final String dumpFilePath = dataSource.getDumpFilePath();
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
         final Xpp3Dom configDropCreateSchema = jiraDatabase.getPluginConfiguration();
@@ -1194,6 +1195,7 @@ public class MavenGoals
         );
         if (StringUtils.isNotEmpty(dumpFilePath))
         {
+            log.info("Do import for dump file: " + dumpFilePath);
             File dumpFile = new File(dumpFilePath);
             if(!dumpFile.exists() || !dumpFile.isFile())
             {
@@ -1201,13 +1203,11 @@ public class MavenGoals
             }
             if(ImportMethod.SQL.toString().equals(dataSource.getImportMethod()))
             {
-                // jdbc against database
-                final Xpp3Dom configImportDumpFile = jiraDatabase.getConfigImportFile();
-                // import database dump file
+                // Use JDBC to import dump file
                 executeMojo(
                         sqlMaven,
                         goal("execute"),
-                        configImportDumpFile,
+                        jiraDatabase.getConfigImportFile(),
                         executionEnvironment()
                 );
             }
@@ -1219,6 +1219,7 @@ public class MavenGoals
                         artifactId("exec-maven-plugin"),
                         version(defaultArtifactIdToVersionMap.get("maven-exec-plugin"))
                 );
+                // Use database specific tool to import dump file
                 executeMojo(
                         execMaven,
                         goal("exec"),
