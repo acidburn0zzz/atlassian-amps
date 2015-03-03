@@ -4,7 +4,7 @@
     <groupId>com.atlassian.amps.it</groupId>
     <artifactId>maven-amps-plugin-integration-test</artifactId>
     <version>testing</version>
-    <name>TestIntegrationTest</name>
+    <name>TestPreIntegrationTest</name>
     <packaging>atlassian-plugin</packaging>
 
     <properties>
@@ -39,7 +39,7 @@
                         <version>testing</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <dumpFilePath>jira_63_postgres91_dump_pure_sql.sql</dumpFilePath>
+                            <dumpFilePath>${project.build.directory}/it/preIntegrationTest/target/classes/jira_63_postgres91_dump_pure_sql.sql</dumpFilePath>
                             <importMethod>SQL</importMethod>
                             <libArtifacts>
                                 <libArtifact>
