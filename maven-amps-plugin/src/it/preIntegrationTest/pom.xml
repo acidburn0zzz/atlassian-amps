@@ -27,7 +27,7 @@
                 <dataSource.jndi>jdbc/JiraDS</dataSource.jndi>
                 <dataSource.defaultDatabase>jdbc:postgresql://localhost:5432/postgres</dataSource.defaultDatabase>
                 <dataSource.systemUsername>postgres</dataSource.systemUsername>
-                <dataSource.systemPassword />
+                <dataSource.systemPassword>postgres</dataSource.systemPassword>
                 <product>jira</product>
                 <instanceId>jira-postgres</instanceId>
             </properties>
