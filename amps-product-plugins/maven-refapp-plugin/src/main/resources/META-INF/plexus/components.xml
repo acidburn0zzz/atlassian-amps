@@ -21,12 +21,14 @@
                                 com.atlassian.maven.plugins:maven-refapp-plugin:generate-rest-docs
                             </process-classes>
                             <process-test-resources>
-                                org.apache.maven.plugins:maven-resources-plugin:testResources
+                                org.apache.maven.plugins:maven-resources-plugin:testResources,
+                                com.atlassian.maven.plugins:maven-refapp-plugin:filter-test-plugin-descriptor
                             </process-test-resources>
                             <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
                             <test>com.atlassian.maven.plugins:maven-refapp-plugin:unit-test</test>
                             <prepare-package>
                                 com.atlassian.maven.plugins:maven-refapp-plugin:copy-bundled-dependencies,
+                                com.atlassian.maven.plugins:maven-refapp-plugin:copy-test-bundled-dependencies,
                                 com.atlassian.maven.plugins:maven-refapp-plugin:generate-manifest,
                                 com.atlassian.maven.plugins:maven-refapp-plugin:generate-test-manifest
                             </prepare-package>
@@ -34,6 +36,7 @@
                                 com.atlassian.maven.plugins:maven-refapp-plugin:validate-manifest,
                                 com.atlassian.maven.plugins:maven-refapp-plugin:jar,
                                 com.atlassian.maven.plugins:maven-refapp-plugin:generate-obr-artifact,
+                                com.atlassian.maven.plugins:maven-refapp-plugin:validate-test-manifest,
                                 com.atlassian.maven.plugins:maven-refapp-plugin:test-jar
                             </package>
                             <pre-integration-test>

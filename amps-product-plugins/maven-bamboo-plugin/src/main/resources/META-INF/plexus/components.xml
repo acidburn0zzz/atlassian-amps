@@ -20,10 +20,10 @@
                             <process-classes>
                                 com.atlassian.maven.plugins:maven-bamboo-plugin:generate-rest-docs
                             </process-classes>
-                            <generate-test-resources>
+                            <process-test-resources>
                                 org.apache.maven.plugins:maven-resources-plugin:testResources,
                                 com.atlassian.maven.plugins:maven-bamboo-plugin:filter-test-plugin-descriptor
-                            </generate-test-resources>
+                            </process-test-resources>
                             <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
                             <test>com.atlassian.maven.plugins:maven-bamboo-plugin:unit-test</test>
                             <prepare-package>
