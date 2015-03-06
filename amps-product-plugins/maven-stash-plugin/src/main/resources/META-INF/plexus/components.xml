@@ -44,7 +44,10 @@
                                 com.atlassian.maven.plugins:maven-stash-plugin:integration-test
                             </integration-test>
                             <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-                            <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+                            <deploy>
+                                org.apache.maven.plugins:maven-deploy-plugin:deploy,
+                                com.atlassian.maven.plugins:maven-stash-plugin:release-notes,
+                            </deploy>
                         </phases>
                     </lifecycle>
                 </lifecycles>

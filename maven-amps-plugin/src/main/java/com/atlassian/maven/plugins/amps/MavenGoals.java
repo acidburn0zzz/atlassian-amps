@@ -125,6 +125,7 @@ public class MavenGoals
                 put("maven-failsafe-plugin", overrides.getProperty("maven-failsafe-plugin","2.12.4"));
                 put("maven-exec-plugin", overrides.getProperty("maven-exec-plugin","1.2.1"));
                 put("sql-maven-plugin", overrides.getProperty("sql-maven-plugin", "1.5"));
+                put("maven-http-client-plugin", overrides.getProperty("maven-http-client-plugin", "1.0.0-SNAPSHOT"));
             }};
     }
 
@@ -1551,6 +1552,30 @@ public class MavenGoals
                         element(name("finalName"), finalName),
                         element(name("archive"),
                                 element(name("manifestFile"), "${project.build.testOutputDirectory}/META-INF/MANIFEST.MF"))
+                ),
+                executionEnvironment()
+        );
+    }
+
+    public void releaseNotes(final String projectKey, final String space) throws MojoExecutionException
+    {
+        executeMojo(
+                plugin(
+                        groupId("com.google.code.maven.plugins"),
+                        artifactId("maven-http-client-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-http-client-plugin"))
+                ),
+                goal("execute"),
+                configuration(
+                        element(name("request"),
+                                element(name("url"), "http://localhost:1990/confluence/rest/releasenotes/1.0/create")),
+                                element(name("parameters"),
+                                        element(name("parameter"),
+                                                element(name("space"), space),
+                                                element(name("projectKey"), projectKey),
+                                                element(name("version"), executionEnvironment().getMavenProject().getVersion()),
+                                                element(name("module"), executionEnvironment().getMavenProject().getName())
+                                                ))
                 ),
                 executionEnvironment()
         );
