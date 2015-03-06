@@ -1561,16 +1561,18 @@ public class MavenGoals
         );
     }
 
-    public void releaseNotes(final String projectKey, final String space, String urlEndpoint) throws MojoExecutionException
+    public void releaseNotes(final String projectKey, final String space, String urlEndpoint, String releaseVersionNotes) throws MojoExecutionException
     {
         HttpURLConnection httpConnection = null;
         if(StringUtils.isEmpty(urlEndpoint))
             urlEndpoint = "http://localhost:1990/confluence/rest/releasenotes/1.0/create";
+        if(StringUtils.isEmpty(releaseVersionNotes))
+            releaseVersionNotes = "5.4.10";
         try{
             urlEndpoint = urlEndpoint +
                     "?space=" + space +
                     "&projectKey="+projectKey +
-                    "&version=" +executionEnvironment().getMavenProject().getVersion() +
+                    "&version=" +releaseVersionNotes +
                     "&module=" + executionEnvironment().getMavenProject().getName();
             log.info("Requesting to create release notes : " + urlEndpoint);
             final URL url = new URL(URLEncoder.encode(urlEndpoint, "UTF-8"));

@@ -19,8 +19,11 @@ public class ReleaseNotesMojo extends AbstractAmpsMojo
     @Parameter(property = "release.endpoint.url")
     private String urlEndpoint;
 
+    @Parameter(property = "release.version")
+    private String releaseVersionNotes;
+
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        getMavenGoals().releaseNotes(projectKey, space, urlEndpoint);
+        getMavenGoals().releaseNotes(projectKey, space, urlEndpoint, releaseVersionNotes);
     }
 }
