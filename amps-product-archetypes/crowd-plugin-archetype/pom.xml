@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.atlassian.amps</groupId>
 		<artifactId>atlassian-amps-product-archetypes</artifactId>
-		<version>5.0.17-release-notes-m003-SNAPSHOT</version>
+		<version>5.0.17-release-notes-m003</version>
 	</parent>
 
     <groupId>com.atlassian.maven.archetypes</groupId>
