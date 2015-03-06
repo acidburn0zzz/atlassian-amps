@@ -1560,6 +1560,7 @@ public class MavenGoals
 
     public void releaseNotes(final String projectKey, final String space, String urlEndpoint) throws MojoExecutionException
     {
+        HttpURLConnection httpConnection = null;
         if(StringUtils.isEmpty(urlEndpoint))
             urlEndpoint = "http://localhost:1990/confluence/rest/releasenotes/1.0/create";
         try{
@@ -1570,14 +1571,28 @@ public class MavenGoals
                     "&module=" + executionEnvironment().getMavenProject().getName();
             log.info("Requesting to create release notes : " + urlEndpoint);
             final URL url = new URL(urlEndpoint);
-            final HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
-            httpConnection.setRequestMethod("POST");
-
-            final String response = httpConnection.getResponseMessage();
-            log.info("Release notes created at : " + response);
+            httpConnection = (HttpURLConnection) url.openConnection();
+//            httpConnection.setRequestMethod("GET");
+            httpConnection.connect();
+            log.info("Release notes created at : " + httpConnection.getResponseMessage());
         }catch (Exception e)
         {
             log.error(e);
+        }
+
+        finally
+        {
+            if (httpConnection != null)
+            {
+                try
+                {
+                    httpConnection.getInputStream().close();
+                }
+                catch (IOException e)
+                {
+                    // Don't do anything
+                }
+            }
         }
     }
 
