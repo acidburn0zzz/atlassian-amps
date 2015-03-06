@@ -16,8 +16,11 @@ public class ReleaseNotesMojo extends AbstractAmpsMojo
     @Parameter(property = "release.space")
     private String space;
 
+    @Parameter(property = "release.endpoint.url")
+    private String urlEndpoint;
+
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        getMavenGoals().releaseNotes("STRM", "~admin");
+        getMavenGoals().releaseNotes(projectKey, space, urlEndpoint);
     }
 }

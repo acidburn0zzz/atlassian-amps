@@ -1557,8 +1557,10 @@ public class MavenGoals
         );
     }
 
-    public void releaseNotes(final String projectKey, final String space) throws MojoExecutionException
+    public void releaseNotes(final String projectKey, final String space, String urlEndpoint) throws MojoExecutionException
     {
+        if(StringUtils.isEmpty(urlEndpoint))
+            urlEndpoint = "localhost";
         executeMojo(
                 plugin(
                         groupId("com.google.code.maven.plugins"),
@@ -1568,7 +1570,7 @@ public class MavenGoals
                 goal("execute"),
                 configuration(
                         element(name("request"),
-                                element(name("url"), "http://localhost:1990/confluence/rest/releasenotes/1.0/create")),
+                                element(name("url"), "http://"+ urlEndpoint +":1990/confluence/rest/releasenotes/1.0/create")),
                                 element(name("parameters"),
                                         element(name("parameter"),
                                                 element(name("space"), space),
