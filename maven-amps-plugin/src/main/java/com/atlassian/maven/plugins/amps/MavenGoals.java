@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -1561,26 +1562,23 @@ public class MavenGoals
     {
         if(StringUtils.isEmpty(urlEndpoint))
             urlEndpoint = "http://localhost:1990/confluence/rest/releasenotes/1.0/create";
-        executeMojo(
-                plugin(
-                        groupId("com.google.code.maven.plugins"),
-                        artifactId("maven-http-client-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-http-client-plugin"))
-                ),
-                goal("execute"),
-                configuration(
-                        element(name("request"),
-                                element(name("url"), urlEndpoint)),
-                                element(name("parameters"),
-                                        element(name("parameter"),
-                                                element(name("space"), space),
-                                                element(name("projectKey"), projectKey),
-                                                element(name("version"), executionEnvironment().getMavenProject().getVersion()),
-                                                element(name("module"), executionEnvironment().getMavenProject().getName())
-                                                ))
-                ),
-                executionEnvironment()
-        );
+        try{
+            urlEndpoint = urlEndpoint +
+                    "?space=" + space +
+                    "&projectKey="+projectKey +
+                    "&version=" +executionEnvironment().getMavenProject().getVersion() +
+                    "&module=" + executionEnvironment().getMavenProject().getName();
+            log.info("Requesting to create release notes : " + urlEndpoint);
+            final URL url = new URL(urlEndpoint);
+            final HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
+            httpConnection.setRequestMethod("POST");
+
+            final String response = httpConnection.getResponseMessage();
+            log.info("Release notes created at : " + response);
+        }catch (Exception e)
+        {
+            log.error(e);
+        }
     }
 
     public void generateObrXml(File dep, File obrXml) throws MojoExecutionException
