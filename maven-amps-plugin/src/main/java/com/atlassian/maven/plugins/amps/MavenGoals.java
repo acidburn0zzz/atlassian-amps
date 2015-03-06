@@ -1,12 +1,15 @@
 package com.atlassian.maven.plugins.amps;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1570,11 +1573,17 @@ public class MavenGoals
                     "&version=" +executionEnvironment().getMavenProject().getVersion() +
                     "&module=" + executionEnvironment().getMavenProject().getName();
             log.info("Requesting to create release notes : " + urlEndpoint);
-            final URL url = new URL(urlEndpoint);
+            final URL url = new URL(URLEncoder.encode(urlEndpoint, "UTF-8"));
             httpConnection = (HttpURLConnection) url.openConnection();
-//            httpConnection.setRequestMethod("GET");
-            httpConnection.connect();
-            log.info("Release notes created at : " + httpConnection.getResponseMessage());
+            httpConnection.setRequestMethod("POST");
+            BufferedReader rd = new BufferedReader(new InputStreamReader(httpConnection.getInputStream()));
+            String s = null;
+            StringBuilder sb = new StringBuilder();
+            while( (s = rd.readLine()) !=null)
+            {
+                sb.append(s);
+            }
+            log.info("Release notes created at : " + sb.toString());
         }catch (Exception e)
         {
             log.error(e);
