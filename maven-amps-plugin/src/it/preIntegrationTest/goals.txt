@@ -1,1 +1,1 @@
-${shitty.product}:pre-integration-test -Dallow.google.tracking=false -DskipAllPrompts=true -Pjira-postgres
+${shitty.product}:pre-integration-test -Dallow.google.tracking=false -DskipAllPrompts=true -Pjira-${product.database.type}

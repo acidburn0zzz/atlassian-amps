@@ -17,11 +17,32 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
 public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
 {
-    private static final String DROP_DATABASE = "DROP DATABASE %s;";
-    private static final String DROP_USER = ";";
-    private static final String CREATE_DATABASE = "CREATE DATABASE %s;";
-    private static final String CREATE_USER = "";
-    private static final String GRANT_PERMISSION = "";
+    private static final String DROP_DATABASE =
+              "USE [master]; \n"
+            + "GO \n"
+            + "IF EXISTS(SELECT * FROM SYS.DATABASES WHERE name='%s') \n"
+            + "DROP DATABASE [%s];\n";
+    private static final String DROP_USER =
+              "USE [master]; \n"
+            + "GO \n"
+            + "IF EXISTS(SELECT * FROM SYS.SERVER_PRINCIPALS WHERE name = '%s') \n"
+            + "DROP LOGIN %s; \n";
+    private static final String CREATE_DATABASE =
+              "USE [master]; \n "
+            + "GO \n "
+            + "CREATE DATABASE [%s]; \n";
+    private static final String CREATE_USER =
+              "USE [master]; \n "
+            + "GO \n "
+            + "CREATE LOGIN %s WITH PASSWORD = '%s'; \n";
+    private static final String GRANT_PERMISSION =
+              "USE [%s];\n"
+            + "GO \n"
+            + "CREATE USER %s FROM LOGIN %s; \n"
+            + "GO \n"
+            + "EXEC SP_ADDROLEMEMBER 'DB_OWNER', '%s'; \n"
+            + "GO \n"
+            + "ALTER LOGIN %s WITH DEFAULT_DATABASE = [%s]; \n";
 
     public JiraDatabaseMssqlImpl(DataSource dataSource)
     {
@@ -31,13 +52,15 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
     @Override
     protected String dropDatabase() throws MojoExecutionException
     {
-        return String.format(DROP_DATABASE, getDatabaseName(getDataSource().getUrl()));
+        final String databaseName = getDatabaseName(getDataSource().getUrl());
+        return String.format(DROP_DATABASE, databaseName, databaseName);
     }
 
     @Override
     protected String dropUser()
     {
-        return String.format(DROP_USER, getDataSource().getUsername());
+        final String username = getDataSource().getUsername();
+        return String.format(DROP_USER, username, username );
     }
 
     @Override
@@ -109,7 +132,7 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
         }
         catch (SQLException e)
         {
-            throw new MojoExecutionException("");
+            throw new MojoExecutionException("Could not detect database name from url: " + url);
         }
         return null;
     }
