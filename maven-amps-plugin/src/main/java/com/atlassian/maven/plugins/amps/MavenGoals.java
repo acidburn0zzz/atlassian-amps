@@ -1574,8 +1574,9 @@ public class MavenGoals
                     "&projectKey="+projectKey +
                     "&version=" +releaseVersionNotes +
                     "&module=" + executionEnvironment().getMavenProject().getName();
+            urlEndpoint = urlEndpoint.replaceAll(" ", "%20");
             log.info("Requesting to create release notes : " + urlEndpoint);
-            final URL url = new URL(URLEncoder.encode(urlEndpoint, "UTF-8"));
+            final URL url = new URL(urlEndpoint);
             httpConnection = (HttpURLConnection) url.openConnection();
             httpConnection.setRequestMethod("POST");
             BufferedReader rd = new BufferedReader(new InputStreamReader(httpConnection.getInputStream()));
@@ -1586,6 +1587,7 @@ public class MavenGoals
                 sb.append(s);
             }
             log.info("Release notes created at : " + sb.toString());
+            rd.close();
         }catch (Exception e)
         {
             log.error(e);
@@ -1601,7 +1603,7 @@ public class MavenGoals
                 }
                 catch (IOException e)
                 {
-                    // Don't do anything
+                    log.error("Couldn't close http connection due to: " + e.getMessage());
                 }
             }
         }
