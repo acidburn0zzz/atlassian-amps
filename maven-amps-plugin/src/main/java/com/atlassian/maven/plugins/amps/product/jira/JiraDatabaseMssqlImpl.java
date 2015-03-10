@@ -141,6 +141,7 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
     public Xpp3Dom getPluginConfiguration() throws MojoExecutionException
     {
         String sql = dropDatabase() + dropUser() + createDatabase() + createUser() + grantPermissionForUser();
+        System.out.println(":::: MSSQL : " + sql);
         Xpp3Dom pluginConfiguration = systemDatabaseConfiguration();
         pluginConfiguration.addChild(
                 element(name("sqlCommand"), sql).toDom()

@@ -1187,6 +1187,7 @@ public class MavenGoals
         );
         sqlMaven.getDependencies().addAll(libs);
         // drop && create database schema
+        log.info("::: config drop & create schema: " + configDropCreateSchema.toString());
         executeMojo(
                 sqlMaven,
                 goal("execute"),
@@ -1213,7 +1214,6 @@ public class MavenGoals
             }
             else
             {
-                // execute database tool to import/restore data
                 final Plugin execMaven = plugin(
                         groupId("org.codehaus.mojo"),
                         artifactId("exec-maven-plugin"),
