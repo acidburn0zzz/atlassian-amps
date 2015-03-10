@@ -3,6 +3,7 @@ package com.atlassian.plugins.codegen.modules.jira;
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -11,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @since 3.6
  */
+@Ignore
 public class WebworkTest extends AbstractModuleCreatorTestCase<WebworkProperties>
 {
     protected ActionProperties action;
