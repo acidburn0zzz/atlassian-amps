@@ -87,11 +87,15 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
         Xpp3Dom configDatabaseTool = null;
         if (ImportMethod.SQLCMD.toString().equals(getDataSource().getImportMethod()))
         {
+            final String databaseName = getDatabaseName(getDataSource().getUrl());
             configDatabaseTool = configuration(
                     element(name("executable"), "sqlcmd"),
                     element(name("arguments"),
                             element(name("argument"), "-s localhost"),
-                            element(name("argument"), "-Q \"RESTORE DATABASE ["+ getDatabaseName(getDataSource().getUrl()) +"] FROM DISK='"+ getDataSource().getDumpFilePath() +"'\"")
+                            element(name("argument"), "-Q \"RESTORE DATABASE "
+                                    + "[" + databaseName + "] FROM DISK='" + getDataSource().getDumpFilePath() + "' "
+                                    + " WITH MOVE '" + databaseName + "' TO 'C:\\" + databaseName + ".mdf', "
+                                    + " WITH MOVE '" + databaseName + "_log' TO 'C:\\" + databaseName + "_log.ldf' \" ")
                     )
             );
         }
