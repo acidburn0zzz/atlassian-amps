@@ -117,6 +117,7 @@ public class MavenGoals
 
                 // You can't actually override the version a plugin if defined in the project, so these don't actually do
                 // anything, since the super pom already defines versions.
+                // TODO upgrade maven-dependency-plugin to the version contains new feature overwriteFiles
                 put("maven-dependency-plugin", overrides.getProperty("maven-dependency-plugin","2.5.1"));
                 put("maven-resources-plugin", overrides.getProperty("maven-resources-plugin","2.3"));
                 put("maven-jar-plugin", overrides.getProperty("maven-jar-plugin","2.2"));
@@ -430,6 +431,7 @@ public class MavenGoals
                         element(name("excludeScope"), "provided"),
                         element(name("excludeScope"), "test"),
                         element(name("includeTypes"), "jar"),
+                        //element(name("overwriteFiles"), "false"),
                         element(name("excludes"), "META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
                         element(name("outputDirectory"), "${project.build.outputDirectory}")
                 ),
