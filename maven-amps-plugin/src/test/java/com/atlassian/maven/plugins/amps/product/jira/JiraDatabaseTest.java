@@ -112,7 +112,7 @@ public class JiraDatabaseTest
     {
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final DataSource dataSource = mock(DataSource.class);
-        final String expectedSQLGenerated = "-Q \"RESTORE DATABASE [jiradb] FROM DISK='jira_63_mssql_dump.bak'  WITH MOVE 'jiradb' TO 'C:\\SQL\\jiradb.mdf',  WITH MOVE 'jiradb_log' TO 'C:\\SQL\\jiradb_log.ldf' \" ";
+        final String expectedSQLGenerated = "-Q \"RESTORE DATABASE [jiradb] FROM DISK='jira_63_mssql_dump.bak' WITH REPLACE \"";
         when(dataSource.getUrl()).thenReturn("jdbc:jtds:sqlserver://localhost:1433/jiradb");
         when(dataSource.getUsername()).thenReturn("jira_user");
         when(dataSource.getPassword()).thenReturn("jira_pwd");

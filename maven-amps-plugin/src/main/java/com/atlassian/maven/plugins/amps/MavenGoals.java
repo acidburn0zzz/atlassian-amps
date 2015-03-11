@@ -1214,16 +1214,18 @@ public class MavenGoals
             }
             else
             {
+                final Xpp3Dom configDatabaseTool = jiraDatabase.getConfigDatabaseTool();
                 final Plugin execMaven = plugin(
                         groupId("org.codehaus.mojo"),
                         artifactId("exec-maven-plugin"),
                         version(defaultArtifactIdToVersionMap.get("maven-exec-plugin"))
                 );
+                log.info("::: configDatabaseTool : " + configDatabaseTool.toString());
                 // Use database specific tool to import dump file
                 executeMojo(
                         execMaven,
                         goal("exec"),
-                        jiraDatabase.getConfigDatabaseTool(),
+                        configDatabaseTool,
                         executionEnvironment()
                 );
             }
