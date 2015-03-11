@@ -78,7 +78,9 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
     @Override
     protected String grantPermissionForUser() throws MojoExecutionException
     {
-        return String.format(GRANT_PERMISSION, getDatabaseName(getDataSource().getUrl()), getDataSource().getUsername());
+        final String username = getDataSource().getUsername();
+        final String databaseName = getDatabaseName(getDataSource().getUrl());
+        return String.format(GRANT_PERMISSION, databaseName, username, username, username, username, databaseName);
     }
 
     @Override
