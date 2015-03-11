@@ -19,29 +19,22 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
 {
     private static final String DROP_DATABASE =
               "USE [master]; \n"
-            + "GO \n"
             + "IF EXISTS(SELECT * FROM SYS.DATABASES WHERE name='%s') \n"
             + "DROP DATABASE [%s];\n";
     private static final String DROP_USER =
               "USE [master]; \n"
-            + "GO \n"
             + "IF EXISTS(SELECT * FROM SYS.SERVER_PRINCIPALS WHERE name = '%s') \n"
             + "DROP LOGIN %s; \n";
     private static final String CREATE_DATABASE =
               "USE [master]; \n "
-            + "GO \n "
             + "CREATE DATABASE [%s]; \n";
     private static final String CREATE_USER =
               "USE [master]; \n "
-            + "GO \n "
             + "CREATE LOGIN %s WITH PASSWORD = '%s'; \n";
     private static final String GRANT_PERMISSION =
               "USE [%s];\n"
-            + "GO \n"
             + "CREATE USER %s FROM LOGIN %s; \n"
-            + "GO \n"
             + "EXEC SP_ADDROLEMEMBER 'DB_OWNER', '%s'; \n"
-            + "GO \n"
             + "ALTER LOGIN %s WITH DEFAULT_DATABASE = [%s]; \n";
 
     public JiraDatabaseMssqlImpl(DataSource dataSource)
