@@ -95,10 +95,12 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
 //            );
 
             configDatabaseTool = configuration(
-                    element(name("executable"), "sqlcmd"),
+                    element(name("executable"), "Sqlcmd"),
                     element(name("arguments"),
-                            element(name("argument"), "-s localhost"),
-                            element(name("argument"), "-Q \"RESTORE DATABASE "
+                            element(name("argument"), "-s"),
+                            element(name("argument"), "localhost"),
+                            element(name("argument"), "-Q"),
+                            element(name("argument"), "\"RESTORE DATABASE "
                                     + "[" + databaseName + "] FROM DISK='" + getDataSource().getDumpFilePath() + "' WITH REPLACE \"")
                     )
             );

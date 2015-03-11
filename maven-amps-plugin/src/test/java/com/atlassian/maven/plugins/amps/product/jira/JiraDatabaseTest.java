@@ -112,7 +112,7 @@ public class JiraDatabaseTest
     {
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final DataSource dataSource = mock(DataSource.class);
-        final String expectedSQLGenerated = "-Q \"RESTORE DATABASE [jiradb] FROM DISK='jira_63_mssql_dump.bak' WITH REPLACE \"";
+        final String expectedSQLGenerated = "\"RESTORE DATABASE [jiradb] FROM DISK='jira_63_mssql_dump.bak' WITH REPLACE \"";
         when(dataSource.getUrl()).thenReturn("jdbc:jtds:sqlserver://localhost:1433/jiradb");
         when(dataSource.getUsername()).thenReturn("jira_user");
         when(dataSource.getPassword()).thenReturn("jira_pwd");
@@ -121,6 +121,6 @@ public class JiraDatabaseTest
         when(dataSource.getDumpFilePath()).thenReturn("jira_63_mssql_dump.bak");
         final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
 
-        assertThat("Generated SQL should be: " + expectedSQLGenerated, jiraDatabase.getConfigDatabaseTool().getChild("arguments").getChild(1).getValue(), equalTo(expectedSQLGenerated));
+        assertThat("Generated SQL should be: " + expectedSQLGenerated, jiraDatabase.getConfigDatabaseTool().getChild("arguments").getChild(3).getValue(), equalTo(expectedSQLGenerated));
     }
 }
