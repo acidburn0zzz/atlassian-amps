@@ -89,6 +89,7 @@ public class PreIntegrationTestMojo extends RunMojo
                             break;
                         case 0:
                             getLog().info("Missing configuration dataSource for pre-integration-test");
+                            break;
                         default:
                             getLog().info("Multiple dataSources does not support. Configuration has: " + dataSources.size() + " dataSources below");
                             for (DataSource dbSource : dataSources)
