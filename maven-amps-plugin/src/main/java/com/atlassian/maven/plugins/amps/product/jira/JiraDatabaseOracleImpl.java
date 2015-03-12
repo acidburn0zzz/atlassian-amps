@@ -12,12 +12,18 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
 public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
 {
-
-    private static final String DROP_DATABASE = "";
-    private static final String DROP_USER = "DROP USER %s CASCADE;\n";
-    private static final String CREATE_DATABASE = "";
-    private static final String CREATE_USER = "GRANT CONNECT, RESOURCE TO %s IDENTIFIED BY %s;\n";
-    private static final String GRANT_PERMISSION = "";
+    private static final String DROP_AND_CREATE_USER =
+            "DECLARE\n"
+            + "    v_count INTEGER := 0;\n"
+            + "BEGIN\n"
+            + "    SELECT COUNT (1) INTO v_count FROM dba_users WHERE username = UPPER ('%s'); \n"
+            + "    IF v_count != 0\n"
+            + "    THEN\n"
+            + "        EXECUTE IMMEDIATE('DROP USER %s CASCADE');\n"
+            + "    END IF;\n"
+            + "    EXECUTE IMMEDIATE('GRANT CONNECT, RESOURCE TO %s IDENTIFIED BY %s');\n"
+            + "END;\n"
+            + "/";
 
 
     public JiraDatabaseOracleImpl(DataSource dataSource)
@@ -28,31 +34,37 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
     @Override
     protected String dropDatabase()
     {
-        return DROP_DATABASE;
+        return null;
     }
 
     @Override
     protected String dropUser()
     {
-        return String.format(DROP_USER, getDataSource().getUsername());
+        return null;
     }
 
     @Override
     protected String createDatabase()
     {
-        return CREATE_DATABASE;
+        return null;
     }
 
     @Override
     protected String createUser()
     {
-        return String.format(CREATE_USER, getDataSource().getUsername(), getDataSource().getPassword());
+        return null;
+    }
+
+    private String getDropAndCreateUser()
+    {
+        return String.format(DROP_AND_CREATE_USER, getDataSource().getUsername(), getDataSource().getUsername(),
+                getDataSource().getUsername(), getDataSource().getPassword());
     }
 
     @Override
     protected String grantPermissionForUser()
     {
-        return GRANT_PERMISSION;
+        return null;
     }
 
     @Override
@@ -81,11 +93,14 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
     @Override
     public Xpp3Dom getPluginConfiguration()
     {
-        String sql = dropDatabase() + dropUser() + createDatabase() + createUser() + grantPermissionForUser();
+        // In oralce, user and schema is quite the same concept, create/drop user also create/drop schema.
+        String sql = getDropAndCreateUser();
         Xpp3Dom pluginConfiguration = systemDatabaseConfiguration();
         pluginConfiguration.addChild(
                 element(name("sqlCommand"), sql).toDom()
         );
+        pluginConfiguration.addChild(element(name("delimiter"), "/").toDom());
+        pluginConfiguration.addChild(element(name("delimiterType"), "row").toDom());
         return pluginConfiguration;
     }
 }

@@ -17,7 +17,7 @@ public class JiraDatabaseMysqlImpl extends AbstractJiraDatabase
 {
 
     private static final String DROP_DATABASE = "DROP DATABASE IF EXISTS `%s`;\n";
-    private static final String DROP_USER = "DROP USER `%s`@localhost;\n";
+    private static final String DROP_USER = "GRANT USAGE ON *.* TO `%s`@localhost;\nDROP USER `%s`@localhost;\n";
     private static final String CREATE_DATABASE = "CREATE DATABASE `%s` CHARACTER SET utf8 COLLATE utf8_bin;\n";
     private static final String CREATE_USER = "CREATE USER `%s`@localhost IDENTIFIED BY '%s';\n";
     private static final String GRANT_PERMISSION = "GRANT ALL ON `%s`.* TO `%s`@localhost;\n";
