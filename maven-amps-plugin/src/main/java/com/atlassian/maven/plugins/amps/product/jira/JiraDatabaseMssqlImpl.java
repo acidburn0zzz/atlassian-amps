@@ -101,7 +101,7 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
                             element(name("argument"), "localhost"),
                             element(name("argument"), "-Q"),
                             element(name("argument"), "\"RESTORE DATABASE "
-                                    + "[" + databaseName + "] FROM DISK='" + getDataSource().getDumpFilePath() + "' WITH REPLACE \"")
+                                    + "[" + databaseName + "] FROM DISK='" + getDataSource().getDumpFilePath() + "' WITH REPLACE; " + grantPermissionForUser() + " \"")
                     )
             );
         }

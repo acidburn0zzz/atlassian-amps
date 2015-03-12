@@ -85,13 +85,14 @@
             <properties>
                 <dataSource.url>jdbc:jtds:sqlserver://localhost:1433/jiradb</dataSource.url>
                 <dataSource.user>jira_user</dataSource.user>
-                <dataSource.password>jira_pwd</dataSource.password>
+                <dataSource.password>@!1234ABC</dataSource.password>
                 <dataSource.driver>net.sourceforge.jtds.jdbc.Driver</dataSource.driver>
                 <dataSource.jndi>jdbc/JiraDS</dataSource.jndi>
                 <dataSource.defaultDatabase>jdbc:jtds:sqlserver://localhost:1433/master</dataSource.defaultDatabase>
                 <dataSource.systemUsername>sa</dataSource.systemUsername>
                 <dataSource.systemPassword>@!1234abc</dataSource.systemPassword>
                 <dataSource.schema>dbo</dataSource.schema>
+                <instanceId>jira-mssql</instanceId>
             </properties>
             <build>
                 <plugins>
