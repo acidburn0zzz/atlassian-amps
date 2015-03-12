@@ -196,12 +196,12 @@
         <profile>
             <id>jira-oracle</id>
             <properties>
-                <dataSource.url>jdbc:oracle:thin:@172.18.0.159:1521:XE</dataSource.url>
+                <dataSource.url>jdbc:oracle:thin:@localhost:1521:XE</dataSource.url>
                 <dataSource.user>jirauser</dataSource.user>
                 <dataSource.password>jirauser</dataSource.password>
                 <dataSource.driver>oracle.jdbc.OracleDriver</dataSource.driver>
                 <dataSource.jndi>jdbc/JiraDS</dataSource.jndi>
-                <dataSource.defaultDatabase>jdbc:oracle:thin:@172.18.0.159:1521:XE</dataSource.defaultDatabase>
+                <dataSource.defaultDatabase>jdbc:oracle:thin:@localhost:1521:XE</dataSource.defaultDatabase>
                 <dataSource.systemUsername>system</dataSource.systemUsername>
                 <dataSource.systemPassword>manager</dataSource.systemPassword>
                 <instanceId>jira-oracle</instanceId>
