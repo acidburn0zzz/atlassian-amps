@@ -92,6 +92,7 @@
                 <dataSource.systemUsername>sa</dataSource.systemUsername>
                 <dataSource.systemPassword>@!1234abc</dataSource.systemPassword>
                 <dataSource.schema>dbo</dataSource.schema>
+                <instanceId>jira-mssql</instanceId>
             </properties>
             <build>
                 <plugins>
