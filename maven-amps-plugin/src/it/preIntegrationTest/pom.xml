@@ -140,12 +140,12 @@
         <profile>
             <id>jira-mysql</id>
             <properties>
-                <dataSource.url>jdbc:mysql://localhost/jiradb</dataSource.url>
+                <dataSource.url>jdbc:mysql://localhost:3307/jiradb</dataSource.url>
                 <dataSource.user>amps_user</dataSource.user>
                 <dataSource.password>amps_pwd</dataSource.password>
                 <dataSource.driver>com.mysql.jdbc.Driver</dataSource.driver>
                 <dataSource.jndi>jdbc/JiraDS</dataSource.jndi>
-                <dataSource.defaultDatabase>jdbc:mysql://localhost/mysql</dataSource.defaultDatabase>
+                <dataSource.defaultDatabase>jdbc:mysql://localhost:3307/mysql</dataSource.defaultDatabase>
                 <dataSource.systemUsername>root</dataSource.systemUsername>
                 <dataSource.systemPassword></dataSource.systemPassword>
                 <instanceId>jira-mysql</instanceId>
