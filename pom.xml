@@ -380,7 +380,7 @@
         <jdkLevel>1.6</jdkLevel>
         <build.maven.version>3.0.5</build.maven.version>
         <bundled.maven.version>3.2.1</bundled.maven.version>
-        <refapp.version>2.20.0-m2</refapp.version>
+        <refapp.version>2.20.0</refapp.version>
         <confluence.version>5.5</confluence.version>
         <confluence.data.version>5.5</confluence.data.version>
         <jira.version>5.2.11</jira.version>
@@ -395,7 +395,7 @@
         <crowd.data.version>2.5.2</crowd.data.version>
         <clover.version>3.1.7</clover.version>
         <studio.version>108.2</studio.version>
-        <studio.data.version>108.2-m0</studio.data.version>
+        <studio.data.version>108.2</studio.data.version>
         <stash.version>2.4.1</stash.version>
         <stash.data.version>2.4.1</stash.data.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
