@@ -4,7 +4,7 @@
 
 * [How to Release][2]
 * [Issues][1]
-* [Builds](https://extranet-bamboo.internal.atlassian.com/browse/AMPS)
+* [EcoBAC](https://ecosystem-bamboo.internal.atlassian.com/browse/AMPS)
 
 ## Using the Plugin SDK
 
@@ -25,6 +25,8 @@ If you want to submit bug fixes or improvements to the Plugin SDK, please assist
 1. Do not commit directly to the primary branch. Please either fork this repo or use a 'feature branch' and then create a Pull Request for your changes to be accepted. The Developer Relations team will review and merge your work.
 2. Create a JIRA Issue for any changes and prefix your commit messages with the relevant issue key.
 3. You are responsible for testing and verifying your own changes. Yes, the Plugin SDK is a complex beast that must run on a variety of platforms against a variety of Atlassian products and must remain very backwards compatible and this means making changes can be difficult - please be diligent in this and help make life better for everyone who has to work on this project! :)
+
+Atlassian developers, please see [The Platform Rules of Engagement (go/proe)](http://go.atlassian.com/proe).
 
 
 [1]: https://ecosystem.atlassian.net/browse/AMPS
