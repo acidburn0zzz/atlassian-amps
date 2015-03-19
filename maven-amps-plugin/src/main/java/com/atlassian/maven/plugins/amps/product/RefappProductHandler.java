@@ -109,6 +109,12 @@ public class RefappProductHandler extends AbstractWebappProductHandler
         return null;
     }
 
+    @Override
+    public String getDefaultContainerId()
+    {
+        return "tomcat8x";
+    }
+
     private static class RefappPluginProvider extends AbstractPluginProvider
     {
 
