@@ -71,7 +71,8 @@ public class MavenGoals
     static final String AJP_PORT_PROPERTY = "cargo.tomcat.ajp.port";
 
     private final Log log;
-    private final Map<String, String> pluginArtifactIdToVersionMap;
+    @VisibleForTesting
+    final Map<String, String> pluginArtifactIdToVersionMap;
     private final MavenContext ctx;
 
     private final Map<String, Container> idToContainerMap = new HashMap<String, Container>()

@@ -11,11 +11,16 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.jar.Manifest;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import com.google.common.collect.Iterables;
+import junit.framework.Assert;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecution;
@@ -220,6 +225,13 @@ public class TestMavenGoals
             }
         }
         fail("No element called " + AJP_PORT_PROPERTY);
+    }
+
+    @Test
+    public void bndlibNotOverridden() {
+        final Map<String, String> pluginArtifactIdToVersionMap = goals.pluginArtifactIdToVersionMap;
+        Assert.assertNull("Bndlib should not be overridden.", pluginArtifactIdToVersionMap.get("bndlib"));
+        Assert.assertNull("Bndlib should not be overridden.", pluginArtifactIdToVersionMap.get("biz.aQute.bndlib"));
     }
 
     private List<MojoExecutor.Element> getConfigurationProperties(final int ajpPort)
