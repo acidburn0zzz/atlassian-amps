@@ -32,6 +32,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositorySystemSession;
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -228,10 +229,11 @@ public class TestMavenGoals
     }
 
     @Test
-    public void bndlibNotOverridden() {
+    public void bndlibNotOverridden()
+    {
         final Map<String, String> pluginArtifactIdToVersionMap = goals.pluginArtifactIdToVersionMap;
-        Assert.assertNull("Bndlib should not be overridden.", pluginArtifactIdToVersionMap.get("bndlib"));
-        Assert.assertNull("Bndlib should not be overridden.", pluginArtifactIdToVersionMap.get("biz.aQute.bndlib"));
+        assertThat("Bndlib should not be overridden.", pluginArtifactIdToVersionMap.get("bndlib"), CoreMatchers.nullValue());
+        assertThat("Bndlib should not be overridden.", pluginArtifactIdToVersionMap.get("biz.aQute.bndlib"), CoreMatchers.nullValue());
     }
 
     private List<MojoExecutor.Element> getConfigurationProperties(final int ajpPort)
