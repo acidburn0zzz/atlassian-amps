@@ -1,10 +1,14 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
+import java.io.File;
+
 import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.product.ImportMethod;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -12,6 +16,9 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
 public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JiraDatabaseOracleImpl.class);
+    private static final String DATA_PUMP_DIR_JIRA = "DATA_PUMP_DIR_JIRA";
     private static final String DROP_AND_CREATE_USER =
             "DECLARE\n"
             + "    v_count INTEGER := 0;\n"
@@ -22,6 +29,8 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
             + "        EXECUTE IMMEDIATE('DROP USER %s CASCADE');\n"
             + "    END IF;\n"
             + "    EXECUTE IMMEDIATE('GRANT CONNECT, RESOURCE TO %s IDENTIFIED BY %s');\n"
+            + "    EXECUTE IMMEDIATE('CREATE DIRECTORY %s AS ''%s'';');\n"
+            + "    EXECUTE IMMEDIATE('GRANT READ, WRITE ON DIRECTORY %s TO %s;');\n"
             + "END;\n"
             + "/";
 
@@ -57,8 +66,16 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
 
     private String getDropAndCreateUser()
     {
-        return String.format(DROP_AND_CREATE_USER, getDataSource().getUsername(), getDataSource().getUsername(),
-                getDataSource().getUsername(), getDataSource().getPassword());
+        final String dumpFileDirectoryPath = (new File(getDataSource().getDumpFilePath())).getParent();
+        final String username = getDataSource().getUsername();
+        final String dropAndCreateUser = String.format(DROP_AND_CREATE_USER,
+                username, username,
+                username, getDataSource().getPassword()
+                ,DATA_PUMP_DIR_JIRA, dumpFileDirectoryPath,
+                DATA_PUMP_DIR_JIRA, username
+        );
+        LOG.info("Oracle drop and create user sql: " + dropAndCreateUser);
+        return dropAndCreateUser;
     }
 
     @Override
@@ -77,15 +94,18 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
     public Xpp3Dom getConfigDatabaseTool() throws MojoExecutionException
     {
         Xpp3Dom configDatabaseTool = null;
-        if (ImportMethod.IMPDB.toString().equals(getDataSource().getImportMethod()))
+        LOG.info("Oracle import method: " + getDataSource().getImportMethod());
+        if (ImportMethod.IMPDP.toString().equals(getDataSource().getImportMethod()))
         {
             configDatabaseTool = configuration(
                     element(name("executable"), "impdp"),
                     element(name("arguments"),
+                            element(name("argument"), "oracle/oracle"),
                             element(name("argument"), "DUMPFILE=" + getDataSource().getDumpFilePath()),
-                            element(name("argument"), "DIRECTORY=" + getDataSource().getUsername())
+                            element(name("argument"), "DIRECTORY=" + DATA_PUMP_DIR_JIRA)
                     )
             );
+            LOG.info("Configuration Oracle DB tool: " + configDatabaseTool);
         }
         return configDatabaseTool;
     }
