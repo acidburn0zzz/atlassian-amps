@@ -35,7 +35,7 @@ import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.ManifestException;
 
-import aQute.lib.osgi.Constants;
+import aQute.bnd.osgi.Constants;
 
 @Mojo(name = "remote-test", requiresDependencyResolution = ResolutionScope.TEST, defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST)
 @Execute(phase = LifecyclePhase.PACKAGE)
