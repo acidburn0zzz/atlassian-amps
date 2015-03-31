@@ -47,7 +47,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
-import aQute.lib.osgi.Constants;
+import aQute.bnd.osgi.Constants;
 
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.getJiraDatabaseFactory;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
@@ -71,7 +71,8 @@ public class MavenGoals
     static final String AJP_PORT_PROPERTY = "cargo.tomcat.ajp.port";
 
     private final Log log;
-    private final Map<String, String> pluginArtifactIdToVersionMap;
+    @VisibleForTesting
+    final Map<String, String> pluginArtifactIdToVersionMap;
     private final MavenContext ctx;
 
     private final Map<String, Container> idToContainerMap = new HashMap<String, Container>()
@@ -109,7 +110,6 @@ public class MavenGoals
                 put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.2"));
                 put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
                 put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","2.5.3"));
-                put("bndlib", overrides.getProperty("bndlib","2.4.0"));
                 put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.3.0"));
                 put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","1.7"));
                 put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.3"));
@@ -821,8 +821,8 @@ public class MavenGoals
         );
         final Dependency bndLib = new Dependency();
         bndLib.setGroupId(groupId("biz.aQute.bnd"));
-        bndLib.setArtifactId(artifactId("bndlib"));
-        bndLib.setVersion(defaultArtifactIdToVersionMap.get("bndlib"));
+        bndLib.setArtifactId(artifactId("biz.aQute.bndlib"));
+        bndLib.setVersion(version("2.4.1"));
         bndPlugin.addDependency(bndLib);
         return bndPlugin;
     }
