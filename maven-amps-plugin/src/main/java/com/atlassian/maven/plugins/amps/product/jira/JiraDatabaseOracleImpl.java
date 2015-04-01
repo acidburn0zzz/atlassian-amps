@@ -21,18 +21,18 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
     private static final String DATA_PUMP_DIR_JIRA = "DATA_PUMP_DIR_JIRA";
     private static final String DROP_AND_CREATE_USER =
             "DECLARE\n"
-            + "    v_count INTEGER := 0;\n"
-            + "BEGIN\n"
-            + "    SELECT COUNT (1) INTO v_count FROM dba_users WHERE username = UPPER ('%s'); \n"
-            + "    IF v_count != 0\n"
-            + "    THEN\n"
-            + "        EXECUTE IMMEDIATE('DROP USER %s CASCADE');\n"
-            + "    END IF;\n"
-            + "    EXECUTE IMMEDIATE('GRANT CONNECT, RESOURCE TO %s IDENTIFIED BY %s');\n"
-            + "    EXECUTE IMMEDIATE(q'{CREATE DIRECTORY %s AS '%s'}');\n"
-            + "    EXECUTE IMMEDIATE('GRANT READ, WRITE ON DIRECTORY %s TO %s');\n"
-            + "END;\n"
-            + "/";
+                    + "    v_count INTEGER := 0;\n"
+                    + "BEGIN\n"
+                    + "    SELECT COUNT (1) INTO v_count FROM dba_users WHERE username = UPPER ('%s'); \n"
+                    + "    IF v_count != 0\n"
+                    + "    THEN\n"
+                    + "        EXECUTE IMMEDIATE('DROP USER %s CASCADE');\n"
+                    + "    END IF;\n"
+                    + "    EXECUTE IMMEDIATE('GRANT CONNECT, RESOURCE TO %s IDENTIFIED BY %s');\n"
+                    + "    EXECUTE IMMEDIATE(q'{CREATE DIRECTORY %s AS '%s'}');\n"
+                    + "    EXECUTE IMMEDIATE('GRANT READ, WRITE ON DIRECTORY %s TO %s');\n"
+                    + "END;\n"
+                    + "/";
 
 
     public JiraDatabaseOracleImpl(DataSource dataSource)
@@ -71,7 +71,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
         final String dropAndCreateUser = String.format(DROP_AND_CREATE_USER,
                 username, username,
                 username, getDataSource().getPassword()
-                ,DATA_PUMP_DIR_JIRA, dumpFileDirectoryPath,
+                , DATA_PUMP_DIR_JIRA, dumpFileDirectoryPath,
                 DATA_PUMP_DIR_JIRA, username
         );
         LOG.info("Oracle drop and create user sql: " + dropAndCreateUser);
@@ -100,7 +100,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
             configDatabaseTool = configuration(
                     element(name("executable"), "impdp"),
                     element(name("arguments"),
-                            element(name("argument"), "oracle/oracle"),
+                            element(name("argument"), getDataSource().getSystemUsername() + "/" + getDataSource().getSystemPassword()),
                             element(name("argument"), "DUMPFILE=" + getDataSource().getDumpFilePath()),
                             element(name("argument"), "DIRECTORY=" + DATA_PUMP_DIR_JIRA)
                     )
