@@ -101,7 +101,8 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
             configDatabaseTool = configuration(
                     element(name("executable"), "impdp"),
                     element(name("arguments"),
-                            element(name("argument"), getDataSource().getUsername() + "/" + getDataSource().getPassword()),
+//                            element(name("argument"), getDataSource().getUsername() + "/" + getDataSource().getPassword()),
+                            element(name("argument"), getDataSource().getSystemUsername() + "/" + getDataSource().getSystemPassword()),
                             element(name("argument"), "DUMPFILE=" + dumpFile),
                             element(name("argument"), "DIRECTORY=" + DATA_PUMP_DIR_JIRA)
                     )
