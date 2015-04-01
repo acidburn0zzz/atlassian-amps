@@ -29,7 +29,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
                     + "        EXECUTE IMMEDIATE('DROP USER %s CASCADE');\n"
                     + "    END IF;\n"
                     + "    EXECUTE IMMEDIATE('GRANT CONNECT, RESOURCE TO %s IDENTIFIED BY %s');\n"
-                    + "    EXECUTE IMMEDIATE(q'{CREATE DIRECTORY %s AS '%s'}');\n"
+                    + "    EXECUTE IMMEDIATE(q'{CREATE OR REPLACE DIRECTORY %s AS '%s'}');\n"
                     + "    EXECUTE IMMEDIATE('GRANT READ, WRITE ON DIRECTORY %s TO %s');\n"
                     + "END;\n"
                     + "/";
@@ -100,7 +100,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
             configDatabaseTool = configuration(
                     element(name("executable"), "impdp"),
                     element(name("arguments"),
-                            element(name("argument"), getDataSource().getSystemUsername() + "/" + getDataSource().getSystemPassword()),
+                            element(name("argument"), getDataSource().getUsername() + "/" + getDataSource().getPassword()),
                             element(name("argument"), "DUMPFILE=" + getDataSource().getDumpFilePath()),
                             element(name("argument"), "DIRECTORY=" + DATA_PUMP_DIR_JIRA)
                     )
