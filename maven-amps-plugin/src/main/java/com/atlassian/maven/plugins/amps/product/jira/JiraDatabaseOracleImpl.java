@@ -28,7 +28,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
                     + "    THEN\n"
                     + "        EXECUTE IMMEDIATE('DROP USER %s CASCADE');\n"
                     + "    END IF;\n"
-                    + "    EXECUTE IMMEDIATE('GRANT CONNECT, RESOURCE TO %s IDENTIFIED BY %s');\n"
+                    + "    EXECUTE IMMEDIATE('GRANT CONNECT, RESOURCE, IMP_FULL_DATABASE TO %s IDENTIFIED BY %s');\n"
                     + "    EXECUTE IMMEDIATE(q'{CREATE OR REPLACE DIRECTORY %s AS '%s'}');\n"
                     + "    EXECUTE IMMEDIATE('GRANT READ, WRITE ON DIRECTORY %s TO %s');\n"
                     + "END;\n"
