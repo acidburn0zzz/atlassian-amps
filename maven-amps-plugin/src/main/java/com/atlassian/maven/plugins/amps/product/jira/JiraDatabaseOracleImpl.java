@@ -102,11 +102,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
             final String dumpFileName = dumpFile.getName();
             // grant executable on dump file for Oracle user to execute import
             dumpFile.setExecutable(true, false);
-            dumpFile.setReadable(true, false);
-            dumpFile.setWritable(true, false);
             dumpFileDirecotry.setExecutable(true, false);
-            dumpFileDirecotry.setWritable(true, false);
-            dumpFileDirecotry.setReadable(true, false);
             configDatabaseTool = configuration(
                     element(name("executable"), "impdp"),
                     element(name("arguments"),
