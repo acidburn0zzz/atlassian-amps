@@ -97,13 +97,18 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
         LOG.info("Oracle import method: " + getDataSource().getImportMethod());
         if (ImportMethod.IMPDP.toString().equals(getDataSource().getImportMethod()))
         {
-            final String dumpFile = ( new File(getDataSource().getDumpFilePath()) ).getName();
+            final File dumpFile = new File(getDataSource().getDumpFilePath());
+            final String dumpFileName = dumpFile.getName();
+            // grant executable on dump file for Oracle user to execute import
+            dumpFile.setExecutable(true, false);
+            dumpFile.setReadable(true, false);
+            dumpFile.setWritable(true, false);
             configDatabaseTool = configuration(
                     element(name("executable"), "impdp"),
                     element(name("arguments"),
                             element(name("argument"), getDataSource().getUsername() + "/" + getDataSource().getPassword()),
 //                            element(name("argument"), getDataSource().getSystemUsername() + "/" + getDataSource().getSystemPassword()),
-                            element(name("argument"), "DUMPFILE=" + dumpFile),
+                            element(name("argument"), "DUMPFILE=" + dumpFileName),
                             element(name("argument"), "DIRECTORY=" + DATA_PUMP_DIR)
                     )
             );
