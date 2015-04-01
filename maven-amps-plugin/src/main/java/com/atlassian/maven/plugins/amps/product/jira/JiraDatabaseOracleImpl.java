@@ -18,7 +18,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(JiraDatabaseOracleImpl.class);
-    private static final String DATA_PUMP_DIR_JIRA = "DATA_PUMP_DIR_JIRA";
+    private static final String DATA_PUMP_DIR = "DATA_PUMP_DIR";
     private static final String DROP_AND_CREATE_USER =
             "DECLARE\n"
                     + "    v_count INTEGER := 0;\n"
@@ -71,8 +71,8 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
         final String dropAndCreateUser = String.format(DROP_AND_CREATE_USER,
                 username, username,
                 username, getDataSource().getPassword()
-                , DATA_PUMP_DIR_JIRA, dumpFileDirectoryPath,
-                DATA_PUMP_DIR_JIRA, username
+                , DATA_PUMP_DIR, dumpFileDirectoryPath,
+                DATA_PUMP_DIR, username
         );
         LOG.info("Oracle drop and create user sql: " + dropAndCreateUser);
         return dropAndCreateUser;
@@ -104,7 +104,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
 //                            element(name("argument"), getDataSource().getUsername() + "/" + getDataSource().getPassword()),
                             element(name("argument"), getDataSource().getSystemUsername() + "/" + getDataSource().getSystemPassword()),
                             element(name("argument"), "DUMPFILE=" + dumpFile),
-                            element(name("argument"), "DIRECTORY=" + DATA_PUMP_DIR_JIRA)
+                            element(name("argument"), "DIRECTORY=" + DATA_PUMP_DIR)
                     )
             );
             LOG.info("Configuration Oracle DB tool: " + configDatabaseTool);
