@@ -1,5 +1,7 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
+import java.io.File;
+
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 import com.atlassian.plugins.codegen.ResourceFile;
 import com.atlassian.plugins.codegen.SourceFile;
@@ -55,7 +57,7 @@ public abstract class AbstractTabPanelTest extends AbstractModuleCreatorTestCase
     {
         props.setUseCustomClass(true);
 
-        getResourceFile("templates/tabpanels", "my-tab-panel.vm");
+        getResourceFile("templates" + File.separatorChar+ "tabpanels", "my-tab-panel.vm");
     }
     
     @Test
