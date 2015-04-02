@@ -32,7 +32,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
                     + "    SELECT COUNT (1) INTO v_count FROM dba_tablespaces WHERE tablespace_name = UPPER('jiradb2'); \n"
                     + "    IF v_count != 0\n"
                     + "    THEN\n"
-                    + "        EXECUTE IMMEDIATE('DROP TABLESPACE jiradb2 INCLUDING CONTENTS');\n"
+                    + "        EXECUTE IMMEDIATE('DROP TABLESPACE jiradb2 INCLUDING CONTENTS AND DATAFILES');\n"
                     + "    END IF;\n"
 
                     + "    EXECUTE IMMEDIATE(q'{CREATE TABLESPACE jiradb2 DATAFILE '/tmp/jiradb2.dbf' SIZE 32m AUTOEXTEND ON NEXT 32m MAXSIZE 4096m EXTENT MANAGEMENT LOCAL}');\n"
