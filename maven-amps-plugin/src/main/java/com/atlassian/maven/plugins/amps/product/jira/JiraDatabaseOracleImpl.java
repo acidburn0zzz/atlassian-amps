@@ -28,7 +28,9 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
                     + "    THEN\n"
                     + "        EXECUTE IMMEDIATE('DROP USER %s CASCADE');\n"
                     + "    END IF;\n"
-                    + "    EXECUTE IMMEDIATE('GRANT CONNECT, RESOURCE, IMP_FULL_DATABASE TO %s IDENTIFIED BY %s');\n"
+                    + "    EXECUTE IMMEDIATE(q'{CREATE TABLESPACE jiradb2 DATAFILE 'jiradb2.dbf' SIZE 32m AUTOEXTEND ON NEXT 32m MAXSIZE 4096m EXTENT MANAGEMENT LOCAL}');\n"
+                    + "    EXECUTE IMMEDIATE('CREATE USER %s IDENTIFIED BY %s DEFAULT TABLESPACE jiradb2 QUOTA UNLIMITED ON jiradb2');\n"
+                    + "    EXECUTE IMMEDIATE('GRANT CONNECT, RESOURCE, IMP_FULL_DATABASE TO %s');\n"
                     + "    EXECUTE IMMEDIATE(q'{CREATE OR REPLACE DIRECTORY %s AS '%s'}');\n"
                     + "    EXECUTE IMMEDIATE('GRANT READ, WRITE ON DIRECTORY %s TO %s');\n"
                     + "END;\n"
@@ -70,7 +72,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
         final String username = getDataSource().getUsername();
         final String dropAndCreateUser = String.format(DROP_AND_CREATE_USER,
                 username, username,
-                username, getDataSource().getPassword()
+                username, getDataSource().getPassword(), username
                 , DATA_PUMP_DIR, dumpFileDirectoryPath,
                 DATA_PUMP_DIR, username
         );
