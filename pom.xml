@@ -376,14 +376,6 @@
         </plugins>
     </reporting>
 
-    <repositories>
-        <repository>
-            <id>sdk-unmanaged</id>
-            <name>Atlassian SDK dependencies that are not present in maven central</name>
-            <url>file:${project.basedir}/repository</url>
-        </repository>
-    </repositories>
-
     <properties>
         <jdkLevel>1.6</jdkLevel>
         <build.maven.version>3.0.5</build.maven.version>
