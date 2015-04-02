@@ -35,7 +35,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
                     + "        EXECUTE IMMEDIATE('DROP TABLESPACE jiradb2 INCLUDING CONTENTS');\n"
                     + "    END IF;\n"
 
-                    + "    EXECUTE IMMEDIATE(q'{CREATE TABLESPACE jiradb2 DATAFILE '~/jiradb2.dbf' SIZE 32m AUTOEXTEND ON NEXT 32m MAXSIZE 4096m EXTENT MANAGEMENT LOCAL}');\n"
+                    + "    EXECUTE IMMEDIATE(q'{CREATE TABLESPACE jiradb2 DATAFILE '/tmp/jiradb2.dbf' SIZE 32m AUTOEXTEND ON NEXT 32m MAXSIZE 4096m EXTENT MANAGEMENT LOCAL}');\n"
                     + "    EXECUTE IMMEDIATE('CREATE USER %s IDENTIFIED BY %s DEFAULT TABLESPACE jiradb2 QUOTA UNLIMITED ON jiradb2');\n"
                     + "    EXECUTE IMMEDIATE('GRANT CONNECT, RESOURCE, IMP_FULL_DATABASE TO %s');\n"
                     + "    EXECUTE IMMEDIATE(q'{CREATE OR REPLACE DIRECTORY %s AS '%s'}');\n"
