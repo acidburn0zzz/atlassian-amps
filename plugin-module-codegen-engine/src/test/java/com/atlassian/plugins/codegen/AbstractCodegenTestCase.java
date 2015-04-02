@@ -207,4 +207,9 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
         failWithChangeset(changeset, "did not generate resource file " + path + "/" + filename);
         return null;
     }
+
+    protected boolean isWindowsOS()
+    {
+        return System.getProperty("os.name").startsWith("Windows");
+    }
 }
