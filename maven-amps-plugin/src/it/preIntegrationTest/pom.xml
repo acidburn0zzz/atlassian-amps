@@ -202,8 +202,8 @@
                 <dataSource.driver>oracle.jdbc.OracleDriver</dataSource.driver>
                 <dataSource.jndi>jdbc/JiraDS</dataSource.jndi>
                 <dataSource.defaultDatabase>jdbc:oracle:thin:@localhost:1521:XE</dataSource.defaultDatabase>
-                <dataSource.systemUsername>system</dataSource.systemUsername>
-                <dataSource.systemPassword>manager</dataSource.systemPassword>
+                <dataSource.systemUsername>oracle</dataSource.systemUsername>
+                <dataSource.systemPassword>oracle</dataSource.systemPassword>
                 <instanceId>jira-oracle</instanceId>
             </properties>
             <build>
