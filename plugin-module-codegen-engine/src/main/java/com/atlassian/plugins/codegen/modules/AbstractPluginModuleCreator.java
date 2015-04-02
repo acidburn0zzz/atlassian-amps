@@ -1,5 +1,6 @@
 package com.atlassian.plugins.codegen.modules;
 
+import java.io.File;
 import java.io.StringReader;
 import java.util.Map;
 import java.util.Properties;
@@ -37,7 +38,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
     public static final String FUNCT_TEST_SUFFIX = "FuncTest";
     public static final String GENERIC_TEMPLATE_PREFIX = "templates/generic/";
     public static final String GENERIC_TEST_TEMPLATE = GENERIC_TEMPLATE_PREFIX + "GenericTest.java.vtl";
-    public static final String TEMPLATES = "templates/";
+    public static final String TEMPLATES = "templates" + File.separator;
     
     protected CodeTemplateHelper templateHelper;
 

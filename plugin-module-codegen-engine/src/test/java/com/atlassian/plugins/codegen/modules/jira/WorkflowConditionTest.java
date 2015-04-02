@@ -1,5 +1,7 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
+import java.io.File;
+
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
 import org.junit.Before;
@@ -45,13 +47,13 @@ public class WorkflowConditionTest extends AbstractModuleCreatorTestCase<Workflo
     @Test
     public void viewTemplateIsGenerated() throws Exception
     {
-        getResourceFile("templates/conditions", "my-workflow-condition.vm");
+        getResourceFile("templates"+ File.separatorChar+"conditions", "my-workflow-condition.vm");
     }
     
     @Test
     public void inputTemplateIsGenerated() throws Exception
     {
-        getResourceFile("templates/conditions", "my-workflow-condition-input.vm");
+        getResourceFile("templates"+File.separatorChar+"conditions", "my-workflow-condition-input.vm");
     }
     
     @Test

@@ -1,5 +1,7 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
+import java.io.File;
+
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
 import org.junit.Before;
@@ -12,7 +14,6 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @since 3.6
  */
-@Ignore
 public class WebworkTest extends AbstractModuleCreatorTestCase<WebworkProperties>
 {
     protected ActionProperties action;
@@ -99,7 +100,7 @@ public class WebworkTest extends AbstractModuleCreatorTestCase<WebworkProperties
     @Test
     public void viewFileIsGenerated() throws Exception
     {
-        getResourceFile("templates", "success.vm");
+        getResourceFile("templates"+ File.separator, "success.vm");
     }
 
     @Test
@@ -117,6 +118,6 @@ public class WebworkTest extends AbstractModuleCreatorTestCase<WebworkProperties
         View errorView = new View("error", "templates/error.vm");
         action.addView(errorView);
         
-        getResourceFile("templates", "error.vm");
+        getResourceFile("templates"+ File.separator, "error.vm");
     }
 }
