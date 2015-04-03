@@ -21,8 +21,8 @@
   'name' : 'version',
   'short' : 'v',
   'maven' : 'version',
-  'description' : 'Version of the project (default is 1.0-SNAPSHOT).',
-  'example' : '1.0-SNAPSHOT'
+  'description' : 'Version of the project (default is 1.0.0-SNAPSHOT).',
+  'example' : '1.0.0-SNAPSHOT'
 },{
   'name' : 'package',
   'short' : 'p',

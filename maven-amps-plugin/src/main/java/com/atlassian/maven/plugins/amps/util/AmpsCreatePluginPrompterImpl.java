@@ -8,6 +8,7 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
  */
 public class AmpsCreatePluginPrompterImpl implements AmpsCreatePluginPrompter
 {
+    public static final String DEFAULT_VERSION = "1.0.0-SNAPSHOT";
     private Prompter prompter;
     
     @Override
@@ -17,7 +18,7 @@ public class AmpsCreatePluginPrompterImpl implements AmpsCreatePluginPrompter
         
         String groupId = prompter.prompt("Define value for groupId: ");
         String artifactId = prompter.prompt("Define value for artifactId: ");
-        String version = prompter.prompt("Define value for version: ","1.0-SNAPSHOT");
+        String version = prompter.prompt("Define value for version: ", DEFAULT_VERSION);
         String thePackage = prompter.prompt("Define value for package: ",groupId);
 
         StringBuilder query = new StringBuilder( "Confirm properties configuration:\n" );

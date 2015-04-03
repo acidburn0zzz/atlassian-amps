@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps.osgi;
 
+import aQute.bnd.header.Attrs;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.plugin.MojoFailureException;
@@ -13,7 +14,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import aQute.libg.header.OSGiHeader;
+import aQute.bnd.header.Parameters;
+import aQute.bnd.header.OSGiHeader;
 
 /**
  * Validates the package imports in a manifest contain proper versions
@@ -48,14 +50,14 @@ public class PackageImportVersionValidator
             Map<String,String> foundPackages = new HashMap<String,String>();
             boolean validationFailed = false;
 
-            Map<String,Map<String,String>> pkgImports = OSGiHeader.parseHeader(imports);
-            for (Map.Entry<String,Map<String,String>> pkgImport : pkgImports.entrySet())
+            Parameters pkgImports = OSGiHeader.parseHeader(imports);
+            for (Map.Entry<String, Attrs> pkgImport : pkgImports.entrySet())
             {
                 String pkg = pkgImport.getKey();
                 if (pkgImport.getValue() != null && pkgImport.getValue().size() > 0)
                 {
-                    Map<String,String> props = pkgImport.getValue();
-                    String version = props.get("version");
+                    Attrs attrs = pkgImport.getValue();
+                    String version = attrs.get("version");
                     foundPackages.put(pkg, guessVersion( pkg));
                     if (version == null || version.length() == 0)
                     {
