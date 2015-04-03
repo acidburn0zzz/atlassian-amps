@@ -208,7 +208,7 @@ public abstract class AbstractCodegenTestCase<T extends PluginModuleProperties>
         return null;
     }
 
-    protected boolean isWindowsOS()
+    protected boolean isWindows()
     {
         return System.getProperty("os.name").startsWith("Windows");
     }

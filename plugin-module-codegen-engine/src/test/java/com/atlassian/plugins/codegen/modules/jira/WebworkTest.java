@@ -5,7 +5,6 @@ import java.io.File;
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -100,7 +99,7 @@ public class WebworkTest extends AbstractModuleCreatorTestCase<WebworkProperties
     @Test
     public void viewFileIsGenerated() throws Exception
     {
-        getResourceFile(isWindowsOS() ? "templates" + File.separatorChar : "templates", "success.vm");
+        getResourceFile(isWindows() ? "templates" + File.separatorChar : "templates", "success.vm");
     }
 
     @Test
@@ -118,6 +117,6 @@ public class WebworkTest extends AbstractModuleCreatorTestCase<WebworkProperties
         View errorView = new View("error", "templates/error.vm");
         action.addView(errorView);
 
-        getResourceFile(isWindowsOS() ? "templates" + File.separatorChar : "templates", "error.vm");
+        getResourceFile(isWindows() ? "templates" + File.separatorChar : "templates", "error.vm");
     }
 }
