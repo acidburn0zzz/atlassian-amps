@@ -99,7 +99,7 @@ public class WebworkTest extends AbstractModuleCreatorTestCase<WebworkProperties
     @Test
     public void viewFileIsGenerated() throws Exception
     {
-        getResourceFile("templates"+ File.separator, "success.vm");
+        getResourceFile(isWindows() ? "templates" + File.separatorChar : "templates", "success.vm");
     }
 
     @Test
@@ -116,7 +116,7 @@ public class WebworkTest extends AbstractModuleCreatorTestCase<WebworkProperties
     {
         View errorView = new View("error", "templates/error.vm");
         action.addView(errorView);
-        
-        getResourceFile("templates"+ File.separator, "error.vm");
+
+        getResourceFile(isWindows() ? "templates" + File.separatorChar : "templates", "error.vm");
     }
 }
