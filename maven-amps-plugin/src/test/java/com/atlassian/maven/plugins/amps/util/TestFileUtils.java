@@ -43,7 +43,10 @@ public class TestFileUtils extends TestCase
             copyDirectory(src, dest, true);
             assertTrue(new File(dest, "a/b/c").exists());
             assertTrue(new File(dest, "a/d").exists());
-            assertEquals(executable, new File(dest, "a/d").canExecute());
+            if(OSUtils.OS.equals(OSUtils.OS.WINDOWS))
+                assertEquals(executable, new File(dest, "a/d").canExecute());
+            else
+                assertFalse(new File(dest, "a/d").canExecute());
             assertEquals(executable, new File(dest, file.getName()).canExecute());
         }
         finally
