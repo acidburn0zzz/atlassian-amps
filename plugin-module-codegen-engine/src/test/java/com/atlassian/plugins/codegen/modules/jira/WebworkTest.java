@@ -7,7 +7,6 @@ import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.atlassian.plugins.codegen.util.OSUtils.isWindows;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -119,5 +118,10 @@ public class WebworkTest extends AbstractModuleCreatorTestCase<WebworkProperties
         action.addView(errorView);
 
         getResourceFile(isWindows() ? "templates" + File.separatorChar : "templates", "error.vm");
+    }
+
+    private boolean isWindows()
+    {
+        return System.getProperty("os.name").contains("Windows");
     }
 }
