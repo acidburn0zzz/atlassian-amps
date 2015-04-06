@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>5.0.15-6e4c7ce</version>
+        <version>5.0.15-SNAPSHOT</version>
     </parent>
 
     <artifactId>atlassian-amps-product-plugins</artifactId>
