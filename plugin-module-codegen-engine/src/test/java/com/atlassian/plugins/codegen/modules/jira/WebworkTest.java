@@ -7,6 +7,7 @@ import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.atlassian.plugins.codegen.util.OSUtils.isWindows;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

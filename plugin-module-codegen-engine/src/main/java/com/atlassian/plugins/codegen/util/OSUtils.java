@@ -1,9 +1,10 @@
-package com.atlassian.maven.plugins.amps.util;
+package com.atlassian.plugins.codegen.util;
 
 /**
  * Provides access to an OS for system-specific behavior.
  */
-public class OSUtils {
+public class OSUtils
+{
 
     public static OS OS;
 
