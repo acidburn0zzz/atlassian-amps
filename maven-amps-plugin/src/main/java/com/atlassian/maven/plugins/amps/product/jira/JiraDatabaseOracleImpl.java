@@ -85,7 +85,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
                 , DATA_PUMP_DIR, dumpFileDirectoryPath,
                 DATA_PUMP_DIR, username
         );
-        LOG.info("Oracle drop and create user sql: " + dropAndCreateUser);
+        LOG.debug("Oracle drop and create user sql: " + dropAndCreateUser);
         return dropAndCreateUser;
     }
 
@@ -105,7 +105,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
     public Xpp3Dom getConfigDatabaseTool() throws MojoExecutionException
     {
         Xpp3Dom configDatabaseTool = null;
-        LOG.info("Oracle import method: " + getDataSource().getImportMethod());
+        LOG.debug("Oracle import method: " + getDataSource().getImportMethod());
         if (ImportMethod.IMPDP.toString().equals(getDataSource().getImportMethod()))
         {
             final File dumpFile = new File(getDataSource().getDumpFilePath());
@@ -127,7 +127,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
                             element(name("argument"), "DIRECTORY=" + DATA_PUMP_DIR)
                     )
             );
-            LOG.info("Configuration Oracle DB tool: " + configDatabaseTool);
+            LOG.debug("Configuration Oracle DB tool: " + configDatabaseTool);
         }
         return configDatabaseTool;
     }
