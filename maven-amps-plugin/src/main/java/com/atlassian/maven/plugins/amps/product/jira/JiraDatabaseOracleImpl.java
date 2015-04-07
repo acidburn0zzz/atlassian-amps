@@ -106,12 +106,12 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
     {
         Xpp3Dom configDatabaseTool = null;
         LOG.debug("Oracle import method: " + getDataSource().getImportMethod());
-        if (ImportMethod.IMPDP.toString().equals(getDataSource().getImportMethod()))
+        if (ImportMethod.IMPDP.equals(ImportMethod.getValueOf(getDataSource().getImportMethod())))
         {
             final File dumpFile = new File(getDataSource().getDumpFilePath());
             final File dumpFileDirecotry = dumpFile.getParentFile();
             final String dumpFileName = dumpFile.getName();
-            // grant executable on dump file for Oracle user to execute import
+            // grant read, write and executable on dump file and parent directory for Oracle to execute import - impdp
             dumpFile.setExecutable(true, false);
             dumpFile.setReadable(true, false);
             dumpFile.setWritable(true, false);
@@ -122,7 +122,6 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
                     element(name("executable"), "impdp"),
                     element(name("arguments"),
                             element(name("argument"), getDataSource().getUsername() + "/" + getDataSource().getPassword()),
-//                            element(name("argument"), getDataSource().getSystemUsername() + "/" + getDataSource().getSystemPassword()),
                             element(name("argument"), "DUMPFILE=" + dumpFileName),
                             element(name("argument"), "DIRECTORY=" + DATA_PUMP_DIR)
                     )
@@ -135,8 +134,9 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
     @Override
     public Xpp3Dom getPluginConfiguration()
     {
-        // In oralce, user and schema is quite the same concept, create/drop user also create/drop schema.
+        // In Oracle database , User and Schema are quite the same concept, create/drop user also create/drop schema.
         String sql = getDropAndCreateUser();
+        LOG.debug("Oracle initialization database sql: " + sql);
         Xpp3Dom pluginConfiguration = systemDatabaseConfiguration();
         pluginConfiguration.addChild(
                 element(name("sqlCommand"), sql).toDom()

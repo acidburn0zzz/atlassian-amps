@@ -84,7 +84,7 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
     public Xpp3Dom getConfigDatabaseTool() throws MojoExecutionException
     {
         Xpp3Dom configDatabaseTool = null;
-        if (ImportMethod.SQLCMD.toString().equals(getDataSource().getImportMethod()))
+        if (ImportMethod.SQLCMD.equals(ImportMethod.getValueOf(getDataSource().getImportMethod())))
         {
             final String databaseName = getDatabaseName(getDataSource().getUrl());
             configDatabaseTool = configuration(
@@ -144,7 +144,7 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
     public Xpp3Dom getPluginConfiguration() throws MojoExecutionException
     {
         String sql = dropDatabase() + dropUser() + createDatabase() + createUser() + grantPermissionForUser();
-        LOG.debug(":::: MSSQL : " + sql);
+        LOG.debug("MSSQL initializarion database sql: " + sql);
         Xpp3Dom pluginConfiguration = systemDatabaseConfiguration();
         pluginConfiguration.addChild(
                 element(name("sqlCommand"), sql).toDom()

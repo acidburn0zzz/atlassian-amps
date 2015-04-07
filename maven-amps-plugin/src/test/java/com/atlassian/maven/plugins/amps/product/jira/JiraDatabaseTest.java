@@ -1,6 +1,7 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
 import com.atlassian.maven.plugins.amps.DataSource;
+import com.atlassian.maven.plugins.amps.product.ImportMethod;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -109,7 +110,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mssqlGenerateRestoreDatabaseSQL() throws Exception
+    public void mssqlGenerateImportDatabaseSQL() throws Exception
     {
         // setup
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
@@ -128,5 +129,147 @@ public class JiraDatabaseTest
 
         // assert
         assertThat("Generated SQL should be: " + expectedSQLGenerated, configDatabaseSQL, containsString(expectedSQLGenerated));
+    }
+
+    @Test
+    public void postgresGenerateInitDatabaseSQL() throws Exception
+    {
+        // expected result
+        final String expectedSQLGenerated = "DROP DATABASE IF EXISTS \"jiradb\";"
+                + "DROP USER IF EXISTS \"jira_user\";"
+                + "CREATE DATABASE \"jiradb\";"
+                + "CREATE USER \"jira_user\" WITH PASSWORD 'jira_pwd' ;"
+                + "ALTER ROLE \"jira_user\" superuser; "
+                + "ALTER DATABASE \"jiradb\" OWNER TO \"jira_user\";";
+
+        // setup
+        final JiraDatabaseFactory factory = getJiraDatabaseFactory();
+        final DataSource dataSource = mock(DataSource.class);
+        when(dataSource.getUrl()).thenReturn("jdbc:postgresql://localhost:5432/jiradb");
+        when(dataSource.getUsername()).thenReturn("jira_user");
+        when(dataSource.getPassword()).thenReturn("jira_pwd");
+        when(dataSource.getDriver()).thenReturn("org.postgresql.Driver");
+        final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
+
+        // execute
+        final String initDatabaseSQL = jiraDatabase.getPluginConfiguration().getChild("sqlCommand").getValue();
+
+        // assert
+        assertThat("Generated SQL should be: " + expectedSQLGenerated, initDatabaseSQL, containsString(expectedSQLGenerated));
+    }
+
+    @Test
+    public void mssqlGenerateInitDatabaseSQL() throws Exception
+    {
+        // expected result
+        final String expectedSQLGenerated = "USE [master]; \n"
+                + "IF EXISTS(SELECT * FROM SYS.DATABASES WHERE name='jiradb') \n"
+                + "DROP DATABASE [jiradb];\n"
+                + "USE [master]; \n"
+                + "IF EXISTS(SELECT * FROM SYS.SERVER_PRINCIPALS WHERE name = 'jira_user') \n"
+                + "DROP LOGIN jira_user; \n"
+                + "USE [master]; \n"
+                + " CREATE DATABASE [jiradb]; \n"
+                + "USE [master]; \n"
+                + " CREATE LOGIN jira_user WITH PASSWORD = 'jira_pwd'; \n"
+                + "USE [jiradb];\n"
+                + "CREATE USER jira_user FROM LOGIN jira_user; \n"
+                + "EXEC SP_ADDROLEMEMBER 'DB_OWNER', 'jira_user'; \n"
+                + "ALTER LOGIN jira_user WITH DEFAULT_DATABASE = [jiradb]; ";
+        // setup
+        final JiraDatabaseFactory factory = getJiraDatabaseFactory();
+        final DataSource dataSource = mock(DataSource.class);
+        when(dataSource.getUsername()).thenReturn("jira_user");
+        when(dataSource.getPassword()).thenReturn("jira_pwd");
+        when(dataSource.getDriver()).thenReturn("net.sourceforge.jtds.jdbc.Driver");
+        when(dataSource.getUrl()).thenReturn("jdbc:jtds:sqlserver://localhost:1433/jiradb");
+        final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
+
+        // execute
+        final String initDatabaseSQL = jiraDatabase.getPluginConfiguration().getChild("sqlCommand").getValue();
+
+        // assert
+        assertThat("Generated SQL should be: " + expectedSQLGenerated, initDatabaseSQL, containsString(expectedSQLGenerated));
+    }
+
+    @Test
+    public void mysqlGenerateInitDatabaseSQL() throws Exception
+    {
+        // expected result
+        final String expectedSQLGenerated = "DROP DATABASE IF EXISTS `jiradb`;\n"
+                + "GRANT USAGE ON *.* TO `jira_user`@localhost;\n"
+                + "DROP USER `jira_user`@localhost;\n"
+                + "CREATE DATABASE `jiradb` CHARACTER SET utf8 COLLATE utf8_bin;\n"
+                + "CREATE USER `jira_user`@localhost IDENTIFIED BY 'jira_pwd';\n"
+                + "GRANT ALL ON `jiradb`.* TO `jira_user`@localhost;";
+        // setup
+        final JiraDatabaseFactory factory = getJiraDatabaseFactory();
+        final DataSource dataSource = mock(DataSource.class);
+        when(dataSource.getUrl()).thenReturn("jdbc:mysql://localhost:3307/jiradb");
+        when(dataSource.getUsername()).thenReturn("jira_user");
+        when(dataSource.getPassword()).thenReturn("jira_pwd");
+        when(dataSource.getDriver()).thenReturn("com.mysql.jdbc.Driver");
+
+        final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
+
+        // execute
+        final String initDatabaseSQL = jiraDatabase.getPluginConfiguration().getChild("sqlCommand").getValue();
+
+        // assert
+        assertThat("Generated SQL should be: " + expectedSQLGenerated, initDatabaseSQL, containsString(expectedSQLGenerated));
+    }
+
+    @Test
+    public void oracleGenerateInitDatabaseSQL() throws Exception
+    {
+        // expected result
+        final String expectedSQLGenerated = "DECLARE\n"
+                + "    v_count INTEGER := 0;\n"
+                + "BEGIN\n"
+                + "    SELECT COUNT (1) INTO v_count FROM dba_users WHERE username = UPPER ('jira_user'); \n"
+                + "    IF v_count != 0\n"
+                + "    THEN\n"
+                + "        EXECUTE IMMEDIATE('DROP USER jira_user CASCADE');\n"
+                + "    END IF;\n"
+                + "    v_count := 0; \n"
+                + "    SELECT COUNT (1) INTO v_count FROM dba_tablespaces WHERE tablespace_name = UPPER('jiradb2'); \n"
+                + "    IF v_count != 0\n"
+                + "    THEN\n"
+                + "        EXECUTE IMMEDIATE('DROP TABLESPACE jiradb2 INCLUDING CONTENTS AND DATAFILES');\n"
+                + "    END IF;\n"
+                + "    EXECUTE IMMEDIATE(q'{CREATE TABLESPACE jiradb2 DATAFILE '/tmp/jiradb2.dbf' SIZE 32m AUTOEXTEND ON NEXT 32m MAXSIZE 4096m EXTENT MANAGEMENT LOCAL}');\n"
+                + "    EXECUTE IMMEDIATE('CREATE USER jira_user IDENTIFIED BY jira_pwd DEFAULT TABLESPACE jiradb2 QUOTA UNLIMITED ON jiradb2');\n"
+                + "    EXECUTE IMMEDIATE('GRANT CONNECT, RESOURCE, IMP_FULL_DATABASE TO jira_user');\n"
+                + "    EXECUTE IMMEDIATE(q'{CREATE OR REPLACE DIRECTORY DATA_PUMP_DIR AS '/usr/home'}');\n"
+                + "    EXECUTE IMMEDIATE('GRANT READ, WRITE ON DIRECTORY DATA_PUMP_DIR TO jira_user');\n"
+                + "END;\n"
+                + "/";
+        // setup
+        final JiraDatabaseFactory factory = getJiraDatabaseFactory();
+        final DataSource dataSource = mock(DataSource.class);
+        when(dataSource.getUrl()).thenReturn("jdbc:oracle:thin:@localhost:1521:XE");
+        when(dataSource.getUsername()).thenReturn("jira_user");
+        when(dataSource.getPassword()).thenReturn("jira_pwd");
+        when(dataSource.getDriver()).thenReturn("oracle.jdbc.OracleDriver");
+        when(dataSource.getDumpFilePath()).thenReturn("/usr/home/oracle.bak");
+        final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
+
+        // execute
+        final String initDatabaseSQL = jiraDatabase.getPluginConfiguration().getChild("sqlCommand").getValue();
+
+        // assert
+        assertThat("Generated SQL should be: " + expectedSQLGenerated, initDatabaseSQL, containsString(expectedSQLGenerated));
+    }
+
+
+    @Test
+    public void testImportMethodCaseInsensitively() throws Exception
+    {
+        final ImportMethod IMPDP = ImportMethod.getValueOf("IMPDP");
+        final ImportMethod impdp = ImportMethod.getValueOf("impdp");
+        final ImportMethod iMpdp = ImportMethod.getValueOf("iMpdp");
+        assertThat("Import method should be IMPDP", IMPDP, equalTo(ImportMethod.IMPDP));
+        assertThat("Import method should be IMPDP", impdp, equalTo(ImportMethod.IMPDP));
+        assertThat("Import method should be IMPDP", iMpdp, equalTo(ImportMethod.IMPDP));
     }
 }
