@@ -10,6 +10,8 @@ import com.atlassian.maven.plugins.amps.product.ImportMethod;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -17,6 +19,8 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
 public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JiraDatabaseMssqlImpl.class);
     private static final String DROP_DATABASE =
               "USE [master]; \n"
             + "IF EXISTS(SELECT * FROM SYS.DATABASES WHERE name='%s') \n"
@@ -140,7 +144,7 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
     public Xpp3Dom getPluginConfiguration() throws MojoExecutionException
     {
         String sql = dropDatabase() + dropUser() + createDatabase() + createUser() + grantPermissionForUser();
-        System.out.println(":::: MSSQL : " + sql);
+        LOG.debug(":::: MSSQL : " + sql);
         Xpp3Dom pluginConfiguration = systemDatabaseConfiguration();
         pluginConfiguration.addChild(
                 element(name("sqlCommand"), sql).toDom()
