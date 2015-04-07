@@ -1,5 +1,7 @@
 package com.atlassian.plugins.codegen.modules.jira;
 
+import java.io.File;
+
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 
 import org.junit.Before;
@@ -46,13 +48,13 @@ public class WorkflowPostFunctionTest extends AbstractModuleCreatorTestCase<Work
     @Test
     public void viewTemplateIsGenerated() throws Exception
     {
-        getResourceFile("templates/postfunctions", "my-workflow-function-input.vm");
+        getResourceFile("templates" + File.separatorChar + "postfunctions", "my-workflow-function-input.vm");
     }
     
     @Test
     public void inputTemplateIsGenerated() throws Exception
     {
-        getResourceFile("templates/postfunctions", "my-workflow-function-input.vm");
+        getResourceFile("templates" + File.separatorChar + "postfunctions", "my-workflow-function-input.vm");
     }
     
     @Test

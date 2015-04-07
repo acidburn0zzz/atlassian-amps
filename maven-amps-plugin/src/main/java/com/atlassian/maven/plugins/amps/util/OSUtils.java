@@ -34,5 +34,8 @@ public class OSUtils {
         }
     }
 
-
+    public static boolean isWindows()
+    {
+        return OS.equals(OS.WINDOWS);
+    }
 }
