@@ -7,8 +7,9 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.io.FileUtils;
 import org.objectweb.asm.ClassReader;
+
+import static com.atlassian.maven.plugins.amps.util.OSUtils.isWindows;
 
 public class ClassUtils
 {
@@ -16,7 +17,7 @@ public class ClassUtils
     {
         String regex = "/";
 
-        if(OSUtils.OS.equals(OSUtils.OS.WINDOWS))
+        if(isWindows())
         {
             regex = "\\\\";
         }
