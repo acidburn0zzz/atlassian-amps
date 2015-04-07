@@ -8,7 +8,7 @@
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>5.0.15-SNAPSHOT</version>
+    <version>5.0.22-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
@@ -24,8 +24,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.org/atlassian/amps.git</developerConnection>
+        <connection>scm:git:git@bitbucket.org:atlassian/amps.git</connection>
+        <developerConnection>scm:git:git@bitbucket.org:atlassian/amps.git</developerConnection>
         <url>https://bitbucket.org/atlassian/amps</url>
       <tag>HEAD</tag>
   </scm>
@@ -37,7 +37,7 @@
 
     <ciManagement>
         <system>Bamboo</system>
-        <url>https://extranet-bamboo.internal.atlassian.com/browse/AMPS</url>
+        <url>https://ecosystem-bamboo.internal.atlassian.com/browse/AMPS</url>
     </ciManagement>
 
     <modules>
@@ -101,6 +101,7 @@
                 <groupId>com.oracle</groupId>
                 <artifactId>ojdbc6</artifactId>
                 <version>${oracle.version}</version>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>net.sourceforge.jtds</groupId>

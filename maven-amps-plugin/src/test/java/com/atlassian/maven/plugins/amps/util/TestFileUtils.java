@@ -3,6 +3,8 @@ package com.atlassian.maven.plugins.amps.util;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.copyDirectory;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.doesFileNameMatchArtifact;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
+import static com.atlassian.maven.plugins.amps.util.OSUtils.isWindows;
+
 import junit.framework.TestCase;
 
 import java.io.File;
@@ -43,7 +45,14 @@ public class TestFileUtils extends TestCase
             copyDirectory(src, dest, true);
             assertTrue(new File(dest, "a/b/c").exists());
             assertTrue(new File(dest, "a/d").exists());
-            //assertFalse(new File(dest, "a/d").canExecute());
+            if (isWindows())
+            {
+                assertEquals(executable, new File(dest, "a/d").canExecute());
+            }
+            else
+            {
+                assertFalse(new File(dest, "a/d").canExecute());
+            }
             assertEquals(executable, new File(dest, file.getName()).canExecute());
         }
         finally

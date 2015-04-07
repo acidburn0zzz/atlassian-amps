@@ -16,7 +16,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import aQute.lib.osgi.Constants;
+import aQute.bnd.osgi.Constants;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 

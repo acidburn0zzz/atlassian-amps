@@ -48,13 +48,13 @@ public class WorkflowPostFunctionTest extends AbstractModuleCreatorTestCase<Work
     @Test
     public void viewTemplateIsGenerated() throws Exception
     {
-        getResourceFile("templates"+File.separatorChar+"postfunctions", "my-workflow-function-input.vm");
+        getResourceFile("templates" + File.separatorChar + "postfunctions", "my-workflow-function-input.vm");
     }
     
     @Test
     public void inputTemplateIsGenerated() throws Exception
     {
-        getResourceFile("templates"+ File.separatorChar+"postfunctions", "my-workflow-function-input.vm");
+        getResourceFile("templates" + File.separatorChar + "postfunctions", "my-workflow-function-input.vm");
     }
     
     @Test

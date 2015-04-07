@@ -119,4 +119,9 @@ public class WebworkTest extends AbstractModuleCreatorTestCase<WebworkProperties
 
         getResourceFile(isWindows() ? "templates" + File.separatorChar : "templates", "error.vm");
     }
+
+    private boolean isWindows()
+    {
+        return System.getProperty("os.name").contains("Windows");
+    }
 }

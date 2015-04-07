@@ -57,7 +57,7 @@ public abstract class AbstractTabPanelTest extends AbstractModuleCreatorTestCase
     {
         props.setUseCustomClass(true);
 
-        getResourceFile("templates" + File.separatorChar+ "tabpanels", "my-tab-panel.vm");
+        getResourceFile("templates" + File.separatorChar + "tabpanels", "my-tab-panel.vm");
     }
     
     @Test
