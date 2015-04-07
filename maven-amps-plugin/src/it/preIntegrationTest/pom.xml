@@ -27,8 +27,8 @@
             <id>jira-postgres</id>
             <properties>
                 <dataSource.url>jdbc:postgresql://localhost:5432/jiradb</dataSource.url>
-                <dataSource.user>amps_user</dataSource.user>
-                <dataSource.password>amps_pass</dataSource.password>
+                <dataSource.user>jira_user</dataSource.user>
+                <dataSource.password>jira_pwd</dataSource.password>
                 <dataSource.schema>public</dataSource.schema>
                 <dataSource.driver>org.postgresql.Driver</dataSource.driver>
                 <dataSource.jndi>jdbc/JiraDS</dataSource.jndi>
@@ -141,8 +141,8 @@
             <id>jira-mysql</id>
             <properties>
                 <dataSource.url>jdbc:mysql://localhost:3307/jiradb</dataSource.url>
-                <dataSource.user>amps_user</dataSource.user>
-                <dataSource.password>amps_pwd</dataSource.password>
+                <dataSource.user>jira_user</dataSource.user>
+                <dataSource.password>jira_pwd</dataSource.password>
                 <dataSource.driver>com.mysql.jdbc.Driver</dataSource.driver>
                 <dataSource.jndi>jdbc/JiraDS</dataSource.jndi>
                 <dataSource.defaultDatabase>jdbc:mysql://localhost:3307/mysql</dataSource.defaultDatabase>
