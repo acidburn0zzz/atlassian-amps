@@ -54,9 +54,7 @@ public abstract class AbstractJiraDatabase extends AbstractMojo implements JiraD
                 element(name("driver") , dataSource.getDriver()),
                 element(name("url"), dataSource.getDefaultDatabase()),
                 element(name("username"), dataSource.getSystemUsername()),
-                element(name("password"), dataSource.getSystemPassword()),
-                // we need commit transaction for drop database and then create them again
-                element(name("autocommit"), "true")
+                element(name("password"), dataSource.getSystemPassword())
         );
     }
 
