@@ -130,5 +130,6 @@ public class PreIntegrationTestMojo extends RunMojo
             // default is import standard sql
             dataSource.setImportMethod(ImportMethod.SQL.getMethod());
         }
+        getLog().info("Pre-integration-test import method: " + dataSource.getImportMethod());
     }
 }

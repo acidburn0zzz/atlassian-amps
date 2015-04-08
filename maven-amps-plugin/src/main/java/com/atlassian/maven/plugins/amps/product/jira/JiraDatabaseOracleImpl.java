@@ -7,8 +7,6 @@ import com.atlassian.maven.plugins.amps.product.ImportMethod;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -17,7 +15,6 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JiraDatabaseOracleImpl.class);
     private static final String DATA_PUMP_DIR = "DATA_PUMP_DIR";
     private static final String DROP_AND_CREATE_USER =
             "DECLARE\n"
@@ -85,7 +82,6 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
                 , DATA_PUMP_DIR, dumpFileDirectoryPath,
                 DATA_PUMP_DIR, username
         );
-        LOG.debug("Oracle drop and create user sql: " + dropAndCreateUser);
         return dropAndCreateUser;
     }
 
@@ -105,7 +101,6 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
     public Xpp3Dom getConfigDatabaseTool() throws MojoExecutionException
     {
         Xpp3Dom configDatabaseTool = null;
-        LOG.debug("Oracle import method: " + getDataSource().getImportMethod());
         if (ImportMethod.IMPDP.equals(ImportMethod.getValueOf(getDataSource().getImportMethod())))
         {
             final File dumpFile = new File(getDataSource().getDumpFilePath());
@@ -126,7 +121,6 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
                             element(name("argument"), "DIRECTORY=" + DATA_PUMP_DIR)
                     )
             );
-            LOG.debug("Configuration Oracle DB tool: " + configDatabaseTool);
         }
         return configDatabaseTool;
     }
@@ -136,7 +130,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
     {
         // In Oracle database , User and Schema are quite the same concept, create/drop user also create/drop schema.
         String sql = getDropAndCreateUser();
-        LOG.debug("Oracle initialization database sql: " + sql);
+        getLog().info("Oracle initialization database sql: " + sql);
         Xpp3Dom pluginConfiguration = systemDatabaseConfiguration();
         pluginConfiguration.addChild(
                 element(name("sqlCommand"), sql).toDom()

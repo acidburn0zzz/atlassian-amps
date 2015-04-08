@@ -1186,8 +1186,6 @@ public class MavenGoals
                 version(defaultArtifactIdToVersionMap.get("sql-maven-plugin"))
         );
         sqlMaven.getDependencies().addAll(libs);
-        // drop && create database schema
-        log.debug("config drop & create schema xml: " + configDropCreateSchema.toString());
         executeMojo(
                 sqlMaven,
                 goal("execute"),
@@ -1196,7 +1194,7 @@ public class MavenGoals
         );
         if (StringUtils.isNotEmpty(dumpFilePath))
         {
-            log.debug("do import for dump file: " + dumpFilePath);
+            log.info("Do import for dump file: " + dumpFilePath);
             File dumpFile = new File(dumpFilePath);
             if(!dumpFile.exists() || !dumpFile.isFile())
             {
@@ -1220,7 +1218,6 @@ public class MavenGoals
                         artifactId("exec-maven-plugin"),
                         version(defaultArtifactIdToVersionMap.get("maven-exec-plugin"))
                 );
-                log.debug("config database tool xml: " + configDatabaseTool.toString());
                 // Use database specific tool to import dump file
                 executeMojo(
                         execMaven,

@@ -3,18 +3,20 @@ package com.atlassian.maven.plugins.amps.product.jira;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.atlassian.maven.plugins.amps.LibArtifact;
 import com.atlassian.maven.plugins.amps.DataSource;
+import com.atlassian.maven.plugins.amps.LibArtifact;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
-public abstract class AbstractJiraDatabase implements JiraDatabase
+public abstract class AbstractJiraDatabase extends AbstractMojo implements JiraDatabase
 {
     private DataSource dataSource;
     protected LibArtifact lib;
@@ -32,6 +34,12 @@ public abstract class AbstractJiraDatabase implements JiraDatabase
     public void setDataSource(DataSource dataSource)
     {
         this.dataSource = dataSource;
+    }
+
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException
+    {
+
     }
 
     protected abstract String dropDatabase() throws MojoExecutionException;
