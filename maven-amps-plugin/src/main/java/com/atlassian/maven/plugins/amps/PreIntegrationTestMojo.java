@@ -83,7 +83,6 @@ public class PreIntegrationTestMojo extends RunMojo
                             {
                                 dataSource.getLibArtifacts().add(new LibArtifact(productArtifact.getGroupId(), productArtifact.getArtifactId(), productArtifact.getVersion()));
                             }
-                            getLog().info("Import method: " + importMethod);
                             populateDatasourceParameter(dataSource);
                             goals.runPreIntegrationTest(dataSource);
                             break;
