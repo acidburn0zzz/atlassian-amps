@@ -1,5 +1,7 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
+import java.io.File;
+
 import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.product.ImportMethod;
 
@@ -223,7 +225,8 @@ public class JiraDatabaseTest
     public void oracleGenerateInitDatabaseSQL() throws Exception
     {
         // expected result
-        final String expectedSQLGenerated = "DECLARE\n"
+        final String dataPumpDir = File.separatorChar + "usr" + File.separatorChar + "home";
+        String expectedSQLGenerated = "DECLARE\n"
                 + "    v_count INTEGER := 0;\n"
                 + "BEGIN\n"
                 + "    SELECT COUNT (1) INTO v_count FROM dba_users WHERE username = UPPER ('jira_user'); \n"
@@ -240,10 +243,11 @@ public class JiraDatabaseTest
                 + "    EXECUTE IMMEDIATE(q'{CREATE TABLESPACE jiradb2 DATAFILE '/tmp/jiradb2.dbf' SIZE 32m AUTOEXTEND ON NEXT 32m MAXSIZE 4096m EXTENT MANAGEMENT LOCAL}');\n"
                 + "    EXECUTE IMMEDIATE('CREATE USER jira_user IDENTIFIED BY jira_pwd DEFAULT TABLESPACE jiradb2 QUOTA UNLIMITED ON jiradb2');\n"
                 + "    EXECUTE IMMEDIATE('GRANT CONNECT, RESOURCE, IMP_FULL_DATABASE TO jira_user');\n"
-                + "    EXECUTE IMMEDIATE(q'{CREATE OR REPLACE DIRECTORY DATA_PUMP_DIR AS '/usr/home'}');\n"
+                + "    EXECUTE IMMEDIATE(q'{CREATE OR REPLACE DIRECTORY DATA_PUMP_DIR AS '%s'}');\n"
                 + "    EXECUTE IMMEDIATE('GRANT READ, WRITE ON DIRECTORY DATA_PUMP_DIR TO jira_user');\n"
                 + "END;\n"
                 + "/";
+        expectedSQLGenerated = String.format(expectedSQLGenerated, dataPumpDir);
         // setup
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final DataSource dataSource = mock(DataSource.class);
