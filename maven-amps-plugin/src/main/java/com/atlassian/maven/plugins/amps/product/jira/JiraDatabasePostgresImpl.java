@@ -7,11 +7,15 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import com.atlassian.maven.plugins.amps.DataSource;
+import com.atlassian.maven.plugins.amps.product.ImportMethod;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
@@ -21,7 +25,7 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
     private static final String DROP_USER = "DROP USER IF EXISTS \"%s\";";
     private static final String CREATE_DATABASE = "CREATE DATABASE \"%s\";";
     private static final String CREATE_USER = "CREATE USER \"%s\" WITH PASSWORD '%s' ;";
-    private static final String GRANT_PERMISSION = "GRANT ALL PRIVILEGES ON DATABASE \"%s\" TO \"%s\";";
+    private static final String GRANT_PERMISSION = "ALTER ROLE \"%s\" superuser; ALTER DATABASE \"%s\" OWNER TO \"%s\";";
 
     public JiraDatabasePostgresImpl(DataSource dataSource)
     {
@@ -55,7 +59,25 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
     @Override
     protected String grantPermissionForUser() throws MojoExecutionException
     {
-        return String.format(GRANT_PERMISSION, getDatabaseName(getDataSource().getUrl()), getDataSource().getUsername());
+        return String.format(GRANT_PERMISSION, getDataSource().getUsername(), getDatabaseName(getDataSource().getUrl()), getDataSource().getUsername());
+    }
+
+    @Override
+    public Xpp3Dom getConfigDatabaseTool() throws MojoExecutionException
+    {
+        Xpp3Dom configDatabaseTool = null;
+        if (ImportMethod.PSQL.equals(ImportMethod.getValueOf(getDataSource().getImportMethod())))
+        {
+            configDatabaseTool = configuration(
+                    element(name("executable"), "psql"),
+                    element(name("arguments"),
+                            element(name("argument"), "-f" + getDataSource().getDumpFilePath()),
+                            element(name("argument"), "-U" + getDataSource().getUsername()),
+                            element(name("argument"), getDatabaseName(getDataSource().getUrl()))
+                    )
+            );
+        }
+        return configDatabaseTool;
     }
 
     /**
@@ -115,7 +137,8 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
     public Xpp3Dom getPluginConfiguration() throws MojoExecutionException
     {
         String sql = dropDatabase() + dropUser() + createDatabase() + createUser() + grantPermissionForUser();
-        Xpp3Dom pluginConfiguration = baseConfiguration();
+        getLog().info("Postgres initialization database sql: " + sql);
+        Xpp3Dom pluginConfiguration = systemDatabaseConfiguration();
         pluginConfiguration.addChild(
                 element(name("sqlCommand"), sql).toDom()
         );

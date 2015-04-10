@@ -21,4 +21,17 @@ public interface JiraDatabase
      * @return dependency
      */
     List<Dependency> getDependencies();
+
+    /**
+     * create sql-maven-plugin configuration, include sql file dump path for import data
+     * Please refer to documentation of maven-sql-plugin at url
+     * http://mojo.codehaus.org/sql-maven-plugin/index.html
+     * @return configuration
+     */
+    Xpp3Dom getConfigImportFile();
+
+    /**
+     * create exec-maven-plugin configuration to execute specific database tool
+     */
+    Xpp3Dom getConfigDatabaseTool() throws MojoExecutionException;
 }

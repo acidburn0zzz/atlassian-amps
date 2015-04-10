@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
+import com.atlassian.maven.plugins.amps.product.ImportMethod;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabase;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory;
 import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
@@ -101,7 +102,7 @@ public class MavenGoals
     private Map<String,String> getArtifactIdToVersionMap(MavenContext ctx)
     {
         final Properties overrides = ctx.getVersionOverrides();
-        
+
         return new HashMap<String, String>()
         {{
                 //overrides.getProperty(JUNIT_ARTIFACT_ID,"
@@ -566,7 +567,7 @@ public class MavenGoals
 
         XmlCompressor compressor = new XmlCompressor();
         File pluginXmlFile = new File(ctx.getProject().getBuild().getOutputDirectory(), "atlassian-plugin.xml");
-        
+
         if (pluginXmlFile.exists())
         {
             try
@@ -1174,9 +1175,10 @@ public class MavenGoals
 
     public void runPreIntegrationTest(final DataSource dataSource) throws MojoExecutionException
     {
+        final String dumpFilePath = dataSource.getDumpFilePath();
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
-        final Xpp3Dom configuration = jiraDatabase.getPluginConfiguration();
+        final Xpp3Dom configDropCreateSchema = jiraDatabase.getPluginConfiguration();
         final List<Dependency> libs = jiraDatabase.getDependencies();
         final Plugin sqlMaven = plugin(
                 groupId("org.codehaus.mojo"),
@@ -1187,9 +1189,45 @@ public class MavenGoals
         executeMojo(
                 sqlMaven,
                 goal("execute"),
-                configuration,
+                configDropCreateSchema,
                 executionEnvironment()
         );
+        if (StringUtils.isNotEmpty(dumpFilePath))
+        {
+            log.info("Do import for dump file: " + dumpFilePath);
+            File dumpFile = new File(dumpFilePath);
+            if(!dumpFile.exists() || !dumpFile.isFile())
+            {
+                throw new MojoExecutionException("SQL dump file does not exist: " + dumpFilePath);
+            }
+            if(ImportMethod.SQL.equals(ImportMethod.getValueOf(dataSource.getImportMethod())))
+            {
+                // Use JDBC to import sql standard dump file
+                executeMojo(
+                        sqlMaven,
+                        goal("execute"),
+                        jiraDatabase.getConfigImportFile(),
+                        executionEnvironment()
+                );
+            }
+            else
+            {
+                final Xpp3Dom configDatabaseTool = jiraDatabase.getConfigDatabaseTool();
+                final Plugin execMaven = plugin(
+                        groupId("org.codehaus.mojo"),
+                        artifactId("exec-maven-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-exec-plugin"))
+                );
+                // Use database specific tool to import dump file
+                executeMojo(
+                        execMaven,
+                        goal("exec"),
+                        configDatabaseTool,
+                        executionEnvironment()
+                );
+            }
+
+        }
     }
 
     private void appendJunitCategoryToConfiguration(final String category, final Xpp3Dom config)
