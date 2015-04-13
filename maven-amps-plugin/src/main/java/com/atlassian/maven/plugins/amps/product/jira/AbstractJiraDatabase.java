@@ -3,17 +3,20 @@ package com.atlassian.maven.plugins.amps.product.jira;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.atlassian.maven.plugins.amps.LibArtifact;
 import com.atlassian.maven.plugins.amps.DataSource;
+import com.atlassian.maven.plugins.amps.LibArtifact;
+
 import org.apache.maven.model.Dependency;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
-public abstract class AbstractJiraDatabase implements JiraDatabase
+public abstract class AbstractJiraDatabase extends AbstractMojo implements JiraDatabase
 {
     private DataSource dataSource;
     protected LibArtifact lib;
@@ -33,19 +36,36 @@ public abstract class AbstractJiraDatabase implements JiraDatabase
         this.dataSource = dataSource;
     }
 
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException
+    {
+
+    }
+
     protected abstract String dropDatabase() throws MojoExecutionException;
     protected abstract String createDatabase() throws MojoExecutionException;
     protected abstract String dropUser();
     protected abstract String createUser();
     protected abstract String grantPermissionForUser() throws MojoExecutionException;
 
-    protected Xpp3Dom baseConfiguration()
+    protected Xpp3Dom systemDatabaseConfiguration()
     {
         return configuration(
                 element(name("driver") , dataSource.getDriver()),
                 element(name("url"), dataSource.getDefaultDatabase()),
                 element(name("username"), dataSource.getSystemUsername()),
                 element(name("password"), dataSource.getSystemPassword()),
+                element(name("autocommit"), "true")
+        );
+    }
+
+    protected Xpp3Dom productDatabaseConfiguration()
+    {
+        return configuration(
+                element(name("driver") , dataSource.getDriver()),
+                element(name("url"), dataSource.getUrl()),
+                element(name("username"), dataSource.getUsername()),
+                element(name("password"), dataSource.getPassword()),
                 // we need commit transaction for drop database and then create them again
                 element(name("autocommit"), "true")
         );
@@ -70,5 +90,22 @@ public abstract class AbstractJiraDatabase implements JiraDatabase
             dependencies.add(dependency);
         }
         return dependencies;
+    }
+
+    @Override
+    public Xpp3Dom getConfigImportFile()
+    {
+        Xpp3Dom pluginConfiguration = productDatabaseConfiguration();
+        pluginConfiguration.addChild(
+                element(name("srcFiles"),
+                        element(name("srcFile"), getDataSource().getDumpFilePath())).toDom()
+        );
+        return pluginConfiguration;
+    }
+
+    @Override
+    public Xpp3Dom getConfigDatabaseTool() throws MojoExecutionException
+    {
+        return null;
     }
 }
