@@ -3,9 +3,11 @@ package com.atlassian.maven.plugins.amps;
 
 import java.util.List;
 
+import com.atlassian.maven.plugins.amps.product.ImportMethod;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -21,8 +23,24 @@ public class PreIntegrationTestMojo extends RunMojo
     @Parameter (property = "maven.test.skip", defaultValue = "false")
     private boolean testsSkip;
 
-    @Parameter(property = "skipTests", defaultValue = "false")
+    @Parameter (property = "skipTests", defaultValue = "false")
     private boolean skipTests;
+
+    @Parameter (property = "db.dump.file.path")
+    private String dumpFilePath;
+
+    @Parameter (property = "import.method")
+    private String importMethod;
+
+    @Parameter (property = "db.default.database")
+    private String defaultDatabase;
+
+    @Parameter (property = "db.system.username")
+    private String systemUsername;
+
+    @Parameter (property = "db.system.password")
+    private String systemPassword;
+
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
@@ -65,10 +83,12 @@ public class PreIntegrationTestMojo extends RunMojo
                             {
                                 dataSource.getLibArtifacts().add(new LibArtifact(productArtifact.getGroupId(), productArtifact.getArtifactId(), productArtifact.getVersion()));
                             }
+                            populateDatasourceParameter(dataSource);
                             goals.runPreIntegrationTest(dataSource);
                             break;
                         case 0:
                             getLog().info("Missing configuration dataSource for pre-integration-test");
+                            break;
                         default:
                             getLog().info("Multiple dataSources does not support. Configuration has: " + dataSources.size() + " dataSources below");
                             for (DataSource dbSource : dataSources)
@@ -80,5 +100,35 @@ public class PreIntegrationTestMojo extends RunMojo
                 }
             }
         }
+    }
+
+    private void populateDatasourceParameter(DataSource dataSource)
+    {
+        if (StringUtils.isNotEmpty(defaultDatabase))
+        {
+            dataSource.setDefaultDatabase(defaultDatabase);
+        }
+        if (StringUtils.isNotEmpty(systemUsername))
+        {
+            dataSource.setSystemUsername(systemUsername);
+        }
+        if (StringUtils.isNotEmpty(systemPassword))
+        {
+            dataSource.setSystemPassword(systemPassword);
+        }
+        if (StringUtils.isNotEmpty(dumpFilePath))
+        {
+            dataSource.setDumpFilePath(dumpFilePath);
+        }
+        if (StringUtils.isNotEmpty(importMethod))
+        {
+            dataSource.setImportMethod(importMethod);
+        }
+        else
+        {
+            // default is import standard sql
+            dataSource.setImportMethod(ImportMethod.SQL.getMethod());
+        }
+        getLog().info("Pre-integration-test import method: " + dataSource.getImportMethod());
     }
 }

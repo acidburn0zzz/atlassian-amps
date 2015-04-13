@@ -9,15 +9,16 @@ import com.atlassian.maven.plugins.amps.DataSource;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
 public class JiraDatabaseMysqlImpl extends AbstractJiraDatabase
 {
-
     private static final String DROP_DATABASE = "DROP DATABASE IF EXISTS `%s`;\n";
-    private static final String DROP_USER = "DROP USER `%s`@localhost;\n";
+    private static final String DROP_USER = "GRANT USAGE ON *.* TO `%s`@localhost;\nDROP USER `%s`@localhost;\n";
     private static final String CREATE_DATABASE = "CREATE DATABASE `%s` CHARACTER SET utf8 COLLATE utf8_bin;\n";
     private static final String CREATE_USER = "CREATE USER `%s`@localhost IDENTIFIED BY '%s';\n";
     private static final String GRANT_PERMISSION = "GRANT ALL ON `%s`.* TO `%s`@localhost;\n";
@@ -101,7 +102,8 @@ public class JiraDatabaseMysqlImpl extends AbstractJiraDatabase
     public Xpp3Dom getPluginConfiguration() throws MojoExecutionException
     {
         String sql = dropDatabase() + dropUser() + createDatabase() + createUser() + grantPermissionForUser();
-        Xpp3Dom pluginConfiguration = baseConfiguration();
+        getLog().info("MySQL initialization database sql: " + sql);
+        Xpp3Dom pluginConfiguration = systemDatabaseConfiguration();
         pluginConfiguration.addChild(
                 element(name("sqlCommand"), sql).toDom()
         );
