@@ -1741,7 +1741,14 @@ public class MavenGoals
             {
                 additionalParam += " -modules \"" + jacksonModules + "\"";
             }
-
+            //AMPSDEV-127: 'generate-rest-docs' fails with JDK8 - invalid flag: -Xdoclint:all
+            //Root cause: ResourceDocletJSON doclet does not support option doclint
+            //Solution: Temporary remove global javadoc configuration(remove doclint)
+            final Plugin globalJavadoc = executionEnvironment().getMavenProject().getPlugin("org.apache.maven.plugins:maven-javadoc-plugin");
+            if (null != globalJavadoc)
+            {
+                executionEnvironment().getMavenProject().getBuild().removePlugin(globalJavadoc);
+            }
             executeMojo(
                     plugin(
                             groupId("org.apache.maven.plugins"),
@@ -1771,7 +1778,11 @@ public class MavenGoals
                     ),
                     executionEnvironment()
             );
-
+            // restore global javadoc plugin for maven next tasks
+            if (null != globalJavadoc)
+            {
+                executionEnvironment().getMavenProject().getBuild().addPlugin(globalJavadoc);
+            }
             try {
 
                 File userAppDocs = new File(prj.getBuild().getOutputDirectory(),"application-doc.xml");
