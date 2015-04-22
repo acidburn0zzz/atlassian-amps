@@ -350,6 +350,9 @@
                 <version>4.0.4</version>
                 <configuration>
                     <useFullyQualifiedJavaLang>false</useFullyQualifiedJavaLang>
+                    <licenseLocation>clover.license</licenseLocation>
+                    <generateHtml>true</generateHtml>
+                    <generateXml>true</generateXml>
                 </configuration>
             </plugin>
         </plugins>
