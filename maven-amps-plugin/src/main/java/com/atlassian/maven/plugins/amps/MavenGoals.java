@@ -126,6 +126,7 @@ public class MavenGoals
                 put("maven-failsafe-plugin", overrides.getProperty("maven-failsafe-plugin","2.12.4"));
                 put("maven-exec-plugin", overrides.getProperty("maven-exec-plugin","1.2.1"));
                 put("sql-maven-plugin", overrides.getProperty("sql-maven-plugin", "1.5"));
+                put("maven-javadoc-plugin", overrides.getProperty("maven-javadoc-plugin", "2.8.1"));
             }};
     }
 
@@ -1753,7 +1754,7 @@ public class MavenGoals
                     plugin(
                             groupId("org.apache.maven.plugins"),
                             artifactId("maven-javadoc-plugin"),
-                            version("2.8.1")
+                            version(defaultArtifactIdToVersionMap.get("maven-javadoc-plugin"))
                     ),
                     goal("javadoc"),
                     configuration(
