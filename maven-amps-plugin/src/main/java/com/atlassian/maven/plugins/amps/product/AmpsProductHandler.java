@@ -96,7 +96,7 @@ public abstract class AmpsProductHandler implements ProductHandler
             }
 
             homeSnapshot.mkdirs();
-            copyDirectory(homeDirectory, homeSnapshot, true);
+            copyDirectory(homeDirectory, homeSnapshot, true, false);
 
             cleanupProductHomeForZip(product, homeSnapshot);
             ZipUtils.zipDir(targetZip, homeSnapshot, entryBase);
@@ -199,7 +199,7 @@ public abstract class AmpsProductHandler implements ProductHandler
             final File srcDir = new File(project.getBasedir(), "src/test/resources/" + ctx.getInstanceId() + "-home");
             if (srcDir.exists() && homeDir.exists())
             {
-                copyDirectory(srcDir, homeDir, false);
+                copyDirectory(srcDir, homeDir, false, false);
             }
         }
         catch (IOException e)

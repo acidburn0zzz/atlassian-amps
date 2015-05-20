@@ -109,14 +109,14 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
 
                 File rootDir = getRootDir(tmpDir, ctx);
 
-                FileUtils.copyDirectory(rootDir, getBaseDirectory(ctx), true);
+                FileUtils.copyDirectory(rootDir, getBaseDirectory(ctx), true, false);
 
-                FileUtils.copyDirectoryIgnoreDuplicated(tmp, homeDir);
+                FileUtils.copyDirectory(tmp, homeDir, true, true);
                 FileUtils.deleteDir(tmp);
             }
             else if (productHomeData.isDirectory())
             {
-                FileUtils.copyDirectory(productHomeData, homeDir, true);
+                FileUtils.copyDirectory(productHomeData, homeDir, true, true);
             }
         }
         catch (final IOException ex)
@@ -414,7 +414,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         final File srcDir = new File(project.getBasedir(), "src/test/resources/" + ctx.getInstanceId() + "-app");
         if (srcDir.exists() && appDir.exists())
         {
-            FileUtils.copyDirectory(srcDir, appDir, true);
+            FileUtils.copyDirectory(srcDir, appDir, true, false);
         }
     }
 

@@ -42,7 +42,7 @@ public class TestFileUtils extends TestCase
             new File(src, "a/b").mkdirs();
             new File(src, "a/b/c").createNewFile();
             new File(src, "a/d").createNewFile();
-            copyDirectory(src, dest, true);
+            copyDirectory(src, dest, true, false);
             assertTrue(new File(dest, "a/b/c").exists());
             assertTrue(new File(dest, "a/d").exists());
             if (isWindows())
