@@ -121,7 +121,7 @@ public class FileUtils
      * @param destination destination directory to copy all files/directories to
      * @throws IOException if the destination files could not be created
      */
-    public static void copyDirectoryIngoreDuplicated(File source, File destination) throws IOException
+    public static void copyDirectoryIgnoreDuplicated(File source, File destination) throws IOException
     {
         if (!destination.mkdirs() && !destination.isDirectory())
         {
@@ -135,7 +135,7 @@ public class FileUtils
             File dstFile = new File(destination, srcFile.getName());
             if (srcFile.isDirectory())
             {
-                copyDirectoryIngoreDuplicated(srcFile, dstFile);
+                copyDirectoryIgnoreDuplicated(srcFile, dstFile);
             }
             else
             {
