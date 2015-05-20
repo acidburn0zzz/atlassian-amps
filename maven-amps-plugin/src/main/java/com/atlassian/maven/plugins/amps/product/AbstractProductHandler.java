@@ -78,7 +78,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         {
 
             // Only create the home dir if it doesn't exist
-            if (!homeDir.exists())
+            if (!homeDir.exists() || StringUtils.isNotBlank(ctx.getDataPath()))
             {
                 extractProductHomeData(productHomeData, homeDir, ctx);
 
@@ -111,7 +111,8 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
 
                 FileUtils.copyDirectory(rootDir, getBaseDirectory(ctx), true);
 
-                moveDirectory(tmp, homeDir);
+                FileUtils.copyDirectory(tmp, homeDir, true);
+                FileUtils.deleteDir(tmp);
             }
             else if (productHomeData.isDirectory())
             {
