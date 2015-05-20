@@ -111,7 +111,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
 
                 FileUtils.copyDirectory(rootDir, getBaseDirectory(ctx), true);
 
-                FileUtils.copyDirectory(tmp, homeDir, true);
+                FileUtils.copyDirectoryIngoreDuplicated(tmp, homeDir);
                 FileUtils.deleteDir(tmp);
             }
             else if (productHomeData.isDirectory())

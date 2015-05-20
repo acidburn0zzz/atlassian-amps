@@ -114,4 +114,37 @@ public class FileUtils
         }
     }
 
+    /**
+     * Copy all files and directories from one folder to another, ignore duplicated ones.
+     *
+     * @param source source directory from which to copy all files/directories from
+     * @param destination destination directory to copy all files/directories to
+     * @throws IOException if the destination files could not be created
+     */
+    public static void copyDirectoryIngoreDuplicated(File source, File destination) throws IOException
+    {
+        if (!destination.mkdirs() && !destination.isDirectory())
+        {
+            throw new IOException("Destination '" + destination + "' directory cannot be created");
+        }
+        File[] srcFiles = source.listFiles();
+        // Who decided that listFiles could return null?!?
+        srcFiles = srcFiles != null ? srcFiles : new File[0];
+        for (File srcFile : srcFiles)
+        {
+            File dstFile = new File(destination, srcFile.getName());
+            if (srcFile.isDirectory())
+            {
+                copyDirectoryIngoreDuplicated(srcFile, dstFile);
+            }
+            else
+            {
+                if (!dstFile.exists())
+                {
+                    copyFile(srcFile, dstFile);
+                }
+
+            }
+        }
+    }
 }
