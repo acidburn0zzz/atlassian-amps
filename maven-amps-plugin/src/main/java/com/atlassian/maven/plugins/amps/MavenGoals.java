@@ -127,6 +127,7 @@ public class MavenGoals
                 put("maven-failsafe-plugin", overrides.getProperty("maven-failsafe-plugin","2.12.4"));
                 put("maven-exec-plugin", overrides.getProperty("maven-exec-plugin","1.2.1"));
                 put("sql-maven-plugin", overrides.getProperty("sql-maven-plugin", "1.5"));
+                put("maven-javadoc-plugin", overrides.getProperty("maven-javadoc-plugin", "2.8.1"));
             }};
     }
 
@@ -823,7 +824,7 @@ public class MavenGoals
         final Dependency bndLib = new Dependency();
         bndLib.setGroupId(groupId("biz.aQute.bnd"));
         bndLib.setArtifactId(artifactId("biz.aQute.bndlib"));
-        bndLib.setVersion(version("2.4.1"));
+        bndLib.setVersion(version("2.4.1-pr-916-atlassian-001"));
         bndPlugin.addDependency(bndLib);
         return bndPlugin;
     }
@@ -1743,12 +1744,19 @@ public class MavenGoals
             {
                 additionalParam += " -modules \"" + jacksonModules + "\"";
             }
-
+            //AMPSDEV-127: 'generate-rest-docs' fails with JDK8 - invalid flag: -Xdoclint:all
+            //Root cause: ResourceDocletJSON doclet does not support option doclint
+            //Solution: Temporary remove global javadoc configuration(remove doclint)
+            final Plugin globalJavadoc = executionEnvironment().getMavenProject().getPlugin("org.apache.maven.plugins:maven-javadoc-plugin");
+            if (null != globalJavadoc)
+            {
+                executionEnvironment().getMavenProject().getBuild().removePlugin(globalJavadoc);
+            }
             executeMojo(
                     plugin(
                             groupId("org.apache.maven.plugins"),
                             artifactId("maven-javadoc-plugin"),
-                            version("2.8.1")
+                            version(defaultArtifactIdToVersionMap.get("maven-javadoc-plugin"))
                     ),
                     goal("javadoc"),
                     configuration(
@@ -1773,7 +1781,11 @@ public class MavenGoals
                     ),
                     executionEnvironment()
             );
-
+            // restore global javadoc plugin for maven next tasks
+            if (null != globalJavadoc)
+            {
+                executionEnvironment().getMavenProject().getBuild().addPlugin(globalJavadoc);
+            }
             try {
 
                 File userAppDocs = new File(prj.getBuild().getOutputDirectory(),"application-doc.xml");
