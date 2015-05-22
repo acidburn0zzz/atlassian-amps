@@ -821,7 +821,7 @@ public class MavenGoals
         final Dependency bndLib = new Dependency();
         bndLib.setGroupId(groupId("biz.aQute.bnd"));
         bndLib.setArtifactId(artifactId("biz.aQute.bndlib"));
-        bndLib.setVersion(version("2.4.1-pr-916-atlassian-001"));
+        bndLib.setVersion(version("2.4.1-pr-916-atlassian-002"));
         bndPlugin.addDependency(bndLib);
         return bndPlugin;
     }
