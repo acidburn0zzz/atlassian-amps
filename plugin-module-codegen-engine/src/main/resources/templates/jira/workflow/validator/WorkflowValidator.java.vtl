@@ -11,15 +11,15 @@ import java.util.Map;
 public class ${CLASSNAME} implements Validator
 {
     private static final Logger log = LoggerFactory.getLogger(${CLASSNAME}.class);
-    public static final String FIELD_WORD="word";
+    public static final String FIELD_WORD = "word";
 
     public void validate(Map transientVars, Map args, PropertySet ps) throws InvalidInputException
     {
-        String word = (String) transientVars.get(FIELD_WORD);
+        String word = (String)transientVars.get(FIELD_WORD);
+        Issue issue = (Issue)transientVars.get("issue");
+        String description = issue.getDescription();
 
-        Issue issue = (Issue) transientVars.get("issue");
-
-        if(null == issue.getDescription() || "".equals(issue.getDescription()) || !issue.getDescription().contains(word)) {
+        if (description == null || !description.contains(word)) {
             throw new InvalidInputException("Issue must contain the word '" + word + "' in the description");
         }
     }
