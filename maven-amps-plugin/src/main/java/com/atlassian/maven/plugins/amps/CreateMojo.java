@@ -18,7 +18,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name = "create", requiresProject = false)
 public class CreateMojo extends AbstractProductHandlerMojo
 {
-    @Component
+    @Component (hint = "amps-create-plugin-prompter")
     private AmpsCreatePluginPrompter ampsCreatePluginPrompter;
 
     @Override
@@ -57,14 +57,14 @@ public class CreateMojo extends AbstractProductHandlerMojo
     protected String getStableProductVersion(AbstractProductHandler handler, Product ctx) throws MojoExecutionException
     {
         ProductArtifact artifact = handler.getArtifact();
-        
+
         if(null == artifact)
         {
-            return "";    
+            return "";
         }
-        
+
         Artifact warArtifact = artifactFactory.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(), "LATEST");
-        
+
         return ctx.getArtifactRetriever().getLatestStableVersion(warArtifact);
     }
 
@@ -76,7 +76,7 @@ public class CreateMojo extends AbstractProductHandlerMojo
         {
             return "";
         }
-        
+
         Artifact warArtifact = artifactFactory.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(), "LATEST");
 
         return ctx.getArtifactRetriever().getLatestStableVersion(warArtifact);
