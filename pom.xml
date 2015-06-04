@@ -53,6 +53,7 @@
         <module>standalone</module>
         <module>maven-3-tests</module>
         <module>sdk-installer</module>
+        <module>micros-service-archetype</module>
     </modules>
 
     <dependencyManagement>

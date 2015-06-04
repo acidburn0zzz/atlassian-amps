@@ -52,7 +52,8 @@ public class CreateMicrosServiceMojo extends AbstractProductHandlerMojo
             getMavenContext().getExecutionEnvironment().getMavenSession().getExecutionProperties().setProperty(pid + "DataVersion", stableDataVersion);
         }
 
-        getMavenGoals().createPlugin(getProductId(), ampsCreatePluginPrompter);
+        MavenMicrosGoals goals = new MavenMicrosGoals(getMavenContext());
+        goals.createMicros(ampsCreatePluginPrompter);
     }
 
     protected String getStableProductVersion(AbstractProductHandler handler, Product ctx) throws MojoExecutionException

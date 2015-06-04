@@ -6,23 +6,11 @@
         <version>6.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>atlassian-amps-product-archetypes</artifactId>
-    <packaging>pom</packaging>
+    <groupId>com.atlassian.maven.archetypes</groupId>
+    <artifactId>micros-service-archetype</artifactId>
+    <packaging>jar</packaging>
 
-    <name>Atlassian Maven Plugin Suite (product archetypes parent pom)</name>
-
-    <modules>
-        <module>refapp-plugin-archetype</module>
-        <module>confluence-plugin-archetype</module>
-        <module>jira4-plugin-archetype</module>
-        <module>jira-plugin-archetype</module>
-        <module>bamboo-plugin-archetype</module>
-        <module>fecru-plugin-archetype</module>
-        <module>crowd-plugin-archetype</module>
-        <module>studio-plugin-archetype</module>
-        <module>stash-plugin-archetype</module>
-        <module>plugin-archetype</module>
-    </modules>
+    <name>Atlassian Maven Plugin Suite (Micros service archetype parent pom)</name>
 
     <dependencies>
     </dependencies>
@@ -61,7 +49,7 @@
                     <include>META-INF/maven/archetype-metadata.xml</include>
                 </includes>
             </resource>
-            
+
             <resource>
                 <directory>${basedir}/../src/main/resources</directory>
                 <filtering>false</filtering>
