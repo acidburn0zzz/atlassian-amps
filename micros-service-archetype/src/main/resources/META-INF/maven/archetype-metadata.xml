@@ -6,32 +6,39 @@
         <requiredProperty key="microsServiceName">
         </requiredProperty>
     </requiredProperties>
-<fileSets>
-    <fileSet filtered="true" packaged="true" encoding="UTF-8">
-        <directory>src/main/java</directory>
-        <includes>
-            <include>**/*</include>
-        </includes>
-    </fileSet>
-    <fileSet filtered="true" packaged="true" encoding="UTF-8">
-        <directory>src/test/java</directory>
-        <includes>
-            <include>**/*</include>
-        </includes>
-    </fileSet>
-    <fileSet encoding="UTF-8">
-        <directory>src/main/resources</directory>
-        <includes>
-            <include>**/*</include>
-        </includes>
-    </fileSet>
-    <fileSet encoding="UTF-8">
-        <directory></directory>
-        <includes>
-            <include>LICENSE</include>
-            <include>README</include>
-        </includes>
-    </fileSet>
-</fileSets>
+    <fileSets>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+            <directory>src/main/java</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+            <directory>src/test/java</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+        <fileSet encoding="UTF-8">
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+        <fileSet encoding="UTF-8">
+            <directory></directory>
+            <includes>
+                <include>LICENSE</include>
+                <include>README</include>
+            </includes>
+        </fileSet>
+
+        <fileSet filtered="true" encoding="UTF-8">
+            <directory></directory>
+            <includes>
+                <include>micros.sd.yaml</include>
+            </includes>
+        </fileSet>
+    </fileSets>
 
 </archetype-descriptor>

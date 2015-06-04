@@ -1,0 +1,17 @@
+name: ${microsServiceName}
+description: ${package}
+organization: ${groupId}
+links:
+  binary:
+    type: __microsServiceName__
+    artifactId: \${groupId}
+    version: ${artifactId}
+    classifier: assembly
+  healthcheck:
+    uri: healthcheck
+  source:
+    url: 'https://www.google.com.vn/'
+notifications:
+  email: hanguyen@atlassian.com
+owners:
+  - hanguyen@atlassian.com
