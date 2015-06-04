@@ -58,7 +58,7 @@ public class MavenMicrosGoals extends MavenGoals
         {
             try
             {
-                props = createPrompter.prompt();
+                props = (CreateMicrosProperties)createPrompter.prompt();
             }
             catch (PrompterException e)
             {

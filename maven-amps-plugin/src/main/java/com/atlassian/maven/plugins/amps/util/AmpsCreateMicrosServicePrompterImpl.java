@@ -13,7 +13,7 @@ public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginProm
     private Prompter prompter;
 
     @Override
-    public CreateMicrosProperties prompt() throws PrompterException
+    public CreatePluginProperties prompt() throws PrompterException
     {
         CreateMicrosProperties props = null;
 

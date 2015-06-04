@@ -22,6 +22,11 @@ public class CreateMicrosProperties extends CreatePluginProperties
         this.notificationEmail = notificationEmail;
     }
 
+    public CreateMicrosProperties(String groupId, String artifactId, String version, String aPackage)
+    {
+        super(groupId, artifactId, version, aPackage);
+    }
+
     public String getName() {
         return name;
     }
