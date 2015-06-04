@@ -74,7 +74,7 @@ public class MavenGoals
     private final Log log;
     @VisibleForTesting
     final Map<String, String> pluginArtifactIdToVersionMap;
-    private final MavenContext ctx;
+    protected final MavenContext ctx;
 
     private final Map<String, Container> idToContainerMap = new HashMap<String, Container>()
     {{
@@ -87,7 +87,7 @@ public class MavenGoals
             put("jetty6x", new Container("jetty6x"));
         }};
 
-    private final Map<String, String> defaultArtifactIdToVersionMap;
+    protected final Map<String, String> defaultArtifactIdToVersionMap;
 
     public MavenGoals(final MavenContext ctx)
     {
@@ -131,7 +131,7 @@ public class MavenGoals
             }};
     }
 
-    private ExecutionEnvironment executionEnvironment()
+    protected ExecutionEnvironment executionEnvironment()
     {
         return ctx.getExecutionEnvironment();
     }

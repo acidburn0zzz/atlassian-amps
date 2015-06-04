@@ -13,9 +13,9 @@ public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginProm
     private Prompter prompter;
 
     @Override
-    public CreatePluginProperties prompt() throws PrompterException
+    public CreateMicrosProperties prompt() throws PrompterException
     {
-        CreatePluginProperties props = null;
+        CreateMicrosProperties props = null;
 
         String groupId = prompter.prompt("Micros Service name: ");
         String artifactId = prompter.prompt("Define value for artifactId: ");
@@ -31,7 +31,7 @@ public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginProm
         String confirmed = prompter.prompt(query.toString(), "Y");
         if ("Y".equalsIgnoreCase(confirmed))
         {
-            props = new CreatePluginProperties(groupId, artifactId, version, thePackage);
+            props = new CreateMicrosProperties(groupId, artifactId, version, thePackage);
         }
 
         return props;
