@@ -12,13 +12,10 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
-import io.atlassian.scheduler.db.resources.SchedulerDatabaseServlet;
-import io.atlassian.scheduler.db.service.ScheduleBuffer;
+import ${package}.resources.HealthCheck;
 
 public class Main
 {
@@ -46,7 +43,7 @@ public class Main
             context.setInitParameter("contextConfigLocation", Main.class.getPackage().getName());
 
             ServletHolder holder = new ServletHolder(new ServletContainer());
-            holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, SchedulerDatabaseServlet.class.getPackage().getName());
+            holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, HealthCheck.class.getPackage().getName());
             holder.setInitOrder(1);
             context.addServlet(holder, "/*");
             server.setHandler(context);
