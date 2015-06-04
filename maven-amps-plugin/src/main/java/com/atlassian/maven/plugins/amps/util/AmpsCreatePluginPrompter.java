@@ -7,5 +7,5 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
  */
 public interface AmpsCreatePluginPrompter
 {
-    public CreateMicrosProperties prompt() throws PrompterException;
+    public CreatePluginProperties prompt() throws PrompterException;
 }

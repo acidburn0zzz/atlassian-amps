@@ -12,9 +12,9 @@ public class AmpsCreatePluginPrompterImpl implements AmpsCreatePluginPrompter
     private Prompter prompter;
     
     @Override
-    public CreateMicrosProperties prompt() throws PrompterException
+    public CreatePluginProperties prompt() throws PrompterException
     {
-        CreateMicrosProperties props = null;
+        CreatePluginProperties props = null;
         
         String groupId = prompter.prompt("Define value for groupId: ");
         String artifactId = prompter.prompt("Define value for artifactId: ");
@@ -30,7 +30,7 @@ public class AmpsCreatePluginPrompterImpl implements AmpsCreatePluginPrompter
         String confirmed = prompter.prompt(query.toString(),"Y");
         if("Y".equalsIgnoreCase(confirmed))
         {
-            props = new CreateMicrosProperties(groupId,artifactId,version,thePackage);
+            props = new CreatePluginProperties(groupId, artifactId, version, thePackage);
         }
         
         return props;

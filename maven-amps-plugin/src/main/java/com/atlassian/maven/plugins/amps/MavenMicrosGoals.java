@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.regex.Matcher;
 
-import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
-import com.atlassian.maven.plugins.amps.util.CreateMicrosProperties;
-import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
-import com.atlassian.maven.plugins.amps.util.VersionUtils;
+import com.atlassian.maven.plugins.amps.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -39,16 +36,28 @@ public class MavenMicrosGoals extends MavenGoals
         CreateMicrosProperties props = null;
         Properties systemProps = System.getProperties();
 
-        if(systemProps.containsKey("groupId")
+        if(systemProps.containsKey("name")
+                && systemProps.containsKey("description")
+                && systemProps.containsKey("organization")
+                && systemProps.containsKey("groupId")
                 && systemProps.containsKey("artifactId")
                 && systemProps.containsKey("version")
                 && systemProps.containsKey("package")
+                && systemProps.containsKey("sourceUrl")
+                && systemProps.containsKey("ownerEmail")
+                && systemProps.containsKey("notificationEmail")
                 )
         {
-            props = new CreateMicrosProperties(systemProps.getProperty("groupId")
+            props = new CreateMicrosProperties(systemProps.getProperty("name")
+                    ,systemProps.getProperty("description")
+                    ,systemProps.getProperty("organization")
+                    ,systemProps.getProperty("groupId")
                     ,systemProps.getProperty("artifactId")
                     ,systemProps.getProperty("version")
                     ,systemProps.getProperty("package")
+                    ,systemProps.getProperty("sourceUrl")
+                    ,systemProps.getProperty("ownerEmail")
+                    ,systemProps.getProperty("notificationEmail")
             );
         }
 
@@ -56,7 +65,7 @@ public class MavenMicrosGoals extends MavenGoals
         {
             try
             {
-                props = createPrompter.prompt();
+                props = ((AmpsCreateMicrosServicePrompterImpl)createPrompter).prompt();
             }
             catch (PrompterException e)
             {
