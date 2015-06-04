@@ -3,8 +3,16 @@
                       name="${artifactId}">
 
     <requiredProperties>
-        <requiredProperty key="microsServiceName">
-        </requiredProperty>
+        <requiredProperty key="microsName" />
+        <requiredProperty key="microsDescription" />
+        <requiredProperty key="microsOrganization" />
+        <requiredProperty key="microsSourceUrl" />
+        <requiredProperty key="microsOwnerEmail" />
+        <requiredProperty key="microsNotificationEmail" />
+        <requiredProperty key="groupId" />
+        <requiredProperty key="artifactId" />
+        <requiredProperty key="version" />
+        <requiredProperty key="package" />
     </requiredProperties>
     <fileSets>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
