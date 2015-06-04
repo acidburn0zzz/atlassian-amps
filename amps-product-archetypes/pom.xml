@@ -22,6 +22,7 @@
         <module>studio-plugin-archetype</module>
         <module>stash-plugin-archetype</module>
         <module>plugin-archetype</module>
+        <module>micros-service-archetype</module>
     </modules>
 
     <dependencies>
