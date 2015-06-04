@@ -71,11 +71,16 @@ public class MavenMicrosGoals extends MavenGoals
             MojoExecutor.ExecutionEnvironment execEnv = executionEnvironment();
 
             Properties sysProps = execEnv.getMavenSession().getExecutionProperties();
+            sysProps.setProperty("microsName", props.getName());
+            sysProps.setProperty("microsDescription", props.getDescription());
+            sysProps.setProperty("microsOrganization", props.getOrganization());
+            sysProps.setProperty("microsSourceUrl", props.getSourceUrl());
+            sysProps.setProperty("microsOwnerEmail", props.getOwnerEmail());
+            sysProps.setProperty("microsNotificationEmail", props.getNotificationEmail());
             sysProps.setProperty("groupId", props.getGroupId());
             sysProps.setProperty("artifactId", props.getArtifactId());
             sysProps.setProperty("version", props.getVersion());
             sysProps.setProperty("package", props.getThePackage());
-            sysProps.setProperty("microsServiceName", "Branch new Java Micros Service");
 
             executeMojo(
                     plugin(

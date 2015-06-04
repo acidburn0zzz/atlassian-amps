@@ -1,17 +1,17 @@
-name: ${microsServiceName}
-description: ${package}
-organization: ${groupId}
+name: ${microsName}
+description: ${microsDescription}
+organization: ${microsOrganization}
 links:
   binary:
-    type: __microsServiceName__
-    artifactId: \${groupId}
-    version: ${artifactId}
+    type: maven
+    artifactId: ${artifactId}
+    version: ${version}
     classifier: assembly
   healthcheck:
     uri: healthcheck
   source:
-    url: 'https://www.google.com.vn/'
+    url: '${microsSourceUrl}'
 notifications:
-  email: hanguyen@atlassian.com
+  email: ${microsNotificationEmail}
 owners:
-  - hanguyen@atlassian.com
+  - ${microsOwnerEmail}
