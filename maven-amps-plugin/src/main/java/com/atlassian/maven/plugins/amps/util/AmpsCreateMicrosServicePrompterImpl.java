@@ -20,7 +20,7 @@ public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginProm
         CreateMicrosProperties props = null;
 
         String name = promptRegexAndMaxLength("Micros Service name: ", "EasyMicros", "^[A-Za-z\\d]*$", 100);
-        String desc = promptMaxLength("Micros Service description: ", null, 1000);
+        String desc = promptMinLength("Micros Service description: ", null, 1);
         String organization = promptRegex("Micros Service organization: ", "RD:Engineering Services", "^[^&]+$");
 
         String groupId = prompter.prompt("Define value for groupId: ", DEFAULT_GROUP_ID);
@@ -53,6 +53,16 @@ public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginProm
         }
 
         return props;
+    }
+
+    private String promptMinLength(String message, String defaultValue, int minLength) throws PrompterException
+    {
+        String value = defaultValue == null ? prompter.prompt(message) : prompter.prompt(message, defaultValue);
+        if (value.length() <= minLength)
+        {
+            value = promptMinLength(message, defaultValue, minLength);
+        }
+        return value;
     }
 
     private String promptMaxLength(String message, String defaultValue, int maxLength) throws PrompterException

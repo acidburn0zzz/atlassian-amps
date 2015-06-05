@@ -134,7 +134,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.3</version>
                 <configuration>
-                    <finalName>\${artifactId}-0.0.1</finalName>
+                    <finalName>\${artifactId}-1.0.0</finalName>
                 </configuration>
                 <executions>
                     <!-- Run shade goal on package phase -->
@@ -202,7 +202,7 @@
                             <arguments>
                                 <argument>java</argument>
                                 <argument>-jar</argument>
-                                <argument>\${artifactId}-0.0.1.jar</argument>
+                                <argument>\${artifactId}-1.0.0.jar</argument>
                             </arguments>
                         </configuration>
                     </execution>
