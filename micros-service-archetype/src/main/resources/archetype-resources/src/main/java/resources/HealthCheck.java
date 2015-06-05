@@ -1,6 +1,7 @@
 package ${package}.resources;
 
 import java.lang.management.ManagementFactory;
+import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -30,7 +31,10 @@ public class HealthCheck
         root.addProperty("service", "Easy Micros");
         root.addProperty("version", getClass().getPackage().getImplementationVersion());
         root.addProperty("uptime", ManagementFactory.getRuntimeMXBean().getUptime());
-
+        for(Map.Entry<String, String> e : System.getenv().entrySet())
+        {
+            root.addProperty(e.getKey(), e.getValue());
+        }
         return Response.ok().entity(new Gson().toJson(root)).build();
     }
 
