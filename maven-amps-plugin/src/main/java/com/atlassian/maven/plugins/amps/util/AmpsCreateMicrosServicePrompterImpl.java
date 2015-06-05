@@ -19,9 +19,9 @@ public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginProm
     {
         CreateMicrosProperties props = null;
 
-        String name = promptRegexAndMaxLength("Micros Service name: ", null, "^[A-Za-z\\\\d]+[ \\\\w.,;?\\\"']*$", 100);
+        String name = promptRegexAndMaxLength("Micros Service name: ", "easy-micros", "^[A-Za-z\\\\d]+[ \\\\w.,;?\\\"']*$", 100);
         String desc = promptMaxLength("Micros Service description: ", null, 1000);
-        String organization = promptRegex("Micros Service organization: ", null, "^[^&]+$");
+        String organization = promptRegex("Micros Service organization: ", "RD:Engineering Services", "^[^&]+$");
 
         String groupId = promptRegex("Define value for groupId: ", DEFAULT_GROUP_ID, "[A-Za-z0-9_\\\\-.]+");
         String artifactId = promptRegex("Define value for artifactId: ", name, "[A-Za-z0-9_\\\\-.]+");
@@ -32,7 +32,7 @@ public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginProm
 
         String sourceUrlDefault = "https://bitbucket.org/atlassian/" + name + ".git";
         String sourceUrl = prompter.prompt("Define value for source url: ", sourceUrlDefault);
-        String ownerEmail = promptRegex("Define value for owner email: ", null, ".+@atlassian\\\\.com$");
+        String ownerEmail = promptRegex("Define value for owner email: ", "saas@atlassian.com", ".+@atlassian\\\\.com$");
         String notificationEmail = promptRegex("Define value for notification email: ", ownerEmail, ".+@atlassian\\\\.com$");
 
         StringBuilder query = new StringBuilder("Confirm properties configuration:\n");
