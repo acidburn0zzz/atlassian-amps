@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginPrompter
 {
     public static final String DEFAULT_VERSION = "1.0.0-SNAPSHOT";
-    public static final String DEFAULT_GROUP_ID = "com.atlassian.micros";
+    public static final String DEFAULT_GROUP_ID = "io.atlassian.micros";
     private Prompter prompter;
 
     @Override
@@ -19,21 +19,19 @@ public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginProm
     {
         CreateMicrosProperties props = null;
 
-        String name = promptRegexAndMaxLength("Micros Service name: ", "easy-micros", "^[A-Za-z\\\\d]+[ \\\\w.,-_;?\\\"']*$", 100);
+        String name = promptRegexAndMaxLength("Micros Service name: ", "EasyMicros", "^[A-Za-z\\d]*$", 100);
         String desc = promptMaxLength("Micros Service description: ", null, 1000);
         String organization = promptRegex("Micros Service organization: ", "RD:Engineering Services", "^[^&]+$");
 
-        String groupId = promptRegex("Define value for groupId: ", DEFAULT_GROUP_ID, "[A-Za-z0-9_\\\\-.]+");
-        String artifactId = promptRegex("Define value for artifactId: ", name, "[A-Za-z0-9_\\\\-.]+");
+        String groupId = prompter.prompt("Define value for groupId: ", DEFAULT_GROUP_ID);
+        String artifactId = prompter.prompt("Define value for artifactId: ", name);
         String version = prompter.prompt("Define value for version: ", DEFAULT_VERSION);
-        String thePackageDefault = artifactId.indexOf(groupId) > 0 ? artifactId : (groupId + "." + artifactId);
-        String thePackage = promptRegex("Define value for package: ",
-                thePackageDefault, "^([a-zA-Z_]{1}[a-zA-Z0-9_]*(\\\\.[a-zA-Z_]{1}[a-zA-Z0-9_]*)*)?$");
-
+//        String thePackageDefault = artifactId.indexOf(groupId) > 0 ? artifactId : (groupId + "." + artifactId);
+        String thePackage = prompter.prompt("Define value for package: ", groupId);
         String sourceUrlDefault = "https://bitbucket.org/atlassian/" + name + ".git";
         String sourceUrl = prompter.prompt("Define value for source url: ", sourceUrlDefault);
-        String ownerEmail = promptRegex("Define value for owner email: ", "saas@atlassian.com", ".+@atlassian\\\\.com$");
-        String notificationEmail = promptRegex("Define value for notification email: ", ownerEmail, ".+@atlassian\\\\.com$");
+        String ownerEmail = promptRegex("Define value for owner email: ", "saas@atlassian.com", ".+@atlassian\\.com$");
+        String notificationEmail = promptRegex("Define value for notification email: ", ownerEmail, ".+@atlassian\\.com$");
 
         StringBuilder query = new StringBuilder("Confirm properties configuration:\n");
         query.append("name: ").append(name).append("\n")
@@ -91,10 +89,9 @@ public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginProm
 
     public static void main(String[] args)
     {
-        String value = ".abcd";
-        final Pattern p = Pattern.compile("^[A-Za-z\\\\d]+[ \\\\w.,;?\\\"']*$");
+        String value = "saas@atlassian.com";
+        final Pattern p = Pattern.compile(".+@atlassian\\.com$");
         System.out.println(p.matcher(value).matches());
-
     }
 
 }

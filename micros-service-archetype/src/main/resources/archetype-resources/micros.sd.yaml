@@ -5,8 +5,7 @@ links:
   binary:
     type: maven
     artifactId: ${artifactId}
-    version: ${version}
-    classifier: assembly
+    version: 0.0.1
   healthcheck:
     uri: healthcheck
   source:

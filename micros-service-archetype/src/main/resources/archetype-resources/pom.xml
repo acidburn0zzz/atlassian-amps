@@ -164,7 +164,6 @@
                         <!-- Exclude integration tests within (unit) test phase. -->
                         <exclude>**/*Test.java</exclude>
                     </excludes>
-                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
             <plugin>
@@ -202,7 +201,7 @@
                             <arguments>
                                 <argument>java</argument>
                                 <argument>-jar</argument>
-                                <argument>ttt-0.0.1.jar</argument>
+                                <argument>\${artifactId}-0.0.1.jar</argument>
                             </arguments>
                         </configuration>
                     </execution>
