@@ -24,4 +24,10 @@ public class HealthCheck
     {
         return Response.ok().entity("healthcheck").build();
     }
+
+    @GET
+    public Response index()
+    {
+        return Response.ok("Hello Micros!!!").build();
+    }
 }
