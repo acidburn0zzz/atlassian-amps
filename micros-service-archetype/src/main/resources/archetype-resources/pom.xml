@@ -197,7 +197,8 @@
                         <phase>pre-integration-test</phase>
                         <goals><goal>start</goal></goals>
                         <configuration>
-                            <!--<workingDir>target</workingDir>-->
+                            <name>jettyIntegrationTest</name>
+                            <processLogFile>../jettyIntegrationTest.log</processLogFile>
                             <arguments>
                                 <argument>java</argument>
                                 <argument>-jar</argument>
