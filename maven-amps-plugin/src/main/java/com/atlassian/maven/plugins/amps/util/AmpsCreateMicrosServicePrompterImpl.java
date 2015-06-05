@@ -3,6 +3,8 @@ package com.atlassian.maven.plugins.amps.util;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 
+import java.util.regex.Pattern;
+
 /**
  * @since version
  */
@@ -17,20 +19,21 @@ public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginProm
     {
         CreateMicrosProperties props = null;
 
-        String name = prompter.prompt("Micros Service name: ");
-        String desc = prompter.prompt("Micros Service description: ");
-        String organization = prompter.prompt("Micros Service organization: ");
+        String name = promptRegexAndMaxLength("Micros Service name: ", null, "^[A-Za-z\\\\d]+[ \\\\w.,;?\\\"']*$", 100);
+        String desc = promptMaxLength("Micros Service description: ", null, 1000);
+        String organization = promptRegex("Micros Service organization: ", null, "^[^&]+$");
 
-        String groupId = prompter.prompt("Define value for groupId: ", DEFAULT_GROUP_ID);
-        String artifactId = prompter.prompt("Define value for artifactId: ", name);
+        String groupId = promptRegex("Define value for groupId: ", DEFAULT_GROUP_ID, "[A-Za-z0-9_\\\\-.]+");
+        String artifactId = promptRegex("Define value for artifactId: ", name, "[A-Za-z0-9_\\\\-.]+");
         String version = prompter.prompt("Define value for version: ", DEFAULT_VERSION);
         String thePackageDefault = artifactId.indexOf(groupId) > 0 ? artifactId : (groupId + "." + artifactId);
-        String thePackage = prompter.prompt("Define value for package: ", thePackageDefault);
+        String thePackage = promptRegex("Define value for package: ",
+                thePackageDefault, "^([a-zA-Z_]{1}[a-zA-Z0-9_]*(\\\\.[a-zA-Z_]{1}[a-zA-Z0-9_]*)*)?$");
 
         String sourceUrlDefault = "https://bitbucket.org/atlassian/" + name + ".git";
         String sourceUrl = prompter.prompt("Define value for source url: ", sourceUrlDefault);
-        String ownerEmail = prompter.prompt("Define value for owner email: ");
-        String notificationEmail = prompter.prompt("Define value for notification email: ", ownerEmail);
+        String ownerEmail = promptRegex("Define value for owner email: ", null, ".+@atlassian\\\\.com$");
+        String notificationEmail = promptRegex("Define value for notification email: ", ownerEmail, ".+@atlassian\\\\.com$");
 
         StringBuilder query = new StringBuilder("Confirm properties configuration:\n");
         query.append("name: ").append(name).append("\n")
@@ -54,5 +57,44 @@ public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginProm
         return props;
     }
 
+    private String promptMaxLength(String message, String defaultValue, int maxLength) throws PrompterException
+    {
+        String value = defaultValue == null ? prompter.prompt(message) : prompter.prompt(message, defaultValue);
+        if (value.length() > maxLength)
+        {
+            value = promptMaxLength(message, defaultValue, maxLength);
+        }
+        return value;
+    }
+
+    private String promptRegex(String message, String defaultValue, String regex) throws PrompterException
+    {
+        String value = defaultValue == null ? prompter.prompt(message) : prompter.prompt(message, defaultValue);
+        final Pattern p = Pattern.compile(regex);
+        if (!p.matcher(value).matches())
+        {
+            value = promptRegex(message, defaultValue, regex);
+        }
+        return value;
+    }
+
+    private String promptRegexAndMaxLength(String message, String defaultValue, String pattern, int maxLength) throws PrompterException
+    {
+        String value = defaultValue == null ? prompter.prompt(message) : prompter.prompt(message, defaultValue);
+        final Pattern p = Pattern.compile(pattern);
+        if (value.length() > maxLength || !p.matcher(value).matches())
+        {
+            value = promptRegexAndMaxLength(message, defaultValue, pattern, maxLength);
+        }
+        return value;
+    }
+
+    public static void main(String[] args)
+    {
+        String value = ".abcd";
+        final Pattern p = Pattern.compile("^[A-Za-z\\\\d]+[ \\\\w.,;?\\\"']*$");
+        System.out.println(p.matcher(value).matches());
+
+    }
 
 }
