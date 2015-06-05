@@ -1,5 +1,7 @@
 package ${package}.resources;
 
+import java.lang.management.ManagementFactory;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -11,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 @Path ("/")
 @Controller
 public class HealthCheck
@@ -19,9 +24,14 @@ public class HealthCheck
 
     @GET
     @Path ("healthcheck")
-    @Produces (MediaType.TEXT_PLAIN)
+    @Produces (MediaType.APPLICATION_JSON)
     public Response healthcheck()
     {
-        return Response.ok().entity("healthcheck").build();
+        JsonObject root = new JsonObject();
+        root.addProperty("service", "Easy Micros");
+        root.addProperty("version", getClass().getPackage().getImplementationVersion());
+        root.addProperty("uptime", ManagementFactory.getRuntimeMXBean().getUptime());
+
+        return Response.ok().entity(new Gson().toJson(root)).build();
     }
 }

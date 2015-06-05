@@ -19,7 +19,7 @@ public class AmpsCreateMicrosServicePrompterImpl implements AmpsCreatePluginProm
     {
         CreateMicrosProperties props = null;
 
-        String name = promptRegexAndMaxLength("Micros Service name: ", "easy-micros", "^[A-Za-z\\\\d]+[ \\\\w.,;?\\\"']*$", 100);
+        String name = promptRegexAndMaxLength("Micros Service name: ", "easy-micros", "^[A-Za-z\\\\d]+[ \\\\w.,-_;?\\\"']*$", 100);
         String desc = promptMaxLength("Micros Service description: ", null, 1000);
         String organization = promptRegex("Micros Service organization: ", "RD:Engineering Services", "^[^&]+$");
 
