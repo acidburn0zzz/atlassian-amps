@@ -24,6 +24,9 @@ import static com.atlassian.maven.plugins.amps.util.FileUtils.deleteDir;
 
 public class BambooProductHandler extends AbstractWebappProductHandler
 {
+    private static final String BUNDLED_PLUGINS_UNZIPPED = "WEB-INF/atlassian-bundled-plugins";
+    private static final String BUNDLED_PLUGINS_ZIP = "WEB-INF/classes/atlassian-bundled-plugins.zip";
+
     public BambooProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
         super(context, goals, new BambooPluginProvider(),artifactFactory);
@@ -87,7 +90,17 @@ public class BambooProductHandler extends AbstractWebappProductHandler
 
     public File getBundledPluginPath(Product ctx, File appDir)
     {
-        return new File(appDir, "WEB-INF/classes/atlassian-bundled-plugins.zip");
+        // the zip became a directory in 5.9, so if the directory exists, use it, otherwise fall back to the old behaviour.
+        final File bundleDir = new File(appDir, BUNDLED_PLUGINS_UNZIPPED);
+
+        if (bundleDir.isDirectory())
+        {
+            return bundleDir;
+        }
+        else
+        {
+            return new File(appDir, BUNDLED_PLUGINS_ZIP);
+        }
     }
 
     public void processHomeDirectory(final Product ctx, final File homeDir) throws MojoExecutionException
