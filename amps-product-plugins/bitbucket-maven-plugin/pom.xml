@@ -1,0 +1,62 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.atlassian.amps</groupId>
+        <artifactId>atlassian-amps-product-plugins</artifactId>
+        <version>6.1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.atlassian.maven.plugins</groupId>
+    <artifactId>bitbucket-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+
+    <name>Bitbucket Maven Plugin</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.atlassian.maven.archetypes</groupId>
+            <artifactId>bitbucket-plugin-archetype</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>shitty</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>shitty-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+            <properties>
+                <shitty.product>bitbucket</shitty.product>
+                <product.version>${bitbucket.version}</product.version>
+                <product.data.version>${bitbucket.data.version}</product.data.version>
+                <tests>
+                cli, compressResources, copyBundledDependencies, create, debug,
+                debugWithTestGroup, 
+                filterPluginDescriptorWithoutPluginDescriptor,
+                filterPluginDescriptorWithPluginDescriptor, generateManifestWithInstructions,
+                generateManifestWithNoInstructions, generateManifestWithNoInstructionsButIsAtlassianPlugin,
+                generateManifestWithNoInstructionsNorIsAtlassianPlugin, generateObr, integrationTest,
+                integrationTestWithTestGroup, nexus_staging,
+                jarWithExistingManifest, run, runParallel, runWithTestGroup, 
+                unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
+                validateManifestWithValidManifest
+                </tests>
+            </properties>
+        </profile>
+    </profiles>
+</project>

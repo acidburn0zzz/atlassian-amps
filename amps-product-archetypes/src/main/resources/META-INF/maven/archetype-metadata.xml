@@ -24,6 +24,13 @@
             <defaultValue>${bamboo.data.version}</defaultValue>
         </requiredProperty>
 
+        <requiredProperty key="bitbucketVersion">
+            <defaultValue>${bitbucket.version}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="bitbucketDataVersion">
+            <defaultValue>${bitbucket.data.version}</defaultValue>
+        </requiredProperty>
+
         <requiredProperty key="stashVersion">
             <defaultValue>${stash.version}</defaultValue>
         </requiredProperty>

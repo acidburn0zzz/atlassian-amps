@@ -20,6 +20,10 @@ public class ProductHandlerFactory
     public static final String CONFLUENCE = "confluence";
     public static final String JIRA = "jira";
     public static final String BAMBOO = "bamboo";
+    /**
+     * @since 6.1.0
+     */
+    public static final String BITBUCKET = "bitbucket";
     public static final String FECRU = "fecru";
     public static final String CROWD = "crowd";
     public static final String STASH = "stash";
@@ -31,8 +35,6 @@ public class ProductHandlerFactory
     public static final String STUDIO_BAMBOO = "studio-bamboo";
     public static final String STUDIO_FECRU = "studio-fecru";
     public static final String STUDIO_CROWD = "studio-crowd";
-
-
 
     public static ProductHandler create(String id, MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
@@ -52,6 +54,10 @@ public class ProductHandlerFactory
         {
             return new BambooProductHandler(context, goals,artifactFactory);
         }
+        else if (BITBUCKET.equals(id))
+        {
+            return new BitbucketProductHandler(context, goals, artifactFactory);
+        }
         else if (FECRU.equals(id))
         {
             return new FeCruProductHandler(context, goals, artifactFactory);
@@ -60,7 +66,6 @@ public class ProductHandlerFactory
         {
             return new CrowdProductHandler(context, goals,artifactFactory);
         }
-
         else if (STASH.equals(id))
         {
             return new StashProductHandler(context, goals,artifactFactory);

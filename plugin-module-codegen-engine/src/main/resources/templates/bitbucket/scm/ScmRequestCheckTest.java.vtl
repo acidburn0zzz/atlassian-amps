@@ -1,0 +1,55 @@
+package ${PACKAGE};
+
+import com.atlassian.bitbucket.scm.ScmRequest;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
+
+import ${FQ_CLASS_UNDER_TEST};
+
+@RunWith(MockitoJUnitRunner.class)
+public class ${CLASSNAME}
+{
+
+    private ${CLASS_UNDER_TEST} check;
+    @Mock
+    private ScmRequest scmRequest;
+
+    @Before
+    public void setup()
+    {
+        check = new ${CLASS_UNDER_TEST}();
+        when(scmRequest.isWrite()).thenReturn(true);
+    }
+
+    @Test
+    public void after5pmOnFriday() throws Exception
+    {
+        mockAfter5pmOnAFriday(true);
+        assertFalse(check.check(scmRequest));
+        verify(scmRequest).isWrite();
+        verify(scmRequest).sendError(anyString(), anyString());
+    }
+
+    @Test
+    public void before5pmOnFriday() throws Exception
+    {
+        mockAfter5pmOnAFriday(false);
+        assertTrue(check.check(scmRequest));
+        verify(scmRequest).isWrite();
+        verifyNoMoreInteractions(scmRequest);
+    }
+
+    private void mockAfter5pmOnAFriday(boolean val)
+    {
+        check = spy(check);
+        when(check.isAfter5pmOnAFriday()).thenReturn(val);
+    }
+
+}

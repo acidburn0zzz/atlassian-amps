@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class TestCreateAndVerifyPlugin extends SdkTestBase
 {
-    public void testJIRA() throws IOException, InterruptedException
+    public void testJira() throws IOException, InterruptedException
     {
         createAndVerify("jira5");
     }
@@ -42,6 +42,10 @@ public class TestCreateAndVerifyPlugin extends SdkTestBase
         createAndVerify("bamboo");
     }
 
+    public void testBitbucket() throws IOException, InterruptedException
+    {
+        createAndVerify("bitbucket");
+    }
 
     private void createAndVerify(String productId)
             throws IOException, InterruptedException

@@ -1,0 +1,16 @@
+<repository-hook key="${MODULE_KEY}"
+        name="${MODULE_NAME}" i18n-name-key="${NAME_I18N_KEY}"
+        class="${FQ_CLASSNAME}">
+    <description key="${DESCRIPTION_I18N_KEY}">${DESCRIPTION}</description>
+    #if($ICON)
+
+    <icon>${ICON}</icon>
+    #end
+    #if($FIELDS)
+
+    <config-form name="${MODULE_NAME} Config" key="${MODULE_KEY}-config">
+        <view>${SOY_PACKAGE}.view</view>
+        <directory location="/static/"/>
+    </config-form>
+    #end
+</repository-hook>

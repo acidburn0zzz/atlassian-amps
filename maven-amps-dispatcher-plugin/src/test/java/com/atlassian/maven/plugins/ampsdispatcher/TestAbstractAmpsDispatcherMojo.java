@@ -38,6 +38,7 @@ public class TestAbstractAmpsDispatcherMojo extends TestCase
 
     public void testDetectAmpsProduct()
     {
+        assertPlugin(true, "bitbucket-maven-plugin");
         assertPlugin(true, "maven-refapp-plugin");
         assertPlugin(true, "maven-confluence-plugin");
         assertPlugin(true, "maven-jira-plugin");
