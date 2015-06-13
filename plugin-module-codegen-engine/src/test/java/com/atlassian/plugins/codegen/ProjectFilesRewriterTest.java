@@ -18,13 +18,13 @@ import static org.junit.Assert.assertTrue;
 
 public class ProjectFilesRewriterTest
 {
-    protected static final ClassId CLASS = fullyQualified("com.atlassian.test.MyClass");
-    protected static final String CONTENT = "this is some amazing content";
-    protected static final String I18N_FILE_NAME = ProjectHelper.GROUP_ID + File.separator + ProjectHelper.ARTIFACT_ID + ".properties";
+    private static final ClassId CLASS = fullyQualified("com.atlassian.test.MyClass");
+    private static final String CONTENT = "this is some amazing content";
+    private static final String I18N_FILE_NAME = ProjectHelper.GROUP_ID + File.separator + ProjectHelper.ARTIFACT_ID + ".properties";
 
-    protected ProjectHelper helper;
-    protected ProjectFilesRewriter rewriter;
-    protected File i18nFile;
+    private ProjectHelper helper;
+    private ProjectFilesRewriter rewriter;
+    private File i18nFile;
 
     @Before
     public void setup() throws Exception

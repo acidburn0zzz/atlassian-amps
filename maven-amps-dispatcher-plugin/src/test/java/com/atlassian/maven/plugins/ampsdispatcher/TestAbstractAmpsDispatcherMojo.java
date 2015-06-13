@@ -18,18 +18,20 @@ import java.util.List;
 public class TestAbstractAmpsDispatcherMojo extends TestCase
 {
 
-    MavenProject project;
-    MavenSession session;
-    BuildPluginManager buildPluginManager;
-    AbstractAmpsDispatcherMojo mojo;
+    private MavenProject project;
+    private MavenSession session;
+    private AbstractAmpsDispatcherMojo mojo;
 
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
+
+        BuildPluginManager buildPluginManager = mock(BuildPluginManager.class);
+
         project = new MavenProject();
         session = mock(MavenSession.class);
-        buildPluginManager = mock(BuildPluginManager.class);
+
         mojo = new AbstractAmpsDispatcherMojo(){};
         mojo.buildPluginManager = buildPluginManager;
         mojo.project = project;

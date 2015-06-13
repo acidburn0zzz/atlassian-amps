@@ -11,39 +11,39 @@ public class BitbucketCommitIndexerTest extends AbstractModuleCreatorTestCase<Bi
 
     public BitbucketCommitIndexerTest()
     {
-        super("changeset-indexer", new BitbucketCommitIndexerModuleCreator());
+        super("commit-indexer", new BitbucketCommitIndexerModuleCreator());
     }
 
     @Before
     public void setupProps() throws Exception
     {
-        setProps(new BitbucketCommitIndexerProperties(PACKAGE_NAME + ".MyChangesetIndexer"));
+        setProps(new BitbucketCommitIndexerProperties(PACKAGE_NAME + ".MyCommitIndexer"));
         props.setIncludeExamples(false);
     }
 
     @Test
     public void classFileIsGenerated() throws Exception
     {
-        getSourceFile(PACKAGE_NAME, "MyChangesetIndexer");
+        getSourceFile(PACKAGE_NAME, "MyCommitIndexer");
     }
 
     @Test
     public void unitTestFileIsGenerated() throws Exception
     {
-        getTestSourceFile(TEST_PACKAGE_NAME, "MyChangesetIndexerTest");
+        getTestSourceFile(TEST_PACKAGE_NAME, "MyCommitIndexerTest");
     }
 
     @Test
     public void moduleHasDefaultKey() throws Exception
     {
-        assertEquals("my-changeset-indexer",
+        assertEquals("my-commit-indexer",
                 getGeneratedModule().attributeValue("key"));
     }
 
     @Test
     public void moduleHasClass() throws Exception
     {
-        assertEquals(PACKAGE_NAME + ".MyChangesetIndexer", getGeneratedModule().attributeValue("class"));
+        assertEquals(PACKAGE_NAME + ".MyCommitIndexer", getGeneratedModule().attributeValue("class"));
     }
 
 }

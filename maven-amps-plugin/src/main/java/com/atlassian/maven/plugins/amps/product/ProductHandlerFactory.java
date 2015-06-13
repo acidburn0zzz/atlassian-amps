@@ -9,9 +9,10 @@ import com.atlassian.maven.plugins.amps.product.studio.StudioFeCruProductHandler
 import com.atlassian.maven.plugins.amps.product.studio.StudioJiraProductHandler;
 import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 
 public class ProductHandlerFactory
@@ -35,6 +36,10 @@ public class ProductHandlerFactory
     public static final String STUDIO_BAMBOO = "studio-bamboo";
     public static final String STUDIO_FECRU = "studio-fecru";
     public static final String STUDIO_CROWD = "studio-crowd";
+
+    private static final List<String> PRODUCT_IDS = ImmutableList.of(
+            REFAPP, CONFLUENCE, JIRA, BAMBOO, BITBUCKET, FECRU, CROWD, STASH, CTK_SERVER,
+            STUDIO, STUDIO_CONFLUENCE, STUDIO_JIRA, STUDIO_BAMBOO, STUDIO_FECRU, STUDIO_CROWD);
 
     public static ProductHandler create(String id, MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
@@ -103,14 +108,11 @@ public class ProductHandlerFactory
             return new StudioCrowdProductHandler(context, goals,artifactFactory);
         }
 
-
-        throw new IllegalArgumentException("Unknown product id: '" + id + "' Valid values: "
-            + Arrays.toString(getIds().toArray()));
+        throw new IllegalArgumentException("Unknown product ID: '" + id + "' Valid values: " + getIds());
     }
 
     public static Collection<String> getIds()
     {
-        return Arrays.asList(REFAPP, CONFLUENCE, JIRA, BAMBOO, FECRU, CROWD, STASH, CTK_SERVER,
-                STUDIO, STUDIO_CONFLUENCE, STUDIO_JIRA, STUDIO_BAMBOO, STUDIO_FECRU, STUDIO_CROWD);
+        return PRODUCT_IDS;
     }
 }
