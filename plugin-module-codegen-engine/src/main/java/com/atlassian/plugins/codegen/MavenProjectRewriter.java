@@ -459,8 +459,8 @@ public class MavenProjectRewriter implements ProjectRewriter
         {
             for (Element p : (List<Element>) plugins.elements("plugin"))
             {
-                if (p.elementTextTrim("groupId").equals("com.atlassian.maven.plugins")
-                    && AMPS_PLUGIN_IDS.contains(p.elementTextTrim("artifactId")))
+                if ("com.atlassian.maven.plugins".equals(p.elementTextTrim("groupId"))
+                        && AMPS_PLUGIN_IDS.contains(p.elementTextTrim("artifactId")))
                 {
                     return p;
                 }
