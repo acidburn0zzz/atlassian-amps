@@ -40,7 +40,7 @@
                                 com.atlassian.maven.plugins:maven-stash-plugin:test-jar
                             </package>
                             <pre-integration-test>
-                                com.atlassian.maven.plugins:maven-stash-plugin:pre-integration-test
+                                com.atlassian.maven.plugins:maven-stash-plugin:prepare-database
                             </pre-integration-test>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-stash-plugin:integration-test
