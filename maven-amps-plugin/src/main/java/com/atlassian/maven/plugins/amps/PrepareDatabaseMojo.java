@@ -17,8 +17,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 /**
  * Run the pre integration tests prepare data.
  */
-@Mojo (name = "pre-integration-test", requiresDependencyResolution = ResolutionScope.TEST)
-public class PreIntegrationTestMojo extends RunMojo
+@Mojo (name = "prepare-database", requiresDependencyResolution = ResolutionScope.TEST)
+public class PrepareDatabaseMojo extends AbstractTestGroupsHandlerMojo
 {
     @Parameter (property = "maven.test.skip", defaultValue = "false")
     private boolean testsSkip;
