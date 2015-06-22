@@ -40,7 +40,7 @@
                                 com.atlassian.maven.plugins:maven-crowd-plugin:test-jar
                             </package>
                             <pre-integration-test>
-                                com.atlassian.maven.plugins:maven-crowd-plugin:pre-integration-test
+                                com.atlassian.maven.plugins:maven-crowd-plugin:prepare-database
                             </pre-integration-test>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-crowd-plugin:integration-test

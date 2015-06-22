@@ -40,7 +40,7 @@
                                 com.atlassian.maven.plugins:maven-amps-plugin:test-jar
                             </package>
                             <pre-integration-test>
-                                com.atlassian.maven.plugins:maven-amps-plugin:pre-integration-test
+                                com.atlassian.maven.plugins:maven-amps-plugin:prepare-database
                             </pre-integration-test>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-amps-plugin:integration-test

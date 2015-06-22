@@ -43,7 +43,7 @@
                                 com.atlassian.maven.plugins:maven-jira-plugin:test-jar
                             </package>
                             <pre-integration-test>
-                                com.atlassian.maven.plugins:maven-jira-plugin:pre-integration-test
+                                com.atlassian.maven.plugins:maven-jira-plugin:prepare-database
                             </pre-integration-test>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-jira-plugin:integration-test

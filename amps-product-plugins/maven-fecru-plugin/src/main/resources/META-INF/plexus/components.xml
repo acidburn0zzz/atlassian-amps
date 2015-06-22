@@ -43,7 +43,7 @@
                                 com.atlassian.maven.plugins:maven-fecru-plugin:test-jar
                             </package>
                             <pre-integration-test>
-                                com.atlassian.maven.plugins:maven-fecru-plugin:pre-integration-test
+                                com.atlassian.maven.plugins:maven-fecru-plugin:prepare-database
                             </pre-integration-test>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-fecru-plugin:integration-test

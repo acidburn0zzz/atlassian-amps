@@ -38,7 +38,7 @@
                                 com.atlassian.maven.plugins:maven-refapp-plugin:test-jar
                             </package>
                             <pre-integration-test>
-                                com.atlassian.maven.plugins:maven-refapp-plugin:pre-integration-test
+                                com.atlassian.maven.plugins:maven-refapp-plugin:prepare-database
                             </pre-integration-test>
                             <integration-test>
                                 com.atlassian.maven.plugins:maven-refapp-plugin:integration-test
