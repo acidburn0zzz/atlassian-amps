@@ -52,7 +52,6 @@
         <module>amps-product-archetypes</module>
         <module>standalone</module>
         <module>maven-3-tests</module>
-        <module>sdk-installer</module>
     </modules>
 
     <dependencyManagement>
