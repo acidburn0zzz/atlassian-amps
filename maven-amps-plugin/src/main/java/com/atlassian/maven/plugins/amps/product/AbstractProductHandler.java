@@ -291,6 +291,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         artifacts.addAll(ctx.getLibArtifacts());
         addArtifactsToDirectory(artifacts, new File(appDir, getLibArtifactTargetDir()));
 
+        //add plugins provided by applications
         extractApplicationPlugins(pluginProvider.provideApplications(ctx), pluginsDir);
 
         artifacts = new ArrayList<ProductArtifact>();
