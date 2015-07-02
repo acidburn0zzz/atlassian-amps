@@ -10,15 +10,6 @@ public class Application
     public Application() {
     }
 
-    public Application(final String applicationKey) {
-        this.applicationKey = applicationKey;
-    }
-
-    public Application(final String applicationKey, final String version) {
-        this.applicationKey = applicationKey;
-        this.version = version;
-    }
-
     public String getApplicationKey()
     {
         return applicationKey;
