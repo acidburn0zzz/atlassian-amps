@@ -11,7 +11,5 @@ import java.util.List;
  */
 public interface PluginProvider
 {
-    List<ProductArtifact> providePlugins(Product product);
-
-    List<ProductArtifact> provideApplications(Product product);
+    List<ProductArtifact> provide(Product product);
 }

@@ -11,8 +11,7 @@ import java.util.Collections;
 
 public abstract class AbstractPluginProvider implements PluginProvider
 {
-    @Override
-    public final List<ProductArtifact> providePlugins(final Product product)
+    public final List<ProductArtifact> provide(Product product)
     {
         final List<ProductArtifact> artifacts = new ArrayList<ProductArtifact>();
         artifacts.addAll(product.getPluginArtifacts());
@@ -53,19 +52,6 @@ public abstract class AbstractPluginProvider implements PluginProvider
         }
 
         return artifacts;
-    }
-
-    @Override
-    public List<ProductArtifact> provideApplications(final Product product)
-    {
-        if (product.getApplications().isEmpty())
-        {
-            return Collections.emptyList();
-        }
-        else
-        {
-            throw new RuntimeException("Product " + product.getId() + " does not support applications.");
-        }
     }
 
     protected abstract Collection<ProductArtifact> getSalArtifacts(String salVersion);

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import com.atlassian.maven.plugins.amps.Application;
 import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
@@ -24,10 +23,7 @@ import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -494,10 +490,6 @@ public class JiraProductHandler extends AbstractWebappProductHandler
 
     private static class JiraPluginProvider extends AbstractPluginProvider
     {
-        private static final Map<String, ProductArtifact> applicationKeys = ImmutableMap.of(
-                "jira-software", new ProductArtifact("com.atlassian.jira", "jira-software-application"),
-                "jira-servicedesk", new ProductArtifact("com.atlassian.servicedesk", "jira-servicedesk-application"));
-
 
         @Override
         protected Collection<ProductArtifact> getSalArtifacts(String salVersion)
@@ -514,35 +506,6 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             plugins.addAll(super.getPdkInstallArtifacts(pdkInstallVersion));
             plugins.add(new ProductArtifact("commons-fileupload", "commons-fileupload", "1.2.1"));
             return plugins;
-        }
-
-        @Override
-        public List<ProductArtifact> provideApplications(final Product product)
-        {
-            return ImmutableList.copyOf(Iterables
-                    .transform(product.getApplications(), new Function<Application, ProductArtifact>()
-                    {
-                        @Override
-                        public ProductArtifact apply(final Application input)
-                        {
-                            final String applicationKey = input.getApplicationKey();
-                            if (applicationKeys.containsKey(applicationKey))
-                            {
-                                final ProductArtifact artifact = applicationKeys.get(applicationKey);
-                                return copyOfArtifactWithVersion(artifact, input.getVersion());
-                            } else
-                            {
-                                throw new RuntimeException("Unknown application key: " + applicationKey
-                                        + " Possible values: " + StringUtils
-                                        .join(applicationKeys.keySet(), ", "));
-                            }
-                        }
-                    }));
-        }
-
-        private ProductArtifact copyOfArtifactWithVersion(final ProductArtifact artifact, final String version)
-        {
-            return new ProductArtifact(artifact.getGroupId(), artifact.getArtifactId(), version);
         }
     }
 
