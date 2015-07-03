@@ -3,7 +3,6 @@ package com.atlassian.maven.plugins.amps;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -46,8 +45,6 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
@@ -130,7 +127,6 @@ public class MavenGoals
                 put("maven-exec-plugin", overrides.getProperty("maven-exec-plugin","1.2.1"));
                 put("sql-maven-plugin", overrides.getProperty("sql-maven-plugin", "1.5"));
                 put("maven-javadoc-plugin", overrides.getProperty("maven-javadoc-plugin", "2.8.1"));
-                put("maven-antrun-plugin", overrides.getProperty("maven-antrun-plugin","1.6"));
             }};
     }
 
@@ -1874,39 +1870,6 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
-    }
-
-    public void unzipJarsFromFileToDirectory(final String sourceFile, final File outputDirectory)
-            throws MojoExecutionException
-    {
-        try
-        {
-            executeMojo(
-                    plugin(
-                            groupId("org.apache.maven.plugins"),
-                            artifactId("maven-antrun-plugin"),
-                            version(defaultArtifactIdToVersionMap.get("maven-antrun-plugin"))
-                    ),
-                    goal("run"),
-                    Xpp3DomBuilder.build(new StringReader("<configuration><tasks>\n"
-                            + "<unzip src=\"" + sourceFile + "\"\n"
-                            + "       dest=\"" + outputDirectory + "\">\n"
-                            + "    <patternset>\n"
-                            + "        <include name=\"**/*.jar\"/>\n"
-                            + "    </patternset>\n"
-                            + "    <flattenmapper/>\n"
-                            + "</unzip></tasks></configuration>"))
-                    ,
-                    executionEnvironment());
-        }
-        catch (final XmlPullParserException e)
-        {
-            throw new MojoExecutionException("Unable to extract file: " + sourceFile,e);
-        }
-        catch (final IOException e)
-        {
-            throw new MojoExecutionException("Unable to extract file: " + sourceFile,e);
-        }
     }
 
     private static class Container extends ProductArtifact

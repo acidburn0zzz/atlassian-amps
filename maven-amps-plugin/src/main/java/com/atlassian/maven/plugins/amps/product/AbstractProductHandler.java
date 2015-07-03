@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
 import com.atlassian.maven.plugins.amps.MavenContext;
@@ -421,12 +422,14 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     }
 
     private void extractApplicationPlugins(final List<ProductArtifact> products, final File bundledPluginsDir)
-            throws MojoExecutionException, RuntimeException
+            throws MojoExecutionException, RuntimeException, IOException
     {
         for (final ProductArtifact product : products)
         {
-            final Artifact artifact = resolveArtifactForProduct(product);
-            goals.unzipJarsFromFileToDirectory(artifact.getFile().getAbsolutePath(), bundledPluginsDir);
+            final File artifact = resolveArtifactForProduct(product).getFile();
+            log.info("Extracting " + artifact.getAbsolutePath() + " into " + bundledPluginsDir.getAbsolutePath());
+            unzip(artifact, bundledPluginsDir.getAbsolutePath(), 0, true, Pattern.compile(".*\\.jar"));
+            log.debug("Extracted.");
         }
     }
 
