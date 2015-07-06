@@ -121,7 +121,7 @@
                             org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
                             com.atlassian.plugin.osgi.bridge.external,
-                            *;resolution:=optional
+                            *
                         </Import-Package>
 
                         <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->
@@ -150,14 +150,6 @@
                         </dependency>
                     </scannedDependencies>
                     <verbose>false</verbose>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${jdkLevel}</source>
-                    <target>${jdkLevel}</target>
                 </configuration>
             </plugin>
         </plugins>

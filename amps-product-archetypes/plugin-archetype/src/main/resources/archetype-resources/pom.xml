@@ -98,7 +98,7 @@
                             org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
                             com.atlassian.plugin.osgi.bridge.external,
-                            *;resolution:=optional
+
                         </Import-Package>
 
                         <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->
