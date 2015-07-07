@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
-import com.atlassian.maven.plugins.amps.Application;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
@@ -24,10 +22,9 @@ import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import com.google.common.collect.Iterables;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -39,13 +36,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-import static com.atlassian.fugue.Option.option;
 import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.JIRA;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.doesFileNameMatchArtifact;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
 import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.transform;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.iterateFiles;
 import static org.apache.commons.io.FileUtils.moveDirectory;
@@ -53,12 +47,20 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 
 public abstract class AbstractProductHandler extends AmpsProductHandler
 {
+    private static final Map<String, Map<String, GroupArtifactPair>> APPLICATION_KEYS =
+            ImmutableMap.<String, Map<String, GroupArtifactPair>>of(
+                    JIRA, ImmutableMap.of(
+                            "jira-software", new GroupArtifactPair("com.atlassian.jira", "jira-software-application"),
+                            "jira-servicedesk", new GroupArtifactPair("com.atlassian.servicedesk", "jira-servicedesk-application")));
+
     private final PluginProvider pluginProvider;
+    private final ApplicationMapper applicationMapper;
 
     protected AbstractProductHandler(MavenContext context, MavenGoals goals, PluginProvider pluginProvider, ArtifactFactory artifactFactory)
     {
         super(context, goals, artifactFactory);
         this.pluginProvider = pluginProvider;
+        this.applicationMapper = new ApplicationMapper(APPLICATION_KEYS);
     }
 
     /**
@@ -147,7 +149,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         File[] topLevelFiles = tmpDir.listFiles();
         if (topLevelFiles.length != 1)
         {
-            Iterable<String> filenames = transform(Arrays.asList(topLevelFiles), new Function<File, String>()
+            Iterable<String> filenames = Iterables.transform(Arrays.asList(topLevelFiles), new Function<File, String>()
             {
                 @Override
                 public String apply(File from)
@@ -301,7 +303,8 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         addArtifactsToDirectory(artifacts, new File(appDir, getLibArtifactTargetDir()));
 
         //add plugins provided by applications
-        extractApplicationPlugins(provideApplications(ctx), pluginsDir);
+        List<ProductArtifact> applications = applicationMapper.provideApplications(ctx);
+        extractApplicationPlugins(applications, pluginsDir);
 
         artifacts = new ArrayList<ProductArtifact>();
         artifacts.addAll(getDefaultBundledPlugins());
@@ -321,54 +324,6 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         {
             copyFile(ctx.getLog4jProperties(), new File(appDir, getLog4jPropertiesPath()));
         }
-    }
-
-    private static final Map<String, Map<String, ProductArtifact>> applicationKeys =
-            ImmutableMap.<String, Map<String, ProductArtifact>>of(
-                    JIRA, ImmutableMap.of(
-                            "jira-software", new ProductArtifact("com.atlassian.jira", "jira-software-application"),
-                            "jira-servicedesk", new ProductArtifact("com.atlassian.servicedesk", "jira-servicedesk-application")));
-
-
-    private List<ProductArtifact> provideApplications(final Product product)
-    {
-        return option(applicationKeys.get(product.getId()))
-                     .map(new Function<Map<String, ProductArtifact>, List<ProductArtifact>>()
-                     {
-                         @Override
-                         public List<ProductArtifact> apply(final Map<String, ProductArtifact> applicationKeysForProduct)
-                         {
-                             final Predicate<Application> isApplicationSupportedByProduct = new Predicate<Application>()
-                             {
-                                 @Override
-                                 public boolean apply(final Application application)
-                                 {
-                                     final String applicationKey = application.getApplicationKey();
-                                     return applicationKeysForProduct.containsKey(applicationKey);
-                                 }
-                             };
-                             final Function<Application, ProductArtifact> toProductArtifact = new Function<Application, ProductArtifact>()
-                             {
-                                 @Override
-                                 public ProductArtifact apply(final Application application)
-                                 {
-                                     final String applicationKey = application.getApplicationKey();
-                                     final ProductArtifact artifact = applicationKeysForProduct.get(applicationKey);
-                                     return copyOfArtifactWithVersion(artifact, application.getVersion());
-                                 }
-                             };
-
-                             return ImmutableList.copyOf(
-                                     transform(
-                                             filter(product.getApplications(), isApplicationSupportedByProduct),
-                                             toProductArtifact));
-                         }
-                     }).getOrElse(Collections.<ProductArtifact>emptyList());
-    }
-
-    private ProductArtifact copyOfArtifactWithVersion(final ProductArtifact artifact, final String version)
-    {
-        return new ProductArtifact(artifact.getGroupId(), artifact.getArtifactId(), version);
     }
 
     /**
