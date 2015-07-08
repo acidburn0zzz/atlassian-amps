@@ -59,7 +59,7 @@
                 <tests>
                     product,
                     copyBundledDependencies,
-                    <!-- Commenting out create plugin test as fecru does not work with java8 -->
+                    <!-- Commenting out create plugin test as fecru does not work with java8, see AMPS-1260-->
                     <!-- create, -->
                     debug,
                     filterPluginDescriptorWithoutPluginDescriptor,
