@@ -5,7 +5,7 @@ import com.atlassian.maven.plugins.amps.cli.IdeaMojo;
 import org.apache.maven.plugins.annotations.Mojo;
 
 /**
- * @since 3.10
+ * @since 6.1.0
  */
 @Mojo(name = "idea", requiresProject = false)
 public class BitbucketIdeaMojo extends IdeaMojo

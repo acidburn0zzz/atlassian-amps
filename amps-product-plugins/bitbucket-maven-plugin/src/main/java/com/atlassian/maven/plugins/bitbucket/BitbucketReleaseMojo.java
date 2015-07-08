@@ -7,7 +7,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 
 /**
- * @since 3.10
+ * @since 6.1.0
  */
 @Mojo(name = "release")
 public class BitbucketReleaseMojo extends ReleaseMojo

@@ -111,15 +111,16 @@ public class StashProductHandler extends AbstractWebappProductHandler
     @Override
     public Map<String, String> getSystemProperties(final Product ctx)
     {
-        ImmutableMap.Builder<String, String> properties = ImmutableMap.builder();
-        properties.putAll(super.getSystemProperties(ctx));
-        properties.put("stash.home", fixSlashes(getHomeDirectory(ctx).getPath()));
-
         String baseUrl = MavenGoals.getBaseUrl(ctx, ctx.getHttpPort());
-        properties.put("baseurl", baseUrl);
-        properties.put("baseurl.display", baseUrl);
-        properties.put("cargo.servlet.uriencoding", "UTF-8");
-        return properties.build();
+
+        return ImmutableMap.<String, String>builder()
+                .putAll(super.getSystemProperties(ctx))
+                .put("baseurl", baseUrl)
+                .put("baseurl.display", baseUrl)
+                .put("cargo.servlet.uriencoding", "UTF-8")
+                .put("johnson.spring.lifecycle.synchronousStartup", Boolean.TRUE.toString())
+                .put("stash.home", fixSlashes(getHomeDirectory(ctx).getPath()))
+                .build();
     }
 
     @Override

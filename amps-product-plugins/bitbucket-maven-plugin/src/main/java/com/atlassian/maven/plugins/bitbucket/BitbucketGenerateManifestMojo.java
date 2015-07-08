@@ -5,7 +5,7 @@ import com.atlassian.maven.plugins.amps.osgi.GenerateManifestMojo;
 import org.apache.maven.plugins.annotations.Mojo;
 
 /**
- * @since 3.10
+ * @since 6.1.0
  */
 @Mojo(name = "generate-manifest")
 public class BitbucketGenerateManifestMojo extends GenerateManifestMojo
