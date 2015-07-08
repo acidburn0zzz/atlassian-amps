@@ -7,7 +7,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 
 @Mojo(name = "create", requiresProject = false)
-public class FeCruCreateMojo extends CreateMojo {
+public class FeCruCreateMojo extends CreateMojo
+{
     @Override
     protected String getDefaultProductId() throws MojoExecutionException
     {
