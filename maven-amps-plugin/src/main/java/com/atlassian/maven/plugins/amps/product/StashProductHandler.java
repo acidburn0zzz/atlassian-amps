@@ -75,7 +75,7 @@ public class StashProductHandler extends AbstractWebappProductHandler
     @Override
     public String getDefaultContainerId()
     {
-        return "tomcat7x";
+        return "tomcat8x";
     }
 
     @Override

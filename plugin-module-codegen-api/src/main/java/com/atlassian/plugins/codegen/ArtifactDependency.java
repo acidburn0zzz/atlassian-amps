@@ -26,7 +26,7 @@ public final class ArtifactDependency implements PluginProjectChange
      * Creates a dependency descriptor whose version string is provided explicitly.
      * @param groupId  Maven group ID
      * @param artifactId  Maven artifact ID
-     * @param version  the version identifier
+     * @param versionId  the version identifier
      * @param scope  dependency scope (use DEfAULT to omit scope declaration)
      */
     public static ArtifactDependency dependency(String groupId, String artifactId, VersionId versionId, Scope scope)
