@@ -15,7 +15,8 @@ public class FeCruCreateMojo extends CreateMojo {
 
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException {
+        getLog().error("!!! Important information !!!");
         getLog().error("FeCru does not support java8 yet so this command is temporarily switched off. Try using an earlier amps version or creating a default amps plugin instead: atlas-create-plugin");
-        throw new MojoFailureException("FeCru does not support java8 yet so this command is temporarily switched off. Try using an earlier amps version or creating a default amps plugin instead: atlas-create-plugin");
+        getLog().error("");
     }
 }
