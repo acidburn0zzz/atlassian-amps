@@ -50,7 +50,7 @@ public abstract class AbstractPluginProvider implements PluginProvider
         {
             artifacts.addAll(getPdeArtifacts(product.getPdeVersion()));
         }
-        
+
         return artifacts;
     }
 

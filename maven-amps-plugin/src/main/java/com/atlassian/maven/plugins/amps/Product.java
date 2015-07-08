@@ -133,6 +133,10 @@ public class Product
 
     /**
      */
+    private List<Application> applications = new ArrayList<Application>();
+
+    /**
+     */
     private List<ProductArtifact> pluginArtifacts = new ArrayList<ProductArtifact>();
 
     /**
@@ -372,6 +376,7 @@ public class Product
         prod.setBundledArtifacts(bundledArtifacts.isEmpty() ? product.getBundledArtifacts() : bundledArtifacts);
         prod.setPluginArtifacts(pluginArtifacts.isEmpty() ? product.getPluginArtifacts() : pluginArtifacts);
         prod.setLibArtifacts(libArtifacts.isEmpty() ? product.getLibArtifacts() : libArtifacts);
+        prod.setApplications(applications.isEmpty() ? product.getApplications() : applications);
 
         prod.setDataPath(StringUtils.isBlank(productDataPath) ? product.getDataPath() : productDataPath);
         prod.setDataVersion(productDataVersion == null ? product.getDataVersion() : productDataVersion);
@@ -674,6 +679,16 @@ public class Product
     public void setProductDataPath(String productDataPath)
     {
         this.productDataPath = productDataPath;
+    }
+
+    public List<Application> getApplications()
+    {
+        return applications;
+    }
+
+    public void setApplications(final List<Application> applications)
+    {
+        this.applications = applications;
     }
 
     public List<ProductArtifact> getPluginArtifacts()
