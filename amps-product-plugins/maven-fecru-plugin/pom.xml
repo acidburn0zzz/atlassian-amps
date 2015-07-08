@@ -57,16 +57,19 @@
                 <product.data.version>${fecru.data.version}</product.data.version>
                 <project.version>${project.version}</project.version>
                 <tests>
-                product,
-                copyBundledDependencies, create, debug,
-                filterPluginDescriptorWithoutPluginDescriptor,
-                filterPluginDescriptorWithPluginDescriptor, generateManifestWithInstructions,
-                generateManifestWithNoInstructions, generateObr, libArtifact
-                <!-- Commenting out tests that start fecru until AMPS-312 is fixed -->
-                <!-- cli, integrationTest, integrationTestWithTestGroup, run, stop -->
-                jarWithExistingManifest,  nexus_staging,
-                unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
-                validateManifestWithValidManifest, libArtifacts
+                    product,
+                    copyBundledDependencies,
+                    <!-- Commenting out create plugin test as fecru does not work with java8 -->
+                    <!-- create, -->
+                    debug,
+                    filterPluginDescriptorWithoutPluginDescriptor,
+                    filterPluginDescriptorWithPluginDescriptor, generateManifestWithInstructions,
+                    generateManifestWithNoInstructions, generateObr, libArtifact
+                    <!-- Commenting out tests that start fecru until AMPS-312 is fixed -->
+                    <!-- cli, integrationTest, integrationTestWithTestGroup, run, stop -->
+                    jarWithExistingManifest,  nexus_staging,
+                    unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
+                    validateManifestWithValidManifest, libArtifacts
                 </tests>
             </properties>
         </profile>
