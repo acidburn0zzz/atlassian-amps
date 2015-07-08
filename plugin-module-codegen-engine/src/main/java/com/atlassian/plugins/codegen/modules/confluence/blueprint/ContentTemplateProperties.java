@@ -11,7 +11,7 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 /**
- * Holds properties for the <content-template> module descriptor used in Blueprint creation.
+ * Holds properties for the {@code &lt;content-template&gt;} module descriptor used in Blueprint creation.
  *
  * @since 4.1.8
  */

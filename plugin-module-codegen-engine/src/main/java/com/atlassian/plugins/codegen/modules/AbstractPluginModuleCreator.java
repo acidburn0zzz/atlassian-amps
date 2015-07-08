@@ -119,7 +119,6 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      *   will be determined by {@link #funcTestClassFor(ClassId)}
      * @param mainTemplate  path to the template file for creating the main source code
      * @param unitTestTemplate  path to the template file for creating the unit test source code
-     * @param unitTestTemplate  path to the template file for creating the functional test source code
      * @return  a {@link PluginProjectChangeset} that describes the new files
      */
     protected PluginProjectChangeset createClassAndTests(ClassBasedModuleProperties props,
@@ -176,7 +175,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
     }
 
     /**
-     * Wrapper for {@link #createTemplateResource(Map, Resource, String)} that derives the path
+     * Wrapper for {@link #createTemplateResource(Map, String, String, String)} that derives the path
      * and filename from a {@link Resource} object.  Also sets the property "CURRENT_VIEW" to the
      * filename when generating the template.
      * @param props  property set whose properties may be used in the template
@@ -214,7 +213,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      * @param templatePath  path to the template file
      * @param props  properties that may be used in the template
      * @return  the generated content
-     * @throws Exception
+     * @throws Exception if the tmplate resource cannot be read
      */
     protected String fromTemplate(String templatePath, Map<Object, Object> props) throws Exception
     {
@@ -225,7 +224,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      * Reads a file as-is from the classpath, with no template substitution.
      * @param filePath  path to the template file
      * @return  the file content
-     * @throws Exception
+     * @throws Exception if the tmplate resource cannot be read
      */
     protected String fromFile(String filePath) throws Exception
     {
