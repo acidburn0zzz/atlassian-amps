@@ -9,12 +9,14 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name = "create", requiresProject = false)
 public class FeCruCreateMojo extends CreateMojo {
     @Override
-    protected String getDefaultProductId() throws MojoExecutionException {
+    protected String getDefaultProductId() throws MojoExecutionException
+    {
         return ProductHandlerFactory.FECRU;
     }
 
     @Override
-    protected void doExecute() throws MojoExecutionException, MojoFailureException {
+    protected void doExecute() throws MojoExecutionException, MojoFailureException
+    {
         //due to AMPS-1260
         getLog().error("!!! Important information !!!");
         getLog().error("FeCru does not support java8 yet so this command is temporarily switched off. Try using an earlier amps version or creating a default amps plugin instead: atlas-create-plugin");
