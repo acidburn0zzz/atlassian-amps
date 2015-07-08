@@ -15,12 +15,14 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -408,6 +410,47 @@ public class TestZipUtils
         File nestedUnzip = new File(unzipDir, SECOND_PREFIX);
 
         assertTrue("nested prefix folder in zip should have been trimmed", !nestedUnzip.exists());
+    }
+
+    @Test
+    public void unzipAndFlatten() throws IOException
+    {
+        File zipFile = new File(tempDir, "zip-flatten.zip");
+        ZipUtils.zipDir(zipFile, sourceZipDir, "");
+
+        File unzipDir = new File(tempDir, "unzip-flatten");
+        ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath(), 0, true, null);
+
+        File level2TextFile = new File(unzipDir, "level2sub2.txt");
+        File level3TextFile = new File(unzipDir, "level3sub1.txt");
+
+        assertTrue(level2TextFile.exists());
+        assertTrue(level3TextFile.exists());
+    }
+
+    @Test
+    public void unzipPatternShouldMatch() throws IOException
+    {
+        File zipFile = new File(tempDir, "zip-pattern.zip");
+        ZipUtils.zipDir(zipFile, sourceZipDir, "");
+
+        File unzipDir = new File(tempDir, "unzip-pattern");
+        ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath(), 0, false, null);
+
+        File level2TextFile = new File(unzipDir, "test-zip-dir/level2sub2/level2sub2.txt");
+        File level3TextFile = new File(unzipDir, "test-zip-dir/level2sub2/level3sub1/level3sub1.txt");
+
+        assertTrue(level2TextFile.exists());
+        assertTrue(level3TextFile.exists());
+
+        unzipDir = new File(tempDir, "unzip-pattern-2");
+        ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath(), 0, false, Pattern.compile(".+level2sub2.txt"));
+
+        level2TextFile = new File(unzipDir, "test-zip-dir/level2sub2/level2sub2.txt");
+        level3TextFile = new File(unzipDir, "test-zip-dir/level2sub2/level3sub1/level3sub1.txt");
+
+        assertTrue(level2TextFile.exists());
+        assertFalse(level3TextFile.exists());
     }
 
     @Test

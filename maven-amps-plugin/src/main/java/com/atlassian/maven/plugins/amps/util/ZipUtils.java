@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import java.io.*;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 
@@ -114,6 +115,29 @@ public class ZipUtils
      */
     public static void unzip(final File zipFile, final String destDir, int leadingPathSegmentsToTrim) throws IOException
     {
+        unzip(zipFile, destDir, leadingPathSegmentsToTrim, false, null);
+    }
+
+    /**
+     * Unzips a file
+     *
+     * @param zipFile
+     *            the Zip file
+     * @param destDir
+     *            the destination folder
+     * @param leadingPathSegmentsToTrim
+     *            number of root folders to skip. Example: If all files are in generated-resources/home/*,
+     *            then you may want to skip 2 folders.
+     * @param flatten
+     *            if true all files from zip are extracted directly to destDir without keeping the subdirectories
+     *            structure from the zip file
+     * @param pattern
+     *            pattern that must be meet by zip entry to be extracted
+     * @throws IOException
+     */
+    public static void unzip(final File zipFile, final String destDir, final int leadingPathSegmentsToTrim,
+                             final boolean flatten, final Pattern pattern) throws IOException
+    {
         final ZipFile zip = new ZipFile(zipFile);
         try
         {
@@ -121,39 +145,46 @@ public class ZipUtils
             while (entries.hasMoreElements())
             {
                 final ZipArchiveEntry zipEntry = entries.nextElement();
-                String zipPath = trimPathSegments(zipEntry.getName(), leadingPathSegmentsToTrim);
-                final File file = new File(destDir + "/" + zipPath);
-                if (zipEntry.isDirectory())
+                final String name = zipEntry.getName();
+                if(pattern == null || pattern.matcher(name).matches())
                 {
-                    file.mkdirs();
-                    continue;
-                }
-                // make sure our parent exists in case zipentries are out of order
-                if (!file.getParentFile().exists())
-                {
-                    file.getParentFile().mkdirs();
-                }
-
-                InputStream is = null;
-                OutputStream fos = null;
-                try
-                {
-                    is = zip.getInputStream(zipEntry);
-                    fos = new FileOutputStream(file);
-                    IOUtils.copy(is, fos);
-
-                    // check for user-executable bit on entry and apply to file
-                    if ((zipEntry.getUnixMode() & 0100) != 0)
+                    String zipPath = trimPathSegments(name, leadingPathSegmentsToTrim);
+                    if (flatten)
                     {
-                        file.setExecutable(true);
+                        zipPath = flattenPath(zipPath);
                     }
+                    final File file = new File(destDir + "/" + zipPath);
+                    if (zipEntry.isDirectory())
+                    {
+                        file.mkdirs();
+                        continue;
+                    }
+                    // make sure our parent exists in case zipentries are out of order
+                    if (!file.getParentFile().exists())
+                    {
+                        file.getParentFile().mkdirs();
+                    }
+
+                    InputStream is = null;
+                    OutputStream fos = null;
+                    try
+                    {
+                        is = zip.getInputStream(zipEntry);
+                        fos = new FileOutputStream(file);
+                        IOUtils.copy(is, fos);
+
+                        // check for user-executable bit on entry and apply to file
+                        if ((zipEntry.getUnixMode() & 0100) != 0)
+                        {
+                            file.setExecutable(true);
+                        }
+                    } finally
+                    {
+                        IOUtils.closeQuietly(is);
+                        IOUtils.closeQuietly(fos);
+                    }
+                    file.setLastModified(zipEntry.getTime());
                 }
-                finally
-                {
-                    IOUtils.closeQuietly(is);
-                    IOUtils.closeQuietly(fos);
-                }
-                file.setLastModified(zipEntry.getTime());
             }
         }
         finally
@@ -379,6 +410,11 @@ public class ZipUtils
         }
 
         return zipPath.substring(startIndex);
+    }
+
+    private static String flattenPath(String zipPath)
+    {
+        return zipPath.substring(Math.max(zipPath.lastIndexOf("/"), 0));
     }
 
 }
