@@ -114,7 +114,7 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     {
         ImmutableMap.Builder<String, String> properties = ImmutableMap.builder();
         properties.putAll(super.getSystemProperties(ctx));
-        properties.put("bb.home", fixSlashes(getHomeDirectory(ctx).getPath()));
+        properties.put("bitbucket.home", fixSlashes(getHomeDirectory(ctx).getPath()));
 
         String baseUrl = MavenGoals.getBaseUrl(ctx, ctx.getHttpPort());
         properties.put("baseurl", baseUrl);
