@@ -136,7 +136,8 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
         File baseDir = homeDir;
 
         File sharedHomeDir = new File(homeDir, "shared");
-        if(sharedHomeDir.exists()) {
+        if(sharedHomeDir.exists())
+        {
             baseDir = sharedHomeDir;
         }
 

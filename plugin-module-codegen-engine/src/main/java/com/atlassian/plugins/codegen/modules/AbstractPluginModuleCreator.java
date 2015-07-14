@@ -213,7 +213,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      * @param templatePath  path to the template file
      * @param props  properties that may be used in the template
      * @return  the generated content
-     * @throws Exception if the tmplate resource cannot be read
+     * @throws Exception if the template resource cannot be read
      */
     protected String fromTemplate(String templatePath, Map<Object, Object> props) throws Exception
     {
@@ -224,7 +224,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      * Reads a file as-is from the classpath, with no template substitution.
      * @param filePath  path to the template file
      * @return  the file content
-     * @throws Exception if the tmplate resource cannot be read
+     * @throws Exception if the template resource cannot be read
      */
     protected String fromFile(String filePath) throws Exception
     {

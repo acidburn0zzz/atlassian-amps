@@ -204,7 +204,8 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
             return new PluginInformation("amps", "");
         }
         String productId = pluginArtifactId.replaceAll("maven-(.*)-plugin", "$1");
-        if (productId.equals(pluginArtifactId)) {
+        if (productId.equals(pluginArtifactId))
+        {
             productId = pluginArtifactId.replaceAll("(.*)-maven-plugin", "$1");
         }
         return new PluginInformation(productId, pluginVersion);
