@@ -125,10 +125,8 @@
 
                         <!-- Add package import here -->
                         <Import-Package>
-                            com.atlassian.sal.api;version="2.7",
                             org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
-                            com.atlassian.plugin.osgi.bridge.external,
                             *
                         </Import-Package>
 
