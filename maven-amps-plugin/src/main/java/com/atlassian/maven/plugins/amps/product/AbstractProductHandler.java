@@ -1,20 +1,5 @@
 package com.atlassian.maven.plugins.amps.product;
 
-import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
-import com.atlassian.maven.plugins.amps.util.FileUtils;
-import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import org.apache.commons.lang.StringUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.plugin.MojoExecutionException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +9,34 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
+import com.atlassian.maven.plugins.amps.util.FileUtils;
+import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
+
+import com.google.common.collect.Iterables;
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+
+import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.JIRA;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.doesFileNameMatchArtifact;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
 import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
@@ -35,12 +47,20 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 
 public abstract class AbstractProductHandler extends AmpsProductHandler
 {
+    private static final Map<String, Map<String, GroupArtifactPair>> APPLICATION_KEYS =
+            ImmutableMap.<String, Map<String, GroupArtifactPair>>of(
+                    JIRA, ImmutableMap.of(
+                            "jira-software", new GroupArtifactPair("com.atlassian.jira", "jira-software-application"),
+                            "jira-servicedesk", new GroupArtifactPair("com.atlassian.servicedesk", "jira-servicedesk-application")));
+
     private final PluginProvider pluginProvider;
+    private final ApplicationMapper applicationMapper;
 
     protected AbstractProductHandler(MavenContext context, MavenGoals goals, PluginProvider pluginProvider, ArtifactFactory artifactFactory)
     {
         super(context, goals, artifactFactory);
         this.pluginProvider = pluginProvider;
+        this.applicationMapper = new ApplicationMapper(APPLICATION_KEYS);
     }
 
     /**
@@ -282,6 +302,10 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         artifacts.addAll(ctx.getLibArtifacts());
         addArtifactsToDirectory(artifacts, new File(appDir, getLibArtifactTargetDir()));
 
+        //add plugins provided by applications
+        List<ProductArtifact> applications = applicationMapper.provideApplications(ctx);
+        extractApplicationPlugins(applications, pluginsDir);
+
         artifacts = new ArrayList<ProductArtifact>();
         artifacts.addAll(getDefaultBundledPlugins());
         artifacts.addAll(ctx.getBundledArtifacts());
@@ -406,6 +430,43 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
             }
             goals.copyPlugins(pluginsDir, artifacts);
         }
+    }
+
+    private void extractApplicationPlugins(final List<ProductArtifact> products, final File bundledPluginsDir)
+            throws MojoExecutionException, RuntimeException, IOException
+    {
+        for (final ProductArtifact product : products)
+        {
+            final File artifact = resolveArtifactForProduct(product).getFile();
+            log.info("Extracting " + artifact.getAbsolutePath() + " into " + bundledPluginsDir.getAbsolutePath());
+            unzip(artifact, bundledPluginsDir.getAbsolutePath(), 0, true, Pattern.compile(".*\\.jar"));
+            log.debug("Extracted.");
+        }
+    }
+
+    private Artifact resolveArtifactForProduct(final ProductArtifact product)
+    {
+        final Artifact artifact = artifactFactory.createArtifact(product.getGroupId(), product.getArtifactId(), product.getVersion(), "compile", "obr");
+        try
+        {
+            final MavenSession session = context.getExecutionEnvironment().getMavenSession();
+            final MavenProject project = context.getExecutionEnvironment().getMavenProject();
+            final ArtifactResolver resolver = session.getContainer().lookup(ArtifactResolver.class);
+            resolver.resolve(artifact, project.getRemoteArtifactRepositories(), session.getLocalRepository());
+        }
+        catch (final ComponentLookupException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (final ArtifactNotFoundException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (final ArtifactResolutionException e)
+        {
+            throw new RuntimeException(e);
+        }
+        return artifact;
     }
 
     protected final void addOverrides(File appDir, final Product ctx) throws IOException
