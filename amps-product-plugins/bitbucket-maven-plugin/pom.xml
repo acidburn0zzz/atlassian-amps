@@ -42,6 +42,7 @@
                 </plugins>
             </build>
             <properties>
+                <shitty.artifactId>bitbucket-maven-plugin</shitty.artifactId>
                 <shitty.product>bitbucket</shitty.product>
                 <product.version>${bitbucket.version}</product.version>
                 <product.data.version>${bitbucket.data.version}</product.data.version>

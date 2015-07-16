@@ -9,8 +9,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-${shitty.product}-plugin</artifactId>
+                <groupId>${shitty.groupId}</groupId>
+                <artifactId>${shitty.artifactId}</artifactId>
                 <version>testing</version>
                 <configuration>
                     <closureJsCompiler>true</closureJsCompiler>

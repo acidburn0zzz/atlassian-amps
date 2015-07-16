@@ -391,7 +391,7 @@
         <guava.osgi.version>10.0.1</guava.osgi.version>
         <bamboo.version>4.4.5</bamboo.version>
         <bamboo.data.version>3.2.2</bamboo.data.version>
-        <bitbucket.version>4.0.0</bitbucket.version>
+        <bitbucket.version>4.0.0-m2</bitbucket.version>
         <bitbucket.data.version>${bitbucket.version}</bitbucket.data.version>
         <fecru.version>2.8.1-20120829051639</fecru.version>
         <fecru.data.version>2.8.1-20120829051639</fecru.data.version>
@@ -411,5 +411,8 @@
         <jtds.version>1.2.4</jtds.version>
         <release.profiles>release,installer-win,installer-linux,installer-osx</release.profiles>
         <release.arguments>-Pinstaller-win,installer-osx,installer-linux</release.arguments>
+        <shitty.artifactId>maven-${shitty.product}-plugin</shitty.artifactId>
+        <shitty.groupId>com.atlassian.maven.plugins</shitty.groupId>
+        <shitty.product>amps</shitty.product>
     </properties>
 </project>
