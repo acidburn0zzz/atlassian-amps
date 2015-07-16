@@ -14,13 +14,11 @@
     <modules>
         <module>refapp-plugin-archetype</module>
         <module>confluence-plugin-archetype</module>
-        <module>jira4-plugin-archetype</module>
         <module>jira-plugin-archetype</module>
         <module>bamboo-plugin-archetype</module>
         <module>bitbucket-plugin-archetype</module>
         <module>fecru-plugin-archetype</module>
         <module>crowd-plugin-archetype</module>
-        <module>studio-plugin-archetype</module>
         <module>stash-plugin-archetype</module>
         <module>plugin-archetype</module>
     </modules>
