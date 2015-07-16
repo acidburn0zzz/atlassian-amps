@@ -1,0 +1,27 @@
+package ${PACKAGE};
+
+import com.atlassian.bitbucket.scm.hook.*;
+import com.atlassian.bitbucket.repository.hook.*;
+import com.atlassian.bitbucket.repository.*;
+
+import java.util.Collection;
+
+public class ${CLASSNAME} implements PreReceiveRepositoryHook
+{
+    /**
+     * Disables deletion of branches
+     */
+    @Override
+    public boolean onReceive(RepositoryHookContext context, Collection<RefChange> refChanges, HookResponse hookResponse)
+    {
+        for (RefChange refChange : refChanges)
+        {
+            if (refChange.getType() == RefChangeType.DELETE)
+            {
+                hookResponse.err().println("The ref '" + refChange.getRefId() + "' cannot be deleted.");
+                return false;
+            }
+        }
+        return true;
+    }
+}

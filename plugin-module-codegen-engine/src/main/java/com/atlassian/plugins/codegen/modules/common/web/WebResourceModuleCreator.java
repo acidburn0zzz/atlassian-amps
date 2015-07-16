@@ -2,6 +2,7 @@ package com.atlassian.plugins.codegen.modules.common.web;
 
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.BitbucketPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
@@ -18,6 +19,7 @@ import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 @JiraPluginModuleCreator
 @ConfluencePluginModuleCreator
 @BambooPluginModuleCreator
+@BitbucketPluginModuleCreator
 @FeCruPluginModuleCreator
 @StashPluginModuleCreator
 public class WebResourceModuleCreator extends AbstractPluginModuleCreator<WebResourceProperties>

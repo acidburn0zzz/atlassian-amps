@@ -1,10 +1,12 @@
 package com.atlassian.plugins.codegen.annotations.asm;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.BitbucketPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
@@ -31,24 +33,27 @@ public class ModuleCreatorAnnotationParser extends AbstractAnnotationParser
 {
 
     public static final String MODULE_PACKAGE = "com.atlassian.plugins.codegen.modules";
-    protected static final Map<String, String> annotationProductMap = new HashMap<String, String>();
+    protected static final Map<String, String> annotationProductMap;
 
     static
     {
-        annotationProductMap.put(JiraPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.JIRA);
-        annotationProductMap.put(ConfluencePluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.CONFLUENCE);
-        annotationProductMap.put(BambooPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.BAMBOO);
-        annotationProductMap.put(CrowdPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.CROWD);
-        annotationProductMap.put(FeCruPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.FECRU);
-        annotationProductMap.put(StashPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.STASH);
-        annotationProductMap.put(RefAppPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.REFAPP);
+        Map<String, String> productMap = new HashMap<String, String>();
+        productMap.put(JiraPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.JIRA);
+        productMap.put(ConfluencePluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.CONFLUENCE);
+        productMap.put(BambooPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.BAMBOO);
+        productMap.put(BitbucketPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.BITBUCKET);
+        productMap.put(CrowdPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.CROWD);
+        productMap.put(FeCruPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.FECRU);
+        productMap.put(StashPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.STASH);
+        productMap.put(RefAppPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.REFAPP);
+
+        annotationProductMap = Collections.unmodifiableMap(productMap);
     }
 
     private final PluginModuleCreatorRegistry pluginModuleCreatorRegistry;
 
     public ModuleCreatorAnnotationParser(PluginModuleCreatorRegistry pluginModuleCreatorRegistry)
     {
-        super();
         this.pluginModuleCreatorRegistry = pluginModuleCreatorRegistry;
     }
 

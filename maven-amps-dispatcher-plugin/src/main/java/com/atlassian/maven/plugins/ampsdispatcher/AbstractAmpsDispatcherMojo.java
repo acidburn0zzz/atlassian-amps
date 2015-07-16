@@ -1,7 +1,6 @@
 package com.atlassian.maven.plugins.ampsdispatcher;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -75,7 +74,7 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
 
     final String determineGoal()
     {
-        String goal = (String) session.getGoals().get(0);
+        String goal = session.getGoals().get(0);
         goal = goal.substring(goal.lastIndexOf(":") + 1);
         return goal;
     }
@@ -89,15 +88,16 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
 
         if (buildPlugins != null)
         {
-            for (Iterator iterator = buildPlugins.iterator(); iterator.hasNext();)
+            for (Object buildPlugin : buildPlugins)
             {
-                Plugin pomPlugin = (Plugin) iterator.next();
+                Plugin pomPlugin = (Plugin) buildPlugin;
 
                 if ("com.atlassian.maven.plugins".equals(pomPlugin.getGroupId()))
                 {
                     for (String type : possiblePluginTypes)
                     {
-                        if (("maven-" + type + "-plugin").equals(pomPlugin.getArtifactId()))
+                        if (("maven-" + type + "-plugin").equals(pomPlugin.getArtifactId()) ||
+                                (type + "-maven-plugin").equals(pomPlugin.getArtifactId()))
                         {
                             return pomPlugin.getArtifactId();
                         }

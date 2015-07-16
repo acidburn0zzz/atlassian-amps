@@ -1,0 +1,69 @@
+package ${PACKAGE};
+
+import com.atlassian.bitbucket.commit.Commit;
+import com.atlassian.bitbucket.idx.IndexingContext;
+import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.bitbucket.user.Person;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Collections;
+
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
+
+import ${FQ_CLASS_UNDER_TEST};
+
+@RunWith(MockitoJUnitRunner.class)
+public class ${CLASSNAME}
+{
+
+    @Mock
+    private Person author;
+    @Mock
+    private Commit commit;
+    @Mock
+    private IndexingContext ctx;
+    private ${CLASS_UNDER_TEST} indexer;
+    @Mock
+    private Repository repository;
+
+    @Before
+    public void setup()
+    {
+        when(commit.getAuthor()).thenReturn(author);
+        indexer = new ${CLASS_UNDER_TEST}();
+    }
+
+    /**
+     * This example test adds a single commit to the index, and verifies that the indexer under test successfully
+     * adds an attribute to the IndexingContext.
+     */
+    @Test
+    public void testOnCommitAdded()
+    {
+        when(author.getEmailAddress()).thenReturn("tim@atlassian.com");
+        simulateIndexerLifecycle(Collections.singletonList(commit), Collections.<Commit>emptyList());
+        verify(ctx).put(eq("byAtlassian"), eq(true));
+        verifyNoMoreInteractions(ctx);
+    }
+
+    private void simulateIndexerLifecycle(Iterable<Commit> added, Iterable<Commit> removed)
+    {
+        assertTrue(indexer.isEnabledForRepository(repository));
+        indexer.onBeforeIndexing(ctx);
+        for (Commit commit : added)
+        {
+            indexer.onCommitAdded(commit, ctx);
+        }
+        for (Commit commit : removed)
+        {
+            indexer.onCommitRemoved(commit, ctx);
+        }
+        indexer.onAfterIndexing(ctx);
+    }
+
+}

@@ -1,0 +1,55 @@
+package ${PACKAGE};
+
+import com.atlassian.bitbucket.commit.Commit;
+import com.atlassian.bitbucket.idx.CommitIndexer;
+import com.atlassian.bitbucket.idx.IndexingContext;
+import com.atlassian.bitbucket.repository.Repository;
+
+import javax.annotation.Nonnull;
+
+public class ${CLASSNAME} implements CommitIndexer
+{
+
+    @Nonnull
+    @Override
+    public String getId()
+    {
+        return "${MODULE_KEY}";
+    }
+
+    @Override
+    public boolean isEnabledForRepository(@Nonnull Repository repository)
+    {
+        // enabled for all repositories
+        return true;
+    }
+
+    @Override
+    public void onAfterIndexing(@Nonnull IndexingContext ctx)
+    {
+        // nothing to do after indexing run
+    }
+
+    @Override
+    public void onBeforeIndexing(@Nonnull IndexingContext ctx)
+    {
+        // nothing to do before indexing run
+    }
+
+    @Override
+    public void onCommitAdded(@Nonnull Commit commit, @Nonnull IndexingContext ctx)
+    {
+        // example code: add byAtlassian attribute to Atlassian authored commits
+        if (commits.getAuthor().getEmailAddress().endsWith("@atlassian.com"))
+        {
+            indexingContext.put("byAtlassian", true);
+        }
+    }
+
+    @Override
+    public void onCommitRemoved(@Nonnull Commit commit, @Nonnull IndexingContext ctx)
+    {
+        // nothing to do, commit attributes will be automatically cleaned up
+    }
+
+}

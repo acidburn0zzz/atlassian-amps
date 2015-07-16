@@ -106,6 +106,8 @@ under the License.
                 <confluence.data.version>${confluence.data.version}</confluence.data.version>
                 <bamboo.version>${bamboo.version}</bamboo.version>
                 <bamboo.data.version>${bamboo.data.version}</bamboo.data.version>
+                <bitbucket.version>${bitbucket.version}</bitbucket.version>
+                <bitbucket.data.version>${bitbucket.data.version}</bitbucket.data.version>
                 <fecru.version>${fecru.version}</fecru.version>
                 <fecru.data.version>${fecru.data.version}</fecru.data.version>
                 <crowd.version>${crowd.version}</crowd.version>

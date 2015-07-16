@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.atlassian.amps</groupId>
@@ -45,16 +46,14 @@
                 <product.version>${stash.version}</product.version>
                 <product.data.version>${stash.data.version}</product.data.version>
                 <tests>
-                cli, compressResources, copyBundledDependencies, create, debug,
-                debugWithTestGroup, 
-                filterPluginDescriptorWithoutPluginDescriptor,
-                filterPluginDescriptorWithPluginDescriptor, generateManifestWithInstructions,
-                generateManifestWithNoInstructions, generateManifestWithNoInstructionsButIsAtlassianPlugin,
-                generateManifestWithNoInstructionsNorIsAtlassianPlugin, generateObr, integrationTest,
-                integrationTestWithTestGroup, nexus_staging,
-                jarWithExistingManifest, run, runParallel, runWithTestGroup, 
-                unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
-                validateManifestWithValidManifest
+                    cli, compressResources, copyBundledDependencies, create, debug, debugWithTestGroup,
+                    filterPluginDescriptorWithoutPluginDescriptor, filterPluginDescriptorWithPluginDescriptor,
+                    generateManifestWithInstructions, generateManifestWithNoInstructions,
+                    generateManifestWithNoInstructionsButIsAtlassianPlugin,
+                    generateManifestWithNoInstructionsNorIsAtlassianPlugin, generateObr, integrationTest,
+                    integrationTestWithTestGroup, nexus_staging, jarWithExistingManifest, run, runParallel,
+                    runWithTestGroup, unitTest, validateManifestSkipValidation,
+                    validateManifestWithInvalidManifest, validateManifestWithValidManifest
                 </tests>
             </properties>
         </profile>

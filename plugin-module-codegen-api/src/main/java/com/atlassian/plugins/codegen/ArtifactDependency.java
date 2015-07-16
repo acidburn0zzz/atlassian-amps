@@ -26,8 +26,8 @@ public final class ArtifactDependency implements PluginProjectChange
      * Creates a dependency descriptor whose version string is provided explicitly.
      * @param groupId  Maven group ID
      * @param artifactId  Maven artifact ID
-     * @param version  the version identifier
-     * @param scope  dependency scope (use DEfAULT to omit scope declaration)
+     * @param versionId  the version identifier
+     * @param scope  dependency scope (use DEFAULT to omit scope declaration)
      */
     public static ArtifactDependency dependency(String groupId, String artifactId, VersionId versionId, Scope scope)
     {
@@ -39,7 +39,7 @@ public final class ArtifactDependency implements PluginProjectChange
      * @param groupId  Maven group ID
      * @param artifactId  Maven artifact ID
      * @param version  the version string
-     * @param scope  dependency scope (use DEfAULT to omit scope declaration)
+     * @param scope  dependency scope (use DEFAULT to omit scope declaration)
      */
     public static ArtifactDependency dependency(String groupId, String artifactId, String version, Scope scope)
     {
@@ -50,7 +50,7 @@ public final class ArtifactDependency implements PluginProjectChange
      * Creates a dependency descriptor whose version string is provided explicitly.
      * @param groupAndArtifactId  Maven group and artifact ID
      * @param versionId  the version identifier
-     * @param scope  dependency scope (use DEfAULT to omit scope declaration)
+     * @param scope  dependency scope (use DEFAULT to omit scope declaration)
      */
     public static ArtifactDependency dependency(ArtifactId groupAndArtifactId, VersionId versionId, Scope scope)
     {
@@ -61,7 +61,7 @@ public final class ArtifactDependency implements PluginProjectChange
      * Creates a dependency descriptor whose version string is provided explicitly.
      * @param groupAndArtifactId  Maven group and artifact ID
      * @param version  the version string
-     * @param scope  dependency scope (use DEfAULT to omit scope declaration)
+     * @param scope  dependency scope (use DEFAULT to omit scope declaration)
      */
     public static ArtifactDependency dependency(ArtifactId groupAndArtifactId, String version, Scope scope)
     {

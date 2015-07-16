@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.pom</groupId>
         <artifactId>public-pom</artifactId>
-        <version>3.0.11</version>
+        <version>3.0.90</version>
     </parent>
 
     <groupId>com.atlassian.amps</groupId>
@@ -45,13 +45,13 @@
         <module>test-codegen-jar-classes</module>
         <module>plugin-module-codegen-engine</module>
         <module>plugin-module-codegen-maven-client</module>
-        <module>maven-amps-plugin</module>
-        <module>maven-amps-dispatcher-plugin</module>
-        <module>atlassian-plugin-sdk</module>
-        <module>amps-product-plugins</module>
-        <module>amps-product-archetypes</module>
         <module>standalone</module>
+        <module>amps-product-archetypes</module>
+        <module>maven-amps-plugin</module>
         <module>maven-3-tests</module>
+        <module>maven-amps-dispatcher-plugin</module>
+        <module>amps-product-plugins</module>
+        <module>atlassian-plugin-sdk</module>
         <module>sdk-installer</module>
     </modules>
 
@@ -125,8 +125,8 @@
         </dependency>
         <dependency>
             <groupId>junit</groupId>
-            <artifactId>junit-dep</artifactId>
-            <version>4.5</version>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -138,7 +138,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>1.8.5</version>
+            <version>1.9.5</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -150,7 +150,7 @@
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
-            <version>1.2</version>
+            <version>1.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -217,6 +217,7 @@
                             <artifact>com.atlassian.maven.plugins:maven-confluence-plugin:${project.version}</artifact>
                             <artifact>com.atlassian.maven.plugins:maven-jira-plugin:${project.version}</artifact>
                             <artifact>com.atlassian.maven.plugins:maven-bamboo-plugin:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.plugins:bitbucket-maven-plugin:${project.version}</artifact>
                             <artifact>com.atlassian.maven.plugins:maven-fecru-plugin:${project.version}</artifact>
                             <artifact>com.atlassian.maven.plugins:maven-crowd-plugin:${project.version}</artifact>
                             <artifact>com.atlassian.maven.plugins:maven-stash-plugin:${project.version}</artifact>
@@ -226,6 +227,7 @@
                             <artifact>com.atlassian.maven.archetypes:confluence-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:jira-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:bamboo-plugin-archetype:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.archetypes:bitbucket-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:fecru-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:crowd-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:stash-plugin-archetype:${project.version}</artifact>
@@ -332,7 +334,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <skip>${maven.test.unit.skip}</skip>
-                    <junitArtifactName>junit:junit-dep</junitArtifactName>
                 </configuration>
             </plugin>
             <plugin>
@@ -381,7 +382,7 @@
         <jdkLevel>1.6</jdkLevel>
         <build.maven.version>3.0.5</build.maven.version>
         <bundled.maven.version>3.2.1</bundled.maven.version>
-        <refapp.version>2.20.0-m2</refapp.version>
+        <refapp.version>2.20.0</refapp.version>
         <confluence.version>5.5</confluence.version>
         <confluence.data.version>5.5</confluence.data.version>
         <jira.version>5.2.11</jira.version>
@@ -390,6 +391,8 @@
         <guava.osgi.version>10.0.1</guava.osgi.version>
         <bamboo.version>4.4.5</bamboo.version>
         <bamboo.data.version>3.2.2</bamboo.data.version>
+        <bitbucket.version>4.0.0</bitbucket.version>
+        <bitbucket.data.version>${bitbucket.version}</bitbucket.data.version>
         <fecru.version>2.8.1-20120829051639</fecru.version>
         <fecru.data.version>2.8.1-20120829051639</fecru.data.version>
         <crowd.version>2.5.2</crowd.version>
@@ -397,8 +400,8 @@
         <clover.version>3.1.7</clover.version>
         <studio.version>108.2</studio.version>
         <studio.data.version>108.2-m0</studio.data.version>
-        <stash.version>2.4.1</stash.version>
-        <stash.data.version>2.4.1</stash.data.version>
+        <stash.version>3.10.2</stash.version>
+        <stash.data.version>${stash.version}</stash.data.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.6</atlassian.spring.scanner.version>
         <maven.cli.version>1.0.11</maven.cli.version>

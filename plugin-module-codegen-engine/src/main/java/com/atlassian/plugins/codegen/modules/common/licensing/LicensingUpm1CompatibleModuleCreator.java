@@ -9,6 +9,7 @@ import com.atlassian.plugins.codegen.PluginArtifact;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.VersionId;
 import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
+import com.atlassian.plugins.codegen.annotations.BitbucketPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
@@ -21,9 +22,9 @@ import com.atlassian.plugins.codegen.modules.common.servlet.ServletModuleCreator
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletProperties;
 
 import static com.atlassian.fugue.Option.some;
-import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
 import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.COMPILE;
 import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.PROVIDED;
+import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
 import static com.atlassian.plugins.codegen.ArtifactId.artifactId;
 import static com.atlassian.plugins.codegen.BundleInstruction.dynamicImportPackage;
 import static com.atlassian.plugins.codegen.BundleInstruction.privatePackage;
@@ -31,12 +32,11 @@ import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
 import static com.atlassian.plugins.codegen.ComponentDeclaration.componentDeclaration;
 import static com.atlassian.plugins.codegen.ComponentImport.componentImport;
 import static com.atlassian.plugins.codegen.MavenPlugin.mavenPlugin;
-import static com.atlassian.plugins.codegen.PluginArtifact.pluginArtifact;
 import static com.atlassian.plugins.codegen.PluginArtifact.ArtifactType.BUNDLED_ARTIFACT;
+import static com.atlassian.plugins.codegen.PluginArtifact.pluginArtifact;
 import static com.atlassian.plugins.codegen.PluginParameter.pluginParameter;
 import static com.atlassian.plugins.codegen.ResourceFile.resourceFile;
 import static com.atlassian.plugins.codegen.VersionId.noVersion;
-import static com.atlassian.plugins.codegen.VersionId.version;
 import static com.atlassian.plugins.codegen.VersionId.versionProperty;
 import static com.atlassian.plugins.codegen.modules.Dependencies.APPLICATION_PROPERTIES_IMPORT;
 import static com.atlassian.plugins.codegen.modules.Dependencies.COMMONS_LANG;
@@ -52,6 +52,7 @@ import static com.atlassian.plugins.codegen.modules.Dependencies.TEMPLATE_RENDER
 @JiraPluginModuleCreator
 @ConfluencePluginModuleCreator
 @BambooPluginModuleCreator
+@BitbucketPluginModuleCreator
 @FeCruPluginModuleCreator
 @CrowdPluginModuleCreator
 @StashPluginModuleCreator

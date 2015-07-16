@@ -6,7 +6,6 @@
         <version>6.1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-plugin-sdk</artifactId>
 
     <name>Atlassian Plugin SDK</name>
@@ -16,6 +15,7 @@
             <groupId>org.apache.maven</groupId>
             <artifactId>apache-maven</artifactId>
             <version>${bundled.maven.version}</version>
+            <scope>provided</scope>
             <type>tar.gz</type>
             <classifier>bin</classifier>
         </dependency>
@@ -29,57 +29,73 @@
         <!-- The following are necessary to ensure the modules are scheduled before this on in a multi-module build -->
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
+            <artifactId>bitbucket-maven-plugin</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <type>maven-plugin</type>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>maven-amps-plugin</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <type>maven-plugin</type>
         </dependency>
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>maven-amps-dispatcher-plugin</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <type>maven-plugin</type>
         </dependency>
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>maven-confluence-plugin</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <type>maven-plugin</type>
         </dependency>
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>maven-refapp-plugin</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <type>maven-plugin</type>
         </dependency>
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>maven-stash-plugin</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <type>maven-plugin</type>
         </dependency>
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>maven-jira-plugin</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <type>maven-plugin</type>
         </dependency>
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>maven-bamboo-plugin</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <type>maven-plugin</type>
         </dependency>
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>maven-fecru-plugin</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <type>maven-plugin</type>
         </dependency>
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>maven-crowd-plugin</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <type>maven-plugin</type>
         </dependency>
         <dependency>
             <groupId>com.atlassian.maven.archetypes</groupId>
@@ -96,6 +112,12 @@
         <dependency>
             <groupId>com.atlassian.maven.archetypes</groupId>
             <artifactId>bamboo-plugin-archetype</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.maven.archetypes</groupId>
+            <artifactId>bitbucket-plugin-archetype</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -275,6 +297,7 @@
                             <descriptors>
                                 <descriptor>src/main/assembly/archive-zip.xml</descriptor>
                             </descriptors>
+                            <tarLongFileMode>gnu</tarLongFileMode>
                         </configuration>
                     </execution>
                     <execution>
@@ -288,6 +311,7 @@
                             <descriptors>
                                 <descriptor>src/main/assembly/archive-tar.xml</descriptor>
                             </descriptors>
+                            <tarLongFileMode>gnu</tarLongFileMode>
                         </configuration>
                     </execution>
                 </executions>
