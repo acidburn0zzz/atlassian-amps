@@ -69,7 +69,7 @@
                     <!-- cli, integrationTest, integrationTestWithTestGroup, run, stop -->
                     jarWithExistingManifest,  nexus_staging,
                     unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
-                    validateManifestWithValidManifest, libArtifacts
+                    validateManifestWithValidManifest, libArtifacts, quickreload
                 </tests>
             </properties>
         </profile>
