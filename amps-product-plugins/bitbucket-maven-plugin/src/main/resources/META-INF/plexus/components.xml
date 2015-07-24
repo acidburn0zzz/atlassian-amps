@@ -40,7 +40,7 @@
                                 com.atlassian.maven.plugins:bitbucket-maven-plugin:test-jar
                             </package>
                             <pre-integration-test>
-                                com.atlassian.maven.plugins:bitbucket-maven-plugin:pre-integration-test
+                                com.atlassian.maven.plugins:bitbucket-maven-plugin:prepare-database
                             </pre-integration-test>
                             <integration-test>
                                 com.atlassian.maven.plugins:bitbucket-maven-plugin:integration-test

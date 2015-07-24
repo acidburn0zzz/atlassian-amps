@@ -201,14 +201,14 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     {
         if (pluginArtifactId == null)
         {
-            return new PluginInformation("amps", "");
+            return new PluginInformation("maven-amps-plugin", "", "amps");
         }
         String productId = pluginArtifactId.replaceAll("maven-(.*)-plugin", "$1");
         if (productId.equals(pluginArtifactId))
         {
             productId = pluginArtifactId.replaceAll("(.*)-maven-plugin", "$1");
         }
-        return new PluginInformation(productId, pluginVersion);
+        return new PluginInformation(pluginArtifactId, pluginVersion, productId);
     }
 
     protected UpdateChecker getUpdateChecker() throws MojoExecutionException
