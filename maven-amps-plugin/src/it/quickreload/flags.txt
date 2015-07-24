@@ -1,0 +1,5 @@
+-s
+${project.build.directory}/it/settings.xml
+-Dhttp.port.bak=${it.http.port}
+-Drmi.port.bak=${it.rmi.port}
+-Dallow.google.tracking=false

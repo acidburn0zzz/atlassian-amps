@@ -51,6 +51,11 @@ public abstract class AbstractPluginProvider implements PluginProvider
             artifacts.addAll(getPdeArtifacts(product.getPdeVersion()));
         }
 
+        if (product.isEnableQuickReload() && product.getQuickReloadVersion() != null)
+        {
+            artifacts.addAll(getQuickLoadArtifacts(product.getQuickReloadVersion()));
+        }
+
         return artifacts;
     }
 
@@ -73,6 +78,11 @@ public abstract class AbstractPluginProvider implements PluginProvider
     protected Collection<ProductArtifact> getFastdevArtifacts(String fastdevVersion)
     {
         return Collections.singletonList(new ProductArtifact("com.atlassian.labs", "fastdev-plugin", fastdevVersion));
+    }
+
+    protected Collection<ProductArtifact> getQuickLoadArtifacts(String version)
+    {
+        return Collections.singletonList(new ProductArtifact("com.atlassian.labs.plugins", "quickreload", version));
     }
 
     protected Collection<ProductArtifact> getDevToolboxArtifacts(String devToolboxVersion)
