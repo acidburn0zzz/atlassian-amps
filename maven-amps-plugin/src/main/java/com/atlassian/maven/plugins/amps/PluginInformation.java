@@ -55,7 +55,8 @@ public class PluginInformation
      * @return the {code artifactId} for the AMPS plugin
      * @since 6.1.0
      */
-    public String getArtifactId() {
+    public String getArtifactId()
+    {
         return artifactId;
     }
 
@@ -63,7 +64,8 @@ public class PluginInformation
      * @return the {@code groupId} for the AMPS plugin
      * @since 6.1.0
      */
-    public String getGroupId() {
+    public String getGroupId()
+    {
         return groupId;
     }
 
@@ -79,7 +81,8 @@ public class PluginInformation
      * @return the product (JIRA, Confluence, etc.) for the AMPS plugin
      * @since 6.1.0
      */
-    public String getProductId() {
+    public String getProductId()
+    {
         return productId;
     }
 
