@@ -388,7 +388,7 @@
         <jira.data.version>5.2.11</jira.data.version>
         <fugue.version>1.0</fugue.version>
         <guava.osgi.version>10.0.1</guava.osgi.version>
-        <bamboo.version>4.4.5</bamboo.version>
+        <bamboo.version>5.9.2</bamboo.version>
         <bamboo.data.version>3.2.2</bamboo.data.version>
         <fecru.version>2.8.1-20120829051639</fecru.version>
         <fecru.data.version>2.8.1-20120829051639</fecru.data.version>
