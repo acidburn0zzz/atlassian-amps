@@ -236,7 +236,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
 
     protected String getAmpsPluginVersion()
     {
-        String ampsPluginVersion = System.getenv("AMPS_PLUGIN_VERSION");
+        final String ampsPluginVersion = System.getenv("AMPS_PLUGIN_VERSION");
         return ampsPluginVersion != null ? ampsPluginVersion : getPluginInformation().getVersion();
     }
     
