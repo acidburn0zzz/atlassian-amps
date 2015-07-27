@@ -1,11 +1,8 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.prefs.Preferences;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
-import com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriber;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -76,7 +73,7 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
     {
         if(null == googleTracker && googleTrackingAllowed())
         {
-            googleTracker = new GoogleAmpsTracker(getProductId(),getSdkVersion(),getPluginInformation().getVersion(),getLog());
+            googleTracker = new GoogleAmpsTracker(getProductId(), getAmpsPluginVersion(),getPluginInformation().getVersion(),getLog());
 
             if(googleTrackingAllowed()) {
                 getLog().info("Google Analytics Tracking is enabled to collect AMPS usage statistics.");
@@ -106,13 +103,13 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
         
         if(googleTrackingAllowed() && runningShellScript)
         {
-            String firstRunKey = PREF_FIRSTRUN_PREFIX + "-" + getSdkVersion();
+            String firstRunKey = PREF_FIRSTRUN_PREFIX + "-" + getAmpsPluginVersion();
             Preferences prefs = Preferences.userNodeForPackage(getClass());
             String alreadyRan = prefs.get(firstRunKey, null);
             
             if(null == alreadyRan)
             {
-                getGoogleTracker().track(GoogleAmpsTracker.SDK_FIRST_RUN,getSdkVersion());
+                getGoogleTracker().track(GoogleAmpsTracker.SDK_FIRST_RUN, getAmpsPluginVersion());
                 prefs.put(firstRunKey,"true");
             }
         }

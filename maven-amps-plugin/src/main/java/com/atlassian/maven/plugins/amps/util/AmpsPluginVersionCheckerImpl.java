@@ -250,7 +250,7 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
     {
         ANSIBuffer ansiBuffer = new ANSIBuffer();
         ansiBuffer.append(ANSIBuffer.ANSICodes.attrib(PrettyPrompter.FG_YELLOW))
-                .append("You are running SDK version ")
+                .append("You are running AMPS plugin version ")
                 .append(runningVersion.toString())
                 .append(" but your pom is using version ")
                 .append(ampsVersionInPom.toString())
@@ -266,7 +266,7 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
     private boolean promptForUpdatePlain(DefaultArtifactVersion ampsVersionInPom, DefaultArtifactVersion runningVersion) throws PrompterException
     {
         StringBuilder builder = new StringBuilder();
-        builder.append("You are running SDK version ")
+        builder.append("You are running AMPS plugin version ")
                   .append(runningVersion.toString())
                   .append(" but your pom is using version ")
                   .append(ampsVersionInPom.toString())
