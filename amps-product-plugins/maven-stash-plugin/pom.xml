@@ -54,7 +54,7 @@
                 integrationTestWithTestGroup, nexus_staging,
                 jarWithExistingManifest, run, runParallel, runWithTestGroup, 
                 unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
-                validateManifestWithValidManifest
+                validateManifestWithValidManifest, quickreload
                 </tests>
             </properties>
         </profile>

@@ -397,8 +397,8 @@
         <clover.version>3.1.7</clover.version>
         <studio.version>108.2</studio.version>
         <studio.data.version>108.2-m0</studio.data.version>
-        <stash.version>2.4.1</stash.version>
-        <stash.data.version>2.4.1</stash.data.version>
+        <stash.version>3.1.0</stash.version>
+        <stash.data.version>3.1.0</stash.data.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.6</atlassian.spring.scanner.version>
         <maven.cli.version>1.0.11</maven.cli.version>
