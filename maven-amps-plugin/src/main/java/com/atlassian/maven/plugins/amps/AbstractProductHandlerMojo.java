@@ -248,6 +248,18 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected String devToolboxVersion;
 
     /**
+     * If QuickReload should be used.
+     */
+    @Parameter(property = "quickreload.enable", defaultValue = "false")
+    protected boolean enableQuickReload;
+
+    /**
+     * QuickReload version should be used.
+     */
+    @Parameter(property = "quickreload.version", defaultValue = DEFAULT_QUICK_RELOAD_VERSION)
+    protected String quickReloadVersion;
+
+    /**
      * If PDE should be enabled
      */
     @Parameter(property = "pde.enable", defaultValue = "true")
@@ -469,6 +481,9 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setEnableFastdev(enableFastdev);
         ctx.setFastdevVersion(fastdevVersion);
 
+        ctx.setEnableQuickReload(enableQuickReload);
+        ctx.setQuickReloadVersion(quickReloadVersion);
+
         ctx.setEnableDevToolbox(enableDevToolbox);
         ctx.setDevToolboxVersion(devToolboxVersion);
 
@@ -626,6 +641,16 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         if (product.getDevToolboxVersion() == null)
         {
             product.setDevToolboxVersion(DEFAULT_DEV_TOOLBOX_VERSION);
+        }
+
+        if (product.isEnableQuickReload() == null)
+        {
+            product.setEnableQuickReload(false);
+        }
+
+        if (product.getQuickReloadVersion() == null)
+        {
+            product.setQuickReloadVersion(DEFAULT_QUICK_RELOAD_VERSION);
         }
 
         if (product.getPdeVersion() == null)

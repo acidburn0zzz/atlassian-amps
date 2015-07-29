@@ -53,7 +53,7 @@
                     generateManifestWithNoInstructionsNorIsAtlassianPlugin, generateObr, integrationTest,
                     integrationTestWithTestGroup, nexus_staging, jarWithExistingManifest, run, runParallel,
                     runWithTestGroup, unitTest, validateManifestSkipValidation,
-                    validateManifestWithInvalidManifest, validateManifestWithValidManifest
+                    validateManifestWithInvalidManifest, validateManifestWithValidManifest, quickreload
                 </tests>
             </properties>
         </profile>
