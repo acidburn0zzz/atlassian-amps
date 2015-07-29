@@ -96,6 +96,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <productVersion>\${refapp.version}</productVersion>
+                    <enableQuickReload>true</enableQuickReload>
+                    <enableFastdev>false</enableFastdev>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
 

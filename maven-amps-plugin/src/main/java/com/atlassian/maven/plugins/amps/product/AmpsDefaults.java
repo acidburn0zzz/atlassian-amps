@@ -14,6 +14,7 @@ public class AmpsDefaults
     public static final String DEFAULT_DEV_TOOLBOX_VERSION = "2.0.16";
     public static final String DEFAULT_REST_API_BROWSER_VERSION = "3.0.12";
     public static final String DEFAULT_PDE_VERSION = "1.2";
+    public static final String DEFAULT_QUICK_RELOAD_VERSION = "1.24";
 
     /**
      * Default product startup timeout: three minutes
