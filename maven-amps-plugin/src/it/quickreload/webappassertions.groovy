@@ -11,7 +11,7 @@ final Properties amps = new Properties();
 ampsFile.withInputStream { amps.load(it) }
 
 new HTTPBuilder("http://localhost:${amps['http.port']}${amps['context.path']}/plugins/servlet/qr").request(GET) {
-    response.success = { assert it.statusLine.statusCode < 400 , "Expected status code below 400 on QuickReload manage page" }
+    response.success = { assert it.statusLine.statusCode == 200 , "Expected status 200 on QuickReload manage page" }
     response.failure = { assert false, "The HTTP GET should have succeeded on QuickReload manage page" }
 }
     
