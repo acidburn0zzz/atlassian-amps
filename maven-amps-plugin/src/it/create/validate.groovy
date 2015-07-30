@@ -1,7 +1,7 @@
 assert mavenExitCode == 0, "The maven build should not have failed!"
 
 // Some reason this is here.  These not delongs here.
-def thisProduct = project.properties['shitty.product']
+def thisArtifactId = project.properties['shitty.artifactId']
 
 final File projectDir = new File("$basedir/amps-it-create")
 assert projectDir.exists(), "The project should have been created under $projectDir"
@@ -19,7 +19,7 @@ assert project[pom.packaging].text() == 'atlassian-plugin'
 
 
 // Verify that the generated plugin has the configuration as transformless (Atlassian-Plugin-Key exist and correct).
-def ampsPlugin = project[pom.build][pom.plugins][pom.plugin].find { it[pom.artifactId].text() == "maven-$thisProduct-plugin" }
+def ampsPlugin = project[pom.build][pom.plugins][pom.plugin].find { it[pom.artifactId].text() == thisArtifactId }
 def pluginKey = ampsPlugin[pom.configuration][pom.instructions][pom.'Atlassian-Plugin-Key'].text()
 assert pluginKey == '${atlassian.plugin.key}', "Unexpected ${pluginKey}"
 

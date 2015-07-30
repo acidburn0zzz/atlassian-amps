@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.atlassian.amps</groupId>
@@ -42,6 +41,7 @@
                 </plugins>
             </build>
             <properties>
+                <shitty.artifactId>bitbucket-maven-plugin</shitty.artifactId>
                 <shitty.product>bitbucket</shitty.product>
                 <product.version>${bitbucket.version}</product.version>
                 <product.data.version>${bitbucket.data.version}</product.data.version>
@@ -51,8 +51,8 @@
                     generateManifestWithInstructions, generateManifestWithNoInstructions,
                     generateManifestWithNoInstructionsButIsAtlassianPlugin,
                     generateManifestWithNoInstructionsNorIsAtlassianPlugin, generateObr, integrationTest,
-                    integrationTestWithTestGroup, nexus_staging, jarWithExistingManifest, run, runParallel,
-                    runWithTestGroup, unitTest, validateManifestSkipValidation,
+                    integrationTestWithTestGroup, jarWithExistingManifest, nexus_staging, quickreload,
+                    run, runParallel, runWithTestGroup, unitTest, validateManifestSkipValidation,
                     validateManifestWithInvalidManifest, validateManifestWithValidManifest
                 </tests>
             </properties>
