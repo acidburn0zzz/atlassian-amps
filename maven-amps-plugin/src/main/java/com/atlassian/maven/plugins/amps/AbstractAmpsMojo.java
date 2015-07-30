@@ -1,13 +1,11 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.atlassian.maven.plugins.amps.util.*;
+import com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriber;
+import com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker;
+import com.atlassian.maven.plugins.amps.util.ProjectUtils;
+import com.atlassian.maven.plugins.amps.util.UpdateChecker;
 import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkResource;
-
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -15,6 +13,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AbstractAmpsMojo extends AbstractMojo
 {
@@ -199,16 +200,9 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
 
     protected PluginInformation getPluginInformation()
     {
-        if (pluginArtifactId == null)
-        {
-            return new PluginInformation("maven-amps-plugin", "", "amps");
-        }
-        String productId = pluginArtifactId.replaceAll("maven-(.*)-plugin", "$1");
-        if (productId.equals(pluginArtifactId))
-        {
-            productId = pluginArtifactId.replaceAll("(.*)-maven-plugin", "$1");
-        }
-        return new PluginInformation(pluginArtifactId, pluginVersion, productId);
+        final String artifactId = pluginArtifactId == null ? "maven-amps-plugin" : pluginArtifactId;
+
+        return PluginInformation.fromArtifactId(artifactId, pluginVersion);
     }
 
     protected UpdateChecker getUpdateChecker() throws MojoExecutionException

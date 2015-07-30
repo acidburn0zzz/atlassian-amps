@@ -109,8 +109,9 @@ public class TestAbstractProductHandlerMojo
         }
 
         @Override
-        protected PluginInformation getPluginInformation() {
-            return new PluginInformation("maven-test-product-plugin", "Test SDK Version", "test-product");
+        protected PluginInformation getPluginInformation()
+        {
+            return PluginInformation.fromArtifactId("maven-test-product-plugin", "Test SDK Version");
         }
     }
 }
