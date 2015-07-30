@@ -50,9 +50,9 @@
                     generateManifestWithInstructions, generateManifestWithNoInstructions,
                     generateManifestWithNoInstructionsButIsAtlassianPlugin,
                     generateManifestWithNoInstructionsNorIsAtlassianPlugin, generateObr, integrationTest,
-                    integrationTestWithTestGroup, nexus_staging, jarWithExistingManifest, run, runParallel,
-                    runWithTestGroup, unitTest, validateManifestSkipValidation,
-                    validateManifestWithInvalidManifest, validateManifestWithValidManifest, quickreload
+                    integrationTestWithTestGroup,, jarWithExistingManifest nexus_staging, quickreload,
+                    run, runParallel, runWithTestGroup, unitTest, validateManifestSkipValidation,
+                    validateManifestWithInvalidManifest, validateManifestWithValidManifest
                 </tests>
             </properties>
         </profile>
