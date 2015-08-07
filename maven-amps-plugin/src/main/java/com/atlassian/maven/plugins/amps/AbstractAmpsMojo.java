@@ -208,7 +208,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
 
     protected UpdateChecker getUpdateChecker() throws MojoExecutionException
     {
-        updateChecker.setCurrentVersion(getAmpsPluginVersion());
+        updateChecker.setCurrentVersion(getSDKVersion());
         updateChecker.setForceCheck(forceUpdateCheck);
         
         boolean skipCheck = (shouldSkipPrompts() || offline);
@@ -238,6 +238,12 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     {
         final String ampsPluginVersion = System.getenv("AMPS_PLUGIN_VERSION");
         return ampsPluginVersion != null ? ampsPluginVersion : getPluginInformation().getVersion();
+    }
+
+    protected String getSDKVersion()
+    {
+        final String sdkVersion = System.getenv("ATLAS_VERSION");
+        return sdkVersion != null ? sdkVersion : getPluginInformation().getVersion();
     }
     
     protected boolean shouldBuildTestPlugin()
