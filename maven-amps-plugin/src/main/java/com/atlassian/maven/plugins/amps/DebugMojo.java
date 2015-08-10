@@ -43,7 +43,7 @@ public class DebugMojo extends RunMojo
 
         getUpdateChecker().check();
 
-        getAmpsPluginVersionChecker().checkAmpsVersionInPom(getSdkVersion(),getMavenContext().getProject());
+        getAmpsPluginVersionChecker().checkAmpsVersionInPom(getAmpsPluginVersion(),getMavenContext().getProject());
 
         promptForEmailSubscriptionIfNeeded();
         

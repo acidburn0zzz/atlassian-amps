@@ -168,9 +168,13 @@ public class ResourcesMinifier
             }
             String baseName = FilenameUtils.removeExtension(name);
             File destFile = new File(destDir,baseName + "-min.js");
+            File sourceMapFile = new File(destDir, baseName + "-min.js.map");
             if(sourceFile.exists() && sourceFile.canRead())
             {
-                if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
+                if(
+                    (destFile.exists() && destFile.lastModified() > sourceFile.lastModified()) &&
+                    (!useClosure || (sourceMapFile.exists() && sourceMapFile.lastModified() > sourceFile.lastModified()))
+                )
                 {
                     log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
                     continue;
@@ -179,7 +183,8 @@ public class ResourcesMinifier
                 log.debug("compressing to " + destFile.getAbsolutePath());
                 if(useClosure)
                 {
-                    closureJsCompile(sourceFile, destFile, cs, log);
+                    log.debug("generating source map to " + sourceMapFile.getAbsolutePath());
+                    closureJsCompile(sourceFile, destFile, sourceMapFile, cs, log);
                 }
                 else
                 {
@@ -235,14 +240,15 @@ public class ResourcesMinifier
         log.info(numberOfMinifiedFile + " CSS file(s) were minified into target directory " + destDir.getAbsolutePath());
     }
 
-    private void closureJsCompile(File sourceFile, File destFile, Charset cs, Log log) throws MojoExecutionException
+    private void closureJsCompile(File sourceFile, File destFile, File sourceMapFile, Charset cs, Log log) throws MojoExecutionException
     {
         try
         {
             FileUtils.forceMkdir(destFile.getParentFile());
             String source = FileUtils.readFileToString(sourceFile, cs);
-            String min = GoogleClosureJSMinifier.compile(source);
-            FileUtils.writeStringToFile(destFile, min, cs);
+            GoogleClosureJSMinifier.CompiledSourceWithSourceMap result = GoogleClosureJSMinifier.compile(source, sourceFile.getAbsolutePath(), log);
+            FileUtils.writeStringToFile(destFile, result.getCompiled(), cs);
+            FileUtils.writeStringToFile(sourceMapFile, result.getSourceMap(), cs);
         }
         catch (IOException e)
         {

@@ -1,6 +1,5 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -209,7 +208,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
 
     protected UpdateChecker getUpdateChecker() throws MojoExecutionException
     {
-        updateChecker.setCurrentVersion(getSdkVersion());
+        updateChecker.setCurrentVersion(getSDKVersion());
         updateChecker.setForceCheck(forceUpdateCheck);
         
         boolean skipCheck = (shouldSkipPrompts() || offline);
@@ -235,9 +234,15 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
         return ampsEmailSubscriber;
     }
 
-    protected String getSdkVersion()
+    protected String getAmpsPluginVersion()
     {
-        String sdkVersion = System.getenv("ATLAS_VERSION");
+        final String ampsPluginVersion = System.getenv("AMPS_PLUGIN_VERSION");
+        return ampsPluginVersion != null ? ampsPluginVersion : getPluginInformation().getVersion();
+    }
+
+    protected String getSDKVersion()
+    {
+        final String sdkVersion = System.getenv("ATLAS_VERSION");
         return sdkVersion != null ? sdkVersion : getPluginInformation().getVersion();
     }
     

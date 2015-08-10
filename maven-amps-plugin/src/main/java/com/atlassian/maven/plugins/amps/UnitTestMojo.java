@@ -37,8 +37,21 @@ public class UnitTestMojo extends AbstractAmpsMojo
     @Parameter
     protected String excludedGroups;
 
+    /**
+     * Skip the unit tests along with any product startups
+     */
+    @Parameter(property = "skipUTs", defaultValue = "false")
+    private boolean skipUTs = false;
+
     public void execute() throws MojoExecutionException, MojoFailureException
     {
+
+        if (skipUTs)
+        {
+            getLog().info("Unit tests skipped");
+            return;
+        }
+
         getMavenGoals().runUnitTests(systemPropertyVariables, excludedGroups, category);
     }
 }
