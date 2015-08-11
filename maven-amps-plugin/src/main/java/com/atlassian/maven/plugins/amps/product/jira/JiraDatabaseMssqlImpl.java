@@ -85,7 +85,7 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
         {
             final String databaseName = getDatabaseName(getDataSource().getUrl());
             final String restoreAndGrantPermission = "\"RESTORE DATABASE " + "[" + databaseName + "] FROM DISK='"
-                    + getDataSource().getDumpFilePath() + "' WITH REPLACE; " + grantPermissionForUser() + " \"";
+                    + getDataSource().getDumpFilePath() + "' WITH REPLACE; " + " \"";
             getLog().info("MSSQL restore database and grant permission: " + restoreAndGrantPermission);
             configDatabaseTool = configuration(
                     element(name("executable"), "Sqlcmd"),
