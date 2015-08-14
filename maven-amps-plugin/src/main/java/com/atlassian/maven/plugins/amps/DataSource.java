@@ -114,6 +114,14 @@ public class DataSource
      */
     private String dumpFilePath;
 
+    private String databaseName;
+
+    private String delegatorName;
+
+    private String jdbcPoolSize;
+
+    private String jdbcValidation;
+
     /**
      * Import method define appropriate way to make import
      * sql : AMPS will use JDBC to import SQL dump file, file must contain standard SQL
@@ -330,6 +338,38 @@ public class DataSource
     public void setImportMethod(String importMethod)
     {
         this.importMethod = importMethod;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
+
+    public String getDelegatorName() {
+        return delegatorName;
+    }
+
+    public void setDelegatorName(String delegatorName) {
+        this.delegatorName = delegatorName;
+    }
+
+    public String getJdbcPoolSize() {
+        return jdbcPoolSize;
+    }
+
+    public void setJdbcPoolSize(String jdbcPoolSize) {
+        this.jdbcPoolSize = jdbcPoolSize;
+    }
+
+    public String getJdbcValidation() {
+        return jdbcValidation;
+    }
+
+    public void setJdbcValidation(String jdbcValidation) {
+        this.jdbcValidation = jdbcValidation;
     }
 
     @Override

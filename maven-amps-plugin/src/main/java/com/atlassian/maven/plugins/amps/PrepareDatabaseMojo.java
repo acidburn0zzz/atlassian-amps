@@ -1,18 +1,23 @@
 package com.atlassian.maven.plugins.amps;
 
 
-import java.util.List;
-
 import com.atlassian.maven.plugins.amps.product.ImportMethod;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
-
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 /**
  * Run the pre integration tests prepare data.
@@ -40,6 +45,10 @@ public class PrepareDatabaseMojo extends AbstractTestGroupsHandlerMojo
 
     @Parameter (property = "db.system.password")
     private String systemPassword;
+
+
+    private static final String FILENAME_DBCONFIG = "dbconfig.xml";
+
 
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException
@@ -84,6 +93,7 @@ public class PrepareDatabaseMojo extends AbstractTestGroupsHandlerMojo
                                 dataSource.getLibArtifacts().add(new LibArtifact(productArtifact.getGroupId(), productArtifact.getArtifactId(), productArtifact.getVersion()));
                             }
                             populateDatasourceParameter(dataSource);
+                            updateDbConfigXmlWithDatasourceValues(new File(productExecution.getProduct().getDataHome()), dataSource);
                             goals.runPreIntegrationTest(dataSource);
                             break;
                         case 0:
@@ -130,5 +140,37 @@ public class PrepareDatabaseMojo extends AbstractTestGroupsHandlerMojo
             dataSource.setImportMethod(ImportMethod.SQL.getMethod());
         }
         getLog().info("Pre-integration-test import method: " + dataSource.getImportMethod());
+    }
+
+    public void updateDbConfigXmlWithDatasourceValues(final File homeDir, final DataSource dataSource)
+            throws MojoExecutionException
+    {
+        final File dbConfigXml = new File(homeDir, FILENAME_DBCONFIG);
+        if (!dbConfigXml.exists())
+        {
+            return;
+        }
+
+        try
+        {
+            InputStream templateIn = new FileInputStream(dbConfigXml);
+            String template = IOUtils.toString(templateIn, "utf-8");
+            template = template.replace("@@DATABASE-NAME@@", dataSource.getDatabaseName());
+            template = template.replace("@@DELEGATOR-NAME@@", dataSource.getDelegatorName());
+            template = template.replace("@@DATABASE-TYPE@@", dataSource.getType());
+            template = template.replace("@@SCHEMA-NAME@@", dataSource.getSchema());
+            template = template.replace("@@JDBC-URL@@", dataSource.getUrl());
+            template = template.replace("@@JDBC-DRIVER-CLASS@@", dataSource.getDriver());
+            template = template.replace("@@JDBC-USERNAME@@", dataSource.getUsername());
+            template = template.replace("@@JDBC-PASSWORD@@", dataSource.getPassword());
+            template = template.replace("@@JDBC-POOL-SIZE@@", dataSource.getJdbcPoolSize());
+            template = template.replace("@@JDBC-VALIDATION@@", dataSource.getJdbcValidation());
+
+            FileUtils.writeStringToFile(dbConfigXml, template, "utf-8");
+        }
+        catch(IOException ex)
+        {
+            throw new MojoExecutionException("Unable to update config file: " + FILENAME_DBCONFIG, ex);
+        }
     }
 }

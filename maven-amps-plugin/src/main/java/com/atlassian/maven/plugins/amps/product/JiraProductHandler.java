@@ -262,6 +262,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     public void processHomeDirectory(final Product ctx, final File homeDir) throws MojoExecutionException
     {
         super.processHomeDirectory(ctx, homeDir);
+        copyDbConfigIntoHomeDirIfAvailable(ctx, homeDir);
         createDbConfigXmlIfNecessary(homeDir);
         if (ctx.getDataSources().size() == 1)
         {
@@ -476,6 +477,22 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         }
     }
 
+    private void copyDbConfigIntoHomeDirIfAvailable(Product ctx, File homeDir) throws MojoExecutionException
+    {
+
+        File dbConfigXml = new File(getBaseDirectory(ctx).getParentFile(), FILENAME_DBCONFIG);
+        if(dbConfigXml.exists())
+        {
+            try
+            {
+                FileUtils.copyFileToDirectory(dbConfigXml, homeDir);
+            }
+            catch(IOException ioe)
+            {
+                throw new MojoExecutionException("Unable to copy config file: " + FILENAME_DBCONFIG, ioe);
+            }
+        }
+    }
     @Override
     public List<ProductArtifact> getDefaultLibPlugins()
     {
