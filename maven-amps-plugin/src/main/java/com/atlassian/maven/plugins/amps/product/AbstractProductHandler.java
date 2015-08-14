@@ -222,7 +222,6 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
      * Each product handler can add specific operations on the application's home and war.
      * By default no operation is performed in this hook.
      *
-     * <p>Example: StudioXXXProductHandlers can change the webapp to be studio-ready.</p>
      * @param ctx the product's details
      * @param homeDir the home directory
      * @param explodedWarDir the directory containing the exploded WAR of the application

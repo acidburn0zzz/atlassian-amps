@@ -292,8 +292,7 @@ public class FeCruProductHandler extends AbstractProductHandler
     }
 
     /**
-     * Add overrides to the Java task before it gets launched. The Studio version of FishEye-Crucible
-     * needs to fork the process here.
+     * Add overrides to the Java task before it gets launched.
      *
      * @param ctx
      * @param java

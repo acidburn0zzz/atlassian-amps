@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import com.atlassian.maven.plugins.amps.*;
@@ -31,7 +30,6 @@ import com.google.common.collect.Lists;
 
 /**
  * This abstract class is common to real applications (which inherit from AbstractProductHandler, like JIRA or Confluence)
- * and the fake application Studio.
  *
  * This class handles common operations
  *
@@ -122,7 +120,7 @@ public abstract class AmpsProductHandler implements ProductHandler
     {
         try {
             // we want to get rid of the plugins folders.
-            FileUtils.deleteDirectory(new File(snapshotDir, "plugins")); // Not used by: fisheye, confluence, studio - Used by: crowd, bamboo, jira
+            FileUtils.deleteDirectory(new File(snapshotDir, "plugins")); // Not used by: fisheye, confluence - Used by: crowd, bamboo, jira
             FileUtils.deleteDirectory(new File(snapshotDir, "bundled-plugins")); // Not used by: fisheye, jira - Used by: confluence, crowd, bamboo
 
             // Get rid of "studio-test-resources.zip", which is the homeZip that was used
@@ -132,7 +130,6 @@ public abstract class AmpsProductHandler implements ProductHandler
                 String originalHomeZip = this.getTestResourcesArtifact().getArtifactId() + ".zip";
                 FileUtils.deleteQuietly(new File(snapshotDir, originalHomeZip));
             }
-
 
             // Proceed to replacements
             List<Replacement> replacements = getReplacements(product);

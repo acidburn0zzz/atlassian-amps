@@ -1039,8 +1039,7 @@ public class MavenGoals
      * Cargo waits (org.codehaus.cargo.container.tomcat.internal.AbstractCatalinaInstalledLocalContainer#waitForCompletion(boolean waitForStarting)) for 3 ports, but the AJP and RMI ports may
      * not be correct (see below), so we configure it to wait on the HTTP port only.
      *
-     * Since we're not configuring the AJP port it defaults to 8009. All the Studio applications are currently using 8009 (by default, since not configured in startWebapp)
-     * which means that this port might have been taken by a different application (the container will still come up though, see
+     * Since we're not configuring the AJP port it defaults to 8009. This port might have been taken by a different application (the container will still come up though, see
      * "INFO: Port busy 8009 java.net.BindException: Address already in use" in the log). Thus we don't want to wait for it because it might be still open also the container
      * is shut down.
      *

@@ -176,8 +176,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         List<String> includes = getIncludesForTestGroup(testGroupId);
         List<String> excludes = getExcludesForTestGroup(testGroupId);
 
-        List<ProductExecution> executionsDeclaredInPom = getTestGroupProductExecutions(testGroupId);
-        List<ProductExecution> productExecutions = includeStudioDependentProducts(executionsDeclaredInPom, goals);
+        List<ProductExecution> productExecutions = getTestGroupProductExecutions(testGroupId);
         setParallelMode(productExecutions);
 
         int counter = 0;

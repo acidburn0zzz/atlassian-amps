@@ -51,8 +51,6 @@ public class TestGroup
         this.instanceIds = instanceIds;
     }
 
-
-
     public List<String> getIncludes()
     {
         return (includes == null) ? Collections.<String>emptyList() : includes;

@@ -18,11 +18,9 @@ import java.util.concurrent.TimeoutException;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
-import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
 import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -39,7 +37,6 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STUDIO;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.*;
 
 /**
@@ -411,7 +408,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     private String additionalResourceFolders;
 
     /**
-     * Start the products in parallel (TestGroups and Studio).
+     * Start the products in parallel (TestGroups).
      */
     @Parameter(property = "parallel", defaultValue = "false")
     protected boolean parallel;
@@ -566,26 +563,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected void setDefaultValues(Product product, ProductHandler handler)
     {
         product.setInstanceId(getProductInstanceId(product));
-
-        //Apply the common default values
-        String dversion = System.getProperty("product.data.version", product.getDataVersion());
-        String pversion = System.getProperty("product.version", product.getVersion());
-        String dpath = System.getProperty("product.data.path", product.getDataPath());
-
-        // If it's a Studio product, some defaults are different (ex: context path for Confluence is /wiki)
-        if (!StudioProductHandler.setDefaultValues(getMavenContext(), product))
-        {
-            // hacky workaround for AMPS-738:  avoid applying the regular product defaults to a Studio sub-product;
-            // however, do apply them to the main Studio product if and only if we're explicitly running Studio (so
-            // we'll get the right result for command-line options like "-Dproduct=studio -Dproduct.version=108.3").
-            if (!STUDIO.equals(product.getId()) || STUDIO.equals(System.getProperty("product")))
-            {
-                product.setVersion(pversion);
-	            product.setDataVersion(dversion);
-                product.setDataPath(dpath);
-            }
-        }
-
         product.setArtifactRetriever(new ArtifactRetriever(artifactResolver, artifactFactory, localRepository, repositories, repositoryMetadataManager));
 
         if (product.getContainerId() == null)
@@ -813,21 +790,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         {
             ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals,artifactFactory);
             setDefaultValues(ctx, handler);
-
-            // If it's a Studio product, check dependent instance are present
-            for (String instanceId : StudioProductHandler.getDependantInstances(ctx))
-            {
-                if (!productMap.containsKey(instanceId))
-                {
-                    ProductHandler dependantHandler = createProductHandler(instanceId);
-                    productMap.put(instanceId, createProductContext(instanceId, instanceId, dependantHandler));
-                }
-            }
         }
-
-        // Submit the Studio products for configuration
-        StudioProductHandler studioProductHandler = (StudioProductHandler) ProductHandlerFactory.create(ProductHandlerFactory.STUDIO, mavenContext, goals,artifactFactory);
-        studioProductHandler.configureStudioProducts(productMap);
 
         return productMap;
     }
@@ -860,11 +823,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             for (Product product : products)
             {
                 Product processedProduct = product.merge(defaultProduct);
-                if (ProductHandlerFactory.STUDIO_CROWD.equals(processedProduct.getId()))
-                {
-                    // This is a temporary fix for StudioCrowd - it requires atlassian.dev.mode=false - see AMPS-556
-                    processedProduct.getSystemPropertyVariables().put("atlassian.dev.mode", "false");
-                }
                 String instanceId = getProductInstanceId(processedProduct);
                 productMap.put(instanceId, processedProduct);
             }
@@ -874,23 +832,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     private String getProductInstanceId(Product processedProduct)
     {
         return processedProduct.getInstanceId() == null ? processedProduct.getId() : processedProduct.getInstanceId();
-    }
-
-
-    private Product createProductContext(String productNickname, String instanceId, ProductHandler handler) throws MojoExecutionException
-    {
-        getLog().info(String.format("Studio (instanceId=%s): No product with name %s is defined in the pom. Using a default product.", instanceId, productNickname));
-        Product product;
-        product = createDefaultProductContext();
-        product.setId(productNickname);
-        product.setInstanceId(instanceId);
-        setDefaultValues(product, handler);
-        if (ProductHandlerFactory.STUDIO_CROWD.equals(product.getId()))
-        {
-            // This is a temporary fix for StudioCrowd - it requires atlassian.dev.mode=false - see AMPS-556
-            product.getSystemPropertyVariables().put("atlassian.dev.mode", "false");
-        }
-        return product;
     }
 
     /**
@@ -1048,61 +989,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
                         product.getInstanceId(), startingUp ? "start" : "stop", TimeUnit.MILLISECONDS.toSeconds(timeout), url, lastMessage));
             }
         }
-    }
-
-    /**
-     * @return the list of instances for the product 'studio'
-     */
-    private Iterable<ProductExecution> getStudioExecutions(final List<ProductExecution> productExecutions)
-    {
-        return Iterables.filter(productExecutions, new Predicate<ProductExecution>(){
-
-            @Override
-            public boolean apply(ProductExecution input)
-            {
-                return input.getProductHandler() instanceof StudioProductHandler;
-            }});
-    }
-
-
-    /**
-     * If there is any Studio instance, returns a list with all products requested by this instance.
-     *
-     * Configures both the Studio instance and its dependent products.
-     *
-     * @param productExecutions the current list of products to run
-     * @param goals
-     * @return the complete list of products to run
-     * @throws MojoExecutionException
-     */
-    protected List<ProductExecution> includeStudioDependentProducts(final List<ProductExecution> productExecutions, final MavenGoals goals)
-            throws MojoExecutionException
-    {
-        // If one of the products is Studio, ask him/her which other products he/she wants to run
-        Iterable<ProductExecution> studioExecutions = getStudioExecutions(productExecutions);
-        if (Iterables.isEmpty(studioExecutions))
-        {
-            return productExecutions;
-        }
-
-        // We have studio execution(s), so we need to add all products requested by Studio
-        List<ProductExecution> productExecutionsIncludingStudio = Lists.newArrayList(productExecutions);
-        Map<String, Product> allContexts = getProductContexts();
-        for(ProductExecution execution : studioExecutions)
-        {
-            for (String dependantProduct : StudioProductHandler.getDependantInstances(execution.getProduct()))
-            {
-                Product product = allContexts.get(dependantProduct);
-                productExecutionsIncludingStudio.add(toProductExecution(product));
-            }
-        }
-
-        return productExecutionsIncludingStudio;
-    }
-
-    protected ProductExecution toProductExecution(Product product)
-    {
-        return new ProductExecution(product, createProductHandler(product.getId()));
     }
 
     protected abstract void doExecute() throws MojoExecutionException, MojoFailureException;
