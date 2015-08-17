@@ -115,6 +115,11 @@ public class DataSource
     private String dumpFilePath;
 
     /**
+     * Connection pool size.
+     */
+    private String poolSize = "20";
+
+    /**
      * Import method define appropriate way to make import
      * sql : AMPS will use JDBC to import SQL dump file, file must contain standard SQL
      * psql: AMPS will use Postgres psql to import SQL dump file. Eg: psql -f jira_63_postgres91_dump.sql -U jira_user jiradb
@@ -139,6 +144,7 @@ public class DataSource
         cargoProperties.add("cargo.datasource.username=" + firstNonNull(username, ""));
         cargoProperties.add("cargo.datasource.password=" + firstNonNull(password, ""));
         cargoProperties.add("cargo.datasource.jndi=" + firstNonNull(jndi, ""));
+        cargoProperties.add("cargo.datasource.poolsize=" + firstNonNull(poolSize, ""));
         if (!StringUtils.isBlank(type))
             cargoProperties.add("cargo.datasource.type=" + type);
         if (!StringUtils.isBlank(transactionSupport))
@@ -330,6 +336,14 @@ public class DataSource
     public void setImportMethod(String importMethod)
     {
         this.importMethod = importMethod;
+    }
+
+    public String getPoolSize() {
+        return poolSize;
+    }
+
+    public void setPoolSize(String poolSize) {
+        this.poolSize = poolSize;
     }
 
     @Override
