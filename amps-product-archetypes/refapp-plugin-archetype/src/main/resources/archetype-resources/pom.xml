@@ -69,9 +69,16 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.atlassian.refapp</groupId>
-                <artifactId>atlassian-platform</artifactId>
-                <version>\${dollar}{refapp.version}</version>
+                <groupId>com.atlassian.platform</groupId>
+                <artifactId>platform</artifactId>
+                <version>\${dollar}{platform.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.platform</groupId>
+                <artifactId>third-party</artifactId>
+                <version>\${dollar}{platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -100,6 +107,7 @@
     </build>
     
     <properties>
+        <platform.version>${platformVersion}</platform.version>
         <refapp.version>${refappVersion}</refapp.version>
         <amps.version>${project.version}</amps.version>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
