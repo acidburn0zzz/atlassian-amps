@@ -387,6 +387,7 @@
         <build.maven.version>3.0.5</build.maven.version>
         <bundled.maven.version>3.2.1</bundled.maven.version>
         <refapp.version>3.0.0</refapp.version>
+        <platform.version>3.0.0</platform.version>
         <confluence.version>5.5</confluence.version>
         <confluence.data.version>5.5</confluence.data.version>
         <jira.version>6.4.7</jira.version>
