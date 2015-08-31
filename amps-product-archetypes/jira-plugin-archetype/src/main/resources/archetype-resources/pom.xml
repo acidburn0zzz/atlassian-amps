@@ -176,10 +176,10 @@
         <amps.version>${project.version}</amps.version>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
         <atlassian.spring.scanner.version>${atlassian.spring.scanner.version}</atlassian.spring.scanner.version>
-		<!-- TestKit version 5.x for JIRA 5.x, 6.x for JIRA 6.x -->
-		<testkit.version>5.2.26</testkit.version>
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
         <atlassian.plugin.key>\${project.groupId}.\${project.artifactId}</atlassian.plugin.key>
+		<!-- TestKit version 6.x for JIRA 6.x -->
+		<testkit.version>6.3.11</testkit.version>
     </properties>
 
 </project>
