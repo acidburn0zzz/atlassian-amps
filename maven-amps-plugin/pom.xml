@@ -24,7 +24,6 @@
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.jtds</groupId>

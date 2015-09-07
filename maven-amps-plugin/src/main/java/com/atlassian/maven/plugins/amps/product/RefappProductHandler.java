@@ -30,6 +30,11 @@ public class RefappProductHandler extends AbstractWebappProductHandler
     {
         super(context, goals, new RefappPluginProvider(),artifactFactory);
     }
+    @Override
+    public String getDefaultContainerId()
+    {
+        return "tomcat7x";
+    }
 
     public String getId()
     {

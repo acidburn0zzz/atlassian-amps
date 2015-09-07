@@ -12,7 +12,7 @@ public class AmpsDefaults
     // Please update maven-3-tests/pom.xml when bumping these versions!
     public static final String DEFAULT_FASTDEV_VERSION = "2.5";
     public static final String DEFAULT_DEV_TOOLBOX_VERSION = "2.0.16";
-    public static final String DEFAULT_REST_API_BROWSER_VERSION = "3.0.12";
+    public static final String DEFAULT_REST_API_BROWSER_VERSION = "3.1.3";
     public static final String DEFAULT_PDE_VERSION = "1.2";
 
     /**
