@@ -1,11 +1,15 @@
 package com.atlassian.maven.plugins.amps;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriber;
 import com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
 import com.atlassian.maven.plugins.amps.util.UpdateChecker;
 import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkResource;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -13,9 +17,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class AbstractAmpsMojo extends AbstractMojo
 {
@@ -207,7 +208,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
 
     protected UpdateChecker getUpdateChecker() throws MojoExecutionException
     {
-        updateChecker.setCurrentVersion(getSdkVersion());
+        updateChecker.setCurrentVersion(getSDKVersion());
         updateChecker.setForceCheck(forceUpdateCheck);
         
         boolean skipCheck = (shouldSkipPrompts() || offline);
@@ -233,9 +234,15 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
         return ampsEmailSubscriber;
     }
 
-    protected String getSdkVersion()
+    protected String getAmpsPluginVersion()
     {
-        String sdkVersion = System.getenv("ATLAS_VERSION");
+        final String ampsPluginVersion = System.getenv("AMPS_PLUGIN_VERSION");
+        return ampsPluginVersion != null ? ampsPluginVersion : getPluginInformation().getVersion();
+    }
+
+    protected String getSDKVersion()
+    {
+        final String sdkVersion = System.getenv("ATLAS_VERSION");
         return sdkVersion != null ? sdkVersion : getPluginInformation().getVersion();
     }
     

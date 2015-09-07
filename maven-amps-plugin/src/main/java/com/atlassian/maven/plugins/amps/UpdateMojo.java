@@ -61,7 +61,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
             // determine which version to download from PAC
             String downloadVersion = StringUtils.isNotBlank(updateVersion) ?
                     updateVersion : sdkResource.getLatestSdkVersion(packageType);
-            String ourVersion = getSdkVersion();
+            String ourVersion = getAmpsPluginVersion();
             
             if(ourVersion.equals(downloadVersion))
             {

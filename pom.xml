@@ -51,8 +51,6 @@
         <module>maven-3-tests</module>
         <module>maven-amps-dispatcher-plugin</module>
         <module>amps-product-plugins</module>
-        <module>atlassian-plugin-sdk</module>
-        <module>sdk-installer</module>
     </modules>
 
     <dependencyManagement>
@@ -91,22 +89,29 @@
                 <groupId>postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgres.version}</version>
+                <scope>provided</scope>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.version}</version>
+                <scope>provided</scope>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>com.oracle</groupId>
                 <artifactId>ojdbc6</artifactId>
                 <version>${oracle.version}</version>
+                <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>net.sourceforge.jtds</groupId>
                 <artifactId>jtds</artifactId>
                 <version>${jtds.version}</version>
+                <scope>provided</scope>
+                <optional>true</optional>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -383,6 +388,7 @@
         <build.maven.version>3.0.5</build.maven.version>
         <bundled.maven.version>3.2.1</bundled.maven.version>
         <refapp.version>3.0.0</refapp.version>
+        <platform.version>3.0.0</platform.version>
         <confluence.version>5.5</confluence.version>
         <confluence.data.version>5.5</confluence.data.version>
         <jira.version>6.4.7</jira.version>
