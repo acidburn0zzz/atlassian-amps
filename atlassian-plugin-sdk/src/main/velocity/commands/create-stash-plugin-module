@@ -1,5 +1,0 @@
-#set( $mvnCommand = "com.atlassian.maven.plugins:maven-stash-plugin:$version:create-plugin-module" )
-
-#set( $goalhelp = "Creates a Stash Plugin Module" )
-
-#set( $opts = [] )
