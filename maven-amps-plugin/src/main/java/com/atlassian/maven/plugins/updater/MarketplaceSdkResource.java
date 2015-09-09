@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -22,7 +23,7 @@ import java.util.Map;
 /**
  * Implements an SdkResource for the Atlassian Marketplace.
  */
-public class MarketplaceSdkResource implements SdkResource {
+public class MarketplaceSdkResource extends AbstractLogEnabled implements SdkResource {
 
     private static final String SDK_DOWNLOAD_URL_ROOT =
             "https://marketplace.atlassian.com/rest/1.0/plugins/atlassian-plugin-sdk-";
@@ -144,8 +145,10 @@ public class MarketplaceSdkResource implements SdkResource {
             jsonStream = new BufferedInputStream(conn.getInputStream());
             json = IOUtils.toString(jsonStream);
         } catch (UnknownHostException e) {
+            this.getLogger().info("Unknown host " + url.getHost());
             json = "";
         } catch (ConnectException e) {
+            this.getLogger().info("Fail to connect to host " + url.getHost());
             json = "";
         } catch (Exception e) {
             throw new RuntimeException(e);
