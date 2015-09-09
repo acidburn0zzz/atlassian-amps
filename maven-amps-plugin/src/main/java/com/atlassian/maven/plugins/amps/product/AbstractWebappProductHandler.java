@@ -2,31 +2,22 @@ package com.atlassian.maven.plugins.amps.product;
 
 import java.io.File;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
-import com.google.common.collect.ImmutableMap;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.factory.DefaultArtifactFactory;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
-
-import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 
-import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.plugin.MojoExecutionException;
+
+import com.atlassian.maven.plugins.amps.DataSource;
+
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
-import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
 
 public abstract class AbstractWebappProductHandler extends AbstractProductHandler
 {
@@ -60,7 +51,17 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
             artifact.setVersion(stableVersion);
             ctx.setVersion(stableVersion);
         }
-        
+
+        if (mustSkipRepackingApplicationWar(homeDir))
+        {
+            final File webappWarFile = new File(getBaseDirectory(ctx), ctx.getId() + "-original.war");
+            if (webappWarFile.exists())
+            {
+                log.info("Skip copying webapp War from maven repository");
+                return webappWarFile;
+            }
+        }
+
         // Copy the webapp war to target
         return goals.copyWebappWar(ctx.getId(), getBaseDirectory(ctx), artifact);
     }

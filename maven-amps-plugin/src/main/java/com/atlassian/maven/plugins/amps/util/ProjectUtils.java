@@ -1,13 +1,13 @@
 package com.atlassian.maven.plugins.amps.util;
 
 import java.io.File;
-import java.util.List;
+import java.io.IOException;
+import java.util.Arrays;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-
-import org.apache.maven.model.Resource;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 
@@ -18,6 +18,11 @@ import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
  */
 public class ProjectUtils
 {
+    /**
+     * The name of the text file that store checksum of pom.xl files. By default, this file is saved in the project
+     * build directory (target).
+     */
+    public static final String POM_CHECKSUM_FILE = "pom-checksum.txt";
 
     /**
      * @return If the test jar should be built based on atlassian-plugin.xml residing in src/test/resources
@@ -26,7 +31,7 @@ public class ProjectUtils
     {
         File testResources = file(context.getProject().getBasedir(),"src","test","resources");
         File pluginXml = new File(testResources,"atlassian-plugin.xml");
-        
+
         return pluginXml.exists();
     }
 
@@ -75,4 +80,80 @@ public class ProjectUtils
         }
         return null;
     }
+
+
+    /**
+     * Calculates file checksum of the pom.xml file of the given project toghether with its parent pom.xml
+     *
+     * @see ProjectUtils#calculateAndWriteProjectPomFileChecksum(MavenProject)
+     * @see ProjectUtils#isProjectPomFileChecksumChanged(MavenProject)
+     * @see ProjectUtils#getProjectPomChecksumFile(MavenProject)
+     */
+    public static String calculateChecksumOfProjectPomFile(MavenProject project)
+    {
+        File pluginPomXml = project.getFile();
+        File parentPomXml = project.getParentFile();
+
+        try
+        {
+            return FileUtils.calculateFileChecksum(Arrays.asList(pluginPomXml, parentPomXml));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("failed to calculate checksum for pom.xml files", e);
+        }
+    }
+
+    /**
+     * Checks that if the checksum of the pom.xml file of the given project is different from the checksum value stored
+     * in the checksum file. The checksum file is the one returned by {@link ProjectUtils#getProjectPomChecksumFile(MavenProject)}
+     * If the checksum file does not exist, it will be considered changed.
+     *
+     * @see ProjectUtils#calculateChecksumOfProjectPomFile(MavenProject)
+     * @see ProjectUtils#calculateAndWriteProjectPomFileChecksum(MavenProject)
+     * @see ProjectUtils#getProjectPomChecksumFile(MavenProject)
+     */
+    public static boolean isProjectPomFileChecksumChanged(MavenProject project)
+    {
+        File checksumFile = getProjectPomChecksumFile(project);
+        String currentPomFileChecksum = calculateChecksumOfProjectPomFile(project);
+
+        try
+        {
+            return !FileUtils.contentEquals(checksumFile, currentPomFileChecksum);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("failed to check checksum of pom.xml files", e);
+        }
+    }
+
+    /**
+     * @return the default file the store checksum of the project's pom.xml file
+     */
+    public static File getProjectPomChecksumFile(MavenProject project)
+    {
+        return new File(project.getBuild().getDirectory(), POM_CHECKSUM_FILE);
+    }
+
+    /**
+     * Calculates POM checksum of the given project and write the value to a file.
+     *
+     * @see ProjectUtils#calculateChecksumOfProjectPomFile(MavenProject)
+     * @see ProjectUtils#getProjectPomChecksumFile(MavenProject)
+     */
+    public static void calculateAndWriteProjectPomFileChecksum(MavenProject project) throws MojoExecutionException
+    {
+        File checksumFile = getProjectPomChecksumFile(project);
+        try
+        {
+            org.apache.commons.io.FileUtils.writeStringToFile(checksumFile, calculateChecksumOfProjectPomFile(project));
+        }
+        catch (IOException e)
+        {
+            throw new MojoExecutionException("failed to write project pom.xml checksum to file", e);
+        }
+    }
+
+
 }

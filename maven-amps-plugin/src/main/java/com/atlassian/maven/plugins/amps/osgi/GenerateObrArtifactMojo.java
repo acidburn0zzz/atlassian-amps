@@ -90,8 +90,19 @@ public class GenerateObrArtifactMojo extends AbstractAmpsMojo
     @Parameter
     private Map instructions = new HashMap();
 
+    /**
+     * Specifies whether to skip this mojo.
+     */
+    @Parameter(property = "obr.generation.skip", defaultValue = "false")
+    protected boolean skipObrGeneration = false;
+
     public void execute() throws MojoExecutionException, MojoFailureException
     {
+        if (skipObrGeneration)
+        {
+            getLog().info("Skip generating OBR file");
+            return;
+        }
         try
         {
             if (!instructions.isEmpty()) {

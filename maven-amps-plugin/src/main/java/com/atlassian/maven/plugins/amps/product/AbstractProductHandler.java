@@ -19,12 +19,13 @@ import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 import com.atlassian.maven.plugins.amps.util.FileUtils;
 import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
-
+import com.atlassian.maven.plugins.amps.util.ProjectUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 
 import com.google.common.collect.Iterables;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -77,6 +78,12 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
 
         // Ask for the system properties (from the ProductHandler and from the pom.xml)
         Map<String, String> systemProperties = mergeSystemProperties(ctx);
+
+        if (isAskedToSkipRepackApplicationWar())
+        {
+            // means, this exploded webapp was started with this baseline
+            createProjectPomChecksumBaseline(homeDir);
+        }
 
         return startApplication(ctx, finalApp, homeDir, systemProperties);
     }
@@ -168,53 +175,88 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
      * adds the artifacts, then returns the 'app'.
      * @return if {@code app} was a dir, returns a dir; if {@code app} was a war, returns a war.
      */
-    private final File addArtifactsAndOverrides(final Product ctx, final File homeDir, final File app) throws MojoExecutionException
+    private File addArtifactsAndOverrides(final Product ctx, final File homeDir, final File app)
+            throws MojoExecutionException
     {
         try
         {
-            final File appDir;
-            if (app.isFile())
+            final File webAppDir = new File(getBaseDirectory(ctx), "webapp");
+            boolean mustAddArtifactsAndOverrides =
+                    !(mustSkipRepackingApplicationWar(homeDir)
+                            && webAppDir.exists()
+                            && (webAppDir.list().length > 0));
+            if (!mustAddArtifactsAndOverrides)
             {
-                appDir = new File(getBaseDirectory(ctx), "webapp");
-                if (!appDir.exists())
-                {
-                    unzip(app, appDir.getAbsolutePath());
-                }
-            }
-            else
-            {
-                appDir = app;
+                log.info("Skip adding and overriding artifacts");
             }
 
-            addArtifacts(ctx, homeDir, appDir);
+            final File appDir = unzipApplication(app, webAppDir);
 
-            // override war files
-            try
+            if (mustAddArtifactsAndOverrides)
             {
-                addOverrides(appDir, ctx);
-                customiseInstance(ctx, homeDir, appDir);
-                fixJvmArgs(ctx);
-            }
-            catch (IOException e)
-            {
-                throw new MojoExecutionException("Unable to override WAR files using src/test/resources/" + ctx.getInstanceId() + "-app", e);
+                addArtifacts(ctx, homeDir, appDir);
+
+                // override war files
+                overrideAndCustomizeApplication(ctx, homeDir, appDir);
             }
 
-            if (app.isFile())
-            {
-                final File warFile = new File(app.getParentFile(), getId() + ".war");
-                com.atlassian.core.util.FileUtils.createZipFile(appDir, warFile);
-                return warFile;
-            }
-            else
-            {
-                return appDir;
-            }
+            fixJvmArgs(ctx);
 
+            if (mustAddArtifactsAndOverrides)
+            {
+                return rezipApplication(app, appDir);
+            }
+            return webAppDir;
         }
         catch (final Exception e)
         {
             throw new MojoExecutionException(e.getMessage(), e);
+        }
+    }
+
+    private File unzipApplication(final File app, final File webAppDir) throws IOException
+    {
+        final File appDir;
+        if (app.isFile())
+        {
+            appDir = webAppDir;
+            if (!appDir.exists())
+            {
+                unzip(app, appDir.getAbsolutePath());
+            }
+        }
+        else
+        {
+            appDir = app;
+        }
+        return appDir;
+    }
+
+    private void overrideAndCustomizeApplication(final Product ctx, final File homeDir, final File appDir)
+            throws MojoExecutionException
+    {
+        try
+        {
+            addOverrides(appDir, ctx);
+            customiseInstance(ctx, homeDir, appDir);
+        }
+        catch (IOException e)
+        {
+            throw new MojoExecutionException("Unable to override WAR files using src/test/resources/" + ctx.getInstanceId() + "-app", e);
+        }
+    }
+
+    private File rezipApplication(final File app, final File appDir) throws Exception
+    {
+        if (app.isFile())
+        {
+            final File warFile = new File(app.getParentFile(), getId() + ".war");
+            com.atlassian.core.util.FileUtils.createZipFile(appDir, warFile);
+            return warFile;
+        }
+        else
+        {
+            return appDir;
         }
     }
 
@@ -516,6 +558,62 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     protected String getLibArtifactTargetDir() 
     {
     	return "WEB-INF/lib";
+    }
+
+    protected boolean mustSkipRepackingApplicationWar(File homeDir)
+    {
+        return isAskedToSkipRepackApplicationWar()
+                && !isProjectPomChecksumChanged(homeDir);
+    }
+
+    private boolean isAskedToSkipRepackApplicationWar()
+    {
+        return BooleanUtils.toBoolean(
+                context.getExecutionEnvironment().getMavenSession().getUserProperties().getProperty(
+                        "amps.start.app.skip.repack.war"));
+    }
+
+    private boolean isProjectPomChecksumChanged(File homeDir)
+    {
+        try
+        {
+            File checksumFileOnHomeDir = getBaselineProjectPomChecksumFile(homeDir);
+            File projectChecksumFile = ProjectUtils.getProjectPomChecksumFile(project);
+            if (!checksumFileOnHomeDir.exists()
+                    || !projectChecksumFile.exists()
+                    || !org.apache.commons.io.FileUtils.contentEquals(checksumFileOnHomeDir, projectChecksumFile))
+            {
+                return true;
+            }
+
+            return ProjectUtils.isProjectPomFileChecksumChanged(project);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private File getBaselineProjectPomChecksumFile(File homeDir)
+    {
+        return new File(homeDir, ProjectUtils.POM_CHECKSUM_FILE);
+    }
+
+    private void createProjectPomChecksumBaseline(final File homeDir)
+    {
+        File projectChecksumFile = ProjectUtils.getProjectPomChecksumFile(project);
+        if (projectChecksumFile.exists())
+        {
+            File checksumFileOnHomeDir = getBaselineProjectPomChecksumFile(homeDir);
+            try
+            {
+                org.apache.commons.io.FileUtils.copyFile(projectChecksumFile, checksumFileOnHomeDir);
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

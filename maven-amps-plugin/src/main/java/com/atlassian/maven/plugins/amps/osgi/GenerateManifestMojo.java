@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.atlassian.maven.plugins.amps.AbstractAmpsMojo;
-
+import com.atlassian.maven.plugins.amps.util.FileUtils;
+import com.atlassian.maven.plugins.amps.util.ProjectUtils;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -40,6 +41,16 @@ public class GenerateManifestMojo extends AbstractAmpsMojo
     @Parameter(property = "manifest.validation.skip")
     protected boolean skipManifestValidation = false;
 
+    /**
+     * If this flag is turned one, the manifest file will only be generated when the following conditions are hold:
+     * <ul>
+     *     <li>it has not been generated yet</li>
+     *     <li>the plugin's pom.xml and its parent POM are not changed</li>
+     * </ul>
+     */
+    @Parameter (property = "manifest.generation.skip.if.existed", defaultValue = "false")
+    protected boolean skipManifestGenerationIfExisted = false;
+
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         final MavenProject project = getMavenContext().getProject();
@@ -51,8 +62,13 @@ public class GenerateManifestMojo extends AbstractAmpsMojo
 
         if (!instructions.isEmpty())
         {
-            getLog().info("Generating a manifest for this plugin");
+            if (mustSkipGeneration())
+            {
+                getLog().info("Skip generating manifest for this plugin");
+                return;
+            }
 
+            getLog().info("Generating a manifest for this plugin");
             if (!instructions.containsKey(Constants.EXPORT_PACKAGE))
             {
                 instructions.put(Constants.EXPORT_PACKAGE, "");
@@ -69,6 +85,8 @@ public class GenerateManifestMojo extends AbstractAmpsMojo
                 instructions.put(Constants.BUNDLE_CLASSPATH, sb.toString());
             }
             getMavenGoals().generateBundleManifest(instructions, basicAttributes);
+
+            ProjectUtils.calculateAndWriteProjectPomFileChecksum(getMavenContext().getProject());
         }
         else
         {
@@ -100,4 +118,22 @@ public class GenerateManifestMojo extends AbstractAmpsMojo
             getMavenGoals().generateMinimalManifest(basicAttributes);
         }
     }
+
+    private boolean mustSkipGeneration() throws MojoExecutionException
+    {
+        if (!skipManifestGenerationIfExisted)
+        {
+            return false;
+        }
+
+        return doesManifestFileExist() && !ProjectUtils.isProjectPomFileChecksumChanged(getMavenContext().getProject());
+    }
+
+    private boolean doesManifestFileExist()
+    {
+        final MavenProject mavenProject = getMavenContext().getProject();
+        File manifestFile = FileUtils.file(mavenProject.getBuild().getDirectory(), "classes", "META-INF", "MANIFEST.MF");
+        return manifestFile.exists();
+    }
+
 }

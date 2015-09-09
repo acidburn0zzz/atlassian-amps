@@ -1,8 +1,17 @@
 package com.atlassian.maven.plugins.amps.util;
 
+import com.google.common.collect.Lists;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
+
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.SequenceInputStream;
+import java.util.Collections;
 import java.util.List;
 
 import static org.apache.commons.io.FileUtils.copyFile;
@@ -112,6 +121,65 @@ public class FileUtils
                 }
             }
         }
+    }
+
+    /**
+     * Calculates the checksum for the list (order-sensitive) of files at on go. The calculated value then can be used
+     * to verifiy that is there any change in any file of this list.
+     *
+     * @param files must not empty. Order of file is matter
+     */
+    public static String calculateFileChecksum(List<File> files) throws IOException
+    {
+        if (files.isEmpty())
+        {
+            throw new IllegalArgumentException("There must be at least one file given for calculating the checksum");
+        }
+
+        List<InputStream> fileInputStreams = Lists.newArrayList();
+        try
+        {
+            for (File file : files)
+            {
+                fileInputStreams.add(new BufferedInputStream(new FileInputStream(file)));
+            }
+        }
+        catch (IOException e)
+        {
+            for (InputStream fileInputStream : fileInputStreams)
+            {
+                IOUtils.closeQuietly(fileInputStream);
+            }
+            throw e;
+        }
+
+        SequenceInputStream sequenceInputStream = new SequenceInputStream(Collections.enumeration(fileInputStreams));
+        try
+        {
+            return DigestUtils.md5Hex(sequenceInputStream);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(sequenceInputStream);
+        }
+    }
+
+    /**
+     * Checks that the content of the given file (read as text) is the same (case sensitive) with the given text.
+     *
+     * @param textFile the text file of which content will be checked. It is read using system's encoding.
+     * @param contentToCheck the text to compare against the content of the given text file.
+     * @return true if same. If the text file does not exist, returning false.
+     * @throws IOException if the file cannot be read.
+     */
+    public static boolean contentEquals(File textFile, String contentToCheck) throws IOException
+    {
+        if (!textFile.exists())
+        {
+            return false;
+        }
+        String text = org.apache.commons.io.FileUtils.readFileToString(textFile);
+        return contentToCheck.equals(text);
     }
 
 }
