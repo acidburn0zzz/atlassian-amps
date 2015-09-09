@@ -81,7 +81,7 @@ public class UpdateCheckerImpl extends AbstractLogEnabled implements UpdateCheck
                     sb.append(" is more recent than MPAC version ").append(latestVersion);
                     sb.append(". No action taken.");
                 }
-                getLogger().debug(sb.toString());
+                getLogger().warn(sb.toString());
             }
         }
     }

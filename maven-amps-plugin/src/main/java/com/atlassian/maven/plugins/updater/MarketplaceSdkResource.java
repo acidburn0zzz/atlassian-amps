@@ -1,6 +1,6 @@
 package com.atlassian.maven.plugins.updater;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -161,7 +161,7 @@ public class MarketplaceSdkResource implements SdkResource {
             if(StringUtils.isNotEmpty(json)) {
                 rootAsMap = mapper.readValue(json, Map.class);
             } else {
-                rootAsMap = Maps.newHashMap();
+                rootAsMap = ImmutableMap.of();
             }
             return rootAsMap;
         } catch (Exception e) {
