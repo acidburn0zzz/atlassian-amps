@@ -103,7 +103,7 @@ public class MarketplaceSdkResource implements SdkResource {
     @Override
     public String getLatestSdkVersion(SdkPackageType packageType) {
         Map<?, ?> rootAsMap = getPluginJsonAsMap(packageType);
-        if(rootAsMap.containsKey("version")) {
+        if (rootAsMap.containsKey("version")) {
             Map<?, ?> version = (Map<?, ?>) rootAsMap.get("version");
             return (String) version.get("version");
         } else {
