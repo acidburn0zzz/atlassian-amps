@@ -1,22 +1,21 @@
 package com.atlassian.maven.plugins.amps.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.prefs.Preferences;
-
 import com.atlassian.maven.plugins.amps.codegen.prompter.PrettyPrompter;
 import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkPackageType;
 import com.atlassian.maven.plugins.updater.SdkResource;
-
+import jline.ANSIBuffer;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
-import jline.ANSIBuffer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.prefs.Preferences;
 
 /**
  * Compares the current version of the SDK with the latest release on developer.atlassian.com.
@@ -73,9 +72,15 @@ public class UpdateCheckerImpl extends AbstractLogEnabled implements UpdateCheck
                 }
             } else {
                 StringBuilder sb = new StringBuilder();
-                sb.append("Current version ").append(currentVersion);
-                sb.append(" is more recent than MPAC version ").append(latestVersion);
-                sb.append(". No action taken.");
+                if(StringUtils.isEmpty(latestVersion)) {
+                    sb.append("Can not get the latest version from MPAC. ");
+                    sb.append("Carry on with current version ").append(currentVersion);
+                    sb.append(". No action taken.");
+                } else {
+                    sb.append("Current version ").append(currentVersion);
+                    sb.append(" is more recent than MPAC version ").append(latestVersion);
+                    sb.append(". No action taken.");
+                }
                 getLogger().debug(sb.toString());
             }
         }
