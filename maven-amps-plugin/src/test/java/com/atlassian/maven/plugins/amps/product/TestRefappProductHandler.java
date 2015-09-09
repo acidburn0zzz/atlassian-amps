@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.IOException;
 
 import static com.atlassian.maven.plugins.amps.product.RefappProductHandler.ATLASSIAN_BUNDLED_PLUGINS_ZIP;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,9 +23,9 @@ public class TestRefappProductHandler
     public TemporaryFolder tempHome = new TemporaryFolder();
 
     @Test
-    public void bundledPluginsLocationCorrectForDirectory()
+    public void bundledPluginsLocationCorrectForDirectory() throws IOException
     {
-        final File bundledPluginsDir = tempHome.newFolder(ATLASSIAN_BUNDLED_PLUGINS_ZIP);
+        final File bundledPluginsDir = tempHome.newFolder(ATLASSIAN_BUNDLED_PLUGINS_ZIP.split("/"));
         assertBundledPluginPath(tempHome.getRoot(), bundledPluginsDir);
     }
 

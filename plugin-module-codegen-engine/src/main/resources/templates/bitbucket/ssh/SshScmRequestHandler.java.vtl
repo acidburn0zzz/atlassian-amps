@@ -1,0 +1,34 @@
+package ${PACKAGE};
+
+import com.atlassian.bitbucket.scm.ssh.ExitCodeCallback;
+import com.atlassian.bitbucket.scm.ssh.SshScmRequest;
+import com.atlassian.bitbucket.scm.ssh.SshScmRequestHandler;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+public class ${CLASSNAME} implements SshScmRequestHandler
+{
+
+    private static final String COMMAND = "echo";
+
+    @Nullable
+    @Override
+    public SshScmRequest create(@Nonnull String remoteCommand,
+                                @Nonnull InputStream in,
+                                @Nonnull OutputStream out,
+                                @Nonnull OutputStream error,
+                                @Nonnull ExitCodeCallback exitCodeCallback)
+    {
+        // check whether the command string is supported by this handler
+        if (remoteCommand.equalsIgnoreCase(COMMAND))
+        {
+            return new ${REQUEST_CLASSNAME}(in, out, exitCodeCallback);
+        }
+
+        // the command wasn't supported by this handler
+        return null;
+    }
+}

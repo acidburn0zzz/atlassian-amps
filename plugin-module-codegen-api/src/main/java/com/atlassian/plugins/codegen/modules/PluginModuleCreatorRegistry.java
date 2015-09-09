@@ -8,13 +8,17 @@ import java.util.Map;
 public interface PluginModuleCreatorRegistry
 {
 
-    public static final String REFAPP = "refapp";
-    public static final String CONFLUENCE = "confluence";
-    public static final String JIRA = "jira";
-    public static final String BAMBOO = "bamboo";
-    public static final String FECRU = "fecru";
-    public static final String CROWD = "crowd";
-    public static final String STASH = "stash";
+    String REFAPP = "refapp";
+    String CONFLUENCE = "confluence";
+    String JIRA = "jira";
+    String BAMBOO = "bamboo";
+    /**
+     * @since 6.1.0
+     */
+    String BITBUCKET = "bitbucket";
+    String FECRU = "fecru";
+    String CROWD = "crowd";
+    String STASH = "stash";
 
     void registerModuleCreator(String productId, PluginModuleCreator moduleCreator);
 

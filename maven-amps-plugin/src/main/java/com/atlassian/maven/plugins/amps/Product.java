@@ -186,6 +186,16 @@ public class Product
     private String devToolboxVersion;
 
     /**
+     * Should QuickReload be enabled.
+     */
+    private Boolean enableQuickReload;
+
+    /**
+     * Version of QuickReload.
+     */
+    private String quickReloadVersion;
+
+    /**
      * Flag to indicate whether or not to enable automatic bundling of PDE.
      */
     private Boolean enablePde;
@@ -331,6 +341,8 @@ public class Product
         prod.setFastdevVersion(fastdevVersion == null ? product.getFastdevVersion() : fastdevVersion);
         prod.setEnableDevToolbox(enableDevToolbox == null ? product.isEnableDevToolbox() : enableDevToolbox);
         prod.setDevToolboxVersion(devToolboxVersion == null ? product.getDevToolboxVersion() : devToolboxVersion);
+        prod.setEnableQuickReload(enableQuickReload == null ? product.isEnableQuickReload() : enableQuickReload);
+        prod.setQuickReloadVersion(quickReloadVersion == null ? product.getQuickReloadVersion() : quickReloadVersion);
         prod.setEnablePde(enablePde == null ? product.isEnablePde() : enablePde);
         prod.setPdeVersion(pdeVersion == null ? product.getPdeVersion() : pdeVersion);
         prod.setRestVersion(restVersion == null ? product.getRestVersion() : restVersion);
@@ -783,6 +795,26 @@ public class Product
     public void setEnableDevToolbox(final Boolean enableDevToolbox)
     {
         this.enableDevToolbox = enableDevToolbox;
+    }
+
+    public String getQuickReloadVersion()
+    {
+        return quickReloadVersion;
+    }
+
+    public void setQuickReloadVersion(final String quickReloadVersion)
+    {
+        this.quickReloadVersion = quickReloadVersion;
+    }
+
+    public Boolean isEnableQuickReload()
+    {
+        return enableQuickReload;
+    }
+
+    public void setEnableQuickReload(final Boolean enableQuickReload)
+    {
+        this.enableQuickReload = enableQuickReload;
     }
 
     public String getDevToolboxVersion()

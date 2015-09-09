@@ -108,7 +108,7 @@ public class MavenGoals
                 //overrides.getProperty(JUNIT_ARTIFACT_ID,"
                 put("maven-cli-plugin", overrides.getProperty("maven-cli-plugin","1.0.11"));
                 put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.4.7"));
-                put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.2"));
+                put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.3"));
                 put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
                 put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","2.5.3"));
                 put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.3.0"));
@@ -118,6 +118,7 @@ public class MavenGoals
 
                 // You can't actually override the version a plugin if defined in the project, so these don't actually do
                 // anything, since the super pom already defines versions.
+                // TODO upgrade maven-dependency-plugin to the version contains new feature overwriteFiles
                 put("maven-dependency-plugin", overrides.getProperty("maven-dependency-plugin","2.5.1"));
                 put("maven-resources-plugin", overrides.getProperty("maven-resources-plugin","2.3"));
                 put("maven-jar-plugin", overrides.getProperty("maven-jar-plugin","2.2"));
@@ -155,49 +156,50 @@ public class MavenGoals
 
     public void startCli(final PluginInformation pluginInformation, final int port) throws MojoExecutionException
     {
-        final String pluginId = pluginInformation.getId();
+        final String groupId = pluginInformation.getGroupId();
+        final String artifactId = pluginInformation.getArtifactId();
 
         final List<Element> configs = new ArrayList<Element>();
         configs.add(element(name("commands"),
                 element(name("pi"),
-                        "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
+                        groupId + ":" + artifactId + ":copy-bundled-dependencies" + " "
+                                + groupId + ":" + artifactId + ":compress-resources" + " "
                                 + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
+                                + groupId + ":" + artifactId + ":filter-plugin-descriptor" + " "
                                 + "compile" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " "
+                                + groupId + ":" + artifactId + ":generate-manifest" + " "
+                                + groupId + ":" + artifactId + ":validate-manifest" + " "
+                                + groupId + ":" + artifactId + ":jar" + " "
                                 + "org.apache.maven.plugins:maven-install-plugin:install" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install"),
+                                + groupId + ":" + artifactId + ":install"),
                 element(name("tpi"),
-                        "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
+                        groupId + ":" + artifactId + ":copy-bundled-dependencies" + " "
+                                + groupId + ":" + artifactId + ":compress-resources" + " "
                                 + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
+                                + groupId + ":" + artifactId + ":filter-plugin-descriptor" + " "
                                 + "compile" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
+                                + groupId + ":" + artifactId + ":generate-manifest" + " "
                                 + "org.apache.maven.plugins:maven-resources-plugin:testResources" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-test-plugin-descriptor" + " "
-                                +"com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-test-bundled-dependencies" + " "
+                                + groupId + ":" + artifactId + ":filter-test-plugin-descriptor" + " "
+                                +groupId + ":" + artifactId + ":copy-test-bundled-dependencies" + " "
                                 + "org.apache.maven.plugins:maven-compiler-plugin:testCompile" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-test-manifest" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-test-manifest" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-jar" + " "
+                                + groupId + ":" + artifactId + ":generate-test-manifest" + " "
+                                + groupId + ":" + artifactId + ":validate-manifest" + " "
+                                + groupId + ":" + artifactId + ":validate-test-manifest" + " "
+                                + groupId + ":" + artifactId + ":jar" + " "
+                                + groupId + ":" + artifactId + ":test-jar" + " "
                                 + "org.apache.maven.plugins:maven-install-plugin:install" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:install" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:test-install"),
+                                + groupId + ":" + artifactId + ":install" + " "
+                                + groupId + ":" + artifactId + ":test-install"),
                 element(name("package"),
-                        "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:copy-bundled-dependencies" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:compress-resources" + " "
+                        groupId + ":" + artifactId + ":copy-bundled-dependencies" + " "
+                                + groupId + ":" + artifactId + ":compress-resources" + " "
                                 + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:filter-plugin-descriptor" + " "
+                                + groupId + ":" + artifactId + ":filter-plugin-descriptor" + " "
                                 + "compile" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:generate-manifest" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:validate-manifest" + " "
-                                + "com.atlassian.maven.plugins:maven-" + pluginId + "-plugin:jar" + " ")));
+                                + groupId + ":" + artifactId + ":generate-manifest" + " "
+                                + groupId + ":" + artifactId + ":validate-manifest" + " "
+                                + groupId + ":" + artifactId + ":jar" + " ")));
         if (port > 0)
         {
             configs.add(element(name("port"), String.valueOf(port)));
@@ -209,7 +211,7 @@ public class MavenGoals
                         version(pluginArtifactIdToVersionMap.get("maven-cli-plugin"))
                 ),
                 goal("execute"),
-                configuration(configs.toArray(new Element[0])),
+                configuration(configs.toArray(new Element[configs.size()])),
                 executionEnvironment());
     }
 
@@ -432,7 +434,7 @@ public class MavenGoals
                         element(name("excludeScope"), "provided"),
                         element(name("excludeScope"), "test"),
                         element(name("includeTypes"), "jar"),
-                        element(name("excludes"), "META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
+                        element(name("excludes"), "atlassian-plugin.xml, META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
                         element(name("outputDirectory"), "${project.build.outputDirectory}")
                 ),
                 executionEnvironment()

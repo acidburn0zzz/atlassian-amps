@@ -3,7 +3,10 @@ package com.atlassian.maven.plugins.amps;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.atlassian.maven.plugins.amps.util.*;
+import com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriber;
+import com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker;
+import com.atlassian.maven.plugins.amps.util.ProjectUtils;
+import com.atlassian.maven.plugins.amps.util.UpdateChecker;
 import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkResource;
 
@@ -198,12 +201,9 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
 
     protected PluginInformation getPluginInformation()
     {
-        if (pluginArtifactId == null)
-        {
-            return new PluginInformation("amps", "");
-        }
-        final String productId = pluginArtifactId.replaceAll("maven-(.*)-plugin", "$1");
-        return new PluginInformation(productId, pluginVersion);
+        final String artifactId = pluginArtifactId == null ? "maven-amps-plugin" : pluginArtifactId;
+
+        return PluginInformation.fromArtifactId(artifactId, pluginVersion);
     }
 
     protected UpdateChecker getUpdateChecker() throws MojoExecutionException

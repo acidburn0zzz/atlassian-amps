@@ -75,7 +75,7 @@ public class StashProductHandler extends AbstractWebappProductHandler
     @Override
     public String getDefaultContainerId()
     {
-        return "tomcat7x";
+        return "tomcat8x";
     }
 
     @Override
@@ -111,15 +111,16 @@ public class StashProductHandler extends AbstractWebappProductHandler
     @Override
     public Map<String, String> getSystemProperties(final Product ctx)
     {
-        ImmutableMap.Builder<String, String> properties = ImmutableMap.builder();
-        properties.putAll(super.getSystemProperties(ctx));
-        properties.put("stash.home", fixSlashes(getHomeDirectory(ctx).getPath()));
-
         String baseUrl = MavenGoals.getBaseUrl(ctx, ctx.getHttpPort());
-        properties.put("baseurl", baseUrl);
-        properties.put("baseurl.display", baseUrl);
-        properties.put("cargo.servlet.uriencoding", "UTF-8");
-        return properties.build();
+
+        return ImmutableMap.<String, String>builder()
+                .putAll(super.getSystemProperties(ctx))
+                .put("baseurl", baseUrl)
+                .put("baseurl.display", baseUrl)
+                .put("cargo.servlet.uriencoding", "UTF-8")
+                .put("johnson.spring.lifecycle.synchronousStartup", Boolean.TRUE.toString())
+                .put("stash.home", fixSlashes(getHomeDirectory(ctx).getPath()))
+                .build();
     }
 
     @Override
@@ -137,7 +138,8 @@ public class StashProductHandler extends AbstractWebappProductHandler
         // In Stash 3.1 we've changed the home directory layout and moved plugins/installed-plugins under
         // shared home, which usually is home/shared. If this directory does not exist, then we assume that
         // Stash will do the migration at a later point.
-        if(sharedHomeDir.exists()) {
+        if(sharedHomeDir.exists())
+        {
             baseDir = sharedHomeDir;
         }
 

@@ -53,7 +53,7 @@
                 <!-- integrationTestWithTestGroup, -->
                 jarWithExistingManifest, run, runParallel, stop, nexus_staging,
                 unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
-                validateManifestWithValidManifest
+                validateManifestWithValidManifest, quickreload
                 </tests>
             </properties>
         </profile>

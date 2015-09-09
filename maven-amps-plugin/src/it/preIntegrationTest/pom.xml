@@ -7,6 +7,8 @@
     <name>TestPreIntegrationTest</name>
 
     <properties>
+        <shitty.artifactId>${shitty.artifactId}</shitty.artifactId>
+        <shitty.groupId>${shitty.groupId}</shitty.groupId>
         <shitty.product>${shitty.product}</shitty.product>
         <jira.version>6.3</jira.version>
     </properties>
@@ -16,8 +18,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.atlassian.maven.plugins</groupId>
-                        <artifactId>maven-${shitty.product}-plugin</artifactId>
+                        <groupId>${shitty.groupId}</groupId>
+                        <artifactId>${shitty.artifactId}</artifactId>
                         <version>testing</version>
                     </plugin>
                 </plugins>
@@ -40,8 +42,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.atlassian.maven.plugins</groupId>
-                        <artifactId>maven-${shitty.product}-plugin</artifactId>
+                        <groupId>${shitty.groupId}</groupId>
+                        <artifactId>${shitty.artifactId}</artifactId>
                         <version>testing</version>
                         <extensions>true</extensions>
                         <configuration>
@@ -97,8 +99,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.atlassian.maven.plugins</groupId>
-                        <artifactId>maven-${shitty.product}-plugin</artifactId>
+                        <groupId>${shitty.groupId}</groupId>
+                        <artifactId>${shitty.artifactId}</artifactId>
                         <version>testing</version>
                         <extensions>true</extensions>
                         <configuration>
@@ -147,14 +149,14 @@
                 <dataSource.jndi>jdbc/JiraDS</dataSource.jndi>
                 <dataSource.defaultDatabase>jdbc:mysql://localhost:3307/mysql</dataSource.defaultDatabase>
                 <dataSource.systemUsername>root</dataSource.systemUsername>
-                <dataSource.systemPassword></dataSource.systemPassword>
+                <dataSource.systemPassword/>
                 <instanceId>jira-mysql</instanceId>
             </properties>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.atlassian.maven.plugins</groupId>
-                        <artifactId>maven-${shitty.product}-plugin</artifactId>
+                        <groupId>${shitty.groupId}</groupId>
+                        <artifactId>${shitty.artifactId}</artifactId>
                         <version>testing</version>
                         <extensions>true</extensions>
                         <configuration>
@@ -209,8 +211,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.atlassian.maven.plugins</groupId>
-                        <artifactId>maven-${shitty.product}-plugin</artifactId>
+                        <groupId>${shitty.groupId}</groupId>
+                        <artifactId>${shitty.artifactId}</artifactId>
                         <version>testing</version>
                         <extensions>true</extensions>
                         <configuration>

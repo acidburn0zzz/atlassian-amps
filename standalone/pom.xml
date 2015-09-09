@@ -52,6 +52,12 @@
                                 <output>${project.build.directory}/bamboo-LATEST.log</output>
                             </product>
                             <product>
+                                <id>bitbucket</id>
+                                <version>LATEST</version>
+                                <dataVersion>LATEST</dataVersion>
+                                <output>${project.build.directory}/bitbucket-LATEST.log</output>
+                            </product>
+                            <product>
                                 <id>fecru</id>
                                 <version>LATEST</version>
                                 <dataVersion>LATEST</dataVersion>

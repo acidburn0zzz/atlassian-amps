@@ -1,7 +1,6 @@
 package com.atlassian.maven.plugins.amps;
 
 import org.apache.maven.model.Build;
-import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
@@ -106,12 +105,13 @@ public class TestAbstractProductHandlerMojo
             when(build.getTestOutputDirectory()).thenReturn(".");
             when(project.getBuild()).thenReturn(build);
             when(project.getBasedir()).thenReturn(new File("."));
-            return new MavenContext(project, null, null, (BuildPluginManager) null, null);
+            return new MavenContext(project, null, null, null, null);
         }
 
         @Override
-        protected PluginInformation getPluginInformation() {
-            return new PluginInformation("test-product", "Test SDK Version");
+        protected PluginInformation getPluginInformation()
+        {
+            return PluginInformation.fromArtifactId("maven-test-product-plugin", "Test SDK Version");
         }
     }
 }

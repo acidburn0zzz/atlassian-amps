@@ -45,16 +45,14 @@
                 <product.version>${stash.version}</product.version>
                 <product.data.version>${stash.data.version}</product.data.version>
                 <tests>
-                cli, compressResources, copyBundledDependencies, create, debug,
-                debugWithTestGroup, 
-                filterPluginDescriptorWithoutPluginDescriptor,
-                filterPluginDescriptorWithPluginDescriptor, generateManifestWithInstructions,
-                generateManifestWithNoInstructions, generateManifestWithNoInstructionsButIsAtlassianPlugin,
-                generateManifestWithNoInstructionsNorIsAtlassianPlugin, generateObr, integrationTest,
-                integrationTestWithTestGroup, nexus_staging,
-                jarWithExistingManifest, run, runParallel, runWithTestGroup, 
-                unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
-                validateManifestWithValidManifest
+                    cli, compressResources, copyBundledDependencies, create, debug, debugWithTestGroup,
+                    filterPluginDescriptorWithoutPluginDescriptor, filterPluginDescriptorWithPluginDescriptor,
+                    generateManifestWithInstructions, generateManifestWithNoInstructions,
+                    generateManifestWithNoInstructionsButIsAtlassianPlugin,
+                    generateManifestWithNoInstructionsNorIsAtlassianPlugin, generateObr, integrationTest,
+                    integrationTestWithTestGroup, jarWithExistingManifest, nexus_staging, quickreload,
+                    run, runParallel, runWithTestGroup, unitTest, validateManifestSkipValidation,
+                    validateManifestWithInvalidManifest, validateManifestWithValidManifest
                 </tests>
             </properties>
         </profile>

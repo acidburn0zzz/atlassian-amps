@@ -3,7 +3,6 @@ package com.atlassian.plugins.codegen.modules.common.keyboard;
 import com.atlassian.plugins.codegen.modules.BasicNameModuleProperties;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,10 +20,11 @@ public abstract class AbstractKeyboardShortcutProperties extends BasicNameModule
     public static final String OPERATION_VALUE = "OPERATION_VALUE";
     public static final String CONTEXT = "CONTEXT";
 
-    public static final List<String> OPERATIONS = Lists.newArrayList("click", "evaluate", "execute", "followLink",
-            "goTo", "moveToAndClick", "moveToAndFocus", "moveToNextItem", "moveToPrevItem");
+    public static final List<String> OPERATIONS = ImmutableList.of(
+            "click", "evaluate", "execute", "followLink", "goTo", "moveToAndClick",
+            "moveToAndFocus", "moveToNextItem", "moveToPrevItem");
 
-    private static final List<String> XPRODUCT_CONTEXTS = Lists.newArrayList("global");
+    private static final List<String> XPRODUCT_CONTEXTS = ImmutableList.of("global");
 
     private final List<String> allowedContexts;
 

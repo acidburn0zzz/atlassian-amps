@@ -56,7 +56,7 @@ public class ApplicationMapperTest
         List<ProductArtifact> result = applicationMapper.provideApplications(product);
 
         @SuppressWarnings ("unchecked")
-        Matcher<Iterable<ProductArtifact>> matcher = Matchers.containsInAnyOrder(
+        Matcher<Iterable<? extends ProductArtifact>> matcher = Matchers.containsInAnyOrder(
                 productArtifact("p1app1group", "p1app1artifact", "version1"),
                 productArtifact("p1app2group", "p1app2artifact", "version2"));
         assertThat(result, matcher);
@@ -68,7 +68,7 @@ public class ApplicationMapperTest
 
         List<ProductArtifact> result = applicationMapper.provideApplications(product);
 
-        Matcher<Iterable<ProductArtifact>> matcher = Matchers.containsInAnyOrder(
+        Matcher<Iterable<? extends ProductArtifact>> matcher = Matchers.contains(
                 productArtifact("p2app1group", "p2app1artifact", "version1"));
         assertThat(result, matcher);
     }

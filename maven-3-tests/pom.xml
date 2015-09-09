@@ -6,7 +6,6 @@
         <version>6.2.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.atlassian.amps</groupId>
     <artifactId>maven-3-tests</artifactId>
     <packaging>pom</packaging>
 
@@ -35,8 +34,8 @@
               the integration tests run. Add them as dependencies
               to ensure that they're fetched. -->
         <dependency>
-            <groupId>com.atlassian.refapp</groupId>
-            <artifactId>atlassian-platform</artifactId>
+            <groupId>com.atlassian.platform</groupId>
+            <artifactId>platform-poms</artifactId>
             <version>${refapp.version}</version>
             <type>pom</type>
         </dependency>

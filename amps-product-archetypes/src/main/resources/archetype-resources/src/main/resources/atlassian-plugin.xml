@@ -1,5 +1,5 @@
 #set( $dollar = '$' )
-<atlassian-plugin key="${dollar}{project.groupId}.${dollar}{project.artifactId}" name="${dollar}{project.name}" plugins-version="2">
+<atlassian-plugin key="${dollar}{atlassian.plugin.key}" name="${dollar}{project.name}" plugins-version="2">
     <plugin-info>
         <description>${dollar}{project.description}</description>
         <version>${dollar}{project.version}</version>
@@ -21,13 +21,5 @@
 
         <context>${artifactId}</context>
     </web-resource>
-    
-    <!-- publish our component -->
-    <component key="myPluginComponent" class="${package}.MyPluginComponentImpl" public="true">
-        <interface>${package}.MyPluginComponent</interface>
-    </component>
-    
-    <!-- import from the product container -->
-    <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" />
     
 </atlassian-plugin>

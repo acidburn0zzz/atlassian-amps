@@ -11,9 +11,6 @@
                     <lifecycle>
                         <id>default</id>
                         <phases>
-                            <generate-resources>
-                                com.atlassian.maven.plugins:maven-stash-plugin:copy-bundled-dependencies
-                            </generate-resources>
                             <process-resources>
                                 com.atlassian.maven.plugins:maven-stash-plugin:compress-resources,
                                 org.apache.maven.plugins:maven-resources-plugin:resources,
@@ -21,20 +18,25 @@
                             </process-resources>
                             <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
                             <process-classes>
-                                com.atlassian.maven.plugins:maven-stash-plugin:generate-manifest,
                                 com.atlassian.maven.plugins:maven-stash-plugin:generate-rest-docs
                             </process-classes>
-                            <generate-test-resources>
+                            <process-test-resources>
                                 org.apache.maven.plugins:maven-resources-plugin:testResources,
-                                com.atlassian.maven.plugins:maven-stash-plugin:filter-test-plugin-descriptor,
-                                com.atlassian.maven.plugins:maven-stash-plugin:generate-test-manifest
-                            </generate-test-resources>
+                                com.atlassian.maven.plugins:maven-stash-plugin:filter-test-plugin-descriptor
+                            </process-test-resources>
                             <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
                             <test>com.atlassian.maven.plugins:maven-stash-plugin:unit-test</test>
+                            <prepare-package>
+                                com.atlassian.maven.plugins:maven-stash-plugin:copy-bundled-dependencies,
+                                com.atlassian.maven.plugins:maven-stash-plugin:copy-test-bundled-dependencies,
+                                com.atlassian.maven.plugins:maven-stash-plugin:generate-manifest,
+                                com.atlassian.maven.plugins:maven-stash-plugin:generate-test-manifest
+                            </prepare-package>
                             <package>
                                 com.atlassian.maven.plugins:maven-stash-plugin:validate-manifest,
                                 com.atlassian.maven.plugins:maven-stash-plugin:jar,
                                 com.atlassian.maven.plugins:maven-stash-plugin:generate-obr-artifact,
+                                com.atlassian.maven.plugins:maven-stash-plugin:validate-test-manifest,
                                 com.atlassian.maven.plugins:maven-stash-plugin:test-jar
                             </package>
                             <pre-integration-test>

@@ -5,17 +5,21 @@
     <artifactId>maven-amps-plugin-integration-test</artifactId>
     <version>testing</version>
     <name>TestIntegrationTest</name>
+    <packaging>atlassian-plugin</packaging>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-${shitty.product}-plugin</artifactId>
+                <groupId>${shitty.groupId}</groupId>
+                <artifactId>${shitty.artifactId}</artifactId>
                 <version>testing</version>
+                <extensions>true</extensions>
                 <configuration>
                     <container>tomcat6x</container>
                     <productInheritConfiguration>true</productInheritConfiguration>
                     <systemPropertyVariables>
+                        <shitty.artifactId>${shitty.artifactId}</shitty.artifactId>
+                        <shitty.groupId>${shitty.groupId}</shitty.groupId>
                         <shitty.product>${shitty.product}</shitty.product>
                     </systemPropertyVariables>
                     <testGroups>
@@ -69,6 +73,8 @@
     </build>
 
     <properties>
+        <shitty.artifactId>${shitty.artifactId}</shitty.artifactId>
+        <shitty.groupId>${shitty.groupId}</shitty.groupId>
         <shitty.product>${shitty.product}</shitty.product>
     </properties>
 

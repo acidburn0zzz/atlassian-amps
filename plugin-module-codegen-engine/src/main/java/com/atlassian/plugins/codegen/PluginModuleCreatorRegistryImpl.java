@@ -20,15 +20,20 @@ public class PluginModuleCreatorRegistryImpl implements PluginModuleCreatorRegis
 
     public PluginModuleCreatorRegistryImpl()
     {
-        ModuleNameComparator comparator = new ModuleNameComparator();
-        this.creatorRegistry = new HashMap<String, SortedMap<Class, PluginModuleCreator>>();
-        creatorRegistry.put(PluginModuleCreatorRegistry.JIRA, new TreeMap<Class, PluginModuleCreator>(comparator));
-        creatorRegistry.put(PluginModuleCreatorRegistry.BAMBOO, new TreeMap<Class, PluginModuleCreator>(comparator));
-        creatorRegistry.put(PluginModuleCreatorRegistry.CONFLUENCE, new TreeMap<Class, PluginModuleCreator>(comparator));
-        creatorRegistry.put(PluginModuleCreatorRegistry.CROWD, new TreeMap<Class, PluginModuleCreator>(comparator));
-        creatorRegistry.put(PluginModuleCreatorRegistry.FECRU, new TreeMap<Class, PluginModuleCreator>(comparator));
-        creatorRegistry.put(PluginModuleCreatorRegistry.STASH, new TreeMap<Class, PluginModuleCreator>(comparator));
-        creatorRegistry.put(PluginModuleCreatorRegistry.REFAPP, new TreeMap<Class, PluginModuleCreator>(comparator));
+        final ModuleNameComparator comparator = new ModuleNameComparator();
+
+        final Map<String, SortedMap<Class, PluginModuleCreator>> registry =
+                new HashMap<String, SortedMap<Class, PluginModuleCreator>>();
+        registry.put(PluginModuleCreatorRegistry.JIRA, new TreeMap<Class, PluginModuleCreator>(comparator));
+        registry.put(PluginModuleCreatorRegistry.BAMBOO, new TreeMap<Class, PluginModuleCreator>(comparator));
+        registry.put(PluginModuleCreatorRegistry.BITBUCKET, new TreeMap<Class, PluginModuleCreator>(comparator));
+        registry.put(PluginModuleCreatorRegistry.CONFLUENCE, new TreeMap<Class, PluginModuleCreator>(comparator));
+        registry.put(PluginModuleCreatorRegistry.CROWD, new TreeMap<Class, PluginModuleCreator>(comparator));
+        registry.put(PluginModuleCreatorRegistry.FECRU, new TreeMap<Class, PluginModuleCreator>(comparator));
+        registry.put(PluginModuleCreatorRegistry.STASH, new TreeMap<Class, PluginModuleCreator>(comparator));
+        registry.put(PluginModuleCreatorRegistry.REFAPP, new TreeMap<Class, PluginModuleCreator>(comparator));
+
+        creatorRegistry = Collections.unmodifiableMap(registry);
     }
 
     @Override
