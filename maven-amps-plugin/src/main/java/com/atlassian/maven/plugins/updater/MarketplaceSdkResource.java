@@ -1,21 +1,29 @@
 package com.atlassian.maven.plugins.updater;
 
-import com.atlassian.maven.plugins.amps.util.OSUtils;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.IOUtils;
-
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Map;
 
 /**
  * Implements an SdkResource for the Atlassian Marketplace.
  */
-public class MarketplaceSdkResource implements SdkResource {
+public class MarketplaceSdkResource extends AbstractLogEnabled implements SdkResource {
 
     private static final String SDK_DOWNLOAD_URL_ROOT =
             "https://marketplace.atlassian.com/rest/1.0/plugins/atlassian-plugin-sdk-";
@@ -96,8 +104,12 @@ public class MarketplaceSdkResource implements SdkResource {
     @Override
     public String getLatestSdkVersion(SdkPackageType packageType) {
         Map<?, ?> rootAsMap = getPluginJsonAsMap(packageType);
-        Map<?, ?> version = (Map<?, ?>) rootAsMap.get("version");
-        return (String) version.get("version");
+        if (rootAsMap.containsKey("version")) {
+            Map<?, ?> version = (Map<?, ?>) rootAsMap.get("version");
+            return (String) version.get("version");
+        } else {
+            return "";
+        }
     }
 
     private void copyResponseStreamToFile(InputStream stream, File file) {
@@ -132,6 +144,12 @@ public class MarketplaceSdkResource implements SdkResource {
             conn = (HttpURLConnection) url.openConnection();
             jsonStream = new BufferedInputStream(conn.getInputStream());
             json = IOUtils.toString(jsonStream);
+        } catch (UnknownHostException e) {
+            this.getLogger().info("Unknown host " + url.getHost());
+            json = "";
+        } catch (ConnectException e) {
+            this.getLogger().info("Fail to connect to host " + url.getHost());
+            json = "";
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -143,7 +161,11 @@ public class MarketplaceSdkResource implements SdkResource {
 
         Map<?, ?> rootAsMap;
         try {
-            rootAsMap = mapper.readValue(json, Map.class);
+            if(StringUtils.isNotEmpty(json)) {
+                rootAsMap = mapper.readValue(json, Map.class);
+            } else {
+                rootAsMap = ImmutableMap.of();
+            }
             return rootAsMap;
         } catch (Exception e) {
             throw new RuntimeException(e);
