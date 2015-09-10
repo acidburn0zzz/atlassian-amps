@@ -1,14 +1,9 @@
 package com.atlassian.maven.plugins.amps;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
-import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
-import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
-
-import com.google.common.collect.Lists;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -33,14 +28,9 @@ public class CreateHomeZipMojo extends AbstractProductHandlerMojo {
     public void doExecute() throws MojoExecutionException, MojoFailureException
     {
         trackFirstRunIfNeeded();
-        
+
         Product product = getProduct(instanceId, getProductId());
         ProductHandler productHandler = createProductHandler(product.getId());
-
-        if (ProductHandlerFactory.STUDIO.equals(product.getId()))
-        {
-            configureStudio(product, (StudioProductHandler) productHandler);
-        }
 
         final File snapshotDir = productHandler.getSnapshotDirectory(product);
         if (homeZip == null)
@@ -55,21 +45,6 @@ public class CreateHomeZipMojo extends AbstractProductHandlerMojo {
         // Make the file the artifact of the project
         getMavenGoals().attachArtifact(homeZip, "zip");
 
-    }
-
-
-
-
-    /**
-     * Configure the Studio product.
-     *
-     * @param studioProduct the studio product. Must not be another product, neither null.
-     * @param studioProductHandler the Studio product handler
-     */
-    private void configureStudio(Product studioProduct, StudioProductHandler studioProductHandler) throws MojoExecutionException
-    {
-        List<ProductExecution> executions = Lists.newArrayList(new ProductExecution(studioProduct, studioProductHandler));
-        includeStudioDependentProducts(executions, getMavenGoals());
     }
 
     /**

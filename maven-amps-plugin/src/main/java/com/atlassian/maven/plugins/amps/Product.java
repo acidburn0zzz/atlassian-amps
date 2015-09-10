@@ -1,7 +1,5 @@
 package com.atlassian.maven.plugins.amps;
 
-import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
-import com.atlassian.maven.plugins.amps.product.studio.StudioProperties;
 import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
 
 import org.apache.commons.lang.StringUtils;
@@ -252,7 +250,7 @@ public class Product
     /**
      * Waits until the application is up before proceeding to the next one (blocking call).<ul>
      * <li>If -Dparallel is not specified, default is TRUE for all products.</li>
-     * <li>If -Dparallel is specified, default is FALSE except for Studio-Crowd and FeCru.</li>
+     * <li>If -Dparallel is specified, default is FALSE except for FeCru.</li>
      * <li>The pom.xml overrides the default values.</li>
      * <li>Use -Dparallel to start products in parallel. {@link AbstractProductHandlerMojo#setParallelMode(List)} sets the default values according to this parameter.</li>
      * </ul>
@@ -270,45 +268,11 @@ public class Product
     private String artifactId;
 
     /**
-     * The studio configuration which is shared for all products in the same
-     * studio instance. Null if products are not studio or not yet configured.
-     * <p>
-     * {@link StudioProductHandler#configure(Product, List)} will set this value.
-     * It must be called before Studio products are launched.
-     */
-    protected StudioProperties studioProperties;
-
-    /**
-     * Only applies to Studio
-     * List of 'sub'-products that are managed by this Studio instance.
-     * Optional. Default value is: studio-crowd, studio-confluence, studio-fecru, studio-bamboo, studio-jira.
-     */
-    protected List<String> instanceIds = new ArrayList<String>();
-
-    /**
-     * Only applies to Studio
-     * Set 'true' if GApps is enabled. Default is 'false'
-     */
-    protected String gappsEnabled;
-
-    /**
-     * Only applies to Studio
-     * The GApps domain, if GApps is enabled
-     */
-    protected String gappsDomain;
-
-    /**
-     * Only applies to StudioFecru
-     * Tells whether shutdown is enabled for Fisheye. This property is passed on in the properties files.
-     */
-    protected Boolean shutdownEnabled;
-
-    /**
      * Registers a JNDI datasource using cargo.datasource.datasource.
      * <ul>
      * <li>Default values depend on the product.</li>
      * <li>Default values will be applied to the first datasource if its definition is incomplete.</li>
-     * <li>Only Jira, Studio-Jira, Studio-Bamboo, Studio-Confluence and Studio-Crowd have a datasource by default, and they use HSQL or H2.</li>
+     * <li>Only Jira has a datasource by default, and they use HSQL or H2.</li>
      * <li>Other products can use datasources if you configure them this way during the setup process (Requires to
      * start with an empty data home).</li>
      * <li>There is a simple prerequisite to configuring multiple datasources. You must use {@code <parallel>true</parallel>},
@@ -413,11 +377,6 @@ public class Product
         prod.setShutdownTimeout(shutdownTimeout == 0 ? product.getShutdownTimeout() : shutdownTimeout);
         prod.setSynchronousStartup(synchronousStartup == null ? product.getSynchronousStartup() : synchronousStartup);
         prod.setSharedHome(sharedHome == null ? product.getSharedHome() : sharedHome);
-
-        // Studio-related properties
-        prod.setStudioProperties(studioProperties == null ? product.getStudioProperties() : studioProperties);
-        prod.setInstanceIds(instanceIds == null ? product.getInstanceIds() : instanceIds);
-        prod.setShutdownEnabled(shutdownEnabled == null ? product.getShutdownEnabled() : shutdownEnabled);
 
         // https related properties
         prod.setHttpsPort(httpsPort == 0 ? product.getHttpsPort() : httpsPort);
@@ -981,59 +940,9 @@ public class Product
         this.artifactId = artifactId;
     }
 
-    public StudioProperties getStudioProperties()
-    {
-        return studioProperties;
-    }
-
-    public void setStudioProperties(StudioProperties studioProperties)
-    {
-        this.studioProperties = studioProperties;
-    }
-
-    public List<String> getInstanceIds()
-    {
-        return instanceIds;
-    }
-
-    public void setInstanceIds(List<String> instanceIds)
-    {
-        this.instanceIds = instanceIds;
-    }
-
-    public String getGappsEnabled()
-    {
-        return gappsEnabled;
-    }
-
-    public void setGappsEnabled(String gappsEnabled)
-    {
-        this.gappsEnabled = gappsEnabled;
-    }
-
-    public String getGappsDomain()
-    {
-        return gappsDomain;
-    }
-
-    public void setGappsDomain(String gappsDomain)
-    {
-        this.gappsDomain = gappsDomain;
-    }
-
     public void setSystemProperties(Map<String, Object> systemProperties)
     {
         this.systemProperties = systemProperties;
-    }
-
-    public Boolean getShutdownEnabled()
-    {
-        return shutdownEnabled;
-    }
-
-    public void setShutdownEnabled(Boolean shutdownEnabled)
-    {
-        this.shutdownEnabled = shutdownEnabled;
     }
 
     public Boolean getSynchronousStartup()

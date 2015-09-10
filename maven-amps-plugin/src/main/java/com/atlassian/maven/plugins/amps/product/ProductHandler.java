@@ -36,8 +36,6 @@ public interface ProductHandler
      * the state of the instance.
      *
      * Most often, equivalent to the home directory.
-     *
-     * Studio snapshots several homes together.
      */
     File getSnapshotDirectory(Product product);
 
@@ -61,8 +59,6 @@ public interface ProductHandler
      * Files returned by this method are guaranteed to be reversed when creating the home zip.
      *
      * @param snapshotCopyDir A snapshot equivalent to the home in most cases. It is a copy of the folder: {@link #getSnapshotDirectory(Product)}
-     * The only exception is for the Studio product itself, as the snapshot dir is the parent of the studio home (so that it
-     * contains the homes of all products).
      *
      * @return a mutable list of files
      */

@@ -404,8 +404,6 @@
         <crowd.version>2.8.3</crowd.version>
         <crowd.data.version>2.8.3</crowd.data.version>
         <clover.version>3.1.7</clover.version>
-        <studio.version>108.2</studio.version>
-        <studio.data.version>108.2-m0</studio.data.version>
         <stash.version>3.11.1</stash.version>
         <stash.data.version>${stash.version}</stash.data.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>

@@ -81,12 +81,6 @@
             <artifactId>cargo-maven2-plugin</artifactId>
             <version>1.0-beta-2-db2</version>
         </dependency>
-        <!--<dependency>
-            <groupId>com.atlassian.studio</groupId>
-            <artifactId>studio-parent</artifactId>
-            <version>108.2</version>
-            <type>pom</type>
-        </dependency>-->
     </dependencies>
 
     <build>

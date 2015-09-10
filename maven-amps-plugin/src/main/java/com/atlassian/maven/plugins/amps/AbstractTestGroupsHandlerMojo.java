@@ -24,21 +24,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 
 public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandlerMojo
 {
-
-    /**
-     * Excluded instances from the execution. Only useful when Studio brings in all instances and you want to run only one.
-     * List of comma separated instanceIds, or {@literal *}/instanceId to exclude all but one product.
-     * <p>
-     * Examples:
-     * <ul>
-     * <li>mvn amps:run -DexcludeInstances=studio-crowd</li>
-     * <li>mvn amps:run -DexcludeInstances={@literal *}/studio-crowd to run only StudioCrowd</li>
-     * </ul>
-     */
-    @Parameter(property = "excludeInstances")
-    protected String excludeInstances;
-
-    /**
+     /**
      * Test group to run. If provided, used to determine the products to run.
      */
     @Parameter(property = "testGroup")
@@ -132,7 +118,6 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
     protected List<ProductExecution> getProductExecutions() throws MojoExecutionException
     {
         final List<ProductExecution> productExecutions;
-        final MavenGoals goals = getMavenGoals();
         if (!isBlank(testGroup))
         {
             productExecutions = getTestGroupProductExecutions(testGroup);
@@ -153,48 +138,6 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
             ProductHandler product = createProductHandler(ctx.getId());
             productExecutions = Collections.singletonList(new ProductExecution(ctx, product));
         }
-        return filterExcludedInstances(includeStudioDependentProducts(productExecutions, goals));
-    }
-
-    private List<ProductExecution> filterExcludedInstances(List<ProductExecution> executions) throws MojoExecutionException
-    {
-        if (StringUtils.isBlank(excludeInstances))
-        {
-            return executions;
-        }
-        boolean inverted = excludeInstances.startsWith("*/");
-        String instanceIdList = inverted ? excludeInstances.substring(2) : excludeInstances;
-
-        // Parse the list given by the user and find ProductExecutions
-        List<String> excludedInstanceIds = Lists.newArrayList(instanceIdList.split(","));
-        List<ProductExecution> excludedExecutions = Lists.newArrayList();
-        for (final String instanceId : excludedInstanceIds)
-        {
-            try
-            {
-                excludedExecutions.add(Iterables.find(executions, new Predicate<ProductExecution>()
-                {
-                    @Override
-                    public boolean apply(ProductExecution input)
-                    {
-                        return input.getProduct().getInstanceId().equals(instanceId);
-                    }
-                }));
-            }
-            catch (NoSuchElementException nsee)
-            {
-                throw new MojoExecutionException("You specified -Dexclude=" + excludeInstances + " but " + instanceId + " is not an existing instance id.");
-            }
-        }
-
-        if (inverted)
-        {
-            return excludedExecutions;
-        }
-        else
-        {
-            executions.removeAll(excludedExecutions);
-            return executions;
-        }
+        return productExecutions;
     }
 }
