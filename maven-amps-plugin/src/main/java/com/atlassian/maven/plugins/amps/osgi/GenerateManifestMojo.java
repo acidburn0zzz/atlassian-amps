@@ -86,7 +86,10 @@ public class GenerateManifestMojo extends AbstractAmpsMojo
             }
             getMavenGoals().generateBundleManifest(instructions, basicAttributes);
 
-            ProjectUtils.calculateAndWriteProjectPomFileChecksum(getMavenContext().getProject());
+            if (skipManifestGenerationIfExisted)
+            {
+                ProjectUtils.calculateAndWriteProjectPomFileChecksum(getMavenContext().getProject());
+            }
         }
         else
         {

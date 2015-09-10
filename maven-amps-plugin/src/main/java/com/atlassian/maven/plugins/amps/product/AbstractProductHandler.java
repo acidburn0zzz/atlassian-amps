@@ -602,17 +602,20 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     private void createProjectPomChecksumBaseline(final File homeDir)
     {
         File projectChecksumFile = ProjectUtils.getProjectPomChecksumFile(project);
-        if (projectChecksumFile.exists())
+        if (!projectChecksumFile.exists())
         {
-            File checksumFileOnHomeDir = getBaselineProjectPomChecksumFile(homeDir);
-            try
-            {
-                org.apache.commons.io.FileUtils.copyFile(projectChecksumFile, checksumFileOnHomeDir);
-            }
-            catch (IOException e)
-            {
-                throw new RuntimeException(e);
-            }
+            // lets generate one
+            ProjectUtils.calculateAndWriteProjectPomFileChecksum(project);
+        }
+
+        File checksumFileOnHomeDir = getBaselineProjectPomChecksumFile(homeDir);
+        try
+        {
+            org.apache.commons.io.FileUtils.copyFile(projectChecksumFile, checksumFileOnHomeDir);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
         }
     }
 

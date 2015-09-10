@@ -2,11 +2,11 @@ package com.atlassian.maven.plugins.amps.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
+import com.google.common.collect.Lists;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
@@ -96,7 +96,13 @@ public class ProjectUtils
 
         try
         {
-            return FileUtils.calculateFileChecksum(Arrays.asList(pluginPomXml, parentPomXml));
+            ArrayList<File> files = Lists.newArrayList(pluginPomXml);
+            if (parentPomXml != null)
+            {
+                files.add(parentPomXml);
+            }
+
+            return FileUtils.calculateFileChecksum(files);
         }
         catch (IOException e)
         {
@@ -142,7 +148,7 @@ public class ProjectUtils
      * @see ProjectUtils#calculateChecksumOfProjectPomFile(MavenProject)
      * @see ProjectUtils#getProjectPomChecksumFile(MavenProject)
      */
-    public static void calculateAndWriteProjectPomFileChecksum(MavenProject project) throws MojoExecutionException
+    public static void calculateAndWriteProjectPomFileChecksum(MavenProject project)
     {
         File checksumFile = getProjectPomChecksumFile(project);
         try
@@ -151,7 +157,7 @@ public class ProjectUtils
         }
         catch (IOException e)
         {
-            throw new MojoExecutionException("failed to write project pom.xml checksum to file", e);
+            throw new RuntimeException("failed to write project pom.xml checksum to file", e);
         }
     }
 
