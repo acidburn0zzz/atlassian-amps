@@ -122,8 +122,7 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
             {
                 validTestGroups.add(group.getId());
             }
-            throw new MojoExecutionException("Unknown test group ID: " + testGroupId
-                + " Detected IDs: " + Arrays.toString(validTestGroups.toArray()));
+            getLog().warn("Unknown test group ID: " + testGroupId + " Detected IDs: " + Arrays.toString(validTestGroups.toArray()));
         }
 
         return instanceIds;
