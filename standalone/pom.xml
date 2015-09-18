@@ -30,37 +30,31 @@
                             <product>
                                 <id>confluence</id>
                                 <version>LATEST</version>
-                                <dataVersion>LATEST</dataVersion>
                                 <output>${project.build.directory}/confluence-LATEST.log</output>
                             </product>
                             <product>
                                 <id>jira</id>
                                 <version>LATEST</version>
-                                <dataVersion>LATEST</dataVersion>
                                 <output>${project.build.directory}/jira-LATEST.log</output>
                             </product>
                             <product>
                                 <id>stash</id>
                                 <version>LATEST</version>
-                                <dataVersion>LATEST</dataVersion>
                                 <output>${project.build.directory}/stash-LATEST.log</output>
                             </product>
                             <product>
                                 <id>bamboo</id>
                                 <version>LATEST</version>
-                                <dataVersion>LATEST</dataVersion>
                                 <output>${project.build.directory}/bamboo-LATEST.log</output>
                             </product>
                             <product>
                                 <id>fecru</id>
                                 <version>LATEST</version>
-                                <dataVersion>LATEST</dataVersion>
                                 <output>${project.build.directory}/fecru-LATEST.log</output>
                             </product>
                             <product>
                                 <id>crowd</id>
                                 <version>LATEST</version>
-                                <dataVersion>LATEST</dataVersion>
                                 <output>${project.build.directory}/crowd-LATEST.log</output>
                             </product>
                         </products>
