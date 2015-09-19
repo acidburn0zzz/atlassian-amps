@@ -216,6 +216,12 @@
             <artifactId>guava-osgi</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven.archetype</groupId>
+            <artifactId>archetype-common</artifactId>
+            <version>2.2</version>
+        </dependency>
     </dependencies>
 
     <build>

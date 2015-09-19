@@ -279,7 +279,8 @@ public class MavenGoals
                     ),
                     execEnv);
 
-
+            /* Remove cr (\r) character */
+            correctCrlf(props.getArtifactId());
 
             File pluginDir = new File(ctx.getProject().getBasedir(),props.getArtifactId());
 
