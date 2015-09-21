@@ -279,7 +279,12 @@ public class MavenGoals
                     ),
                     execEnv);
 
-            /* Remove cr (\r) character */
+            /*
+            The problem is if plugin is sub of multiple module project, then the pom file will be add parent section.
+            When add parent section to module pom file, maven use the default Format with lineEnding is \r\n.
+            This step add \r\n character as the line ending.
+            Call the function below to remove cr (\r) character
+            */
             correctCrlf(props.getArtifactId());
 
             File pluginDir = new File(ctx.getProject().getBasedir(),props.getArtifactId());
@@ -326,58 +331,67 @@ public class MavenGoals
         }
     }
 
+    /**
+     * Helper function to re-write pom.xml file with lineEnding \n instead of \r\n
+     */
     private void correctCrlf(String artifactId) throws MojoExecutionException
     {
-        File outputDirectoryFile = new File(ctx.getProject().getBasedir(), artifactId);
-        FilenameFilter pomFilter = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                if ("pom.xml".equals(name)) {
-                    return true;
-                } else {
-                    return false;
+        if (null != ctx && null != ctx.getProject()
+            && null != ctx.getProject().getBasedir() && ctx.getProject().getBasedir().exists()) {
+            File outputDirectoryFile = new File(ctx.getProject().getBasedir(), artifactId);
+
+            if (null != outputDirectoryFile && outputDirectoryFile.exists()) {
+                FilenameFilter pomFilter = new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        if ("pom.xml".equals(name)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                };
+
+                File[] pomFiles = outputDirectoryFile.listFiles(pomFilter);
+                DefaultPomManager pomManager = new DefaultPomManager();
+                InputStream inputStream = null;
+                Writer outputStreamWriter = null;
+                String fileEncoding = "UTF-8";
+                Model generatedModel = null;
+
+                for (File pom : pomFiles) {
+                    try {
+                        generatedModel = pomManager.readPom(pom);
+
+                        fileEncoding =
+                                org.codehaus.plexus.util.StringUtils.isEmpty(generatedModel.getModelEncoding()) ? generatedModel.getModelEncoding() : "UTF-8";
+
+                        inputStream = new FileInputStream(pom);
+
+                        SAXBuilder builder = new SAXBuilder();
+                        org.jdom.Document doc = builder.build(inputStream);
+                        inputStream.close();
+                        inputStream = null;
+
+                        // The cdata parts of the pom are not preserved from initial to target
+                        MavenJDOMWriter writer = new MavenJDOMWriter();
+
+                        outputStreamWriter =
+                                new OutputStreamWriter(new FileOutputStream(pom), fileEncoding);
+
+                        Format form = Format.getRawFormat().setEncoding(fileEncoding);
+                        form.setLineSeparator("\n");
+                        writer.write(generatedModel, doc, outputStreamWriter, form);
+                        outputStreamWriter.close();
+                        outputStreamWriter = null;
+
+                    } catch (Exception e) {
+                        log.error("Have exception when try correct line ending");
+                    } finally {
+                        IOUtil.close(inputStream);
+                        IOUtil.close(outputStreamWriter);
+                    }
                 }
-            }
-        };
-
-        File[] pomFiles = outputDirectoryFile.listFiles(pomFilter);
-        DefaultPomManager pomManager = new DefaultPomManager();
-        InputStream inputStream = null;
-        Writer outputStreamWriter = null;
-        String fileEncoding = "UTF-8";
-        Model generatedModel = null;
-
-        for(File pom : pomFiles) {
-            try {
-                generatedModel = pomManager.readPom(pom);
-
-                fileEncoding =
-                        org.codehaus.plexus.util.StringUtils.isEmpty(generatedModel.getModelEncoding()) ? generatedModel.getModelEncoding() : "UTF-8";
-
-                inputStream = new FileInputStream(pom);
-
-                SAXBuilder builder = new SAXBuilder();
-                org.jdom.Document doc = builder.build(inputStream);
-                inputStream.close();
-                inputStream = null;
-
-                // The cdata parts of the pom are not preserved from initial to target
-                MavenJDOMWriter writer = new MavenJDOMWriter();
-
-                outputStreamWriter =
-                        new OutputStreamWriter(new FileOutputStream(pom), fileEncoding);
-
-                Format form = Format.getRawFormat().setEncoding(fileEncoding);
-                form.setLineSeparator("\n");
-                writer.write(generatedModel, doc, outputStreamWriter, form);
-                outputStreamWriter.close();
-                outputStreamWriter = null;
-
-            } catch (Exception e) {
-                log.error("Have exception when try correct line ending");
-            } finally {
-                IOUtil.close(inputStream);
-                IOUtil.close(outputStreamWriter);
             }
         }
     }
