@@ -4,23 +4,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.jar.Manifest;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
-import com.google.common.collect.Iterables;
-import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.archetype.common.DefaultPomManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecution;
@@ -46,6 +43,7 @@ import static com.atlassian.maven.plugins.amps.MavenGoals.AJP_PORT_PROPERTY;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -260,5 +258,36 @@ public class TestMavenGoals
         final Parameter p = new Parameter();
         p.setName(name);
         return p;
+    }
+
+    @Test
+    public void testProcessCorrectCrlf()
+    {
+        final DefaultPomManager pomManager = new DefaultPomManager();
+        final URL originalPomPath = TestMavenGoals.class.getResource("originalPom.xml");
+        final File sysTempDir = new File(System.getProperty("java.io.tmpdir"));
+        try {
+            File originalPomFile = new File(originalPomPath.toURI());
+            File temp = new File(sysTempDir, "tempOriginalPom.xml");
+
+            FileUtils.copyFile(originalPomFile, temp);
+            System.out.println(temp.getCanonicalPath());
+            String originalPomXml = FileUtils.readFileToString(temp);
+
+            assertTrue(originalPomXml.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+            assertTrue(originalPomXml.contains("\r\n"));
+
+            goals.processCorrectCrlf(pomManager, temp);
+
+            String processedPomXml = FileUtils.readFileToString(temp);
+            assertTrue(processedPomXml.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+            assertTrue(processedPomXml.contains("\n"));
+            assertFalse(processedPomXml.contains("\r\n"));
+            temp.deleteOnExit();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 }
