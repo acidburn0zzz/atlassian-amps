@@ -261,7 +261,7 @@ public class MavenGoals
             sysProps.setProperty("groupId",props.getGroupId());
             sysProps.setProperty("artifactId",props.getArtifactId());
             sysProps.setProperty("version",props.getVersion());
-            sysProps.setProperty("package", props.getThePackage());
+            sysProps.setProperty("package",props.getThePackage());
 
             executeMojo(
                     plugin(
@@ -377,8 +377,6 @@ public class MavenGoals
 
             SAXBuilder builder = new SAXBuilder();
             Document doc = builder.build(inputStream);
-            inputStream.close();
-            inputStream = null;
 
             // The cdata parts of the pom are not preserved from initial to target
             MavenJDOMWriter writer = new MavenJDOMWriter();
@@ -388,8 +386,6 @@ public class MavenGoals
             Format form = Format.getRawFormat().setEncoding(fileEncoding);
             form.setLineSeparator("\n");
             writer.write(model, doc, outputStreamWriter, form);
-            outputStreamWriter.close();
-            outputStreamWriter = null;
         } catch (Exception e) {
             log.error("Have exception when try correct line ending.", e);
         } finally {
