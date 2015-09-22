@@ -42,7 +42,10 @@ import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 import static com.atlassian.maven.plugins.amps.MavenGoals.AJP_PORT_PROPERTY;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -50,7 +53,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
@@ -275,15 +277,15 @@ public class TestMavenGoals
         FileUtils.copyFile(originalPomFile, temp);
         String originalPomXml = FileUtils.readFileToString(temp);
 
-        assertThat("Not expected file!", originalPomXml, Matchers.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
-        assertTrue(originalPomXml.contains("\r\n"));
+        assertThat("Not expected file!", originalPomXml, startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+        assertThat("File contains \r\n before process correct CRLF", originalPomXml, containsString("\r\n"));
 
         goals.processCorrectCrlf(pomManager, temp);
 
         String processedPomXml = FileUtils.readFileToString(temp);
-        assertThat("Not expected file after process correct crlf!", originalPomXml, Matchers.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
-        assertTrue(processedPomXml.contains("\n"));
-        assertFalse(processedPomXml.contains("\r\n"));
+        assertThat("Not expected file after process correct CRLF!", processedPomXml, startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+        assertThat("File contains \n after process correct CRLF", processedPomXml, containsString("\n"));
+        assertThat("File not contains \r\n after process correct CRLF", processedPomXml, not(containsString("\r\n")));
         temp.deleteOnExit();
     }
 }
