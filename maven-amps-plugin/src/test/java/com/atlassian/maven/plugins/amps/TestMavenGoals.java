@@ -30,6 +30,7 @@ import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositorySystemSession;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -49,6 +50,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
@@ -261,33 +263,27 @@ public class TestMavenGoals
     }
 
     @Test
-    public void testProcessCorrectCrlf()
+    public void testProcessCorrectCrlf() throws Exception
     {
         final DefaultPomManager pomManager = new DefaultPomManager();
         final URL originalPomPath = TestMavenGoals.class.getResource("originalPom.xml");
         final File sysTempDir = new File(System.getProperty("java.io.tmpdir"));
-        try {
-            File originalPomFile = new File(originalPomPath.toURI());
-            File temp = new File(sysTempDir, "tempOriginalPom.xml");
 
-            FileUtils.copyFile(originalPomFile, temp);
-            System.out.println(temp.getCanonicalPath());
-            String originalPomXml = FileUtils.readFileToString(temp);
+        File originalPomFile = new File(originalPomPath.toURI());
+        File temp = new File(sysTempDir, "tempOriginalPom.xml");
 
-            assertTrue(originalPomXml.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
-            assertTrue(originalPomXml.contains("\r\n"));
+        FileUtils.copyFile(originalPomFile, temp);
+        String originalPomXml = FileUtils.readFileToString(temp);
 
-            goals.processCorrectCrlf(pomManager, temp);
+        assertThat("Not expected file!", originalPomXml, Matchers.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+        assertTrue(originalPomXml.contains("\r\n"));
 
-            String processedPomXml = FileUtils.readFileToString(temp);
-            assertTrue(processedPomXml.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
-            assertTrue(processedPomXml.contains("\n"));
-            assertFalse(processedPomXml.contains("\r\n"));
-            temp.deleteOnExit();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        goals.processCorrectCrlf(pomManager, temp);
+
+        String processedPomXml = FileUtils.readFileToString(temp);
+        assertThat("Not expected file after process correct crlf!", originalPomXml, Matchers.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+        assertTrue(processedPomXml.contains("\n"));
+        assertFalse(processedPomXml.contains("\r\n"));
+        temp.deleteOnExit();
     }
 }
