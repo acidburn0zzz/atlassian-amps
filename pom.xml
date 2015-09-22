@@ -384,7 +384,7 @@
 
 
     <properties>
-        <jdkLevel>1.6</jdkLevel>
+        <jdkLevel>1.7</jdkLevel>
         <build.maven.version>3.0.5</build.maven.version>
         <bundled.maven.version>3.2.1</bundled.maven.version>
         <refapp.version>3.0.0</refapp.version>

@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import com.atlassian.maven.plugins.amps.*;
@@ -302,6 +301,17 @@ public abstract class AmpsProductHandler implements ProductHandler
     public String getDefaultContainerId()
     {
         return AmpsDefaults.DEFAULT_CONTAINER;
+    }
+
+    @Override
+    public String getDefaultContainerId(final String version)
+    {
+        String containerId = ProductContainerVersionMapper.containerForProductVersion(getId(), version);
+        if (containerId == null)
+        {
+            containerId = AmpsDefaults.DEFAULT_CONTAINER;
+        }
+        return containerId;
     }
 
     protected File createHomeDirectory(Product ctx)
