@@ -1,8 +1,50 @@
 package com.atlassian.maven.plugins.amps;
 
+import aQute.bnd.osgi.Constants;
+import com.atlassian.maven.plugins.amps.product.ImportMethod;
+import com.atlassian.maven.plugins.amps.product.jira.JiraDatabase;
+import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory;
+import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
+import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
+import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
+import com.atlassian.maven.plugins.amps.util.VersionUtils;
+import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
+import com.google.common.annotations.VisibleForTesting;
+import com.googlecode.htmlcompressor.compressor.XmlCompressor;
+import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.archetype.common.DefaultPomManager;
+import org.apache.maven.archetype.common.MavenJDOMWriter;
+import org.apache.maven.archetype.common.util.Format;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Resource;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.jdom.Document;
+import org.jdom.input.SAXBuilder;
+import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
+import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -17,38 +59,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
-
-import com.atlassian.maven.plugins.amps.product.ImportMethod;
-import com.atlassian.maven.plugins.amps.product.jira.JiraDatabase;
-import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory;
-import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
-import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
-import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
-import com.atlassian.maven.plugins.amps.util.VersionUtils;
-import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
-import com.google.common.annotations.VisibleForTesting;
-import com.googlecode.htmlcompressor.compressor.XmlCompressor;
-import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.lang.StringUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.Resource;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.components.interactivity.PrompterException;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
-import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
-
-import aQute.bnd.osgi.Constants;
 
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.getJiraDatabaseFactory;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
@@ -270,6 +280,14 @@ public class MavenGoals
                     ),
                     execEnv);
 
+            /*
+            The problem is if plugin is sub of multiple module project, then the pom file will be add parent section.
+            When add parent section to module pom file, maven use the default Format with lineEnding is \r\n.
+            This step add \r\n character as the line ending.
+            Call the function below to remove cr (\r) character
+            */
+            correctCrlf(props.getArtifactId());
+
             File pluginDir = new File(ctx.getProject().getBasedir(),props.getArtifactId());
 
             if(pluginDir.exists())
@@ -311,6 +329,70 @@ public class MavenGoals
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Helper function to scan all generated folder and list all pom.xml files that need to be re-write to remove \r
+     */
+    private void correctCrlf(String artifactId) throws MojoExecutionException
+    {
+        if (null != ctx && null != ctx.getProject()
+            && null != ctx.getProject().getBasedir() && ctx.getProject().getBasedir().exists()) {
+            File outputDirectoryFile = new File(ctx.getProject().getBasedir(), artifactId);
+
+            if (outputDirectoryFile.exists()) {
+                FilenameFilter pomFilter = new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        if ("pom.xml".equals(name)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                };
+
+                File[] pomFiles = outputDirectoryFile.listFiles(pomFilter);
+                DefaultPomManager pomManager = new DefaultPomManager();
+
+                for (File pom : pomFiles) {
+                    processCorrectCrlf(pomManager, pom);
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper function to re-write pom.xml file with lineEnding \n instead of \r\n
+     */
+    protected void processCorrectCrlf(DefaultPomManager pomManager, File pom)
+    {
+        InputStream inputStream = null;
+        Writer outputStreamWriter = null;
+        final Model model;
+        try {
+            model = pomManager.readPom(pom);
+            String fileEncoding = StringUtils.isEmpty(model.getModelEncoding()) ? model.getModelEncoding() : "UTF-8";
+
+            inputStream = new FileInputStream(pom);
+
+            SAXBuilder builder = new SAXBuilder();
+            Document doc = builder.build(inputStream);
+
+            // The cdata parts of the pom are not preserved from initial to target
+            MavenJDOMWriter writer = new MavenJDOMWriter();
+
+            outputStreamWriter = new OutputStreamWriter(new FileOutputStream(pom), fileEncoding);
+
+            Format form = Format.getRawFormat().setEncoding(fileEncoding);
+            form.setLineSeparator("\n");
+            writer.write(model, doc, outputStreamWriter, form);
+        } catch (Exception e) {
+            log.error("Have exception when try correct line ending.", e);
+        } finally {
+            IOUtil.close(inputStream);
+            IOUtil.close(outputStreamWriter);
         }
     }
 
