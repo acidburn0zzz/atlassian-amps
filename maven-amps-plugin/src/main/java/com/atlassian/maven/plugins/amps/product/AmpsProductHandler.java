@@ -306,12 +306,7 @@ public abstract class AmpsProductHandler implements ProductHandler
     @Override
     public String getDefaultContainerId(final String version)
     {
-        String containerId = ProductContainerVersionMapper.containerForProductVersion(getId(), version);
-        if (containerId == null)
-        {
-            containerId = AmpsDefaults.DEFAULT_CONTAINER;
-        }
-        return containerId;
+        return ProductContainerVersionMapper.containerForProductVersion(getId(), version);
     }
 
     protected File createHomeDirectory(Product ctx)

@@ -13,7 +13,10 @@ import java.util.TreeMap;
  */
 public class ProductContainerVersionMapper
 {
-    private final static Map<String, TreeMap<ComparableVersion, String>> productMapping = new HashMap<>();
+    private static final Map<String, TreeMap<ComparableVersion, String>> productMapping = new HashMap<>();
+    private static final String TOMCAT6X = "tomcat6x";
+    private static final String TOMCAT7X = "tomcat7x";
+    private static final String TOMCAT8X = "tomcat8x";
 
     static
     {
@@ -26,16 +29,16 @@ public class ProductContainerVersionMapper
         populateVersionMapForProduct(ProductHandlerFactory.STASH, "0", "2.0.0", "3.3.0");
         //Bitbucket only supports Tomcat8
         TreeMap<ComparableVersion, String> versions = new TreeMap<>();
-        versions.put(new ComparableVersion("4.0.0"), "tomcat8x");
+        versions.put(new ComparableVersion("4.0.0"), TOMCAT8X);
         productMapping.put(ProductHandlerFactory.BITBUCKET, versions);
     }
 
     private static void populateVersionMapForProduct(final String productId, final String tomcat6Version, final String tomcat7Version, final String tomcat8Version)
     {
         TreeMap<ComparableVersion, String> versions = new TreeMap<>();
-        versions.put(new ComparableVersion(tomcat6Version), "tomcat6x");
-        versions.put(new ComparableVersion(tomcat7Version), "tomcat7x");
-        versions.put(new ComparableVersion(tomcat8Version), "tomcat8x");
+        versions.put(new ComparableVersion(tomcat6Version), TOMCAT6X);
+        versions.put(new ComparableVersion(tomcat7Version), TOMCAT7X);
+        versions.put(new ComparableVersion(tomcat8Version), TOMCAT8X);
         productMapping.put(productId, versions);
     }
 
@@ -43,7 +46,7 @@ public class ProductContainerVersionMapper
     {
         final ComparableVersion productVersion = new ComparableVersion(version);
         TreeMap versions = productMapping.get(productId);
-        String containerId =null;
+        String containerId = null;
         if (versions != null)
         {
             Map.Entry<ComparableVersion, String> entry = versions.floorEntry(productVersion);
