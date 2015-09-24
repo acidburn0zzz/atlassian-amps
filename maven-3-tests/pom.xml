@@ -53,7 +53,7 @@
         <dependency>
             <groupId>com.atlassian.devrel</groupId>
             <artifactId>developer-toolbox-plugin</artifactId>
-            <version>2.0.16</version>
+            <version>2.0.17</version>
         </dependency>
         <dependency>
             <groupId>com.atlassian.labs</groupId>
