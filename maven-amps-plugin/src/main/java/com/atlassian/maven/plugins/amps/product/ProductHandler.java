@@ -31,7 +31,7 @@ public interface ProductHandler
 
     String getDefaultContainerId();
 
-    String getDefaultContainerId(final String version);
+    String getDefaultContainerId(final Product product) throws MojoExecutionException;
 
     /**
      * Return the directory to snapshot when we want to restore
