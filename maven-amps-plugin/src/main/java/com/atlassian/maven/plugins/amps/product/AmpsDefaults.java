@@ -10,8 +10,8 @@ public class AmpsDefaults
     public static final String DEFAULT_PDK_VERSION = "0.6";
     public static final String DEFAULT_WEB_CONSOLE_VERSION = "1.2.8";
     // Please update maven-3-tests/pom.xml when bumping these versions!
-    public static final String DEFAULT_FASTDEV_VERSION = "2.5";
-    public static final String DEFAULT_DEV_TOOLBOX_VERSION = "2.0.16";
+    public static final String DEFAULT_FASTDEV_VERSION = "2.6";
+    public static final String DEFAULT_DEV_TOOLBOX_VERSION = "2.0.17";
     public static final String DEFAULT_REST_API_BROWSER_VERSION = "3.1.3";
     public static final String DEFAULT_PDE_VERSION = "1.2";
     public static final String DEFAULT_QUICK_RELOAD_VERSION = "1.24";
@@ -28,7 +28,7 @@ public class AmpsDefaults
 
     static
     {
-        String localHostName = null;
+        String localHostName;
         try
         {
             localHostName = InetAddress.getLocalHost().getHostName();
