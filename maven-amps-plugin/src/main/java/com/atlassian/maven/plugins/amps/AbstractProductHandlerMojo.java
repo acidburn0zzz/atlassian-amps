@@ -601,11 +601,33 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             }
         }
 
+        if (product.getVersion() == null)
+        {
+            product.setVersion("RELEASE");
+        }
+
+        if (product.getDataVersion() == null)
+        {
+            // Default the productDataVersion to match the productVersion. Defaulting to LATEST
+            // is bad because there is no guarantee that a snapshots let alone a more recent
+            // version of a product's data is compatible with an earlier version of the product or
+            // that a product is required to provide a 'downgrade' task. Developers can still
+            // specify LATEST explicitly
+            product.setDataVersion(product.getVersion());
+        }
+
         product.setArtifactRetriever(new ArtifactRetriever(artifactResolver, artifactFactory, localRepository, repositories, repositoryMetadataManager));
 
         if (product.getContainerId() == null)
         {
-            product.setContainerId(handler.getDefaultContainerId(product.getVersion()));
+            try
+            {
+                product.setContainerId(handler.getDefaultContainerId(product));
+            }
+            catch (MojoExecutionException e)
+            {
+                product.setContainerId(handler.getDefaultContainerId());
+            }
         }
 
         if (product.getServer() == null)
@@ -716,21 +738,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         if (product.getHttpsHttpSecure() == null)
         {
             product.setHttpsHttpSecure(Boolean.parseBoolean(DEFAULT_HTTP_SECURE));
-        }
-
-        if (product.getVersion() == null)
-        {
-            product.setVersion("RELEASE");
-        }
-
-        if (product.getDataVersion() == null)
-        {
-            // Default the productDataVersion to match the productVersion. Defaulting to LATEST
-            // is bad because there is no guarantee that a snapshots let alone a more recent
-            // version of a product's data is compatible with an earlier version of the product or
-            // that a product is required to provide a 'downgrade' task. Developers can still
-            // specify LATEST explicitly
-            product.setDataVersion(product.getVersion());
         }
 
         if (product.getContextPath() == null)

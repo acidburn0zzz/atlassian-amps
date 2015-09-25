@@ -225,6 +225,12 @@ public class StudioProductHandler extends AmpsProductHandler
     }
 
     @Override
+    public String getDefaultContainerId(final Product product) throws MojoExecutionException
+    {
+        return getDefaultContainerId();
+    }
+
+    @Override
     public int getDefaultHttpsPort()
     {
         // No default - this product can't be launched

@@ -303,12 +303,6 @@ public abstract class AmpsProductHandler implements ProductHandler
         return AmpsDefaults.DEFAULT_CONTAINER;
     }
 
-    @Override
-    public String getDefaultContainerId(final String version)
-    {
-        return ProductContainerVersionMapper.containerForProductVersion(getId(), version);
-    }
-
     protected File createHomeDirectory(Product ctx)
     {
         return ProjectUtils.createDirectory(getHomeDirectory(ctx));

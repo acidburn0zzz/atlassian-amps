@@ -44,6 +44,7 @@ import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.iterateFiles;
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 public abstract class AbstractProductHandler extends AmpsProductHandler
 {
@@ -79,6 +80,28 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         Map<String, String> systemProperties = mergeSystemProperties(ctx);
 
         return startApplication(ctx, finalApp, homeDir, systemProperties);
+    }
+
+    @Override
+    public String getDefaultContainerId(final Product product) throws MojoExecutionException
+    {
+        return ProductContainerVersionMapper.containerForProductVersion(getId(), resolveVersion(product));
+    }
+
+    private String resolveVersion(final Product product) throws MojoExecutionException
+    {
+        String version = product.getVersion();
+        if (isBlank(version))
+        {
+            version = Artifact.RELEASE_VERSION;
+        }
+        if(Artifact.RELEASE_VERSION.equals(version) || Artifact.LATEST_VERSION.equals(version))
+        {
+            ProductArtifact productArtifact = getArtifact();
+            Artifact warArtifact = artifactFactory.createProjectArtifact(productArtifact.getGroupId(), productArtifact.getArtifactId(), version);
+            version = product.getArtifactRetriever().getLatestStableVersion(warArtifact);
+        }
+        return version;
     }
 
     protected final File extractAndProcessHomeDirectory(final Product ctx) throws MojoExecutionException

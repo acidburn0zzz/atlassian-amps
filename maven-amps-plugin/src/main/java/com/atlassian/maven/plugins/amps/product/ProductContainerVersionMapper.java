@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 
 import java.util.HashMap;
@@ -44,6 +45,10 @@ public class ProductContainerVersionMapper
 
     public static String containerForProductVersion(String productId, String version)
     {
+        if (version == null)
+        {
+            version = Artifact.LATEST_VERSION;
+        }
         final ComparableVersion productVersion = new ComparableVersion(version);
         TreeMap versions = productMapping.get(productId);
         String containerId = null;

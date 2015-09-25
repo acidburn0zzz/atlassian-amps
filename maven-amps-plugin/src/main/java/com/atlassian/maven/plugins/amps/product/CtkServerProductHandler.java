@@ -98,7 +98,7 @@ public class CtkServerProductHandler implements ProductHandler
     }
 
     @Override
-    public String getDefaultContainerId(String version)
+    public String getDefaultContainerId(Product product)
     {
         return getDefaultContainerId();
     }
