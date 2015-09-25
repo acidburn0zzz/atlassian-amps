@@ -88,10 +88,14 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         return ProductContainerVersionMapper.containerForProductVersion(getId(), resolveVersion(product));
     }
 
-    private String resolveVersion(final Product product ) throws MojoExecutionException
+    private String resolveVersion(final Product product) throws MojoExecutionException
     {
         String version = product.getVersion();
-        if(Artifact.RELEASE_VERSION.equals(version) || Artifact.LATEST_VERSION.equals(version) || isBlank(version))
+        if (isBlank(version))
+        {
+            version = Artifact.RELEASE_VERSION;
+        }
+        if(Artifact.RELEASE_VERSION.equals(version) || Artifact.LATEST_VERSION.equals(version))
         {
             ProductArtifact productArtifact = getArtifact();
             Artifact warArtifact = artifactFactory.createProjectArtifact(productArtifact.getGroupId(), productArtifact.getArtifactId(), version);
