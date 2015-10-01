@@ -1,26 +1,11 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.jar.Manifest;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
-import com.google.common.collect.Iterables;
-import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.archetype.common.DefaultPomManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecution;
@@ -42,27 +27,26 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.twdata.maven.mojoexecutor.MojoExecutor;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.jar.Manifest;
+
 import static com.atlassian.maven.plugins.amps.MavenGoals.AJP_PORT_PROPERTY;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.Matchers.hasItem;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironmentM3;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 public class TestMavenGoals
 {
@@ -260,5 +244,30 @@ public class TestMavenGoals
         final Parameter p = new Parameter();
         p.setName(name);
         return p;
+    }
+
+    @Test
+    public void testProcessCorrectCrlf() throws Exception
+    {
+        final DefaultPomManager pomManager = new DefaultPomManager();
+        final URL originalPomPath = TestMavenGoals.class.getResource("originalPom.xml");
+        final File sysTempDir = new File(System.getProperty("java.io.tmpdir"));
+
+        File originalPomFile = new File(originalPomPath.toURI());
+        File temp = new File(sysTempDir, "tempOriginalPom.xml");
+
+        FileUtils.copyFile(originalPomFile, temp);
+        String originalPomXml = FileUtils.readFileToString(temp);
+
+        assertThat("Not expected file!", originalPomXml, startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+        assertThat("File contains \r\n before process correct CRLF", originalPomXml, containsString("\r\n"));
+
+        goals.processCorrectCrlf(pomManager, temp);
+
+        String processedPomXml = FileUtils.readFileToString(temp);
+        assertThat("Not expected file after process correct CRLF!", processedPomXml, startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+        assertThat("File contains \n after process correct CRLF", processedPomXml, containsString("\n"));
+        assertThat("File not contains \r\n after process correct CRLF", processedPomXml, not(containsString("\r\n")));
+        temp.deleteOnExit();
     }
 }

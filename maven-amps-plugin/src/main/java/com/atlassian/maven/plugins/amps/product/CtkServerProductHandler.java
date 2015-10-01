@@ -98,6 +98,12 @@ public class CtkServerProductHandler implements ProductHandler
     }
 
     @Override
+    public String getDefaultContainerId(Product product)
+    {
+        return getDefaultContainerId();
+    }
+
+    @Override
     public File getSnapshotDirectory(final Product product)
     {
         return getBaseDirectory(product);

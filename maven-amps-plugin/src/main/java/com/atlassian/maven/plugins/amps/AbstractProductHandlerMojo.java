@@ -582,7 +582,14 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         if (product.getContainerId() == null)
         {
-            product.setContainerId(handler.getDefaultContainerId());
+            try
+            {
+                product.setContainerId(handler.getDefaultContainerId(product));
+            }
+            catch (MojoExecutionException e)
+            {
+                product.setContainerId(handler.getDefaultContainerId());
+            }
         }
 
         if (product.getServer() == null)
