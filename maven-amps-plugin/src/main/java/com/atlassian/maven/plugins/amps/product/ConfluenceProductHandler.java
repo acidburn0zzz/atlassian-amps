@@ -64,6 +64,11 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
         return 8441;
     }
 
+    @Override
+    public String getDefaultContainerId()
+    {
+        return "tomcat7x";
+    }
 
     @Override
     public Map<String, String> getSystemProperties(Product ctx)
