@@ -397,7 +397,7 @@
         <guava.osgi.version>10.0.1</guava.osgi.version>
         <bamboo.version>5.9.2</bamboo.version>
         <bamboo.data.version>5.9.2</bamboo.data.version>
-        <bitbucket.version>4.0.0-m7</bitbucket.version>
+        <bitbucket.version>4.0.2</bitbucket.version>
         <bitbucket.data.version>${bitbucket.version}</bitbucket.data.version>
         <fecru.version>3.9.1-20150910131426</fecru.version>
         <fecru.data.version>3.9.1-20150910131426</fecru.data.version>
