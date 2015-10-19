@@ -1,17 +1,5 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.jar.Manifest;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
@@ -21,6 +9,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -30,7 +19,6 @@ import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositorySystemSession;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -40,14 +28,26 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.twdata.maven.mojoexecutor.MojoExecutor;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.jar.Manifest;
+
 import static com.atlassian.maven.plugins.amps.MavenGoals.AJP_PORT_PROPERTY;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -55,7 +55,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironmentM3;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
@@ -72,8 +74,11 @@ public class TestMavenGoals
     @Mock private MavenProject project;
     @Mock private MavenSession session;
     @Mock private Build build;
+    @Mock private Product product;
     private MavenGoals goals;
-    
+    @Mock private MojoExecutor.ExecutionEnvironment executionEnvironment;
+    @Mock private MavenProject mavenProject;
+
     @Before
     public void setUp()
     {
@@ -287,5 +292,25 @@ public class TestMavenGoals
         assertThat("File contains \n after process correct CRLF", processedPomXml, containsString("\n"));
         assertThat("File not contains \r\n after process correct CRLF", processedPomXml, not(containsString("\r\n")));
         temp.deleteOnExit();
+    }
+
+    @Test
+    public void shouldUsePortsConfiguredFromProductWhenStartWebapp() throws MojoExecutionException
+    {
+        final String productInstanceId = "";
+        final File war = Mockito.mock(File.class);
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(executionEnvironment.getMavenProject()).thenReturn(mavenProject);
+        when(mavenProject.getBuild()).thenReturn(build);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+        when(product.getServer()).thenReturn("server");
+        when(product.getContextPath()).thenReturn("/context");
+        when(war.getPath()).thenReturn("/");
+
+        goals.startWebapp(productInstanceId, war, new HashMap<String, String>(), new ArrayList<ProductArtifact>(), product);
+
+        verify(product).getRmiPort();
+        verify(product).getAjpPort();
+        verify(product, atLeastOnce()).getHttpPort();
     }
 }
