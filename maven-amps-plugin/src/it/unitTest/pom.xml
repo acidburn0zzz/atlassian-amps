@@ -13,13 +13,6 @@
                 <artifactId>${shitty.artifactId}</artifactId>
                 <version>testing</version>
             </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
