@@ -156,6 +156,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
      * Set of plugin artifactId (as used by amps internally) to override internal
      * hardcoded versions with those provided
      * by the effective pom's pluginManagement section.
+     * @since 6.2.0
      */
     @Parameter(property = "version.override.set")
     private Set<String> versionOverrides;
