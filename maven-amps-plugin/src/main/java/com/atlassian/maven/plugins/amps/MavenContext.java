@@ -83,21 +83,21 @@ public class MavenContext
                 }
             }
             
-            if(null != versionOverridesSet) {
-                if (null != project.getPluginManagement())
+            if(null != versionOverridesSet)
+            {
+                if(null != project.getPluginManagement())
                 {
                     Set<String> found = new HashSet<>();
-                    for (Plugin plg : project.getPluginManagement().getPlugins())
+                    for(Plugin plg : project.getPluginManagement().getPlugins())
                     {
                         if (versionOverridesSet.contains(plg.getArtifactId()))
                         {
                             versionOverrides.setProperty(plg.getArtifactId(), plg.getVersion());
                             found.add(plg.getArtifactId());
-//                            getLog().debug("Overriding " + plg.getArtifactId() + " with version " + plg.getVersion());
                         }
                     }
                     final Sets.SetView<String> diff = Sets.difference(versionOverridesSet, found);
-                    if (!diff.isEmpty())
+                    if(!diff.isEmpty())
                     {
                         getLog().warn("Plugin artifactId(s) defined in 'versionOverrides' parameter but no associated entry found in <pluginManagement> section for " + diff.toString());
                     }
