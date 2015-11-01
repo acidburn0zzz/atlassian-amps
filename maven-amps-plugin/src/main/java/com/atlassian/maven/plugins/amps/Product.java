@@ -1,13 +1,12 @@
 package com.atlassian.maven.plugins.amps;
 
 import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
-
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
 
@@ -23,6 +22,11 @@ public class Product
      * HTTP port for the servlet containers
      */
     protected int httpPort = 0;
+
+    /**
+     * RMI port, for Tomcat this is port used to send shutdown message
+     */
+    protected int rmiPort = 0;
 
     /**
      * if we should start with https on port 443
@@ -368,6 +372,7 @@ public class Product
         prod.setServer(server == null ? product.getServer() : server);
         prod.setContextPath(contextPath == null ? product.getContextPath() : contextPath);
         prod.setContainerId(containerId == null ? product.getContainerId() : containerId);
+        prod.setRmiPort(rmiPort == 0 ? product.getRmiPort() : rmiPort);
         prod.setHttpPort(httpPort == 0 ? product.getHttpPort() : httpPort);
         prod.setAjpPort(ajpPort == 0 ? product.getAjpPort() : ajpPort);
         prod.setJvmDebugPort(jvmDebugPort == 0 ? product.getJvmDebugPort() : jvmDebugPort);
@@ -418,6 +423,16 @@ public class Product
     public void setHttpPort(int httpPort)
     {
         this.httpPort = httpPort;
+    }
+
+    public int getRmiPort()
+    {
+        return rmiPort;
+    }
+
+    public void setRmiPort(int rmiPort)
+    {
+        this.rmiPort = rmiPort;
     }
 
     public Boolean getUseHttps()

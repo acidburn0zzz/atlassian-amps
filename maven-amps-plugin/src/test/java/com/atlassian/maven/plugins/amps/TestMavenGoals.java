@@ -9,6 +9,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -38,15 +39,35 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.jar.Manifest;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import static com.atlassian.maven.plugins.amps.MavenGoals.AJP_PORT_PROPERTY;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironmentM3;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
 
 public class TestMavenGoals
 {
@@ -54,8 +75,11 @@ public class TestMavenGoals
     @Mock private MavenProject project;
     @Mock private MavenSession session;
     @Mock private Build build;
+    @Mock private Product product;
     private MavenGoals goals;
-    
+    @Mock private MojoExecutor.ExecutionEnvironment executionEnvironment;
+    @Mock private MavenProject mavenProject;
+
     @Before
     public void setUp()
     {
@@ -269,5 +293,25 @@ public class TestMavenGoals
         assertThat("File contains \n after process correct CRLF", processedPomXml, containsString("\n"));
         assertThat("File not contains \r\n after process correct CRLF", processedPomXml, not(containsString("\r\n")));
         temp.deleteOnExit();
+    }
+
+    @Test
+    public void shouldUsePortsConfiguredFromProductWhenStartWebapp() throws MojoExecutionException
+    {
+        final String productInstanceId = "";
+        final File war = Mockito.mock(File.class);
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(executionEnvironment.getMavenProject()).thenReturn(mavenProject);
+        when(mavenProject.getBuild()).thenReturn(build);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+        when(product.getServer()).thenReturn("server");
+        when(product.getContextPath()).thenReturn("/context");
+        when(war.getPath()).thenReturn("/");
+
+        goals.startWebapp(productInstanceId, war, new HashMap<String, String>(), new ArrayList<ProductArtifact>(), product);
+
+        verify(product).getRmiPort();
+        verify(product).getAjpPort();
+        verify(product, atLeastOnce()).getHttpPort();
     }
 }
