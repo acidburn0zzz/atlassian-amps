@@ -950,7 +950,7 @@ public class MavenGoals
             }
         }
 
-        final int rmiPort = pickFreePort(webappContext.getRmiPort());
+        final int rmiPort = pickFreePort(0);
         final int actualAjpPort = pickFreePort(webappContext.getAjpPort());
         final int actualHttpPort;
         String protocol = "http";
