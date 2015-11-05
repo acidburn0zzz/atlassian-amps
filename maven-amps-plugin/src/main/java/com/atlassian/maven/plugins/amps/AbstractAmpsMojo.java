@@ -10,6 +10,7 @@ import com.atlassian.maven.plugins.amps.util.UpdateChecker;
 import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkResource;
 
+import java.util.Set;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -140,15 +141,26 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
 
     /**
      * The path to a properties file to override internal plugin versions.
-     * The props file should be in the folowing format:
+     * The props file should be in the following format:
      * artifactId=version
-     * 
+     * @deprecated doesn't work well with multimodule builds, use versionOverrides
      * e.g.
      * maven-deploy-plugin=2.5
      */
+    @Deprecated
     @Parameter(property = "version.override.path")
     private String versionOverridesPath;
-    
+
+
+    /**
+     * Set of plugin artifactId (as used by amps internally) to override internal
+     * hardcoded versions with those provided
+     * by the effective pom's pluginManagement section.
+     * @since 6.2.0
+     */
+    @Parameter(property = "version.override.set")
+    private Set<String> versionOverrides;
+
     /**
      * Project source files encoding. Along with explicit definition in the plugin
      * configuration property inherits value from the build section (for maven 3.x)
@@ -187,6 +199,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
         }
         
         mavenContext.setVersionOverridesPath(this.versionOverridesPath);
+        mavenContext.setVersionOverrides(this.versionOverrides);
         return mavenContext;
     }
 

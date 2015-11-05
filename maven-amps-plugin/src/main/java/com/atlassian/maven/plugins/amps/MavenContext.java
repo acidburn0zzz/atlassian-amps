@@ -1,13 +1,16 @@
 package com.atlassian.maven.plugins.amps;
 
+import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
+import java.util.Set;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -27,6 +30,7 @@ public class MavenContext
     private String versionOverridesPath;
     
     private Properties versionOverrides;
+    private Set<String> versionOverridesSet;
 
     public MavenContext(final MavenProject project, List<MavenProject> reactor, final MavenSession session,
             BuildPluginManager buildPluginManager,
@@ -61,7 +65,7 @@ public class MavenContext
         if(null == versionOverrides)
         {
             this.versionOverrides = new Properties();
-            
+
             if(null != versionOverridesPath)
             {
                 File overridesFile = new File(versionOverridesPath);
@@ -75,6 +79,27 @@ public class MavenContext
                     catch (IOException e)
                     {
                         log.error("unable to load version overrides file as Properties: " + overridesFile.getAbsolutePath(), e);
+                    }
+                }
+            }
+            
+            if(null != versionOverridesSet)
+            {
+                if(null != project.getPluginManagement())
+                {
+                    Set<String> found = new HashSet<>();
+                    for(Plugin plg : project.getPluginManagement().getPlugins())
+                    {
+                        if (versionOverridesSet.contains(plg.getArtifactId()))
+                        {
+                            versionOverrides.setProperty(plg.getArtifactId(), plg.getVersion());
+                            found.add(plg.getArtifactId());
+                        }
+                    }
+                    final Sets.SetView<String> diff = Sets.difference(versionOverridesSet, found);
+                    if(!diff.isEmpty())
+                    {
+                        getLog().warn("Plugin artifactId(s) defined in 'versionOverrides' parameter but no associated entry found in <pluginManagement> section for " + diff.toString());
                     }
                 }
             }
@@ -103,5 +128,10 @@ public class MavenContext
     public void setVersionOverridesPath(String versionOverridesPath)
     {
         this.versionOverridesPath = versionOverridesPath;
+    }
+
+    void setVersionOverrides(Set<String> versionOverrides)
+    {
+        this.versionOverridesSet = versionOverrides;
     }
 }
