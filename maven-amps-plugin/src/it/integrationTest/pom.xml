@@ -12,7 +12,7 @@
             <plugin>
                 <groupId>${shitty.groupId}</groupId>
                 <artifactId>${shitty.artifactId}</artifactId>
-                <version>testing</version>
+                <version>${project.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <container>tomcat6x</container>

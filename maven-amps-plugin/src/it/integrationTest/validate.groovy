@@ -1,6 +1,4 @@
-assert mavenExitCode == 0, "The maven build should not have failed!"
-
-def product = project.properties['shitty.product']
+def product = binding.product
 product = 'amps'.equals(product) ? 'refapp' : product
 
 def integrationSurefireReports = new File(basedir, "target/group-__no_test_group__/tomcat6x/surefire-reports")

@@ -23,7 +23,7 @@
     
     <profiles>
         <profile>
-            <id>shitty</id>
+            <id>invoker</id>
             <build>
                 <plugins>
                     <plugin>
@@ -35,8 +35,14 @@
                         <artifactId>maven-resources-plugin</artifactId>
                     </plugin>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>shitty-maven-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-invoker-plugin</artifactId>
+                        <configuration>
+                            <scriptVariables>
+                                <artifactId>${shitty.artifactId}</artifactId>
+                                <product>${shitty.product}</product>
+                            </scriptVariables>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

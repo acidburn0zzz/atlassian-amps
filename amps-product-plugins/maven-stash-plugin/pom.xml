@@ -23,7 +23,7 @@
 
     <profiles>
         <profile>
-            <id>shitty</id>
+            <id>invoker</id>
             <build>
                 <plugins>
                     <plugin>
@@ -35,25 +35,23 @@
                         <artifactId>maven-resources-plugin</artifactId>
                     </plugin>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>shitty-maven-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-invoker-plugin</artifactId>
+                        <configuration>
+                            <scriptVariables>
+                                <artifactId>${shitty.artifactId}</artifactId>
+                                <product>${shitty.product}</product>
+                            </scriptVariables>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
             <properties>
+                <!--<invoker.test>compressResourcesTest,copyBundledDependenciesTest,createTest,debugTest,debugWithTestGroupTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateManifestWithNoInstructionsButIsAtlassianPluginTest,generateManifestWithNoInstructionsNorIsAtlassianPluginTest,generateObrTest,integrationTestTest,integrationTestWithTestGroupTest,jarWithExistingManifestTest,nexus_stagingTest,quickreloadTest,runTest,runParallelTest,runWithTestGroupTest,unitTestTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest</invoker.test>-->
+                <invoker.test>compressResourcesTest,copyBundledDependenciesTest,createTest,debugTest,!debugWithTestGroupTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateManifestWithNoInstructionsButIsAtlassianPluginTest,generateManifestWithNoInstructionsNorIsAtlassianPluginTest,generateObrTest,integrationTestTest,!integrationTestWithTestGroupTest,jarWithExistingManifestTest,nexus_stagingTest,quickreloadTest,runTest,runParallelTest,!runWithTestGroupTest,unitTestTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest</invoker.test>
                 <shitty.product>stash</shitty.product>
                 <product.version>${stash.version}</product.version>
                 <product.data.version>${stash.data.version}</product.data.version>
-                <tests>
-                    cli, compressResources, copyBundledDependencies, create, debug, debugWithTestGroup,
-                    filterPluginDescriptorWithoutPluginDescriptor, filterPluginDescriptorWithPluginDescriptor,
-                    generateManifestWithInstructions, generateManifestWithNoInstructions,
-                    generateManifestWithNoInstructionsButIsAtlassianPlugin,
-                    generateManifestWithNoInstructionsNorIsAtlassianPlugin, generateObr, integrationTest,
-                    integrationTestWithTestGroup, jarWithExistingManifest, nexus_staging, quickreload,
-                    run, runParallel, runWithTestGroup, unitTest, validateManifestSkipValidation,
-                    validateManifestWithInvalidManifest, validateManifestWithValidManifest
-                </tests>
             </properties>
         </profile>
     </profiles>

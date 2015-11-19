@@ -43,13 +43,10 @@ under the License.
  | values (values used when the setting is not specified) are provided.
  |
  |-->
-<settings xmlns="http://maven.apache.org/settings/1.0.0"
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-
-
     <profiles>
-
         <!-- Default profile containing Atlassian servers -->
         <profile>
             <id>defaultProfile</id>
@@ -59,7 +56,8 @@ under the License.
             <repositories>
                 <repository>
                     <id>atlassian-public</id>
-                    <url>https://maven.atlassian.com/repository/public</url>
+                    <url>http://172.18.1.52:8081/nexus/content/groups/public</url>
+                    <!--<url>https://maven.atlassian.com/repository/public</url>-->
                     <snapshots>
                         <enabled>true</enabled>
                         <updatePolicy>daily</updatePolicy>
@@ -86,7 +84,8 @@ under the License.
             <pluginRepositories>
                 <pluginRepository>
                     <id>atlassian-public</id>
-                    <url>https://maven.atlassian.com/repository/public</url>
+                    <url>http://172.18.1.52:8081/nexus/content/groups/public</url>
+                    <!--<url>https://maven.atlassian.com/repository/public</url>-->
                     <releases>
                         <enabled>true</enabled>
                         <checksumPolicy>warn</checksumPolicy>
@@ -117,7 +116,5 @@ under the License.
                 <skipAllPrompts>true</skipAllPrompts>
             </properties>
         </profile>
-
     </profiles>
-
 </settings>

@@ -20,7 +20,7 @@
                     <plugin>
                         <groupId>${shitty.groupId}</groupId>
                         <artifactId>${shitty.artifactId}</artifactId>
-                        <version>testing</version>
+                        <version>${project.version}</version>
                     </plugin>
                 </plugins>
             </build>
@@ -44,7 +44,7 @@
                     <plugin>
                         <groupId>${shitty.groupId}</groupId>
                         <artifactId>${shitty.artifactId}</artifactId>
-                        <version>testing</version>
+                        <version>${project.version}</version>
                         <extensions>true</extensions>
                         <configuration>
                             <dumpFilePath>${project.build.directory}/it/preIntegrationTest/target/classes/jira_63_postgres91_dump_pure_sql.sql</dumpFilePath>
@@ -101,7 +101,7 @@
                     <plugin>
                         <groupId>${shitty.groupId}</groupId>
                         <artifactId>${shitty.artifactId}</artifactId>
-                        <version>testing</version>
+                        <version>${project.version}</version>
                         <extensions>true</extensions>
                         <configuration>
                             <dumpFilePath>${project.build.directory}/it/preIntegrationTest/target/classes/jira_63_mssql_dump.bak</dumpFilePath>
@@ -157,7 +157,7 @@
                     <plugin>
                         <groupId>${shitty.groupId}</groupId>
                         <artifactId>${shitty.artifactId}</artifactId>
-                        <version>testing</version>
+                        <version>${project.version}</version>
                         <extensions>true</extensions>
                         <configuration>
                             <dumpFilePath>${project.build.directory}/it/preIntegrationTest/target/classes/jira_63_mysql55_dump.sql</dumpFilePath>
@@ -213,7 +213,7 @@
                     <plugin>
                         <groupId>${shitty.groupId}</groupId>
                         <artifactId>${shitty.artifactId}</artifactId>
-                        <version>testing</version>
+                        <version>${project.version}</version>
                         <extensions>true</extensions>
                         <configuration>
                             <dumpFilePath>${project.build.directory}/it/preIntegrationTest/target/classes/jira_63_oracle_11g_xe_dump.dmp</dumpFilePath>

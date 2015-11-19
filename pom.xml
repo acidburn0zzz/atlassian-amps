@@ -172,6 +172,35 @@
                     <version>2.2</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-invoker-plugin</artifactId>
+                    <version>2.0.0</version>
+                    <configuration>
+                        <projectsDirectory>target/it</projectsDirectory>
+                        <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+                        <settingsFile>target/it/settings.xml</settingsFile>
+                        <!--Run on Bamboo-->
+                        <!--<localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>-->
+                        <!-- Do not need to resolve all dedepencies each time run IT in DEV MODE-->
+                        <localRepositoryPath>${user.home}/local-repo</localRepositoryPath>
+                        <debug>true</debug>
+                        <postBuildHookScript>validate</postBuildHookScript>
+                        <preBuildHookScript>setup</preBuildHookScript>
+                        <addTestClassPath>true</addTestClassPath>
+                        <!--<invokerTest>!cliTest,!*GroupTest,*Test</invokerTest>-->
+                    </configuration>
+
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>install</goal>
+                                <goal>run</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>shitty-maven-plugin</artifactId>
                     <version>1.0-alpha-3-atlassian-7</version>
@@ -389,6 +418,7 @@
         <build.maven.version>3.0.5</build.maven.version>
         <bundled.maven.version>3.2.1</bundled.maven.version>
         <refapp.version>3.0.0</refapp.version>
+        <refapp.data.version>3.0.0</refapp.data.version>
         <platform.version>3.0.0</platform.version>
         <confluence.version>5.8.10</confluence.version>
         <confluence.data.version>5.8.10</confluence.data.version>
@@ -421,5 +451,6 @@
         <shitty.artifactId>maven-${shitty.product}-plugin</shitty.artifactId>
         <shitty.groupId>com.atlassian.maven.plugins</shitty.groupId>
         <shitty.product>amps</shitty.product>
+        <invoker.test>!cliTest,!*GroupTest,*Test</invoker.test>
     </properties>
 </project>
