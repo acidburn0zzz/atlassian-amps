@@ -1955,6 +1955,29 @@ public class MavenGoals
         );
     }
 
+    public void saveArtifactToCurrentDirectory(String groupId, String artifactId, String version, String type, String filename) throws MojoExecutionException
+    {
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("copy"),
+                configuration(
+                        element(name("artifactItems"),
+                                element(name("artifactItem"),
+                                        element(name("groupId"), groupId),
+                                        element(name("artifactId"), artifactId),
+                                        element(name("version"), version),
+                                        element(name("type"), type),
+                                        element(name("destFileName"), filename))),
+                        element(name("outputDirectory"), ".")
+                ),
+                executionEnvironment()
+        );
+    }
+
     private static class Container extends ProductArtifact
     {
         private final String id;
