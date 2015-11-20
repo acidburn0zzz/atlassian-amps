@@ -73,57 +73,55 @@ public class RunCloudMojo extends AbstractAmpsMojo
                         POM_FILENAME);
             }
 
-            try {
-                MavenGoals goals = createMavenGoals(new File(POM_FILENAME));
+            try
+            {
+                MavenContext mavenContext = createMavenContext(new File(POM_FILENAME));
+                MavenGoals goals = new MavenGoals(mavenContext);
                 Plugin plugin = getPluginFromProjectDefinition(goals.getContextProject(), "com.atlassian.maven.plugins", "maven-jira-plugin");
 
                 executeMojo(plugin,
                         goal("run"),
                         (Xpp3Dom) plugin.getConfiguration(),
-                        getMavenContext().getExecutionEnvironment());
+                        mavenContext.getExecutionEnvironment());
 
-            } catch (ProjectBuildingException e) {
+            }
+            catch (ProjectBuildingException e)
+            {
                 throw new IllegalStateException("Couldn't run jira:run from downloaded pom.");
             }
         }
     }
 
-    private MavenGoals createMavenGoals(File pomFile) throws ProjectBuildingException {
+    private MavenContext createMavenContext(File pomFile) throws ProjectBuildingException
+    {
         final MavenContext oldContext = getMavenContext();
         MavenSession oldSession = oldContext.getSession();
 
         ProjectBuildingRequest pbr = oldSession.getProjectBuildingRequest();
 
-        pbr.getSystemProperties().setProperty("project.basedir", pomFile.getPath());
+        pbr.getSystemProperties().setProperty("project.basedir", pomFile.getAbsoluteFile().getParent());
 
-        ProjectBuildingResult result = projectBuilder.build(getPomArtifact("com.atlassian.plugins", "atlassian-connect-jira-software-runner", "LATEST"), false, pbr);
+        ProjectBuildingResult result = projectBuilder.build(pomFile, pbr);
 
         final List<MavenProject> newReactor = singletonList(result.getProject());
 
         MavenSession newSession = oldSession.clone();
         newSession.setProjects(newReactor);
 
-        // Horrible hack #3 from before
-        result.getProject().setFile(new DefaultModelLocator().locatePom(pomFile));
-
-        final MavenContext newContext = oldContext.with(
+        return oldContext.with(
                 result.getProject(),
                 newReactor,
                 newSession);
-
-        return new MavenGoals(newContext);
     }
 
-    private Artifact getPomArtifact(final String groupId, final String artifactId, final String version)
+    private Plugin getPluginFromProjectDefinition(MavenProject project, final String groupId, final String artifactId)
     {
-        return artifactFactory.createProjectArtifact(groupId, artifactId, version, "pom");
-    }
-
-    private Plugin getPluginFromProjectDefinition(MavenProject project, final String groupId, final String artifactId) {
         List<Plugin> plugins = project.getBuild().getPlugins();
-        return plugins.stream().filter(new Predicate<Plugin>() {
+        return plugins.stream().filter(new Predicate<Plugin>()
+        {
             @Override
-            public boolean test(Plugin plugin) {
+            public boolean test(Plugin plugin)
+            {
                 return plugin.getArtifactId().equals(artifactId) && plugin.getGroupId().equals(groupId);
             }
         }).findFirst().get();
