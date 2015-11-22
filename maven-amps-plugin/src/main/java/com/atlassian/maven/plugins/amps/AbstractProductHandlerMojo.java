@@ -1,32 +1,13 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.product.studio.StudioProductHandler;
 import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
-
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -39,8 +20,31 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_DEV_TOOLBOX_VERSION;
+import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_FASTDEV_VERSION;
+import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PDE_VERSION;
+import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PDK_VERSION;
+import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PRODUCT_SHUTDOWN_TIMEOUT;
+import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PRODUCT_STARTUP_TIMEOUT;
+import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_QUICK_RELOAD_VERSION;
+import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_SERVER;
+import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_WEB_CONSOLE_VERSION;
 import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.STUDIO;
-import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.*;
+import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pingRepeatedly;
+import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.toArtifacts;
 
 /**
  * Base class for webapp mojos
@@ -272,20 +276,20 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected String pdeVersion;
 
     @Parameter
-    private List<Application> applications = new ArrayList<Application>();
+    private List<Application> applications = new ArrayList<>();
 
     @Parameter
-    private List<ProductArtifact> pluginArtifacts = new ArrayList<ProductArtifact>();
-
-    /**
-     */
-    @Parameter
-    private List<ProductArtifact> libArtifacts = new ArrayList<ProductArtifact>();
+    private List<ProductArtifact> pluginArtifacts = new ArrayList<>();
 
     /**
      */
     @Parameter
-    private List<ProductArtifact> bundledArtifacts = new ArrayList<ProductArtifact>();
+    private List<ProductArtifact> libArtifacts = new ArrayList<>();
+
+    /**
+     */
+    @Parameter
+    private List<ProductArtifact> bundledArtifacts = new ArrayList<>();
 
     /**
      * SAL version
@@ -401,7 +405,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * A list of product-specific configurations (as literally provided in the pom.xml)
      */
     @Parameter
-    protected List<Product> products = new ArrayList<Product>();
+    protected List<Product> products = new ArrayList<>();
 
     /**
      * A map of {instanceId -> Product}, initialized by {@link #createProductContexts()}.
@@ -442,7 +446,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         // If they aren't defined, define those system properties. They will override the product
         // handler's properties.
-        Map<String, Object> properties = new HashMap<String, Object>(systemPropertyVariables);
+        Map<String, Object> properties = new HashMap<>(systemPropertyVariables);
         properties.put("atlassian.sdk.version", getAmpsPluginVersion());
         setDefaultSystemProperty(properties, "atlassian.dev.mode", "true");
         setDefaultSystemProperty(properties, "java.awt.headless", "true");
@@ -751,34 +755,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         }
     }
 
-    private List<ProductArtifact> stringToArtifactList(String val, List<ProductArtifact> artifacts)
-    {
-        if (val == null || val.trim().length() == 0)
-        {
-            return artifacts;
-        }
-
-        for (String ptn : val.split(","))
-        {
-            String[] items = ptn.split(":");
-            if (items.length < 2 || items.length > 3)
-            {
-                throw new IllegalArgumentException("Invalid artifact pattern: " + ptn);
-            }
-            String groupId = items[0];
-            String artifactId = items[1];
-            String version = (items.length == 3 ? items[2] : "LATEST");
-            artifacts.add(new ProductArtifact(groupId, artifactId, version));
-        }
-        return artifacts;
-    }
-
     @Override
     public final void execute() throws MojoExecutionException, MojoFailureException
     {
-        stringToArtifactList(pluginArtifactsString, pluginArtifacts);
-        stringToArtifactList(libArtifactsString, libArtifacts);
-        stringToArtifactList(bundledArtifactsString, bundledArtifacts);
+        pluginArtifacts.addAll(toArtifacts(pluginArtifactsString));
+        libArtifacts.addAll(toArtifacts(libArtifactsString));
+        bundledArtifacts.addAll(toArtifacts(bundledArtifactsString));
         systemPropertyVariables.putAll((Map) systemProperties);
 
         detectDeprecatedVersionOverrides();
@@ -803,10 +785,10 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
             Properties overrides = getMavenContext().getVersionOverrides();
             
-            this.testFrameworkPlugins = new ArrayList<ProductArtifact>();
-
-            testFrameworkPlugins.add(new ProductArtifact(JUNIT_GROUP_ID, JUNIT_ARTIFACT_ID,overrides.getProperty(JUNIT_ARTIFACT_ID,JUNIT_VERSION)));
-            testFrameworkPlugins.add(new ProductArtifact(TESTRUNNER_GROUP_ID, TESTRUNNER_BUNDLE_ARTIFACT_ID,overrides.getProperty(TESTRUNNER_BUNDLE_ARTIFACT_ID,testRunnerVersion)));
+            this.testFrameworkPlugins = Lists.newArrayList(
+                    new ProductArtifact(JUNIT_GROUP_ID, JUNIT_ARTIFACT_ID, overrides.getProperty(JUNIT_ARTIFACT_ID, JUNIT_VERSION)),
+                    new ProductArtifact(TESTRUNNER_GROUP_ID, TESTRUNNER_BUNDLE_ARTIFACT_ID, overrides.getProperty(TESTRUNNER_BUNDLE_ARTIFACT_ID, testRunnerVersion))
+            );
         }
         
         return testFrameworkPlugins;
@@ -935,25 +917,20 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         try
         {
             long before = System.nanoTime();
-            for (final ProductExecution execution : Iterables.reverse(productExecutions))
+            for (final ProductExecution execution : Lists.reverse(productExecutions))
             {
                 final Product product = execution.getProduct();
                 final ProductHandler productHandler = execution.getProductHandler();
 
-                Future<?> task = executor.submit(new Runnable()
-                {
-                    @Override
-                    public void run()
+                Future<?> task = executor.submit(() -> {
+                    getLog().info(product.getInstanceId() + ": Shutting down");
+                    try
                     {
-                        getLog().info(product.getInstanceId() + ": Shutting down");
-                        try
-                        {
-                            productHandler.stop(product);
-                        }
-                        catch (MojoExecutionException e)
-                        {
-                            getLog().error("Exception while trying to stop " + product.getInstanceId(), e);
-                        }
+                        productHandler.stop(product);
+                    }
+                    catch (MojoExecutionException e)
+                    {
+                        getLog().error("Exception while trying to stop " + product.getInstanceId(), e);
                     }
                 });
 
@@ -996,89 +973,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     {
         for (ProductExecution productExecution : productExecutions)
         {
-            pingRepeatedly(productExecution.getProduct(), startingUp);
-        }
-    }
-
-    /**
-     * Ping the product until it's up or stopped
-     * @param startingUp true if applications are expected to be up; false if applications are expected to be brought down
-     * @throws MojoExecutionException if the product didn't have the expected behaviour before the timeout
-     */
-    private void pingRepeatedly(Product product, boolean startingUp) throws MojoExecutionException
-    {
-        if (product.getHttpPort() != 0)
-        {
-			final String url = product.getProtocol() + "://" + product.getServer() + ":" + product.getHttpPort()
-					+ StringUtils.defaultString(product.getContextPath(), "");
-
-            int timeout = startingUp ? product.getStartupTimeout() : product.getShutdownTimeout();
-            final long end = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeout);
-            boolean interrupted = false;
-            boolean success = false;
-            String lastMessage = "";
-
-            // keep retrieving from the url until a good response is returned, under a time limit.
-            while (!success && !interrupted && System.nanoTime() < end)
-            {
-                HttpURLConnection connection = null;
-                try
-                {
-                    URL urlToPing = new URL(url);
-                    connection = (HttpURLConnection) urlToPing.openConnection();
-                    int response = connection.getResponseCode();
-                    // Tomcat returns 404 until the webapp is up
-                    lastMessage = "Last response code is " + response;
-                    if (startingUp)
-                    {
-                        success = response < 400;
-                    }
-                    else
-                    {
-                        success = response >= 400;
-                    }
-                }
-                catch (IOException e)
-                {
-                    lastMessage = e.getMessage();
-                    success = !startingUp;
-                }
-                finally
-                {
-                    if (connection != null)
-                    {
-                        try
-                        {
-                            connection.getInputStream().close();
-                        }
-                        catch (IOException e)
-                        {
-                            // Don't do anything
-                        }
-                    }
-                }
-
-                if (!success)
-                {
-                    getLog().info("Waiting for " + url + (startingUp ? "" : " to stop"));
-                    try
-                    {
-                        Thread.sleep(1000);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        Thread.currentThread().interrupt();
-                        interrupted = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!success)
-            {
-                throw new MojoExecutionException(String.format("The product %s didn't %s after %ds at %s. %s",
-                        product.getInstanceId(), startingUp ? "start" : "stop", TimeUnit.MILLISECONDS.toSeconds(timeout), url, lastMessage));
-            }
+            pingRepeatedly(productExecution.getProduct(), startingUp, getLog());
         }
     }
 
@@ -1087,13 +982,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      */
     private Iterable<ProductExecution> getStudioExecutions(final List<ProductExecution> productExecutions)
     {
-        return Iterables.filter(productExecutions, new Predicate<ProductExecution>(){
-
-            @Override
-            public boolean apply(ProductExecution input)
-            {
-                return input.getProductHandler() instanceof StudioProductHandler;
-            }});
+        return Iterables.filter(productExecutions, input -> input.getProductHandler() instanceof StudioProductHandler);
     }
 
 
@@ -1103,12 +992,10 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * Configures both the Studio instance and its dependent products.
      *
      * @param productExecutions the current list of products to run
-     * @param goals
      * @return the complete list of products to run
      * @throws MojoExecutionException
      */
-    protected List<ProductExecution> includeStudioDependentProducts(final List<ProductExecution> productExecutions, final MavenGoals goals)
-            throws MojoExecutionException
+    protected List<ProductExecution> includeStudioDependentProducts(final List<ProductExecution> productExecutions) throws MojoExecutionException
     {
         // If one of the products is Studio, ask him/her which other products he/she wants to run
         Iterable<ProductExecution> studioExecutions = getStudioExecutions(productExecutions);
