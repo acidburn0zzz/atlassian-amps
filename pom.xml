@@ -187,9 +187,7 @@
                         <postBuildHookScript>validate</postBuildHookScript>
                         <preBuildHookScript>setup</preBuildHookScript>
                         <addTestClassPath>true</addTestClassPath>
-                        <!--<invokerTest>!cliTest,!*GroupTest,*Test</invokerTest>-->
                     </configuration>
-
                     <executions>
                         <execution>
                             <id>integration-test</id>
