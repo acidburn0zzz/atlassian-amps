@@ -1,0 +1,9 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.atlassian.amps.it</groupId>
+    <artifactId>maven-amps-plugin-run-cloud-test</artifactId>
+    <packaging>pom</packaging>
+    <version>testing</version>
+    <name>TestRunCloud</name>
+</project>
