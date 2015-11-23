@@ -4,6 +4,6 @@
 -Drmi.port.bak=${it.rmi.port}
 -Dallow.google.tracking=false
 -DskipAllPrompts=true
-${shitty.product}:run org.codehaus.gmaven:gmaven-plugin::execute
-${shitty.product}:stop org.codehaus.gmaven:gmaven-plugin::execute
+${invoker.product}:run org.codehaus.gmaven:gmaven-plugin::execute
+${invoker.product}:stop org.codehaus.gmaven:gmaven-plugin::execute
 clean

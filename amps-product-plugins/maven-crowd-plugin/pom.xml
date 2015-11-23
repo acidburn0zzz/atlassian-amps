@@ -39,8 +39,8 @@
                         <artifactId>maven-invoker-plugin</artifactId>
                         <configuration>
                             <scriptVariables>
-                                <artifactId>${shitty.artifactId}</artifactId>
-                                <product>${shitty.product}</product>
+                                <artifactId>${invoker.artifactId}</artifactId>
+                                <product>${invoker.product}</product>
                             </scriptVariables>
                         </configuration>
                     </plugin>
@@ -48,7 +48,7 @@
             </build>
             <properties>
                 <invoker.test>copyBundledDependenciesTest,createTest,debugTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateObrTest,integrationTestTest,jarWithExistingManifestTest,runTest,runParallelTest,stopTest,nexus_stagingTest,unitTestTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest,quickreloadTest</invoker.test>
-                <shitty.product>crowd</shitty.product>
+                <invoker.product>crowd</invoker.product>
                 <product.version>${crowd.version}</product.version>
                 <product.data.version>${crowd.data.version}</product.data.version>
             </properties>

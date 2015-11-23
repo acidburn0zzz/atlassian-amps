@@ -1,5 +1,5 @@
 -Dproduct.version=${product.version}
 -Dproduct.data.version=${product.data.version}
 -DskipAllPrompts=true
-${shitty.product}:generate-manifest
+${invoker.product}:generate-manifest
 clean

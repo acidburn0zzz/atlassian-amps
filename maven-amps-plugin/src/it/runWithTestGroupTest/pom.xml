@@ -10,8 +10,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>${shitty.groupId}</groupId>
-                <artifactId>${shitty.artifactId}</artifactId>
+                <groupId>${invoker.groupId}</groupId>
+                <artifactId>${invoker.artifactId}</artifactId>
                 <version>${project.version}</version>
                 <extensions>true</extensions>
                 <configuration>
@@ -20,9 +20,9 @@
                     <container>tomcat6x</container>
                     <productInheritConfiguration>true</productInheritConfiguration>
                     <systemPropertyVariables>
-                        <shitty.artifactId>${shitty.artifactId}</shitty.artifactId>
-                        <shitty.groupId>${shitty.groupId}</shitty.groupId>
-                        <shitty.product>${shitty.product}</shitty.product>
+                        <invoker.artifactId>${invoker.artifactId}</invoker.artifactId>
+                        <invoker.groupId>${invoker.groupId}</invoker.groupId>
+                        <invoker.product>${invoker.product}</invoker.product>
                     </systemPropertyVariables>
                     <testGroups>
                         <testGroup>
@@ -47,11 +47,11 @@
                     </testGroups>
                     <products>
                         <product>
-                            <id>${shitty.product}</id>
+                            <id>${invoker.product}</id>
                             <instanceId>product-1</instanceId>
                         </product>
                         <product>
-                            <id>${shitty.product}</id>
+                            <id>${invoker.product}</id>
                             <instanceId>product-2</instanceId>
                         </product>
                     </products>

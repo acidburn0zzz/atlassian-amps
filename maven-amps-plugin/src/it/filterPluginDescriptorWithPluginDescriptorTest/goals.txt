@@ -1,4 +1,4 @@
 -Dproduct.version=${product.version}
 -Dproduct.data.version=${product.data.version}
 -DskipAllPrompts=true
-${shitty.product}:filter-plugin-descriptor
+${invoker.product}:filter-plugin-descriptor

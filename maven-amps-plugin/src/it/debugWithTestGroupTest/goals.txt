@@ -5,5 +5,5 @@
 -DtestGroup=bar
 -DskipAllPrompts=true
 -Dallow.google.tracking=false
-${shitty.product}:debug org.codehaus.gmaven:gmaven-plugin::execute ${shitty.product}:stop
+${invoker.product}:debug org.codehaus.gmaven:gmaven-plugin::execute ${invoker.product}:stop
 clean

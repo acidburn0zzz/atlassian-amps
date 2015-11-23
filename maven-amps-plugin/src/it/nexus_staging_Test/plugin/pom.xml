@@ -11,8 +11,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>${shitty.groupId}</groupId>
-                <artifactId>${shitty.artifactId}</artifactId>
+                <groupId>${invoker.groupId}</groupId>
+                <artifactId>${invoker.artifactId}</artifactId>
                 <version>${project.version}</version>
                 <extensions>true</extensions>
             </plugin>

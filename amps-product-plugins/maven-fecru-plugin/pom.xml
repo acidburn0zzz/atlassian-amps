@@ -39,8 +39,8 @@
                         <artifactId>maven-invoker-plugin</artifactId>
                         <configuration>
                             <scriptVariables>
-                                <artifactId>${shitty.artifactId}</artifactId>
-                                <product>${shitty.product}</product>
+                                <artifactId>${invoker.artifactId}</artifactId>
+                                <product>${invoker.product}</product>
                             </scriptVariables>
                         </configuration>
                     </plugin>
@@ -59,7 +59,7 @@
             </build>
             <properties>
                 <invoker.test>copyBundledDependenciesTest,debugTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateObrTest,libArtifactTest,jarWithExistingManifestTest,nexus_stagingTest,unitTestTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest,libArtifactsTest,quickreloadTest</invoker.test>
-                <shitty.product>fecru</shitty.product>
+                <invoker.product>fecru</invoker.product>
                 <product.version>${fecru.version}</product.version>
                 <product.data.version>${fecru.data.version}</product.data.version>
                 <project.version>${project.version}</project.version>

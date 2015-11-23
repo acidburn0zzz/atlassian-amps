@@ -1,4 +1,4 @@
 -Dproduct.version=${product.version}
 -Dproduct.data.version=${product.data.version}
 -DskipAllPrompts=true
-process-resources ${shitty.product}:generate-manifest
+process-resources ${invoker.product}:generate-manifest

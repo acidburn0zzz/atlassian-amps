@@ -1,4 +1,4 @@
 -Dproduct.version=${product.version}
 -Dproduct.data.version=${product.data.version}
 -DskipAllPrompts=true
-process-resources ${shitty.product}:jar
+process-resources ${invoker.product}:jar

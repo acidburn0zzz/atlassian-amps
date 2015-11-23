@@ -39,8 +39,8 @@
                         <artifactId>maven-invoker-plugin</artifactId>
                         <configuration>
                             <scriptVariables>
-                                <artifactId>${shitty.artifactId}</artifactId>
-                                <product>${shitty.product}</product>
+                                <artifactId>${invoker.artifactId}</artifactId>
+                                <product>${invoker.product}</product>
                             </scriptVariables>
                         </configuration>
                     </plugin>
@@ -49,7 +49,7 @@
             <properties>
                 <!--<invoker.test>compressResourcesTest,copyBundledDependenciesTest,createTest,debugTest,debugWithTestGroupTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateManifestWithNoInstructionsButIsAtlassianPluginTest,generateManifestWithNoInstructionsNorIsAtlassianPluginTest,generateObrTest,integrationTestTest,integrationTestWithTestGroupTest,jarWithExistingManifestTest,nexus_stagingTest,quickreloadTest,runTest,runParallelTest,runWithTestGroupTest,unitTestTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest</invoker.test>-->
                 <invoker.test>compressResourcesTest,copyBundledDependenciesTest,createTest,debugTest,!debugWithTestGroupTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateManifestWithNoInstructionsButIsAtlassianPluginTest,generateManifestWithNoInstructionsNorIsAtlassianPluginTest,generateObrTest,integrationTestTest,!integrationTestWithTestGroupTest,jarWithExistingManifestTest,nexus_stagingTest,quickreloadTest,runTest,runParallelTest,!runWithTestGroupTest,unitTestTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest</invoker.test>
-                <shitty.product>stash</shitty.product>
+                <invoker.product>stash</invoker.product>
                 <product.version>${stash.version}</product.version>
                 <product.data.version>${stash.data.version}</product.data.version>
             </properties>

@@ -2,5 +2,5 @@
 -Dproduct.data.version=${product.data.version}
 -Dhttp.port.bak=${it.http.port}
 -Drmi.port.bak=${it.rmi.port}
-${shitty.product}:run org.codehaus.gmaven:gmaven-plugin::execute ${shitty.product}:cli org.codehaus.gmaven:gmaven-plugin::execute -Dallow.google.tracking=false -DskipAllPrompts=true ${shitty.product}:stop
+${invoker.product}:run org.codehaus.gmaven:gmaven-plugin::execute ${invoker.product}:cli org.codehaus.gmaven:gmaven-plugin::execute -Dallow.google.tracking=false -DskipAllPrompts=true ${invoker.product}:stop
 clean

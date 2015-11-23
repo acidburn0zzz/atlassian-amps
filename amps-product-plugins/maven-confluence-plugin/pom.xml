@@ -39,15 +39,15 @@
                         <artifactId>maven-invoker-plugin</artifactId>
                         <configuration>
                             <scriptVariables>
-                                <artifactId>${shitty.artifactId}</artifactId>
-                                <product>${shitty.product}</product>
+                                <artifactId>${invoker.artifactId}</artifactId>
+                                <product>${invoker.product}</product>
                             </scriptVariables>
                         </configuration>
                     </plugin>
                 </plugins>
             </build>
             <properties>
-                <shitty.product>confluence</shitty.product>
+                <invoker.product>confluence</invoker.product>
                 <product.version>${confluence.version}</product.version>
                 <product.data.version>${confluence.data.version}</product.data.version>
                 <product.database.type>no-database-type</product.database.type>

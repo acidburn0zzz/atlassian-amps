@@ -30,15 +30,15 @@
                         <artifactId>maven-invoker-plugin</artifactId>
                         <configuration>
                             <scriptVariables>
-                                <artifactId>${shitty.artifactId}</artifactId>
-                                <product>${shitty.product}</product>
+                                <artifactId>${invoker.artifactId}</artifactId>
+                                <product>${invoker.product}</product>
                             </scriptVariables>
                         </configuration>
                     </plugin>
                 </plugins>
             </build>
             <properties>
-                <shitty.product>refapp</shitty.product>
+                <invoker.product>refapp</invoker.product>
                 <product.version>${refapp.version}</product.version>
                 <product.data.version>${refapp.data.version}</product.data.version>
                 <product.database.type>no-database-type</product.database.type>

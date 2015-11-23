@@ -7,9 +7,9 @@
     <name>TestPreIntegrationTest</name>
 
     <properties>
-        <shitty.artifactId>${shitty.artifactId}</shitty.artifactId>
-        <shitty.groupId>${shitty.groupId}</shitty.groupId>
-        <shitty.product>${shitty.product}</shitty.product>
+        <invoker.artifactId>${invoker.artifactId}</invoker.artifactId>
+        <invoker.groupId>${invoker.groupId}</invoker.groupId>
+        <invoker.product>${invoker.product}</invoker.product>
         <jira.version>6.3</jira.version>
     </properties>
     <profiles>
@@ -18,8 +18,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>${shitty.groupId}</groupId>
-                        <artifactId>${shitty.artifactId}</artifactId>
+                        <groupId>${invoker.groupId}</groupId>
+                        <artifactId>${invoker.artifactId}</artifactId>
                         <version>${project.version}</version>
                     </plugin>
                 </plugins>
@@ -42,8 +42,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>${shitty.groupId}</groupId>
-                        <artifactId>${shitty.artifactId}</artifactId>
+                        <groupId>${invoker.groupId}</groupId>
+                        <artifactId>${invoker.artifactId}</artifactId>
                         <version>${project.version}</version>
                         <extensions>true</extensions>
                         <configuration>
@@ -99,8 +99,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>${shitty.groupId}</groupId>
-                        <artifactId>${shitty.artifactId}</artifactId>
+                        <groupId>${invoker.groupId}</groupId>
+                        <artifactId>${invoker.artifactId}</artifactId>
                         <version>${project.version}</version>
                         <extensions>true</extensions>
                         <configuration>
@@ -155,8 +155,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>${shitty.groupId}</groupId>
-                        <artifactId>${shitty.artifactId}</artifactId>
+                        <groupId>${invoker.groupId}</groupId>
+                        <artifactId>${invoker.artifactId}</artifactId>
                         <version>${project.version}</version>
                         <extensions>true</extensions>
                         <configuration>
@@ -211,8 +211,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>${shitty.groupId}</groupId>
-                        <artifactId>${shitty.artifactId}</artifactId>
+                        <groupId>${invoker.groupId}</groupId>
+                        <artifactId>${invoker.artifactId}</artifactId>
                         <version>${project.version}</version>
                         <extensions>true</extensions>
                         <configuration>

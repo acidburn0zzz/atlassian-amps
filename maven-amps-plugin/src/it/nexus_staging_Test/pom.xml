@@ -9,12 +9,12 @@
     <distributionManagement>
         <snapshotRepository>
             <id>nexus-snapshots</id>
-            <!-- basedir in shitty not the usual place -->
+            <!-- basedir in invoker not the usual place -->
             <url>file://${basedir}/target/it/nexus_staging_Test/target/snapshots</url>
         </snapshotRepository>
         <repository>
             <id>nexus-staging</id>
-            <!-- basedir in shitty not the usual place -->
+            <!-- basedir in invoker not the usual place -->
             <url>file://${basedir}/target/it/nexus_staging_Test/target/releases</url>
         </repository>
     </distributionManagement>
@@ -39,7 +39,7 @@
                 <version>2.8.2</version>
                 <configuration>
                     <!-- if this repo is used, nexus is not used? -->
-                    <!-- basedir in shitty not the usual place -->
+                    <!-- basedir in invoker not the usual place -->
                     <altDeploymentRepository>file://${basedir}/target/it/nexus_staging_Test/target/releases-wrong</altDeploymentRepository>
                 </configuration>
             </plugin>

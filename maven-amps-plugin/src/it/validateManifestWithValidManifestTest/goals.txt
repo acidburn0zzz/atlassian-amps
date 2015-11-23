@@ -1,5 +1,5 @@
 -Dproduct.version=${product.version}
 -Dproduct.data.version=${product.data.version}
 -DskipAllPrompts=true
-process-resources ${shitty.product}:validate-manifest
+process-resources ${invoker.product}:validate-manifest
 clean

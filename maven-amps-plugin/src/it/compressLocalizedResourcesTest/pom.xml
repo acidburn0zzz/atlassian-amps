@@ -9,8 +9,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>${shitty.groupId}</groupId>
-                <artifactId>${shitty.artifactId}</artifactId>
+                <groupId>${invoker.groupId}</groupId>
+                <artifactId>${invoker.artifactId}</artifactId>
                 <version>${project.version}</version>
                 <configuration>
                 	<encoding>UTF-16</encoding>

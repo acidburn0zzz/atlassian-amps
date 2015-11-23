@@ -33,7 +33,7 @@
 
     <profiles>
         <profile>
-            <id>shitty</id>
+            <id>invoker</id>
             <build>
                 <plugins>
                     <plugin>
@@ -45,14 +45,14 @@
                         <artifactId>maven-resources-plugin</artifactId>
                     </plugin>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>shitty-maven-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-invoker-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
             <properties>
-                <shitty.artifactId>bitbucket-maven-plugin</shitty.artifactId>
-                <shitty.product>bitbucket</shitty.product>
+                <invoker.artifactId>bitbucket-maven-plugin</invoker.artifactId>
+                <invoker.product>bitbucket</invoker.product>
                 <product.version>${bitbucket.version}</product.version>
                 <product.data.version>${bitbucket.data.version}</product.data.version>
                 <tests>
