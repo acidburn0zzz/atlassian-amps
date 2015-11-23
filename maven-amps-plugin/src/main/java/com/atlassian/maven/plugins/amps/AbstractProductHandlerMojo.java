@@ -992,10 +992,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      * Configures both the Studio instance and its dependent products.
      *
      * @param productExecutions the current list of products to run
+     * @param goals
      * @return the complete list of products to run
      * @throws MojoExecutionException
      */
-    protected List<ProductExecution> includeStudioDependentProducts(final List<ProductExecution> productExecutions) throws MojoExecutionException
+    protected List<ProductExecution> includeStudioDependentProducts(final List<ProductExecution> productExecutions, final MavenGoals goals)
+            throws MojoExecutionException
     {
         // If one of the products is Studio, ask him/her which other products he/she wants to run
         Iterable<ProductExecution> studioExecutions = getStudioExecutions(productExecutions);

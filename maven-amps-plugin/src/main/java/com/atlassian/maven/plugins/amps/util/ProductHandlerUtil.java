@@ -39,7 +39,7 @@ public final class ProductHandlerUtil
 
     public static List<ProductArtifact> toArtifacts(String val)
     {
-        if (StringUtils.isEmpty(val))
+        if (StringUtils.isBlank(val))
         {
             return Lists.newArrayList();
         }
@@ -50,9 +50,9 @@ public final class ProductHandlerUtil
             {
                 throw new IllegalArgumentException("Invalid artifact pattern: " + artifact);
             }
-            final String groupId = items[0];
-            final String artifactId = items[1];
-            final String version = (items.length == 3 ? items[2] : "LATEST");
+            final String groupId = items[0].trim();
+            final String artifactId = items[1].trim();
+            final String version = (items.length == 3 ? items[2].trim() : "LATEST");
             return new ProductArtifact(groupId, artifactId, version);
         }).collect(Collectors.toList());
     }
