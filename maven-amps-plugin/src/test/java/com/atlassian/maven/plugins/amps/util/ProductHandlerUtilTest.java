@@ -7,11 +7,10 @@ import java.util.List;
 
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.toArtifacts;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ProductHandlerUtilTest
 {
-
     @Test
     public void toArtifactsShouldReturnEmptyArrayForBlankString() throws Exception
     {
@@ -42,6 +41,28 @@ public class ProductHandlerUtilTest
 
     @Test
     public void toArtifactsShouldReturnMultipleArtifactsFromString()
+    {
+        final List<ProductArtifact> productArtifacts = toArtifacts("group1:artifact1:11,group2:artifact2:22,group3:artifact3:33");
+        assertThat(productArtifacts.size(), equalTo(3));
+
+        assertThat(productArtifacts.get(0).getGroupId(), equalTo("group1"));
+        assertThat(productArtifacts.get(0).getArtifactId(), equalTo("artifact1"));
+        assertThat(productArtifacts.get(0).getVersion(), equalTo("11"));
+
+        assertThat(productArtifacts.get(1).getGroupId(), equalTo("group2"));
+        assertThat(productArtifacts.get(1).getArtifactId(), equalTo("artifact2"));
+        assertThat(productArtifacts.get(1).getVersion(), equalTo("22"));
+
+        assertThat(productArtifacts.get(2).getGroupId(), equalTo("group3"));
+        assertThat(productArtifacts.get(2).getArtifactId(), equalTo("artifact3"));
+        assertThat(productArtifacts.get(2).getVersion(), equalTo("33"));
+    }
+
+    /**
+     * Just to make helen happy
+     */
+    @Test
+    public void toArtifactsShouldReturnMultipleArtifactsFromStringWithSpacePadding()
     {
         final List<ProductArtifact> productArtifacts = toArtifacts("group1:artifact1:11, group2:artifact2:22 , group3 : artifact3: 33");
         assertThat(productArtifacts.size(), equalTo(3));

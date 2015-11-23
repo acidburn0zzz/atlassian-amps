@@ -157,6 +157,15 @@ public final class ProductHandlerUtil
         }
     }
 
+    /**
+     * If the product is using https, we configure the SSLSocketFactory and Verifier to accept all certificates without throwing error when we ping.
+     * We return the old configurations so we can reset once we're done.
+     *
+     * @param useHttps true if we are using https
+     * @return an optional of the old configurations depending upon whether we use https or not.
+     * @throws NoSuchAlgorithmException
+     * @throws KeyManagementException
+     */
     private static Optional<SSLFactoryAndVerifier> configureConnection(boolean useHttps) throws NoSuchAlgorithmException, KeyManagementException
     {
         if (useHttps)
