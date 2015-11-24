@@ -2,8 +2,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.atlassian.amps.it</groupId>
-    <artifactId>maven-amps-plugin-run-cloud-test</artifactId>
+    <artifactId>maven-amps-plugin-run-cloud-with-jira-software-test</artifactId>
     <packaging>pom</packaging>
     <version>testing</version>
-    <name>TestRunCloud</name>
+    <name>TestRunCloudJiraSoftware</name>
 </project>
