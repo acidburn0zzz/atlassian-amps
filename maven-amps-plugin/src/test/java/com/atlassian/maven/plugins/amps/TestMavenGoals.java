@@ -296,7 +296,6 @@ public class TestMavenGoals
         temp.deleteOnExit();
     }
 
-    @Ignore
     @Test
     public void shouldUsePortsConfiguredFromProductWhenStartWebapp() throws MojoExecutionException
     {
