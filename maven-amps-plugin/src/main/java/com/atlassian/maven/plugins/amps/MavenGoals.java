@@ -950,7 +950,7 @@ public class MavenGoals
             }
         }
 
-        final int rmiPort = pickFreePort(0);
+        final int rmiPort = pickFreePort(webappContext.getRmiPort());
         final int actualAjpPort = pickFreePort(webappContext.getAjpPort());
         final int actualHttpPort;
         String protocol = "http";
@@ -1950,6 +1950,29 @@ public class MavenGoals
                                 element(name("argument"), "-jar"),
                                 element(name("argument"), "${project.build.directory}/remotable-plugins-container-standalone.jar"),
                                 element(name("argument"), pluginFile.getPath()))
+                ),
+                executionEnvironment()
+        );
+    }
+
+    public void saveArtifactToCurrentDirectory(String groupId, String artifactId, String version, String type, String filename) throws MojoExecutionException
+    {
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("copy"),
+                configuration(
+                        element(name("artifactItems"),
+                                element(name("artifactItem"),
+                                        element(name("groupId"), groupId),
+                                        element(name("artifactId"), artifactId),
+                                        element(name("version"), version),
+                                        element(name("type"), type),
+                                        element(name("destFileName"), filename))),
+                        element(name("outputDirectory"), ".")
                 ),
                 executionEnvironment()
         );
