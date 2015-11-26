@@ -1,2 +1,2 @@
-${shitty.product}:debug org.codehaus.gmaven:gmaven-plugin::execute -Dallow.google.tracking=false -DskipAllPrompts=true ${shitty.product}:stop
+${shitty.product}:debug org.codehaus.gmaven:gmaven-plugin::execute -Dallow.google.tracking=false -DskipAllPrompts=true
 clean -DskipAllPrompts=true
