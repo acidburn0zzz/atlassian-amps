@@ -68,7 +68,7 @@ public class RunCloudMojo extends AbstractAmpsMojo
                 getMavenGoals().saveArtifactToCurrentDirectory(
                         "com.atlassian.plugins",
                         "atlassian-connect-jira-software-runner",
-                        "LATEST",
+                        "RELEASE",
                         "pom",
                         POM_FILENAME);
             }
