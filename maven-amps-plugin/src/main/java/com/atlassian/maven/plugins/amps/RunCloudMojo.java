@@ -55,16 +55,13 @@ public class RunCloudMojo extends AbstractAmpsMojo
             throw new IllegalArgumentException("Unknown productPackage: '" + productPackage + "' Valid values: " + SUPPORTED_PRODUCTS);
         }
 
-        if (productPackage.equals(JIRA_SOFTWARE))
-        {
+        if (productPackage.equals(JIRA_SOFTWARE)) {
 
-            File pomFile = new File(POM_FILENAME);
-            if(pomFile.isFile())
-            {
+            File basedir = getMavenContext().getExecutionEnvironment().getMavenProject().getBasedir();
+            File pomFile = new File(basedir, POM_FILENAME);
+            if (pomFile.isFile()) {
                 this.getLog().info("You already have a jira-run-pom.xml in the current directory. If you want to update, remove the file.");
-            }
-            else
-            {
+            } else {
                 getMavenGoals().saveArtifactToCurrentDirectory(
                         "com.atlassian.plugins",
                         "atlassian-connect-jira-software-runner",
@@ -73,10 +70,14 @@ public class RunCloudMojo extends AbstractAmpsMojo
                         POM_FILENAME);
             }
 
-            try
-            {
-                MavenContext mavenContext = createMavenContext(new File(POM_FILENAME));
+            try {
+                File downloadedPom = new File(basedir, POM_FILENAME);
+                if (!downloadedPom.isFile()) {
+                    throw new IllegalStateException("The downloaded file does not exist" + downloadedPom.getAbsolutePath());
+                }
+                MavenContext mavenContext = createMavenContext(downloadedPom);
                 MavenGoals goals = new MavenGoals(mavenContext);
+
                 Plugin plugin = getPluginFromProjectDefinition(goals.getContextProject(), "com.atlassian.maven.plugins", "maven-jira-plugin");
 
                 executeMojo(plugin,
@@ -84,9 +85,7 @@ public class RunCloudMojo extends AbstractAmpsMojo
                         (Xpp3Dom) plugin.getConfiguration(),
                         mavenContext.getExecutionEnvironment());
 
-            }
-            catch (ProjectBuildingException e)
-            {
+            } catch (ProjectBuildingException e) {
                 throw new IllegalStateException("Couldn't run jira:run from downloaded pom.");
             }
         }
