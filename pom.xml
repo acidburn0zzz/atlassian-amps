@@ -419,5 +419,6 @@
         <shitty.artifactId>maven-${shitty.product}-plugin</shitty.artifactId>
         <shitty.groupId>com.atlassian.maven.plugins</shitty.groupId>
         <shitty.product>amps</shitty.product>
+        <javadoc.additional.params>-Xdoclint:none</javadoc.additional.params>
     </properties>
 </project>
