@@ -349,13 +349,6 @@
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
@@ -426,5 +419,6 @@
         <shitty.artifactId>maven-${shitty.product}-plugin</shitty.artifactId>
         <shitty.groupId>com.atlassian.maven.plugins</shitty.groupId>
         <shitty.product>amps</shitty.product>
+        <javadoc.additional.params>-Xdoclint:none</javadoc.additional.params>
     </properties>
 </project>
