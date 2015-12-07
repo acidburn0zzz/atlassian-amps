@@ -22,10 +22,9 @@ public abstract class AbstractProductHandlerAwareMojo extends AbstractProductAwa
      * Create a ProductHandler
      * @param productId the product nickname (not the instance id)
      * @return a product handler for this nickname
-     * @throws MojoExecutionException
      */
     protected ProductHandler createProductHandler(String productId)
     {
-        return ProductHandlerFactory.create(productId, getMavenContext(), getMavenGoals(),artifactFactory);
+        return ProductHandlerFactory.create(productId, getMavenContext(), getMavenGoals(), artifactFactory);
     }
 }

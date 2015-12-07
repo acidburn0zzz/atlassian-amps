@@ -293,9 +293,6 @@ public class FeCruProductHandler extends AbstractProductHandler
 
     /**
      * Add overrides to the Java task before it gets launched.
-     *
-     * @param ctx
-     * @param java
      */
     protected void addOverridesToJavaTask(final Product ctx, Java java)
     {
@@ -353,11 +350,6 @@ public class FeCruProductHandler extends AbstractProductHandler
      * i.e. standard structure should have a single root folder.
      * If it finds something looking like the old structure it will re-organize the data to match what is expected
      * of the new structure.
-     * @param tmpDir
-     * @param ctx
-     * @return
-     * @throws MojoExecutionException
-     * @throws IOException
      */
     @Override
     protected File getRootDir(File tmpDir, Product ctx) throws MojoExecutionException, IOException

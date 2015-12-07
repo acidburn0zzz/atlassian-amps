@@ -401,7 +401,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected List<Product> products = new ArrayList<Product>();
 
     /**
-     * A map of {instanceId -> Product}, initialized by {@link #createProductContexts()}.
+     * A map of {instanceId -&gt; Product}, initialized by {@link #createProductContexts()}.
      * Cannot be set by the user.
      */
     private Map<String, Product> productMap;
@@ -803,11 +803,10 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     }
 
     /**
-     * Builds the map {instanceId -> Product bean}, based on: <ul>
+     * Builds the map {instanceId -&gt; Product bean}, based on: <ul>
      * <li>the {@literal <products>} tag</li>
      * <li>the configuration values inherited from the {@literal <configuration>} tag
      * </ul>
-     * @throws MojoExecutionException
      */
     Map<String, Product> createProductContexts() throws MojoExecutionException
     {
@@ -820,7 +819,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         for (Product ctx : Lists.newArrayList(productMap.values()))
         {
-            ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals,artifactFactory);
+            ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals, artifactFactory);
             setDefaultValues(ctx, handler);
         }
 
@@ -828,7 +827,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     }
 
     /**
-     * Returns the map { instanceId -> Product } with initialized values.
+     * Returns the map { instanceId -&gt; Product } with initialized values.
      */
     protected Map<String, Product> getProductContexts() throws MojoExecutionException
     {

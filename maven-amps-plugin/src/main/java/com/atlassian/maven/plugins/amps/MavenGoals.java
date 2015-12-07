@@ -1122,15 +1122,15 @@ public class MavenGoals
     /**
      * Cargo waits (org.codehaus.cargo.container.tomcat.internal.AbstractCatalinaInstalledLocalContainer#waitForCompletion(boolean waitForStarting)) for 3 ports, but the AJP and RMI ports may
      * not be correct (see below), so we configure it to wait on the HTTP port only.
-     *
+     * <P>
      * Since we're not configuring the AJP port it defaults to 8009. This port might have been taken by a different application (the container will still come up though, see
      * "INFO: Port busy 8009 java.net.BindException: Address already in use" in the log). Thus we don't want to wait for it because it might be still open also the container
      * is shut down.
-     *
+     * <P>
      * The RMI port is randomly chosen (see startWebapp), thus we don't have any information close at hand. As a future optimisation, e.g. when we move away from cargo to let's say
      * Apache's Tomcat Maven Plugin we could retrieve the actual configuration from the server.xml on shutdown and thus know exactly for what which port to wait until it gets closed.
      * We could do that already in cargo (e.g. container/tomcat6x/<productHome>/conf/server.xml) but that means that we have to support all the containers we are supporting with cargo.
-     *
+     * <P>
      * Since the HTTP port is the only one that interests us, we set all three ports to this one when calling stop. But since that may be randomly chosen as well we might be waiting
      * for the wrong port to get closed. Since this is the minor use case, one has to either accept the timeout if the default port is open, or configure product.stop.timeout to 0 in
      * order to skip the wait.
@@ -1147,7 +1147,7 @@ public class MavenGoals
 
     /**
      * THIS USED TO Decide whether to use the org.twdata.maven.cargo-maven2-plugin or the org.codehaus.cargo.cargo-maven2-plugin.
-     * <p/>
+     * <p>
      * This has now been changed to just return the codehaus version since there are new features/fixes we need and the twdata version is no longer useful.
      */
     protected Plugin cargo(Product context)
@@ -1704,7 +1704,7 @@ public class MavenGoals
      * The artifact will be deployed using the name and version of the current project,
      * as in if your artifactId is 'MyProject', it will be MyProject-1.0-SNAPSHOT.jar,
      * overriding any artifact created at compilation time.
-     *
+     * <P>
      * Attached artifacts get installed (at install phase) and deployed (at deploy phase)
      * @param file the file
      * @param type the type of the file, default 'jar'
@@ -1986,7 +1986,7 @@ public class MavenGoals
 
         /**
          * Installable container that can be downloaded by Maven.
-         *
+         * <P>
          * @param id         identifier of container, eg. "tomcat5x".
          * @param groupId    groupId of container.
          * @param artifactId artifactId of container.
@@ -2002,7 +2002,7 @@ public class MavenGoals
 
         /**
          * Installable container that can be downloaded by Maven.
-         *
+         * <P>
          * @param id         identifier of container, eg. "tomcat5x".
          * @param groupId    groupId of container.
          * @param artifactId artifactId of container.
@@ -2019,7 +2019,7 @@ public class MavenGoals
 
         /**
          * Embedded container packaged with Cargo.
-         *
+         * <P>
          * @param id identifier of container, eg. "jetty6x".
          */
         public Container(final String id)

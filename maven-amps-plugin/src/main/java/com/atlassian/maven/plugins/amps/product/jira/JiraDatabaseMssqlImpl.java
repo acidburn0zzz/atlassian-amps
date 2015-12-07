@@ -102,8 +102,8 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
 
     /**
      * reference jtds documentation url http://jtds.sourceforge.net/faq.html The URL format for jTDS is:
-     * jdbc:jtds:<server_type>://<server>[:<port>][/<database>][;<property>=<value>[;...]]
-     * @param url
+     * jdbc:jtds:&lt;server_type&gt;://&lt;server&gt;[:&lt;port&gt;][/&lt;database&gt;][;&lt;property&gt;=&lt;value&gt;[;...]]
+     * @param url the URL
      * @return database name
      */
     @Override

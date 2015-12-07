@@ -57,11 +57,11 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
 
     /**
      * When there is {@literal runProject} property set, Mojo will be executed on project with specified artifact's ID.
-     * <p>Example:
+     * <p>
+     * Example:
      * <ul>
      *     <li><code>mvn amps:run -DrunProject=my-project</code></li>
      * </ul>
-     * </p>
      */
     @Parameter(property = "runProject", required = false)
     protected String runProject;
@@ -292,12 +292,10 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
     }
 
     /**
-     * <p>Determines whether Mojo should be executed. By default it won't affect execution but it can be influenced by
-     * {@link com.atlassian.maven.plugins.amps.RunMojo#runLastProject} and {@link com.atlassian.maven.plugins.amps.RunMojo#runProject} properties</p>
-     *
+     * Determines whether Mojo should be executed. By default it won't affect execution but it can be influenced by
+     * {@link com.atlassian.maven.plugins.amps.RunMojo#runLastProject} and {@link com.atlassian.maven.plugins.amps.RunMojo#runProject} properties
      * @see com.atlassian.maven.plugins.amps.RunMojo#runLastProject
      * @see com.atlassian.maven.plugins.amps.RunMojo#runProject
-     *
      * @return <code>true</code> when this execution not should be skipped, <code>false</code> otherwise
      */
     protected boolean shouldExecute()

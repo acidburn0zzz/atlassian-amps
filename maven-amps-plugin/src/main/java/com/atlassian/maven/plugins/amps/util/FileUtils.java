@@ -79,7 +79,7 @@ public class FileUtils
      * Copy all files and directories from one folder to another, preserving structure.
      * This is an unfortunate duplicate of other libraries, which do not preserve the executable status of files,
      * most likely due to Java version restrictions.
-     * <p />
+     * <p>
      * If you do <i>not</i> have this requirement please use commons-io instead:
      * {@link org.apache.commons.io.FileUtils#copyDirectory(java.io.File, java.io.File)}.
      * @param source source directory from which to copy all files/directories from

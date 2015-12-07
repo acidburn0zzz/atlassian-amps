@@ -49,8 +49,8 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
     private JarArchiver jarArchiver;
 
     /**
-     * The archive configuration to use. See <a href="http://maven.apache.org/shared/maven-archiver/index.html">Maven
-     * Archiver Reference</a>.
+     * The archive configuration to use.
+     * @see <a href="http://maven.apache.org/shared/maven-archiver/index.html">Maven Archiver Reference</a>
      */
     @Parameter
     private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
@@ -453,19 +453,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
 
             archiver.createArchive(mavenProject, archive);
         }
-        catch (IOException e)
-        {
-            throw new MojoExecutionException("Error creating obr archive: " + e.getMessage(), e);
-        }
-        catch (ArchiverException e)
-        {
-            throw new MojoExecutionException("Error creating obr archive: " + e.getMessage(), e);
-        }
-        catch (DependencyResolutionRequiredException e)
-        {
-            throw new MojoExecutionException("Error creating obr archive: " + e.getMessage(), e);
-        }
-        catch (ManifestException e)
+        catch (IOException | DependencyResolutionRequiredException | ManifestException | ArchiverException e)
         {
             throw new MojoExecutionException("Error creating obr archive: " + e.getMessage(), e);
         }

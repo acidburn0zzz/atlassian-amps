@@ -40,8 +40,6 @@ public class PackageImportVersionValidator
     /**
      * Validates the package imports.
      * @param imports The package imports from the manifest
-     * @throws MojoFailureException If the validation fails.  Will contain user-friendly error message trying to guess
-     * a desirable bnd configuration for package imports.
      */
     public void validate(String imports)
     {
