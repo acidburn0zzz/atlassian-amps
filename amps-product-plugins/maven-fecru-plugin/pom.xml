@@ -58,7 +58,7 @@
                 </testResources>
             </build>
             <properties>
-                <invoker.test>copyBundledDependenciesTest,debugTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateObrTest,libArtifactTest,jarWithExistingManifestTest,nexus_stagingTest,unitTestTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest,libArtifactsTest,quickreloadTest</invoker.test>
+                <invoker.test>copyBundledDependenciesTest,debugTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateObrTest,libArtifactTest,jarWithExistingManifestTest,nexusStagingTest,unitTestTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest,libArtifactsTest,quickreloadTest</invoker.test>
                 <invoker.product>fecru</invoker.product>
                 <product.version>${fecru.version}</product.version>
                 <product.data.version>${fecru.data.version}</product.data.version>

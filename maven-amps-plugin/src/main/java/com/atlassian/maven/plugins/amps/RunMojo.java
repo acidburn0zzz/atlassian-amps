@@ -76,7 +76,6 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
 
-        getLog().info("Write properties file: " + writePropertiesToFile);
         if (!shouldExecute())
         {
             getLog().info("Skipping execution");

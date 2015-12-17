@@ -128,8 +128,6 @@
                                 <projectsDirectory>target/it</projectsDirectory>
                                 <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                                 <settingsFile>target/it/settings.xml</settingsFile>
-                                <!--Run on Bamboo-->
-                                <!--<localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>-->
                                 <!-- Do not need to resolve all dedepencies each time run IT in DEV MODE-->
                                 <localRepositoryPath>${user.home}/local-repo</localRepositoryPath>
                                 <postBuildHookScript>validate</postBuildHookScript>

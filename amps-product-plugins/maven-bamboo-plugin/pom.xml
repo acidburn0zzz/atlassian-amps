@@ -47,7 +47,7 @@
                 </plugins>
             </build>
             <properties>
-                <invoker.test>!cliTest,!preIntegrationTest,!*GroupTest,*Test</invoker.test>
+                <invoker.test>copyBundledDependenciesTest,createTest,debugTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateObrTest,integrationTestTest,jarWithExistingManifestTest,runTest,runParallelTest,stopTest,nexusStagingTest,unitTestTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest,quickreloadTest</invoker.test>
                 <invoker.product>bamboo</invoker.product>
                 <product.version>${bamboo.version}</product.version>
                 <product.data.version>${bamboo.data.version}</product.data.version>

@@ -10,12 +10,12 @@
         <snapshotRepository>
             <id>nexus-snapshots</id>
             <!-- basedir in invoker not the usual place -->
-            <url>file://${basedir}/target/it/nexus_staging_Test/target/snapshots</url>
+            <url>file://${basedir}/target/it/nexusStagingTest/target/snapshots</url>
         </snapshotRepository>
         <repository>
             <id>nexus-staging</id>
             <!-- basedir in invoker not the usual place -->
-            <url>file://${basedir}/target/it/nexus_staging_Test/target/releases</url>
+            <url>file://${basedir}/target/it/nexusStagingTest/target/releases</url>
         </repository>
     </distributionManagement>
     <modules>
@@ -40,7 +40,7 @@
                 <configuration>
                     <!-- if this repo is used, nexus is not used? -->
                     <!-- basedir in invoker not the usual place -->
-                    <altDeploymentRepository>file://${basedir}/target/it/nexus_staging_Test/target/releases-wrong</altDeploymentRepository>
+                    <altDeploymentRepository>file://${basedir}/target/it/nexusStagingTest/target/releases-wrong</altDeploymentRepository>
                 </configuration>
             </plugin>
         </plugins>
