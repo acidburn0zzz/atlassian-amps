@@ -1,0 +1,11 @@
+-s
+${project.build.directory}/it/settings.xml
+-Dproduct.version=${product.version}
+-Dproduct.data.version=${product.data.version}
+-Dhttp.port.bak=${it.http.port}
+-Drmi.port.bak=${it.rmi.port}
+-Dallow.google.tracking=false
+-DskipAllPrompts=true
+${invoker.product}:debug org.codehaus.gmaven:gmaven-plugin::execute
+${invoker.product}:stop
+clean

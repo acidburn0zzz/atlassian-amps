@@ -1,3 +1,0 @@
-${shitty.product}:run org.codehaus.gmaven:gmaven-plugin::execute -DskipAllPrompts=true
-${shitty.product}:stop org.codehaus.gmaven:gmaven-plugin::execute -DskipAllPrompts=true
-clean -DskipAllPrompts=true

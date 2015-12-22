@@ -205,7 +205,7 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
             }
 
             // We don't stop products when -Dwait=false, because some projects rely on the
-            // application running after the end of the RunMojo goal. The SHITTY tests
+            // application running after the end of the RunMojo goal. The Invoker tests
             // check this behaviour.
             stopProducts(productExecutions);
         }

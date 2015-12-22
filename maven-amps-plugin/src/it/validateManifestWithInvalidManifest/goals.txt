@@ -1,2 +1,0 @@
-process-resources ${shitty.product}:validate-manifest -DskipAllPrompts=true
-clean -DskipAllPrompts=true

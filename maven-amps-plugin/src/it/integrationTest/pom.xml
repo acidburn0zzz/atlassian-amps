@@ -10,9 +10,9 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>${shitty.groupId}</groupId>
-                <artifactId>${shitty.artifactId}</artifactId>
-                <version>testing</version>
+                <groupId>${invoker.groupId}</groupId>
+                <artifactId>${invoker.artifactId}</artifactId>
+                <version>${project.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <container>tomcat6x</container>
@@ -30,16 +30,16 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <reportsDirectory>target/shitty-it-surefire-reports</reportsDirectory>
+                    <reportsDirectory>target/invoker-reports</reportsDirectory>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
     <properties>
-        <shitty.artifactId>${shitty.artifactId}</shitty.artifactId>
-        <shitty.groupId>${shitty.groupId}</shitty.groupId>
-        <shitty.product>${shitty.product}</shitty.product>
+        <invoker.artifactId>${invoker.artifactId}</invoker.artifactId>
+        <invoker.groupId>${invoker.groupId}</invoker.groupId>
+        <invoker.product>${invoker.product}</invoker.product>
     </properties>
 
     <dependencies>
