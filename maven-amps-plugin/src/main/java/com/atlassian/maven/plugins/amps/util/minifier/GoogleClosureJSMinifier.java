@@ -44,9 +44,7 @@ public class GoogleClosureJSMinifier
         }
     }
 
-    private static CompilerOptions options;
-
-    public static void setOptions(Map<String,String> closureOptions, Log log)
+    public static CompilerOptions getOptions(Map<String, String> closureOptions, Log log)
     {
         GoogleClosureOptionsHandler googleClosureOptionsHandler = new GoogleClosureOptionsHandler(log);
         if(closureOptions != null && !closureOptions.isEmpty()) {
@@ -56,11 +54,12 @@ public class GoogleClosureJSMinifier
             }
         }
 
-        options = googleClosureOptionsHandler.getCompilerOptions();
+        return googleClosureOptionsHandler.getCompilerOptions();
     }
 
-    public static CompiledSourceWithSourceMap compile(String code, String sourcePath, Log log) {
+    public static CompiledSourceWithSourceMap compile(String code, String sourcePath, Map<String, String> closureOptions, Log log) {
         Compiler compiler = new Compiler();
+        CompilerOptions options = getOptions(closureOptions, log);
         CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
 
         // Dummy file paths used for source map, all those paths will be replaced at runtime.
