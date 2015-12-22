@@ -193,7 +193,7 @@ public class ResourcesMinifier
                 }
                 else
                 {
-                    yuiJsCompile(sourceFile, destFile, minifierParameters.getLog(), minifierParameters.getCs());
+                    yuiJsCompile(sourceFile, destFile, log, cs);
                 }
                 numberOfMinifiedFile++;
             }
