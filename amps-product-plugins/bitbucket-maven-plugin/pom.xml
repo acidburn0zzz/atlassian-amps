@@ -47,6 +47,12 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-invoker-plugin</artifactId>
+                        <configuration>
+                            <scriptVariables>
+                                <artifactId>${invoker.artifactId}</artifactId>
+                                <product>${invoker.product}</product>
+                            </scriptVariables>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
