@@ -1847,20 +1847,20 @@ public class MavenGoals
                             element(name("docletPath"), docletPath.toString()),
                             element(name("docletArtifacts"),
                                     element(name("docletArtifact"),
-                                            element(name("groupId"),"com.atlassian.plugins.rest"),
-                                            element(name("artifactId"),"atlassian-rest-doclet"),
-                                            element(name("version"),"2.9.2")
+                                            element(name("groupId"), "com.atlassian.plugins.rest"),
+                                            element(name("artifactId"), "atlassian-rest-doclet"),
+                                            element(name("version"), "2.9.2")
                                     ),
                                     element(name("docletArtifact"),
-                                        element(name("groupId"),"xerces"),
-                                        element(name("artifactId"),"xercesImpl"),
-                                        element(name("version"),"2.9.1")
-                                ),
-                                element(name("docletArtifact"),
-                                        element(name("groupId"),"commons-lang"),
-                                        element(name("artifactId"),"commons-lang"),
-                                        element(name("version"),"2.6")
-                                )
+                                            element(name("groupId"), "xerces"),
+                                            element(name("artifactId"), "xercesImpl"),
+                                            element(name("version"), "2.9.1")
+                                    ),
+                                    element(name("docletArtifact"),
+                                            element(name("groupId"), "commons-lang"),
+                                            element(name("artifactId"), "commons-lang"),
+                                            element(name("version"), "2.6")
+                                    )
                             ),
                             element(name("additionalparam"), additionalParam),
                             element(name("useStandardDocletOptions"),"false")

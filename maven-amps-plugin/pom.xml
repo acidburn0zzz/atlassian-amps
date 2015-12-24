@@ -131,13 +131,6 @@
           <version>1.6.2</version>
         </dependency>
 
-        <!-- rest doc generation -->
-<!--        <dependency>
-          <groupId>com.atlassian.plugins.rest</groupId>
-          <artifactId>atlassian-rest-doclet</artifactId>
-          <version>2.9.2</version>
-        </dependency>-->
-
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
