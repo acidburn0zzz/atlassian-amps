@@ -6,4 +6,3 @@
 -DskipAllPrompts=true
 ${invoker.product}:run org.codehaus.gmaven:gmaven-plugin::execute
 ${invoker.product}:stop org.codehaus.gmaven:gmaven-plugin::execute
-clean

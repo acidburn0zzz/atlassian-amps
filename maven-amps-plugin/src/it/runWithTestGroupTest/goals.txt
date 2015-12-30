@@ -6,4 +6,3 @@
 -Dallow.google.tracking=false
 -DskipAllPrompts=true
 ${invoker.product}:run org.codehaus.gmaven:gmaven-plugin::execute ${invoker.product}:stop
-clean
