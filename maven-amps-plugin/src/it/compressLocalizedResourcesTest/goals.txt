@@ -1,0 +1,3 @@
+-Dproduct.version=${product.version}
+-Dproduct.data.version=${product.data.version}
+package ${invoker.product}:compress-resources -DskipAllPrompts=true

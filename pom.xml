@@ -8,7 +8,7 @@
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>6.2.1-SNAPSHOT</version>
+    <version>6.2.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
@@ -170,44 +170,6 @@
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>2.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>shitty-maven-plugin</artifactId>
-                    <version>1.0-alpha-3-atlassian-7</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>clean</goal>
-                                <goal>install</goal>
-                                <goal>test</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>clean-after-tests</id>
-                            <phase>post-integration-test</phase>
-                            <goals>
-                                <goal>clean</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <offline>false</offline>
-                        <jvmArgs>-Xmx512m -XX:MaxPermSize=256m</jvmArgs>
-                        <projects>
-                            <fileset>
-                                <directory>${project.build.directory}/it</directory>
-                                <includes>
-                                    <include>*/pom.xml</include>
-                                </includes>
-                            </fileset>
-                        </projects>
-                        <filesets>
-                            <fileset>
-                                <directory>${project.build.directory}/it</directory>
-                            </fileset>
-                        </filesets>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>com.atlassian.maven.plugins</groupId>
@@ -384,11 +346,13 @@
 
 
     <properties>
+        <javadoc.additional.params>-Xdoclint:none</javadoc.additional.params>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <build.maven.version>3.0.5</build.maven.version>
         <bundled.maven.version>3.2.1</bundled.maven.version>
         <refapp.version>3.0.0</refapp.version>
+        <refapp.data.version>3.0.0</refapp.data.version>
         <platform.version>3.0.0</platform.version>
         <confluence.version>5.8.10</confluence.version>
         <confluence.data.version>5.8.10</confluence.data.version>
@@ -416,8 +380,9 @@
         <jtds.version>1.2.4</jtds.version>
         <release.profiles>release,installer-win,installer-linux,installer-osx</release.profiles>
         <release.arguments>-Pinstaller-win,installer-osx,installer-linux</release.arguments>
-        <shitty.artifactId>maven-${shitty.product}-plugin</shitty.artifactId>
-        <shitty.groupId>com.atlassian.maven.plugins</shitty.groupId>
-        <shitty.product>amps</shitty.product>
+        <javadoc.additional.params>-Xdoclint:none</javadoc.additional.params>
+        <invoker.artifactId>maven-${invoker.product}-plugin</invoker.artifactId>
+        <invoker.groupId>com.atlassian.maven.plugins</invoker.groupId>
+        <invoker.product>amps</invoker.product>
     </properties>
 </project>

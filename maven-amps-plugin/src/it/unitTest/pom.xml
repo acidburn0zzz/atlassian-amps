@@ -9,9 +9,9 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>${shitty.groupId}</groupId>
-                <artifactId>${shitty.artifactId}</artifactId>
-                <version>testing</version>
+                <groupId>${invoker.groupId}</groupId>
+                <artifactId>${invoker.artifactId}</artifactId>
+                <version>${project.version}</version>
             </plugin>
         </plugins>
     </build>

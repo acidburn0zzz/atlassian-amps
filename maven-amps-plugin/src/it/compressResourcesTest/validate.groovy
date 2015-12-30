@@ -1,0 +1,5 @@
+def targetClasses = new File(basedir, 'target/classes')
+assert new File(targetClasses, 'foo.js').exists()
+assert new File(targetClasses, 'foo-min.js').exists()
+assert new File(targetClasses, 'foo.css').exists()
+assert new File(targetClasses, 'foo-min.css').exists()

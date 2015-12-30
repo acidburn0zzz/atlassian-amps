@@ -1,11 +1,9 @@
 package com.atlassian.maven.plugins.amps;
 
 import com.google.common.collect.ImmutableSet;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.locator.DefaultModelLocator;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -39,23 +37,18 @@ public class RunCloudMojo extends AbstractAmpsMojo
     @Component
     private ProjectBuilder projectBuilder;
 
-    @Component
-    private ArtifactFactory artifactFactory;
-
-    @Parameter( property = "productPackage", required = true)
-    private String productPackage;
+    @Parameter( property = "application", required = true)
+    private String application;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        getUpdateChecker().check();
-
-        if (!SUPPORTED_PRODUCTS.contains(productPackage))
+        if (!SUPPORTED_PRODUCTS.contains(application))
         {
-            throw new IllegalArgumentException("Unknown productPackage: '" + productPackage + "' Valid values: " + SUPPORTED_PRODUCTS);
+            throw new IllegalArgumentException("Unknown application: '" + application + "' Valid values: " + SUPPORTED_PRODUCTS);
         }
 
-        if (productPackage.equals(JIRA_SOFTWARE)) {
+        if (application.equals(JIRA_SOFTWARE)) {
 
             File basedir = getMavenContext().getExecutionEnvironment().getMavenProject().getBasedir();
             File pomFile = new File(basedir, POM_FILENAME);
