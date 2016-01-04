@@ -163,8 +163,27 @@ public class MavenGoals
             executionEnvironment());
     }
 
+    public static void warnDeprecated(Log log) {
+        log.warn("");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("");
+        log.warn(">>>  WARNING: atlas-cli and fastdev are DEPRECATED in favour of QuickReload  <<<");
+        log.warn("");
+        log.warn(">>>  WARNING: Support for atlas-cli and fastdev will be completely removed in the next AMPS version.  <<<");
+        log.warn("");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("");
+    }
+
     public void startCli(final PluginInformation pluginInformation, final int port) throws MojoExecutionException
     {
+        warnDeprecated(log);
         final String groupId = pluginInformation.getGroupId();
         final String artifactId = pluginInformation.getArtifactId();
 
