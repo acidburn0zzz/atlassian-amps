@@ -395,7 +395,6 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
     {
         List<ProductArtifact> pluginsToDeploy = new ArrayList<ProductArtifact>();
         pluginsToDeploy.addAll(getTestFrameworkPlugins());
-        pluginsToDeploy.add(new ProductArtifact("com.atlassian.labs","fastdev-plugin", AmpsDefaults.DEFAULT_FASTDEV_VERSION));
         pluginsToDeploy.addAll(deployArtifacts);
 
         Map<ProductArtifact,File> artifactFileMap = new HashMap<ProductArtifact, File>(pluginsToDeploy.size());

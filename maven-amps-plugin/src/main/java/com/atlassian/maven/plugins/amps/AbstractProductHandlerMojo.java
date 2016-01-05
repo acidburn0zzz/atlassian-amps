@@ -4,7 +4,6 @@ import com.atlassian.maven.plugins.amps.product.ProductHandler;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
@@ -33,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_DEV_TOOLBOX_VERSION;
-import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_FASTDEV_VERSION;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PDE_VERSION;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PDK_VERSION;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PRODUCT_SHUTDOWN_TIMEOUT;
@@ -225,18 +223,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      */
     @Parameter(property = "product.data.path")
     private String productDataPath;
-
-    /**
-     * If FastDev should be enabled
-     */
-    @Parameter(property = "fastdev.enable", defaultValue = "true")
-    protected boolean enableFastdev;
-
-    /**
-     * The version of FastDev to bundle
-     */
-    @Parameter(property = "fastdev.version", defaultValue = DEFAULT_FASTDEV_VERSION)
-    protected String fastdevVersion;
 
     /**
      * If DevToolbox should be enabled
@@ -481,9 +467,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setPdkVersion(pdkVersion);
         ctx.setWebConsoleVersion(webConsoleVersion);
 
-        ctx.setEnableFastdev(enableFastdev);
-        ctx.setFastdevVersion(fastdevVersion);
-
         ctx.setEnableQuickReload(enableQuickReload);
         ctx.setQuickReloadVersion(quickReloadVersion);
 
@@ -611,16 +594,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         if (product.getWebConsoleVersion() == null)
         {
             product.setWebConsoleVersion(DEFAULT_WEB_CONSOLE_VERSION);
-        }
-
-        if (product.isEnableFastdev() == null)
-        {
-            product.setEnableFastdev(true);
-        }
-
-        if (product.getFastdevVersion() == null)
-        {
-            product.setFastdevVersion(DEFAULT_FASTDEV_VERSION);
         }
 
         if (product.isEnableDevToolbox() == null)

@@ -96,7 +96,6 @@
                     <productVersion>\${dollar}{bamboo.version}</productVersion>
                     <productDataVersion>\${dollar}{bamboo.data.version}</productDataVersion>
                     <enableQuickReload>true</enableQuickReload>
-                    <enableFastdev>false</enableFastdev>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
 
