@@ -107,7 +107,6 @@
                 <configuration>
                     <productVersion>\${dollar}{fecru.version}</productVersion>
                     <productDataVersion>\${dollar}{fecru.data.version}</productDataVersion>
-                    <enableFastdev>false</enableFastdev>
                     <enableQuickReload>true</enableQuickReload>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>

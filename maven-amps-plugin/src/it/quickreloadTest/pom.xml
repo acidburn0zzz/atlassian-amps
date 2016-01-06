@@ -18,7 +18,6 @@
                     <wait>false</wait>
                     <writePropertiesToFile>true</writePropertiesToFile>
                     <enableQuickReload>true</enableQuickReload>
-                    <enableFastdev>false</enableFastdev>
                 </configuration>
             </plugin>
 

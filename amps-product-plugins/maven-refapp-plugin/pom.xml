@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-product-plugins</artifactId>
-        <version>6.2.2-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.atlassian.maven.plugins</groupId>
@@ -43,7 +43,7 @@
                 <product.data.version>${refapp.data.version}</product.data.version>
                 <product.database.type>no-database-type</product.database.type>
                 <tests>
-                    cli, compressResources, compressResourcesWithClosureOptionLanguageIn, compressResourcesWithIncludeParam, copyBundledDependencies, create, debug, debugWithTestGroup,
+                    compressResources, compressResourcesWithClosureOptionLanguageIn, compressResourcesWithIncludeParam, copyBundledDependencies, create, debug, debugWithTestGroup,
                     filterPluginDescriptorWithoutPluginDescriptor, filterPluginDescriptorWithPluginDescriptor,
                     generateManifestWithInstructions, generateManifestWithNoInstructions,
                     generateObr, integrationTest,

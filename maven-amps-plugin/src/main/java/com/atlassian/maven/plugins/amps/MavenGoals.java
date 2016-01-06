@@ -163,67 +163,6 @@ public class MavenGoals
             executionEnvironment());
     }
 
-    public void startCli(final PluginInformation pluginInformation, final int port) throws MojoExecutionException
-    {
-        final String groupId = pluginInformation.getGroupId();
-        final String artifactId = pluginInformation.getArtifactId();
-
-        final List<Element> configs = new ArrayList<Element>();
-        configs.add(element(name("commands"),
-                element(name("pi"),
-                        groupId + ":" + artifactId + ":copy-bundled-dependencies" + " "
-                                + groupId + ":" + artifactId + ":compress-resources" + " "
-                                + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
-                                + groupId + ":" + artifactId + ":filter-plugin-descriptor" + " "
-                                + "compile" + " "
-                                + groupId + ":" + artifactId + ":generate-manifest" + " "
-                                + groupId + ":" + artifactId + ":validate-manifest" + " "
-                                + groupId + ":" + artifactId + ":jar" + " "
-                                + "org.apache.maven.plugins:maven-install-plugin:install" + " "
-                                + groupId + ":" + artifactId + ":install"),
-                element(name("tpi"),
-                        groupId + ":" + artifactId + ":copy-bundled-dependencies" + " "
-                                + groupId + ":" + artifactId + ":compress-resources" + " "
-                                + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
-                                + groupId + ":" + artifactId + ":filter-plugin-descriptor" + " "
-                                + "compile" + " "
-                                + groupId + ":" + artifactId + ":generate-manifest" + " "
-                                + "org.apache.maven.plugins:maven-resources-plugin:testResources" + " "
-                                + groupId + ":" + artifactId + ":filter-test-plugin-descriptor" + " "
-                                +groupId + ":" + artifactId + ":copy-test-bundled-dependencies" + " "
-                                + "org.apache.maven.plugins:maven-compiler-plugin:testCompile" + " "
-                                + groupId + ":" + artifactId + ":generate-test-manifest" + " "
-                                + groupId + ":" + artifactId + ":validate-manifest" + " "
-                                + groupId + ":" + artifactId + ":validate-test-manifest" + " "
-                                + groupId + ":" + artifactId + ":jar" + " "
-                                + groupId + ":" + artifactId + ":test-jar" + " "
-                                + "org.apache.maven.plugins:maven-install-plugin:install" + " "
-                                + groupId + ":" + artifactId + ":install" + " "
-                                + groupId + ":" + artifactId + ":test-install"),
-                element(name("package"),
-                        groupId + ":" + artifactId + ":copy-bundled-dependencies" + " "
-                                + groupId + ":" + artifactId + ":compress-resources" + " "
-                                + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
-                                + groupId + ":" + artifactId + ":filter-plugin-descriptor" + " "
-                                + "compile" + " "
-                                + groupId + ":" + artifactId + ":generate-manifest" + " "
-                                + groupId + ":" + artifactId + ":validate-manifest" + " "
-                                + groupId + ":" + artifactId + ":jar" + " ")));
-        if (port > 0)
-        {
-            configs.add(element(name("port"), String.valueOf(port)));
-        }
-        executeMojo(
-                plugin(
-                        groupId("org.twdata.maven"),
-                        artifactId("maven-cli-plugin"),
-                        version(pluginArtifactIdToVersionMap.get("maven-cli-plugin"))
-                ),
-                goal("execute"),
-                configuration(configs.toArray(new Element[configs.size()])),
-                executionEnvironment());
-    }
-
     public void createPlugin(final String productId, AmpsCreatePluginPrompter createPrompter) throws MojoExecutionException
     {
         CreatePluginProperties props = null;
@@ -1453,20 +1392,6 @@ public class MavenGoals
                         element(name("serverUrl"), baseUrl),
                         element(name("pluginKey"), pluginKey)
                 ),
-                executionEnvironment()
-        );
-    }
-
-    public void installIdeaPlugin() throws MojoExecutionException
-    {
-        executeMojo(
-                plugin(
-                        groupId("org.twdata.maven"),
-                        artifactId("maven-cli-plugin"),
-                        version(pluginArtifactIdToVersionMap.get("maven-cli-plugin"))
-                ),
-                goal("idea"),
-                configuration(),
                 executionEnvironment()
         );
     }
