@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-product-plugins</artifactId>
-        <version>6.1.3-SNAPSHOT</version>
+        <version>6.1.6-SNAPSHOT</version>
     </parent>
 
     <groupId>com.atlassian.maven.plugins</groupId>
@@ -23,7 +23,7 @@
 
     <profiles>
         <profile>
-            <id>shitty</id>
+            <id>invoker</id>
             <build>
                 <plugins>
                     <plugin>
@@ -35,26 +35,22 @@
                         <artifactId>maven-resources-plugin</artifactId>
                     </plugin>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>shitty-maven-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-invoker-plugin</artifactId>
+                        <configuration>
+                            <scriptVariables>
+                                <artifactId>${invoker.artifactId}</artifactId>
+                                <product>${invoker.product}</product>
+                            </scriptVariables>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
             <properties>
-                <shitty.product>bamboo</shitty.product>
+                <invoker.test>copyBundledDependenciesTest,createTest,debugTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateObrTest,integrationTestTest,jarWithExistingManifestTest,runTest,runParallelTest,stopTest,nexusStagingTest,unitTestTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest,quickreloadTest</invoker.test>
+                <invoker.product>bamboo</invoker.product>
                 <product.version>${bamboo.version}</product.version>
                 <product.data.version>${bamboo.data.version}</product.data.version>
-                <tests>
-                cli, copyBundledDependencies, create, debug,
-                filterPluginDescriptorWithoutPluginDescriptor,
-                filterPluginDescriptorWithPluginDescriptor, generateManifestWithInstructions,
-                generateManifestWithNoInstructions, generateObr, integrationTest,
-                <!-- Commented out until Bamboo doesn't hang when multiple instances are used-->
-                <!-- integrationTestWithTestGroup, -->
-                jarWithExistingManifest, run, runParallel, stop, nexus_staging,
-                unitTest, validateManifestSkipValidation, validateManifestWithInvalidManifest,
-                validateManifestWithValidManifest, quickreload
-                </tests>
             </properties>
         </profile>
     </profiles>

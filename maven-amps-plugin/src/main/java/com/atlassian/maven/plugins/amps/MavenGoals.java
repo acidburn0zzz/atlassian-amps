@@ -12,7 +12,6 @@ import com.atlassian.maven.plugins.amps.util.minifier.MinifierParameters;
 import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
 import com.google.common.annotations.VisibleForTesting;
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
-import com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -1852,19 +1851,24 @@ public class MavenGoals
                     configuration(
                             element(name("maxmemory"),"1024m"),
                             element(name("sourcepath"),packagesPath.toString()),
-                            element(name("doclet"), ResourceDocletJSON.class.getName()),
+                            element(name("doclet"), "com.sun.jersey.wadl.resourcedoc.ResourceDocletJSON"),
                             element(name("docletPath"), docletPath.toString()),
                             element(name("docletArtifacts"),
-                                element(name("docletArtifact"),
-                                        element(name("groupId"),"xerces"),
-                                        element(name("artifactId"),"xercesImpl"),
-                                        element(name("version"),"2.9.1")
-                                ),
-                                element(name("docletArtifact"),
-                                        element(name("groupId"),"commons-lang"),
-                                        element(name("artifactId"),"commons-lang"),
-                                        element(name("version"),"2.6")
-                                )
+                                    element(name("docletArtifact"),
+                                            element(name("groupId"), "com.atlassian.plugins.rest"),
+                                            element(name("artifactId"), "atlassian-rest-doclet"),
+                                            element(name("version"), "2.9.2")
+                                    ),
+                                    element(name("docletArtifact"),
+                                            element(name("groupId"), "xerces"),
+                                            element(name("artifactId"), "xercesImpl"),
+                                            element(name("version"), "2.9.1")
+                                    ),
+                                    element(name("docletArtifact"),
+                                            element(name("groupId"), "commons-lang"),
+                                            element(name("artifactId"), "commons-lang"),
+                                            element(name("version"), "2.6")
+                                    )
                             ),
                             element(name("additionalparam"), additionalParam),
                             element(name("useStandardDocletOptions"),"false")
