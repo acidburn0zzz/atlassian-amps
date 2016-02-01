@@ -8,6 +8,7 @@ import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
 import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
+import com.atlassian.maven.plugins.amps.util.minifier.MinifierParameters;
 import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
 import com.google.common.annotations.VisibleForTesting;
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
@@ -606,7 +607,14 @@ public class MavenGoals
 
     public void compressResources(boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Map<String,String> closureOptions) throws MojoExecutionException
     {
-        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), new File(ctx.getProject().getBuild().getOutputDirectory()), compressJs, compressCss, useClosureForJs, cs, log, closureOptions);
+        MinifierParameters closureParameters = new MinifierParameters(compressJs,
+                compressCss,
+                useClosureForJs,
+                cs,
+                log,
+                closureOptions
+        );
+        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), ctx.getProject().getBuild().getOutputDirectory(), closureParameters);
         /*
         executeMojo(
                 plugin(
