@@ -584,6 +584,11 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      */
     protected void setDefaultValues(Product product, ProductHandler handler)
     {
+        //Apply the common default values
+        product.setDataVersion(System.getProperty("product.data.version", product.getDataVersion()));
+        product.setVersion(System.getProperty("product.version", product.getVersion()));
+        product.setDataPath(System.getProperty("product.data.path", product.getDataPath()));
+
         product.setInstanceId(getProductInstanceId(product));
         product.setArtifactRetriever(new ArtifactRetriever(artifactResolver, artifactFactory, localRepository, repositories, repositoryMetadataManager));
 
