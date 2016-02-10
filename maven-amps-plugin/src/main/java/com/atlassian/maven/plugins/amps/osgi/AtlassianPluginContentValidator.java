@@ -38,7 +38,8 @@ public class AtlassianPluginContentValidator {
                 if (!document.getRootElement().elements(forbidden).isEmpty()) {
                     throw new MojoFailureException("\n\natlassian-plugin.xml contains a definition of " + forbidden
                             + ". This is not allowed when Atlassian-Plugin-Key is set.\n\n"
-                            + "Please check the documentation of https://bitbucket.org/atlassian/atlassian-spring-scanner for further details.\n\n");
+                            + "Please check the documentation of https://bitbucket.org/atlassian/atlassian-spring-scanner" +
+                            " or https://developer.atlassian.com/display/DOCS/Configuration+of+Instructions+in+Atlassian+Plugins for further details.\n\n");
                 }
             }
         }
