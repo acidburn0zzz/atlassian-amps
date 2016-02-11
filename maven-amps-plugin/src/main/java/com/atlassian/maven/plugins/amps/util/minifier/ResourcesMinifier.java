@@ -31,9 +31,8 @@ public class ResourcesMinifier
     {
     }
 
-    public static void minify(List<Resource> resources, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Log log, Map<String,String> closureOptions) throws MojoExecutionException
+    public static void minify(List<Resource> resources, String outputDir, MinifierParameters minifierParameters) throws MojoExecutionException
     {
-        GoogleClosureJSMinifier.setOptions(closureOptions, log);
         if(null == INSTANCE)
         {
             INSTANCE = new ResourcesMinifier();
@@ -41,11 +40,11 @@ public class ResourcesMinifier
 
         for(Resource resource : resources)
         {
-            INSTANCE.processResource(resource,outputDir,compressJs, compressCss, useClosureForJs, cs, log);
+            INSTANCE.processResource(resource, new File(outputDir), minifierParameters);
         }
     }
     
-    public void processResource(Resource resource, File outputDir, boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Log log) throws MojoExecutionException
+    public void processResource(Resource resource, File outputDir, MinifierParameters minifierParameters) throws MojoExecutionException
     {
         File destDir = outputDir;
         if(StringUtils.isNotBlank(resource.getTargetPath()))
@@ -60,21 +59,24 @@ public class ResourcesMinifier
             return;
         }
 
-        if(compressJs)
+        if(minifierParameters.isCompressJs())
         {
-            processJs(resourceDir,destDir,resource.getIncludes(),resource.getExcludes(),useClosureForJs,cs,log);
+            processJs(resourceDir,destDir,resource.getIncludes(),resource.getExcludes(), minifierParameters);
         }
         
-        if(compressCss)
+        if(minifierParameters.isCompressCss())
         {
-            processCss(resourceDir,destDir,resource.getIncludes(),resource.getExcludes(), cs, log);
+            processCss(resourceDir,destDir,resource.getIncludes(),resource.getExcludes(), minifierParameters);
         }
 
-        processXml(resourceDir, destDir, resource.getIncludes(), resource.getExcludes(), cs, log);
+        processXml(resourceDir, destDir, resource.getIncludes(), resource.getExcludes(), minifierParameters);
     }
 
-    public void processXml(final File resourceDir, final File destDir, List<String> includes, final List<String> excludes, Charset cs, final Log log) throws MojoExecutionException
+    public void processXml(final File resourceDir, final File destDir, List<String> includes, final List<String> excludes, MinifierParameters minifierParameters) throws MojoExecutionException
     {
+        Log log = minifierParameters.getLog();
+        Charset cs = minifierParameters.getCs();
+
         log.info("Compressing XML files");
 
         DirectoryScanner scanner = new DirectoryScanner();
@@ -132,8 +134,11 @@ public class ResourcesMinifier
         log.info(numberOfMinifiedFile +" XML file(s) were minified into target directory " + destDir.getAbsolutePath());
     }
 
-    public void processJs(File resourceDir, File destDir, List<String> includes, List<String> excludes, boolean useClosure, Charset cs, Log log) throws MojoExecutionException
+    public void processJs(File resourceDir, File destDir, List<String> includes, List<String> excludes, MinifierParameters minifierParameters) throws MojoExecutionException
     {
+        Log log = minifierParameters.getLog();
+        boolean useClosure = minifierParameters.isUseClosureForJs();
+        Charset cs = minifierParameters.getCs();
         if(useClosure)
         {
             log.info("Compiling javascript using Closure");
@@ -184,7 +189,7 @@ public class ResourcesMinifier
                 if(useClosure)
                 {
                     log.debug("generating source map to " + sourceMapFile.getAbsolutePath());
-                    closureJsCompile(sourceFile, destFile, sourceMapFile, cs, log);
+                    closureJsCompile(sourceFile, destFile, sourceMapFile, minifierParameters);
                 }
                 else
                 {
@@ -196,8 +201,10 @@ public class ResourcesMinifier
         log.info(numberOfMinifiedFile + " Javascript file(s) were minified into target directory " + destDir.getAbsolutePath());
     }
 
-    public void processCss(File resourceDir, File destDir, List<String> includes, List<String> excludes, Charset cs, Log log) throws MojoExecutionException
+    public void processCss(File resourceDir, File destDir, List<String> includes, List<String> excludes, MinifierParameters minifierParameters) throws MojoExecutionException
     {
+        Log log = minifierParameters.getLog();
+        Charset cs = minifierParameters.getCs();
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(resourceDir);
         if(null == includes || includes.isEmpty())
@@ -240,13 +247,16 @@ public class ResourcesMinifier
         log.info(numberOfMinifiedFile + " CSS file(s) were minified into target directory " + destDir.getAbsolutePath());
     }
 
-    private void closureJsCompile(File sourceFile, File destFile, File sourceMapFile, Charset cs, Log log) throws MojoExecutionException
+    private void closureJsCompile(File sourceFile, File destFile, File sourceMapFile, MinifierParameters minifierParameters) throws MojoExecutionException
     {
+        Log log = minifierParameters.getLog();
+        Charset cs = minifierParameters.getCs();
+        Map<String, String> closureOptions = minifierParameters.getClosureOptions();
         try
         {
             FileUtils.forceMkdir(destFile.getParentFile());
             String source = FileUtils.readFileToString(sourceFile, cs);
-            GoogleClosureJSMinifier.CompiledSourceWithSourceMap result = GoogleClosureJSMinifier.compile(source, sourceFile.getAbsolutePath(), log);
+            GoogleClosureJSMinifier.CompiledSourceWithSourceMap result = GoogleClosureJSMinifier.compile(source, sourceFile.getAbsolutePath(), closureOptions, log);
             FileUtils.writeStringToFile(destFile, result.getCompiled(), cs);
             FileUtils.writeStringToFile(sourceMapFile, result.getSourceMap(), cs);
         }

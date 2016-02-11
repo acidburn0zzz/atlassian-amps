@@ -2,24 +2,33 @@ package com.atlassian.maven.plugins.amps.product;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.model.Build;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.w3c.dom.Document;
 
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_FROM_4_1;
@@ -31,6 +40,9 @@ import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.PLUGIN
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -41,12 +53,14 @@ import static org.mockito.Mockito.when;
 public class TestJiraProductHandler
 {
     static File tempHome;
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private static File createTempDir(final String subPath)
     {
         return new File(System.getProperty("java.io.tmpdir"), subPath);
     }
-    
+
     @Before
     public void createTemporaryHomeDirectory() throws IOException
     {
@@ -55,15 +69,15 @@ public class TestJiraProductHandler
         {
             throw new IOException();
         }
-        
+
         if (!f.mkdir())
         {
             throw new IOException();
         }
-        
+
         tempHome = f;
     }
-    
+
     @After
     public void deleteTemporaryHomeDirectoryAndContents() throws Exception
     {
@@ -122,6 +136,61 @@ public class TestJiraProductHandler
     public void updateDBConfigXmlForMssqlJTDS() throws Exception
     {
         testUpdateDbConfigXml(JiraDatabaseType.MSSQL_JTDS);
+    }
+
+    @Test
+    public void shouldByDefaultForceJiraSynchronousStartup() throws IOException {
+        final MavenContext mockMavenContext = mock(MavenContext.class);
+        MavenProject projectMock = mock(MavenProject.class);
+        Build buildMock = mock(Build.class);
+        when(buildMock.getDirectory()).thenReturn(temporaryFolder.newFolder("jira").getAbsolutePath());
+        when(projectMock.getBuild()).thenReturn(buildMock);
+        when(mockMavenContext.getProject()).thenReturn(projectMock);
+        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
+        final Product product = new Product();
+        product.setInstanceId("jira");
+        product.setDataSources(Lists.<DataSource>newArrayList());
+
+        // when
+        product.setAwaitFullInitialization(null);
+        final Map<String, String> systemProperties = productHandler.getSystemProperties(product);
+
+        // then
+        Assert.assertThat(
+                systemProperties, hasEntry(
+                        "com.atlassian.jira.startup.LauncherContextListener.SYNCHRONOUS", "true"
+                ));
+    }
+
+    @Test
+    public void shouldPassAwaitInitializationFlagFromProduct() throws IOException {
+        final MavenContext mockMavenContext = mock(MavenContext.class);
+        MavenProject projectMock = mock(MavenProject.class);
+        Build buildMock = mock(Build.class);
+        when(buildMock.getDirectory()).thenReturn(temporaryFolder.newFolder("jira").getAbsolutePath());
+        when(projectMock.getBuild()).thenReturn(buildMock);
+        when(mockMavenContext.getProject()).thenReturn(projectMock);
+        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
+        final Product product = new Product();
+        product.setInstanceId("jira");
+        product.setDataSources(Lists.<DataSource>newArrayList());
+
+        // when
+        product.setAwaitFullInitialization(true);
+        final Map<String, String> systemPropertiesWithAwait = productHandler.getSystemProperties(product);
+
+        product.setAwaitFullInitialization(false);
+        final Map<String, String> systemPropertiesNoWait = productHandler.getSystemProperties(product);
+
+        // then
+        assertThat(
+                systemPropertiesWithAwait, hasEntry(
+                        "com.atlassian.jira.startup.LauncherContextListener.SYNCHRONOUS", "true"
+                ));
+        assertThat(
+                systemPropertiesNoWait, not(hasKey(
+                        "com.atlassian.jira.startup.LauncherContextListener.SYNCHRONOUS"
+                )));
     }
 
     private void testUpdateDbConfigXml(JiraDatabaseType dbType) throws Exception
@@ -203,7 +272,7 @@ public class TestJiraProductHandler
         File f = new File(tempHome, FILENAME_DBCONFIG);
         FileUtils.writeStringToFile(f, "Original contents");
         JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
-        
+
         String after = FileUtils.readFileToString(f);
         assertEquals("Original contents", after);
     }

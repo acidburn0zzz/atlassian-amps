@@ -252,6 +252,16 @@ public class Product
     private Boolean synchronousStartup;
 
     /**
+     * Waits until product is fully started - this is added for JIRA - JIRA new asynchronous start -
+     * JIRA is performing minimal initialization and then whole plugin system startup is performed in background.<br>
+     * This can interfere with integration tests - AMPS starts them after minimal initialization and some may crash as
+     * plugin system is not fully started (if they do not perform check if jira is fully started).<br>
+     * This flag prevents such situation and forces product to perform full initializaion before continuing to next
+     * step.
+     */
+    private Boolean awaitFullInitialization;
+
+    /**
      * An optional override of the webapp's groupId
      */
     private String groupId;
@@ -379,6 +389,7 @@ public class Product
         prod.setHttpsKeystorePass(httpsKeystorePass == null ? product.getHttpsKeystorePass() : httpsKeystorePass);
         prod.setHttpsKeyAlias(httpsKeyAlias == null ? product.getHttpsKeyAlias() : httpsKeyAlias);
         prod.setHttpsHttpSecure(httpsHttpSecure == null ? product.getHttpsHttpSecure() : httpsHttpSecure);
+        prod.setAwaitFullInitialization(awaitFullInitialization==null ? product.isAwaitFullInitialization() : awaitFullInitialization);
 
         return prod;
     }
@@ -1023,5 +1034,13 @@ public class Product
     public String getProtocol()
     {
         return useHttps != null && useHttps ? "https" : "http";
+    }
+
+    public Boolean isAwaitFullInitialization() {
+        return awaitFullInitialization;
+    }
+
+    public void setAwaitFullInitialization(Boolean awaitFullInitialization) {
+        this.awaitFullInitialization = awaitFullInitialization;
     }
 }

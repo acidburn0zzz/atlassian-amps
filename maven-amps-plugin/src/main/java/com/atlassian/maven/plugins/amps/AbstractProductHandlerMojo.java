@@ -417,6 +417,9 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     @Parameter(property = "parallel", defaultValue = "false")
     protected boolean parallel;
 
+    @Parameter(property = "await.full.initialization", defaultValue = "true")
+    protected boolean awaitFullInitialization;
+
 
     protected Product createDefaultProductContext() throws MojoExecutionException
     {
@@ -477,6 +480,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setPdeVersion(pdeVersion);
 
         ctx.setHttpPort(httpPort);
+        ctx.setAwaitFullInitialization(awaitFullInitialization);
         return ctx;
     }
 
