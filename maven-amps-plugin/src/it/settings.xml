@@ -56,8 +56,8 @@ under the License.
             <repositories>
                 <repository>
                     <id>atlassian-public</id>
-                    <url>http://172.18.1.52:8081/nexus/content/groups/public</url>
-                    <!--<url>https://maven.atlassian.com/repository/public</url>-->
+                    <!--<url>http://172.18.1.52:8081/nexus/content/groups/public</url>-->
+                    <url>https://maven.atlassian.com/repository/public</url>
                     <snapshots>
                         <enabled>true</enabled>
                         <updatePolicy>daily</updatePolicy>
@@ -84,8 +84,8 @@ under the License.
             <pluginRepositories>
                 <pluginRepository>
                     <id>atlassian-public</id>
-                    <url>http://172.18.1.52:8081/nexus/content/groups/public</url>
-                    <!--<url>https://maven.atlassian.com/repository/public</url>-->
+                    <!--<url>http://172.18.1.52:8081/nexus/content/groups/public</url>-->
+                    <url>https://maven.atlassian.com/repository/public</url>
                     <releases>
                         <enabled>true</enabled>
                         <checksumPolicy>warn</checksumPolicy>
