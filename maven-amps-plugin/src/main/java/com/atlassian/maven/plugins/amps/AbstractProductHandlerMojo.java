@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static com.atlassian.maven.plugins.amps.MavenGoals.warnDeprecated;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_DEV_TOOLBOX_VERSION;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PDE_VERSION;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PDK_VERSION;
@@ -566,6 +567,11 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      */
     protected void setDefaultValues(Product product, ProductHandler handler)
     {
+        //Apply the common default values
+        product.setDataVersion(System.getProperty("product.data.version", product.getDataVersion()));
+        product.setVersion(System.getProperty("product.version", product.getVersion()));
+        product.setDataPath(System.getProperty("product.data.path", product.getDataPath()));
+
         product.setInstanceId(getProductInstanceId(product));
         product.setArtifactRetriever(new ArtifactRetriever(artifactResolver, artifactFactory, localRepository, repositories, repositoryMetadataManager));
 
@@ -778,6 +784,10 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         {
             ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals, artifactFactory);
             setDefaultValues(ctx, handler);
+            if (ctx.isEnableFastdev())
+            {
+                warnDeprecated(getLog());
+            }
         }
 
         return productMap;
