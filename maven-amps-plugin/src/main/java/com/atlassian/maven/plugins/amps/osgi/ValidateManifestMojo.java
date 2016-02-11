@@ -1,5 +1,13 @@
 package com.atlassian.maven.plugins.amps.osgi;
 
+import aQute.bnd.osgi.Constants;
+import com.atlassian.maven.plugins.amps.AbstractAmpsMojo;
+import org.apache.commons.io.IOUtils;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -7,16 +15,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.Manifest;
-
-import com.atlassian.maven.plugins.amps.AbstractAmpsMojo;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-
-import aQute.bnd.osgi.Constants;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 
@@ -56,6 +54,12 @@ public class ValidateManifestMojo extends AbstractAmpsMojo
                     PackageImportVersionValidator validator = new PackageImportVersionValidator(getMavenContext().getProject(),
                             getMavenContext().getLog(), getPluginInformation().getId());
                     validator.validate(mf.getMainAttributes().getValue(Constants.IMPORT_PACKAGE));
+                }
+                if (instructions.containsKey("Atlassian-Plugin-Key"))
+                {
+                    AtlassianPluginContentValidator validator = new AtlassianPluginContentValidator();
+                    validator.validate(file(getMavenContext().getProject().getBuild().getOutputDirectory(),
+                            "atlassian-plugin.xml"));
                 }
             }
             catch (IOException e)
