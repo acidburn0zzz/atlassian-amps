@@ -18,9 +18,8 @@ public class GoogleClosureJSMinifierTest
     @Test
     public void minification()
     {
-        GoogleClosureJSMinifier.setOptions(new HashMap<String, String>(), log);
         GoogleClosureJSMinifier.CompiledSourceWithSourceMap compiled =
-            GoogleClosureJSMinifier.compile("var a = 1;" + "\nvar b = 2;", "/path-to-source", log);
+            GoogleClosureJSMinifier.compile("var a = 1;" + "\nvar b = 2;", "/path-to-source", new HashMap<>(), log);
         assertThat(compiled.getCompiled(), not(isEmptyString()));
         assertThat(compiled.getSourceMap(), not(isEmptyString()));
     }
