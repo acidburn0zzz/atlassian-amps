@@ -23,6 +23,7 @@ import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.io.FileUtils;
@@ -140,6 +141,10 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         properties.putAll(super.getSystemProperties(ctx));
         properties.put("jira.home", fixWindowsSlashes(getHomeDirectory(ctx).getPath()));
         properties.put("cargo.servlet.uriencoding", "UTF-8");
+        final boolean forceAwaitFullInit = Optional.fromNullable(ctx.isAwaitFullInitialization()).or(Boolean.TRUE);
+        if (forceAwaitFullInit) {
+            properties.put("com.atlassian.jira.startup.LauncherContextListener.SYNCHRONOUS", "true");
+        }
         return properties.build();
     }
 
