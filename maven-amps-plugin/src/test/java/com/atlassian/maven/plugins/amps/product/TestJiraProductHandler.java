@@ -139,8 +139,7 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void shouldByDefaultForceJiraSynchronousStartup()
-    {
+    public void shouldByDefaultForceJiraSynchronousStartup() throws IOException {
         final MavenContext mockMavenContext = mock(MavenContext.class);
         MavenProject projectMock = mock(MavenProject.class);
         Build buildMock = mock(Build.class);
@@ -164,8 +163,7 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void shouldPassAwaitInitializationFlagFromProduct()
-    {
+    public void shouldPassAwaitInitializationFlagFromProduct() throws IOException {
         final MavenContext mockMavenContext = mock(MavenContext.class);
         MavenProject projectMock = mock(MavenProject.class);
         Build buildMock = mock(Build.class);
