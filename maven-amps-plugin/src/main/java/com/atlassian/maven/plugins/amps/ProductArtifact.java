@@ -1,5 +1,7 @@
 package com.atlassian.maven.plugins.amps;
 
+import java.util.Objects;
+
 /**
  * Represents a plugin artifact to be retrieved
  */
@@ -68,5 +70,21 @@ public class ProductArtifact
     public String toString()
     {
         return new StringBuilder(groupId).append(":").append(artifactId).append(":").append(version).append(":").append(type).toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ProductArtifact)) return false;
+        ProductArtifact that = (ProductArtifact) o;
+        return Objects.equals(groupId, that.groupId) &&
+                Objects.equals(artifactId, that.artifactId) &&
+                Objects.equals(version, that.version) &&
+                Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(groupId, artifactId, version, type);
     }
 }

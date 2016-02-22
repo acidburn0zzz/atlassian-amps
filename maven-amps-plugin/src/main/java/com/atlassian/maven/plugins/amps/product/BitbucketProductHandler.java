@@ -5,6 +5,7 @@ import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.atlassian.maven.plugins.amps.util.Version;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -22,6 +23,8 @@ import java.util.Map;
  */
 public class BitbucketProductHandler extends AbstractWebappProductHandler
 {
+    private static final String FIRST_SEARCH_VERSION = "4.5.0";
+
     public BitbucketProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
     {
         super(context, goals, new BitbucketPluginProvider(),artifactFactory);
@@ -39,6 +42,15 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     public String getId()
     {
         return ProductHandlerFactory.BITBUCKET;
+    }
+
+    @Override
+    public List<ProductArtifact> getAdditionalPlugins(Product ctx) {
+        Version productVersion = Version.valueOf(ctx.getVersion());
+        if(productVersion.isGreaterOrEqualTo(Version.valueOf(FIRST_SEARCH_VERSION))) {
+            return Collections.singletonList(new ProductArtifact("com.atlassian.bitbucket.server", "bitbucket-distribution-search-bundle", ctx.getVersion()));
+        }
+        return Collections.emptyList();
     }
 
     @Override
