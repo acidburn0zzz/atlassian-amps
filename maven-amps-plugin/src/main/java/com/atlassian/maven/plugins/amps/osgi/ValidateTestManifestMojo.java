@@ -46,27 +46,13 @@ public class ValidateTestManifestMojo extends AbstractAmpsMojo
             if (!skipManifestValidation && mfile.exists())
             {
                 getLog().info("Manifest found, validating...");
-                InputStream mfin = null;
                 try
                 {
                     checkManifestEndsWithNewLine(mfile);
-    
-                    mfin = new FileInputStream(mfile);
-                    Manifest mf = new Manifest(mfin);
-                    if (testInstructions.containsKey(Constants.IMPORT_PACKAGE))
-                    {
-                        PackageImportVersionValidator validator = new PackageImportVersionValidator(getMavenContext().getProject(),
-                                getMavenContext().getLog(), getPluginInformation().getId());
-                        validator.validate(mf.getMainAttributes().getValue(Constants.IMPORT_PACKAGE));
-                    }
                 }
                 catch (IOException e)
                 {
                     throw new MojoExecutionException("Unable to read manifest", e);
-                }
-                finally
-                {
-                    IOUtils.closeQuietly(mfin);
                 }
                 getLog().info("Manifest validated");
             }
