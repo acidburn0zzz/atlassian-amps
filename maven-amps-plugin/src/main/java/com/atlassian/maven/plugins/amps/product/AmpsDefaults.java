@@ -15,7 +15,7 @@ public class AmpsDefaults
     public static final String DEFAULT_REST_API_BROWSER_VERSION = "3.1.3";
     public static final String DEFAULT_PDE_VERSION = "1.2";
     public static final String DEFAULT_QUICK_RELOAD_VERSION = "1.24.1";
-    public static final String DEFAULT_PLUGIN_VIEWER_VERSION = "1.0.3";
+    public static final String DEFAULT_PLUGIN_VIEWER_VERSION = "1.0.4";
 
 
     /**
