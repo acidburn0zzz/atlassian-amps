@@ -37,6 +37,7 @@ import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_DEV_
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_FASTDEV_VERSION;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PDE_VERSION;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PDK_VERSION;
+import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PLUGIN_VIEWER_VERSION;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PRODUCT_SHUTDOWN_TIMEOUT;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PRODUCT_STARTUP_TIMEOUT;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_QUICK_RELOAD_VERSION;
@@ -262,6 +263,18 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      */
     @Parameter(property = "quickreload.version", defaultValue = DEFAULT_QUICK_RELOAD_VERSION)
     protected String quickReloadVersion;
+
+    /**
+     * If PluginViewer should be used.
+     */
+    @Parameter(property = "viewer.enable", defaultValue = "false")
+    protected boolean enablePluginViewer;
+
+    /**
+     * PluginViewer version should be used.
+     */
+    @Parameter(property = "viewer.version", defaultValue = DEFAULT_PLUGIN_VIEWER_VERSION)
+    protected String pluginViewerVersion;
 
     /**
      * If PDE should be enabled
@@ -491,6 +504,9 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setEnableQuickReload(enableQuickReload);
         ctx.setQuickReloadVersion(quickReloadVersion);
 
+        ctx.setEnablePluginViewer(enablePluginViewer);
+        ctx.setPluginViewerVersion(pluginViewerVersion);
+
         ctx.setEnableDevToolbox(enableDevToolbox);
         ctx.setDevToolboxVersion(devToolboxVersion);
 
@@ -651,6 +667,16 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         if (product.getQuickReloadVersion() == null)
         {
             product.setQuickReloadVersion(DEFAULT_QUICK_RELOAD_VERSION);
+        }
+
+        if (product.isEnablePluginViewer() == null)
+        {
+            product.setEnablePluginViewer(false);
+        }
+
+        if (product.getPluginViewerVersion() == null)
+        {
+            product.setPluginViewerVersion(DEFAULT_PLUGIN_VIEWER_VERSION);
         }
 
         if (product.getPdeVersion() == null)
