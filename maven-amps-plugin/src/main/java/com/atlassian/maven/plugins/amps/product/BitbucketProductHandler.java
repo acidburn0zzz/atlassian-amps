@@ -8,6 +8,7 @@ import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.atlassian.maven.plugins.amps.util.Version;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -24,6 +25,7 @@ import java.util.Map;
 public class BitbucketProductHandler extends AbstractWebappProductHandler
 {
     private static final String FIRST_SEARCH_VERSION = "4.5.0";
+    private static final String groupId = "com.atlassian.bitbucket.server";
 
     public BitbucketProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
     {
@@ -46,9 +48,27 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
 
     @Override
     public List<ProductArtifact> getAdditionalPlugins(Product ctx) {
-        Version productVersion = Version.valueOf(ctx.getVersion());
-        if(productVersion.isGreaterOrEqualTo(Version.valueOf(FIRST_SEARCH_VERSION))) {
-            return Collections.singletonList(new ProductArtifact("com.atlassian.bitbucket.server", "bitbucket-distribution-search-bundle", ctx.getVersion()));
+        if (Version.valueOf(ctx.getVersion()).isGreaterOrEqualTo(Version.valueOf(FIRST_SEARCH_VERSION))) {
+            try {
+                ProductArtifact searchDistributionPlugin = new ProductArtifact("com.atlassian.bitbucket.search", "embedded-elasticsearch-plugin");
+                // The version of search distribution should be the same as the search plugin. So find the plugin dependency to get the version
+                Artifact bitbucketArtifact = artifactFactory.createParentArtifact(groupId, "bitbucket-parent", ctx.getVersion());
+                ctx.getArtifactRetriever().getMavenProjectLoader(context)
+                        .loadMavenProject(bitbucketArtifact, true, true)
+                        .getDependencyManagement()
+                        .getDependencies()
+                        .stream()
+                        .filter(dep -> dep.getGroupId().equals("com.atlassian.bitbucket.search"))
+                        .filter(dep -> dep.getArtifactId().equals("search-plugin"))
+                        .findFirst().ifPresent(dep -> searchDistributionPlugin.setVersion(dep.getVersion()));
+                if (searchDistributionPlugin.getVersion() != null) {
+                    return Collections.singletonList(searchDistributionPlugin);
+                } else {
+                    log.warn("Could not find a dependency on embedded-elasticsearch-plugin");
+                }
+            } catch (MojoExecutionException e) {
+                Collections.emptyList();
+            }
         }
         return Collections.emptyList();
     }
@@ -56,7 +76,7 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     @Override
     public ProductArtifact getArtifact()
     {
-        return new ProductArtifact("com.atlassian.bitbucket.server", "bitbucket-webapp");
+        return new ProductArtifact(groupId, "bitbucket-webapp");
     }
 
     @Override
@@ -139,7 +159,7 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     @Override
     public ProductArtifact getTestResourcesArtifact()
     {
-        return new ProductArtifact("com.atlassian.bitbucket.server", "bitbucket-it-resources");
+        return new ProductArtifact(groupId, "bitbucket-it-resources");
     }
 
     @Override

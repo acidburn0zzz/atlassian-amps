@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps.util;
 
+import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 
 import org.apache.commons.lang.StringUtils;
@@ -11,7 +12,11 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.settings.building.SettingsBuildingException;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.List;
 
@@ -50,7 +55,20 @@ public class ArtifactRetriever
         }
         return artifact.getFile().getPath();
     }
-    
+
+    public MavenProjectLoader getMavenProjectLoader(MavenContext context) throws MojoExecutionException {
+        PlexusContainer container = context.getExecutionEnvironment().getMavenSession().getContainer();
+        try {
+            return new MavenProjectLoader(localRepository, remoteRepositories, container);
+        } catch (ComponentLookupException e) {
+            throw new MojoExecutionException("Error while performing a lookup on the PlexusContainer", e);
+        } catch (SettingsBuildingException e) {
+            throw new MojoExecutionException("Error while building the Maven settings", e);
+        } catch (MavenExecutionRequestPopulationException e) {
+            throw new MojoExecutionException("Error while populating the MavenExecutionRequest", e);
+        }
+    }
+
     public String getLatestStableVersion(Artifact artifact) throws MojoExecutionException
     {
         RepositoryMetadata metadata;
