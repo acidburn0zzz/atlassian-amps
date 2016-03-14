@@ -1,7 +1,5 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.util.Objects;
-
 /**
  * Represents a plugin artifact to be retrieved
  */
@@ -77,14 +75,20 @@ public class ProductArtifact
         if (this == o) return true;
         if (!(o instanceof ProductArtifact)) return false;
         ProductArtifact that = (ProductArtifact) o;
-        return Objects.equals(groupId, that.groupId) &&
-                Objects.equals(artifactId, that.artifactId) &&
-                Objects.equals(version, that.version) &&
-                Objects.equals(type, that.type);
+
+        if (groupId != null ? !groupId.equals(that.groupId) : that.groupId != null) return false;
+        if (artifactId != null ? !artifactId.equals(that.artifactId) : that.artifactId != null) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+        return type != null ? type.equals(that.type) : that.type == null;
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupId, artifactId, version, type);
+        int result = groupId != null ? groupId.hashCode() : 0;
+        result = 31 * result + (artifactId != null ? artifactId.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        return result;
     }
 }
