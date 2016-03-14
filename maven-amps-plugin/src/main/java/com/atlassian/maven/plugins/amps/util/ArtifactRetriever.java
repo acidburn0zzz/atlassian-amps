@@ -57,9 +57,8 @@ public class ArtifactRetriever
     }
 
     public MavenProjectLoader getMavenProjectLoader(MavenContext context) throws MojoExecutionException {
-        PlexusContainer container = context.getExecutionEnvironment().getMavenSession().getContainer();
         try {
-            return new MavenProjectLoader(localRepository, remoteRepositories, container);
+            return new MavenProjectLoader(localRepository, remoteRepositories, context.getExecutionEnvironment().getMavenSession());
         } catch (ComponentLookupException e) {
             throw new MojoExecutionException("Error while performing a lookup on the PlexusContainer", e);
         } catch (SettingsBuildingException e) {
