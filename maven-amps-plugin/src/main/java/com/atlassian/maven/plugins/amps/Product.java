@@ -107,7 +107,7 @@ public class Product
     protected String jvmArgs = "";
 
     /**
-     * Extra set of JVM arguments to be appended to the above jvmArgs when passed to cargo
+     * Extra set of JVM arguments to be appended to the existing jvmArgs
      */
     private String extraJvmArgs = "";
 

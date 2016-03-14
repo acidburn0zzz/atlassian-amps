@@ -169,7 +169,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected String jvmArgs;
 
     /**
-     * JVM arguments to pass to cargo
+     * Extra JVM arguments to pass to cargo, to be appended to the existing jvmArgs
      */
     @Parameter(property = "extrajvmargs")
     protected String extraJvmArgs;
