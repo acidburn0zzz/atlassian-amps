@@ -204,7 +204,7 @@ public class CtkServerProductHandler implements ProductHandler
     {
         final Map<String,String> systemProperties = getSystemProperties(product);
         final Java java = javaTaskFactory.newJavaTask(output(product.getOutput()).systemProperties(systemProperties).
-                jvmArgs(product.getJvmArgs() + product.getDebugArgs()));
+                jvmArgs(product.getJvmArgs() + " " + product.getExtraJvmArgs() + " " + product.getDebugArgs()));
         java.setDir(getBaseDirectory(product));
         java.setJar(findServerJar(product));
         java.createArg().setValue("--host");

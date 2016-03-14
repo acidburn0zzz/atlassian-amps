@@ -274,7 +274,7 @@ public class FeCruProductHandler extends AbstractProductHandler
         Java java = javaTaskFactory.newJavaTask(
                 output(ctx.getOutput()).
                 systemProperties(properties).
-                jvmArgs(ctx.getJvmArgs() + (useDebugArgs ? ctx.getDebugArgs() : "")));
+                jvmArgs(ctx.getJvmArgs() + " " + ctx.getExtraJvmArgs() + " " + (useDebugArgs ? ctx.getDebugArgs() : "")));
 
         addOverridesToJavaTask(ctx, java);
 

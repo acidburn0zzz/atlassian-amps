@@ -72,6 +72,8 @@ public class DebugMojo extends RunMojo
                 product.setJvmArgs(StringUtils.defaultString(jvmArgs));
             }
 
+            product.setExtraJvmArgs(StringUtils.defaultString(extraJvmArgs));
+
             product.setDebugArgs(debugArgs);
 
             if (writePropertiesToFile)

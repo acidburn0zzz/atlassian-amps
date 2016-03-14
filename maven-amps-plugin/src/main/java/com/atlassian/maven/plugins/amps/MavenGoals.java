@@ -1032,7 +1032,7 @@ public class MavenGoals
 
         props.add(element(name(AJP_PORT_PROPERTY), String.valueOf(actualAjpPort)));
         props.add(element(name("cargo.rmi.port"), String.valueOf(rmiPort)));
-        props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs() + webappContext.getDebugArgs()));
+        props.add(element(name("cargo.jvmargs"), webappContext.getJvmArgs() + " " + webappContext.getExtraJvmArgs() + " " +  webappContext.getDebugArgs()));
         return props;
     }
 

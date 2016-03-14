@@ -107,6 +107,11 @@ public class Product
     protected String jvmArgs = "";
 
     /**
+     * Extra set of JVM arguments to be appended to the above jvmArgs when passed to cargo
+     */
+    private String extraJvmArgs = "";
+
+    /**
      * Debug arguments to pass to cargo as JVM arguments
      */
     protected String debugArgs = "";
@@ -361,6 +366,7 @@ public class Product
         prod.setDataHome(dataHome == null ? product.getDataHome() : dataHome);
         prod.setLog4jProperties(log4jProperties == null ? product.getLog4jProperties() : log4jProperties);
         prod.setJvmArgs(StringUtils.stripToNull(jvmArgs) == null ? product.getJvmArgs() : jvmArgs);
+        prod.setExtraJvmArgs(StringUtils.stripToNull(extraJvmArgs) == null ? product.getExtraJvmArgs() : extraJvmArgs);
         prod.setDebugArgs(StringUtils.stripToNull(debugArgs) == null ? product.getDebugArgs() : debugArgs);
         prod.setDataSources(dataSources == null ? product.getDataSources() : dataSources);
         prod.setGroupId(groupId == null ? product.getGroupId() : groupId);
@@ -1042,5 +1048,15 @@ public class Product
 
     public void setAwaitFullInitialization(Boolean awaitFullInitialization) {
         this.awaitFullInitialization = awaitFullInitialization;
+    }
+
+    public void setExtraJvmArgs(String extraJvmArgs)
+    {
+        this.extraJvmArgs = extraJvmArgs == null ? "" : extraJvmArgs;
+    }
+
+    public String getExtraJvmArgs()
+    {
+        return extraJvmArgs;
     }
 }

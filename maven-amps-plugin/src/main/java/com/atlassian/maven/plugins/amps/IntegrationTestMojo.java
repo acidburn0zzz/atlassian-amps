@@ -213,7 +213,9 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                     {
                         product.setJvmArgs(StringUtils.defaultString(jvmArgs));
                     }
-    
+
+                    product.setExtraJvmArgs(StringUtils.defaultString(extraJvmArgs));
+
                     product.setDebugArgs(debugArgs);
                 }
                 

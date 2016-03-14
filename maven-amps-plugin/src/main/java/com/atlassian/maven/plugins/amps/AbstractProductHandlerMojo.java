@@ -169,6 +169,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected String jvmArgs;
 
     /**
+     * JVM arguments to pass to cargo
+     */
+    @Parameter(property = "extrajvmargs")
+    protected String extraJvmArgs;
+
+    /**
      * Product startup timeout in milliseconds
      */
     @Parameter(property = "product.start.timeout")
@@ -429,6 +435,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setServer(server);
         ctx.setContextPath(contextPath);
         ctx.setJvmArgs(jvmArgs);
+        ctx.setExtraJvmArgs(extraJvmArgs);
         ctx.setStartupTimeout(startupTimeout);
         ctx.setShutdownTimeout(shutdownTimeout);
 
