@@ -1,11 +1,6 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -21,6 +16,11 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
 
 import static java.util.Collections.singletonList;
 
@@ -89,7 +89,13 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo
 
         MavenSession oldSession = oldContext.getSession();
 
-        File base = new File("amps-standalone").getAbsoluteFile();
+        // Different dir per version.
+        // (If we use the same directory, we get support pain when the old version from an existing directory gets restarted
+        //  instead of the version they specified on the commandline.)
+        final Properties systemProperties = oldSession.getSystemProperties();
+        final String product = getPropertyOrBlank(systemProperties, "product");
+        final String productVersion = getPropertyOrBlank(systemProperties, "product.version");
+        File base = new File("amps-standalone-" + product + "-" + productVersion).getAbsoluteFile();
 
         ProjectBuildingRequest pbr = oldSession.getProjectBuildingRequest();
 
@@ -115,5 +121,10 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo
             newSession);
 
         return new MavenGoals(newContext);
+    }
+
+    private String getPropertyOrBlank(Properties systemProperties, String property) {
+        String value = systemProperties.getProperty(property);
+        return value == null ? "" : value;
     }
 }
