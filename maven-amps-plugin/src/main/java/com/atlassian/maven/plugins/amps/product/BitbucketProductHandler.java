@@ -27,7 +27,7 @@ import java.util.Optional;
 public class BitbucketProductHandler extends AbstractWebappProductHandler
 {
     private static final String FIRST_SEARCH_VERSION = "4.5.0";
-    private static final String groupId = "com.atlassian.bitbucket.server";
+    private static final String GROUP_ID = "com.atlassian.bitbucket.server";
     private final MavenProjectLoader projectLoader;
 
     public BitbucketProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory,
@@ -61,7 +61,7 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
         {
             // The version of search distribution should be the same as the search plugin.
             projectLoader.loadMavenProject(context.getExecutionEnvironment().getMavenSession(),
-                        artifactFactory.createParentArtifact(groupId, "bitbucket-parent", ctx.getVersion()), true)
+                        artifactFactory.createParentArtifact(GROUP_ID, "bitbucket-parent", ctx.getVersion()), true)
                     .flatMap(mp -> Optional.ofNullable(mp.getDependencyManagement())
                             .flatMap(dm -> dm.getDependencies()
                                     .stream()
@@ -69,9 +69,8 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
                                     .filter(dep -> dep.getArtifactId().equals("search-plugin"))
                                     .findFirst()
                                     .flatMap(dependency -> Optional.ofNullable(dependency.getVersion()))))
-                    .ifPresent(version ->
-                            additionalPlugins.add(new ProductArtifact("com.atlassian.bitbucket.search",
-                                    "embedded-elasticsearch-plugin", version)));
+                    .ifPresent(version -> additionalPlugins.add(new ProductArtifact("com.atlassian.bitbucket.search",
+                            "embedded-elasticsearch-plugin", version)));
         }
         return additionalPlugins;
     }
@@ -79,7 +78,7 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     @Override
     public ProductArtifact getArtifact()
     {
-        return new ProductArtifact(groupId, "bitbucket-webapp");
+        return new ProductArtifact(GROUP_ID, "bitbucket-webapp");
     }
 
     @Override
@@ -162,7 +161,7 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     @Override
     public ProductArtifact getTestResourcesArtifact()
     {
-        return new ProductArtifact(groupId, "bitbucket-it-resources");
+        return new ProductArtifact(GROUP_ID, "bitbucket-it-resources");
     }
 
     @Override

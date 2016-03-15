@@ -14,6 +14,14 @@ import java.util.Optional;
 
 public class MavenProjectLoader
 {
+    /**
+     * Resolve a given artifact with its dependencies
+     * @param session
+     * @param pomArtifact
+     * @param dependencies
+     * @return  Optional.of(MavenProject) if the maven project for the given artifact and session can be resolved.
+     *          Optional.empty() otherwise
+     */
     public Optional<MavenProject> loadMavenProject(MavenSession session, Artifact pomArtifact, boolean dependencies)
     {
         MavenExecutionRequest executionRequest = session.getRequest();
