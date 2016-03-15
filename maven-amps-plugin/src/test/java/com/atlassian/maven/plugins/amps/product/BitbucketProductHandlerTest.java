@@ -4,7 +4,6 @@ import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
 import com.atlassian.maven.plugins.amps.util.MavenProjectLoader;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -54,17 +53,15 @@ public class BitbucketProductHandlerTest {
     public void setUp() throws Exception {
         this.bitbucketProductHandler = new BitbucketProductHandler(mavenContext, mavenGoals, artifactFactory);
 
-        ArtifactRetriever artifactRetriever = mock(ArtifactRetriever.class);
-        MavenProjectLoader mavenProjectLoader = mock(MavenProjectLoader.class);
         MavenProject mavenProject = mock(MavenProject.class);
         DependencyManagement dependencyManagement = mock(DependencyManagement.class);
         Dependency searchDependency = mock(Dependency.class);
 
-        when(ctx.getArtifactRetriever()).thenReturn(artifactRetriever);
-        when(artifactRetriever.getMavenProjectLoader(mavenContext)).thenReturn(mavenProjectLoader);
-        when(mavenProjectLoader.loadMavenProject(any(Artifact.class), anyBoolean())).thenReturn(Optional.of(mavenProject));
+        when(mock(MavenProjectLoader.class).loadMavenProject(any(Artifact.class), anyBoolean()))
+                .thenReturn(Optional.of(mavenProject));
         when(mavenProject.getDependencyManagement()).thenReturn(dependencyManagement);
         when(dependencyManagement.getDependencies()).thenReturn(Collections.singletonList(searchDependency));
+
         when(searchDependency.getGroupId()).thenReturn(SEARCH_GROUP_ID);
         when(searchDependency.getArtifactId()).thenReturn(SEARCH_ARTIFACT_ID);
         when(searchDependency.getVersion()).thenReturn(SEARCH_VERSION);

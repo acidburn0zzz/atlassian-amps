@@ -13,28 +13,40 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 import java.util.Optional;
 
-public class MavenProjectLoader {
+public class MavenProjectLoader
+{
 
     private final MavenExecutionRequest executionRequest;
     private final ProjectBuilder projectBuilder;
 
-    public MavenProjectLoader(MavenSession session) throws ComponentLookupException {
+    public MavenProjectLoader(MavenSession session) throws MojoExecutionException
+    {
         executionRequest = session.getRequest();
-        projectBuilder = session.getContainer().lookup(ProjectBuilder.class);
+        try
+        {
+            projectBuilder = session.getContainer().lookup(ProjectBuilder.class);
+        } catch (ComponentLookupException e)
+        {
+            throw new MojoExecutionException("Error while performing a lookup on the PlexusContainer", e);
+        }
     }
 
-    public Optional<MavenProject> loadMavenProject(Artifact pomArtifact, boolean dependencies) throws MojoExecutionException {
+    public Optional<MavenProject> loadMavenProject(Artifact pomArtifact, boolean dependencies) throws MojoExecutionException
+    {
         ProjectBuildingRequest projectBuildingRequest = executionRequest.getProjectBuildingRequest()
                 // The validation level is currently "VALIDATION_LEVEL_MAVEN_3_0". Setting it to minimal might speed things up a bit
                 .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
                 // ResolveDependencies is currently "false". If the calling function needs dependencies, we need to tell maven about it
                 .setResolveDependencies(dependencies);
-        try {
+        try
+        {
             MavenProject mp = projectBuilder.build(pomArtifact, projectBuildingRequest).getProject();
-            if (mp != null) {
+            if (mp != null)
+            {
                 return Optional.of(mp);
             }
-        } catch (ProjectBuildingException e) {
+        } catch (ProjectBuildingException e)
+        {
             throw new MojoExecutionException(String.format("Couldn't build project for %s:%s:%s", pomArtifact.getGroupId(), pomArtifact.getArtifactId(), pomArtifact.getVersion()));
         }
         return Optional.empty();
