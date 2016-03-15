@@ -6,6 +6,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.*;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -23,7 +24,7 @@ public class MavenProjectLoader {
         projectBuilder = plexus.lookup(ProjectBuilder.class);
     }
 
-    public MavenProject loadMavenProject(Artifact pomArtifact, boolean dependencies, boolean plugins) {
+    public MavenProject loadMavenProject(Artifact pomArtifact, boolean dependencies, boolean plugins) throws MojoExecutionException {
         ProjectBuildingRequest projectBuildingRequest = executionRequest.getProjectBuildingRequest();
         projectBuildingRequest.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
         projectBuildingRequest.setResolveDependencies(dependencies);
@@ -37,8 +38,8 @@ public class MavenProjectLoader {
             if (mp != null) {
                 return mp;
             }
-        } catch (ProjectBuildingException ex) {
-            System.out.println("ERROR");
+        } catch (ProjectBuildingException e) {
+            throw new MojoExecutionException(String.format("Couldn't build project for %s:%s:%s", pomArtifact.getGroupId(), pomArtifact.getArtifactId(), pomArtifact.getVersion()));
         }
         return null;
     }
