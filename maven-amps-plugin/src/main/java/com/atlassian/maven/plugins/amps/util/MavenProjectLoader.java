@@ -4,7 +4,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -15,40 +14,22 @@ import java.util.Optional;
 
 public class MavenProjectLoader
 {
-
-    private final MavenExecutionRequest executionRequest;
-    private final ProjectBuilder projectBuilder;
-
-    public MavenProjectLoader(MavenSession session) throws MojoExecutionException
+    public Optional<MavenProject> loadMavenProject(MavenSession session, Artifact pomArtifact, boolean dependencies)
     {
-        executionRequest = session.getRequest();
+        MavenExecutionRequest executionRequest = session.getRequest();
         try
         {
-            projectBuilder = session.getContainer().lookup(ProjectBuilder.class);
-        } catch (ComponentLookupException e)
-        {
-            throw new MojoExecutionException("Error while performing a lookup on the PlexusContainer", e);
-        }
-    }
-
-    public Optional<MavenProject> loadMavenProject(Artifact pomArtifact, boolean dependencies) throws MojoExecutionException
-    {
-        ProjectBuildingRequest projectBuildingRequest = executionRequest.getProjectBuildingRequest()
-                // The validation level is currently "VALIDATION_LEVEL_MAVEN_3_0". Setting it to minimal might speed things up a bit
-                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
-                // ResolveDependencies is currently "false". If the calling function needs dependencies, we need to tell maven about it
-                .setResolveDependencies(dependencies);
-        try
-        {
+            ProjectBuilder projectBuilder = session.getContainer().lookup(ProjectBuilder.class);
+            ProjectBuildingRequest projectBuildingRequest = executionRequest.getProjectBuildingRequest()
+                    // The validation level is currently "VALIDATION_LEVEL_MAVEN_3_0". Setting it to minimal might speed things up a bit
+                    .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
+                    // ResolveDependencies is currently "false". If the calling function needs dependencies, we need to tell maven about it
+                    .setResolveDependencies(dependencies);
             MavenProject mp = projectBuilder.build(pomArtifact, projectBuildingRequest).getProject();
-            if (mp != null)
-            {
-                return Optional.of(mp);
-            }
-        } catch (ProjectBuildingException e)
+            return Optional.ofNullable(mp);
+        } catch (ComponentLookupException | ProjectBuildingException e)
         {
-            throw new MojoExecutionException(String.format("Couldn't build project for %s:%s:%s", pomArtifact.getGroupId(), pomArtifact.getArtifactId(), pomArtifact.getVersion()));
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 }

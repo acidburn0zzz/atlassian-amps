@@ -2,6 +2,7 @@ package com.atlassian.maven.plugins.amps.product;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.util.MavenProjectLoader;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,7 +49,7 @@ public class ProductHandlerFactory
         }
         else if (BITBUCKET.equals(id))
         {
-            return new BitbucketProductHandler(context, goals, artifactFactory);
+            return new BitbucketProductHandler(context, goals, artifactFactory, new MavenProjectLoader());
         }
         else if (FECRU.equals(id))
         {
