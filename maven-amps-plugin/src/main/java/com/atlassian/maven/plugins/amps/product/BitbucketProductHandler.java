@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
@@ -57,13 +58,18 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
                 Artifact bitbucketArtifact = artifactFactory.createParentArtifact(groupId, "bitbucket-parent", ctx.getVersion());
                 ctx.getArtifactRetriever().getMavenProjectLoader(context)
                         .loadMavenProject(bitbucketArtifact, true)
-                        .ifPresent(mp -> mp.getDependencyManagement()
-                                .getDependencies()
-                                .stream()
-                                .filter(dep -> dep.getGroupId().equals("com.atlassian.bitbucket.search"))
-                                .filter(dep -> dep.getArtifactId().equals("search-plugin"))
-                                .findFirst()
-                                .ifPresent(dep -> searchDistributionPlugin.setVersion(dep.getVersion())));
+                        .ifPresent(mp -> {
+                            DependencyManagement dm = mp.getDependencyManagement();
+                            if (dm != null)
+                            {
+                                dm.getDependencies()
+                                        .stream()
+                                        .filter(dep -> dep.getGroupId().equals("com.atlassian.bitbucket.search"))
+                                        .filter(dep -> dep.getArtifactId().equals("search-plugin"))
+                                        .findFirst()
+                                        .ifPresent(dep -> searchDistributionPlugin.setVersion(dep.getVersion()));
+                            }
+                        });
                 // If the above code could not resolve the search-plugin or its version, then the version will remain null
                 if (searchDistributionPlugin.getVersion() != null) {
                     additionalPlugins.add(searchDistributionPlugin);
