@@ -93,8 +93,14 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo
         // (If we use the same directory, we get support pain when the old version from an existing directory gets restarted
         //  instead of the version they specified on the commandline.)
         final Properties systemProperties = oldSession.getSystemProperties();
-        final String product = getPropertyOrBlank(systemProperties, "product");
-        final String productVersion = getPropertyOrBlank(systemProperties, "product.version");
+
+        // Defaults to refapp if not set
+        final String product = getPropertyOrDefault(systemProperties, "product", "refapp");
+
+        // Only the inner execution in com.atlassian.amps:standalone has the actual latest version that will be used if
+        // they didn't specify a version number. Too hard to restructure; 'LATEST' is better than nothing.
+        final String productVersion = getPropertyOrDefault(systemProperties, "product.version", "LATEST");
+
         File base = new File("amps-standalone-" + product + "-" + productVersion).getAbsoluteFile();
 
         ProjectBuildingRequest pbr = oldSession.getProjectBuildingRequest();
@@ -123,8 +129,8 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo
         return new MavenGoals(newContext);
     }
 
-    private String getPropertyOrBlank(Properties systemProperties, String property) {
+    private String getPropertyOrDefault(Properties systemProperties, String property, String defaultValue) {
         String value = systemProperties.getProperty(property);
-        return value == null ? "" : value;
+        return value == null ? defaultValue : value;
     }
 }
