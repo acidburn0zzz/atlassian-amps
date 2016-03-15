@@ -14,6 +14,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -48,29 +49,32 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
 
     @Override
     public List<ProductArtifact> getAdditionalPlugins(Product ctx) {
+        ArrayList<ProductArtifact> additionalPlugins = new ArrayList<>();
         if (Version.valueOf(ctx.getVersion()).isGreaterOrEqualTo(Version.valueOf(FIRST_SEARCH_VERSION))) {
             try {
                 ProductArtifact searchDistributionPlugin = new ProductArtifact("com.atlassian.bitbucket.search", "embedded-elasticsearch-plugin");
                 // The version of search distribution should be the same as the search plugin. So find the plugin dependency to get the version
                 Artifact bitbucketArtifact = artifactFactory.createParentArtifact(groupId, "bitbucket-parent", ctx.getVersion());
                 ctx.getArtifactRetriever().getMavenProjectLoader(context)
-                        .loadMavenProject(bitbucketArtifact, true, true)
-                        .getDependencyManagement()
-                        .getDependencies()
-                        .stream()
-                        .filter(dep -> dep.getGroupId().equals("com.atlassian.bitbucket.search"))
-                        .filter(dep -> dep.getArtifactId().equals("search-plugin"))
-                        .findFirst().ifPresent(dep -> searchDistributionPlugin.setVersion(dep.getVersion()));
+                        .loadMavenProject(bitbucketArtifact, true)
+                        .ifPresent(mp -> mp.getDependencyManagement()
+                                .getDependencies()
+                                .stream()
+                                .filter(dep -> dep.getGroupId().equals("com.atlassian.bitbucket.search"))
+                                .filter(dep -> dep.getArtifactId().equals("search-plugin"))
+                                .findFirst()
+                                .ifPresent(dep -> searchDistributionPlugin.setVersion(dep.getVersion())));
+                // If the above code could not resolve the search-plugin or its version, then the version will remain null
                 if (searchDistributionPlugin.getVersion() != null) {
-                    return Collections.singletonList(searchDistributionPlugin);
+                    additionalPlugins.add(searchDistributionPlugin);
                 } else {
-                    log.warn("Could not find a dependency on embedded-elasticsearch-plugin");
+                    log.warn("Could not find a dependency on com.atlassian.bitbucket.search. The embedded-elasticsearch-plugin will not be loaded.");
                 }
             } catch (MojoExecutionException e) {
-                Collections.emptyList();
+                log.warn("There was an error when searching for the dependency on com.atlassian.bitbucket.search. The embedded-elasticsearch-plugin will not be loaded.", e);
             }
         }
-        return Collections.emptyList();
+        return additionalPlugins;
     }
 
     @Override

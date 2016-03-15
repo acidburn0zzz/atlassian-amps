@@ -19,6 +19,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -61,7 +62,7 @@ public class BitbucketProductHandlerTest {
 
         when(ctx.getArtifactRetriever()).thenReturn(artifactRetriever);
         when(artifactRetriever.getMavenProjectLoader(mavenContext)).thenReturn(mavenProjectLoader);
-        when(mavenProjectLoader.loadMavenProject(any(Artifact.class), anyBoolean(), anyBoolean())).thenReturn(mavenProject);
+        when(mavenProjectLoader.loadMavenProject(any(Artifact.class), anyBoolean())).thenReturn(Optional.of(mavenProject));
         when(mavenProject.getDependencyManagement()).thenReturn(dependencyManagement);
         when(dependencyManagement.getDependencies()).thenReturn(Collections.singletonList(searchDependency));
         when(searchDependency.getGroupId()).thenReturn(SEARCH_GROUP_ID);
