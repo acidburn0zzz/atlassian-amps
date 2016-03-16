@@ -366,7 +366,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     abstract protected File getBundledPluginPath(Product ctx, File appDir);
     abstract protected File getUserInstalledPluginsDirectory(Product product, File webappDir, File homeDir);
 
-    protected List<ProductArtifact> getAdditionalPlugins(Product ctx) {
+    protected List<ProductArtifact> getAdditionalPlugins(Product ctx) throws MojoExecutionException {
         return Collections.emptyList();
     }
 

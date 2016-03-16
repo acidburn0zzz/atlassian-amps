@@ -4,6 +4,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -23,21 +24,27 @@ public class MavenProjectLoader
      *          Optional.empty() otherwise
      */
     public Optional<MavenProject> loadMavenProject(MavenSession session, Artifact pomArtifact, boolean dependencies)
+            throws MojoExecutionException
     {
         MavenExecutionRequest executionRequest = session.getRequest();
         try
         {
             ProjectBuilder projectBuilder = session.getContainer().lookup(ProjectBuilder.class);
             ProjectBuildingRequest projectBuildingRequest = executionRequest.getProjectBuildingRequest()
-                    // The validation level is currently "VALIDATION_LEVEL_MAVEN_3_0". Setting it to minimal might speed things up a bit
+                    // The validation level is currently "VALIDATION_LEVEL_MAVEN_3_0".
+                    // Setting it to minimal might speed things up a bit
                     .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
-                    // ResolveDependencies is currently "false". If the calling function needs dependencies, we need to tell maven about it
+                    // ResolveDependencies is currently "false".
+                    // If the calling function needs dependencies, we need to tell maven about it
                     .setResolveDependencies(dependencies);
             MavenProject mp = projectBuilder.build(pomArtifact, projectBuildingRequest).getProject();
             return Optional.ofNullable(mp);
-        } catch (ComponentLookupException | ProjectBuildingException e)
+        } catch (ComponentLookupException e)
         {
-            return Optional.empty();
+            throw new MojoExecutionException("Could not get the ProjectBuilder from the maven session", e);
+        } catch (ProjectBuildingException e)
+        {
+            throw new MojoExecutionException(String.format("Could not build the MavenProject for %s", pomArtifact), e);
         }
     }
 }

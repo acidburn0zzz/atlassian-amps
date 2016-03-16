@@ -52,7 +52,7 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    public List<ProductArtifact> getAdditionalPlugins(Product ctx)
+    public List<ProductArtifact> getAdditionalPlugins(Product ctx) throws MojoExecutionException
     {
         ArrayList<ProductArtifact> additionalPlugins = new ArrayList<>();
 
