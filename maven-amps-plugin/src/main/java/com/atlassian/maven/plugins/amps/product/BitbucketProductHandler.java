@@ -6,10 +6,10 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.atlassian.maven.plugins.amps.util.MavenProjectLoader;
-import com.atlassian.maven.plugins.amps.util.Version;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
@@ -26,7 +26,7 @@ import java.util.Optional;
  */
 public class BitbucketProductHandler extends AbstractWebappProductHandler
 {
-    private static final String FIRST_SEARCH_VERSION = "4.5.0";
+    private static final DefaultArtifactVersion FIRST_SEARCH_VERSION = new DefaultArtifactVersion("4.5.0");
     private static final String GROUP_ID = "com.atlassian.bitbucket.server";
     private final MavenProjectLoader projectLoader;
 
@@ -57,7 +57,7 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
         ArrayList<ProductArtifact> additionalPlugins = new ArrayList<>();
 
         // Add the embedded elasticsearch plugin
-        if (Version.valueOf(ctx.getVersion()).isGreaterOrEqualTo(Version.valueOf(FIRST_SEARCH_VERSION)))
+        if (new DefaultArtifactVersion(ctx.getVersion()).compareTo(FIRST_SEARCH_VERSION) > 0)
         {
             // The version of search distribution should be the same as the search plugin.
             projectLoader.loadMavenProject(context.getExecutionEnvironment().getMavenSession(),
