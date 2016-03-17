@@ -26,7 +26,9 @@ import java.util.Optional;
  */
 public class BitbucketProductHandler extends AbstractWebappProductHandler
 {
-    private static final DefaultArtifactVersion FIRST_SEARCH_VERSION = new DefaultArtifactVersion("4.5.0");
+    // Note FIRST_SEARCH_VERSION requires the qualifier a0 so that any SNAPSHOT, milestone or rc release are evaluated
+    // as being 'later' then FIRST_SEARCH_VERSION (see org.apache.maven.artifact.versioning.ComparableVersion)
+    private static final DefaultArtifactVersion FIRST_SEARCH_VERSION = new DefaultArtifactVersion("4.6.0-a0");
     private static final String GROUP_ID = "com.atlassian.bitbucket.server";
     private final MavenProjectLoader projectLoader;
 
@@ -57,7 +59,7 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
         ArrayList<ProductArtifact> additionalPlugins = new ArrayList<>();
 
         // Add the embedded elasticsearch plugin
-        if (new DefaultArtifactVersion(ctx.getVersion()).compareTo(FIRST_SEARCH_VERSION) > 0)
+        if (new DefaultArtifactVersion(ctx.getVersion()).compareTo(FIRST_SEARCH_VERSION) >= 0)
         {
             // The version of search distribution should be the same as the search plugin.
             projectLoader.loadMavenProject(context.getExecutionEnvironment().getMavenSession(),

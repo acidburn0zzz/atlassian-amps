@@ -88,14 +88,49 @@ public class BitbucketProductHandlerTest {
 
     @Test
     public void testGetAdditionalPluginsBeforeFirstSearchVersion() throws Exception {
-        when(ctx.getVersion()).thenReturn("4.4.0");
+        when(ctx.getVersion()).thenReturn("4.5.0");
         List<ProductArtifact> pluginList = bitbucketProductHandler.getAdditionalPlugins(ctx);
         assertFalse(pluginFoundInPluginList(pluginList));
     }
 
     @Test
-    public void testGetAdditionalPluginsAfterFirstSearchVersion() throws Exception {
+    public void testGetAdditionalPluginsAtFirstSearchVersion() throws Exception {
         when(ctx.getVersion()).thenReturn("4.6.0");
+        List<ProductArtifact> pluginList = bitbucketProductHandler.getAdditionalPlugins(ctx);
+        assertTrue(pluginFoundInPluginList(pluginList));
+    }
+
+    @Test
+    public void testGetAdditionalPluginsAtSearchEAPVersion() throws Exception {
+        when(ctx.getVersion()).thenReturn("4.6.0-search-eap1");
+        List<ProductArtifact> pluginList = bitbucketProductHandler.getAdditionalPlugins(ctx);
+        assertTrue(pluginFoundInPluginList(pluginList));
+    }
+
+    @Test
+    public void testGetAdditionalPluginsAtSearchMilestoneVersion() throws Exception {
+        when(ctx.getVersion()).thenReturn("4.6.0-m1");
+        List<ProductArtifact> pluginList = bitbucketProductHandler.getAdditionalPlugins(ctx);
+        assertTrue(pluginFoundInPluginList(pluginList));
+    }
+
+    @Test
+    public void testGetAdditionalPluginsAtSearchReleaseCandidateVersion() throws Exception {
+        when(ctx.getVersion()).thenReturn("4.6.0-rc1");
+        List<ProductArtifact> pluginList = bitbucketProductHandler.getAdditionalPlugins(ctx);
+        assertTrue(pluginFoundInPluginList(pluginList));
+    }
+
+    @Test
+    public void testGetAdditionalPluginsAtSearchAlphaVersion() throws Exception {
+        when(ctx.getVersion()).thenReturn("4.6.0-a0");
+        List<ProductArtifact> pluginList = bitbucketProductHandler.getAdditionalPlugins(ctx);
+        assertTrue(pluginFoundInPluginList(pluginList));
+    }
+
+    @Test
+    public void testGetAdditionalPluginsAfterFirstSearchVersion() throws Exception {
+        when(ctx.getVersion()).thenReturn("4.7.0");
         List<ProductArtifact> pluginList = bitbucketProductHandler.getAdditionalPlugins(ctx);
         assertTrue(pluginFoundInPluginList(pluginList));
     }
