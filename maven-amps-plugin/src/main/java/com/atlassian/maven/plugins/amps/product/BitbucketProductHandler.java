@@ -62,8 +62,8 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
             // The version of search distribution should be the same as the search plugin.
             projectLoader.loadMavenProject(context.getExecutionEnvironment().getMavenSession(),
                         artifactFactory.createParentArtifact(GROUP_ID, "bitbucket-parent", ctx.getVersion()), true)
-                    .flatMap(mp -> Optional.ofNullable(mp.getDependencyManagement())
-                            .flatMap(dm -> dm.getDependencies()
+                    .flatMap(mavenProject -> Optional.ofNullable(mavenProject.getDependencyManagement())
+                            .flatMap(dependencyManager -> dependencyManager.getDependencies()
                                     .stream()
                                     .filter(dep -> dep.getGroupId().equals("com.atlassian.bitbucket.search"))
                                     .filter(dep -> dep.getArtifactId().equals("search-plugin"))
