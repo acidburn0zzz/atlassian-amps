@@ -5,26 +5,38 @@ import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.atlassian.maven.plugins.amps.util.MavenProjectLoader;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @since 6.1.0
  */
 public class BitbucketProductHandler extends AbstractWebappProductHandler
 {
-    public BitbucketProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory)
+    // Note FIRST_SEARCH_VERSION requires the qualifier a0 so that any SNAPSHOT, milestone or rc release are evaluated
+    // as being 'later' then FIRST_SEARCH_VERSION (see org.apache.maven.artifact.versioning.ComparableVersion)
+    private static final DefaultArtifactVersion FIRST_SEARCH_VERSION = new DefaultArtifactVersion("4.6.0-a0");
+    private static final String GROUP_ID = "com.atlassian.bitbucket.server";
+    private final MavenProjectLoader projectLoader;
+
+    public BitbucketProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory,
+                                   MavenProjectLoader projectLoader)
     {
         super(context, goals, new BitbucketPluginProvider(),artifactFactory);
+        this.projectLoader = projectLoader;
     }
 
     @Override
@@ -42,9 +54,32 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
+    public List<ProductArtifact> getAdditionalPlugins(Product ctx) throws MojoExecutionException
+    {
+        ArrayList<ProductArtifact> additionalPlugins = new ArrayList<>();
+
+        // Add the embedded elasticsearch plugin
+        if (new DefaultArtifactVersion(ctx.getVersion()).compareTo(FIRST_SEARCH_VERSION) >= 0)
+        {
+            // The version of search distribution should be the same as the search plugin.
+            projectLoader.loadMavenProject(context.getExecutionEnvironment().getMavenSession(),
+                        artifactFactory.createParentArtifact(GROUP_ID, "bitbucket-parent", ctx.getVersion()), true)
+                    .flatMap(mavenProject -> Optional.ofNullable(mavenProject.getDependencyManagement())
+                            .flatMap(dependencyManager -> dependencyManager.getDependencies()
+                                    .stream()
+                                    .filter(dep -> dep.getGroupId().equals("com.atlassian.bitbucket.search"))
+                                    .findFirst()
+                                    .flatMap(dependency -> Optional.ofNullable(dependency.getVersion()))))
+                    .ifPresent(version -> additionalPlugins.add(new ProductArtifact("com.atlassian.bitbucket.search",
+                            "embedded-elasticsearch-plugin", version)));
+        }
+        return additionalPlugins;
+    }
+
+    @Override
     public ProductArtifact getArtifact()
     {
-        return new ProductArtifact("com.atlassian.bitbucket.server", "bitbucket-webapp");
+        return new ProductArtifact(GROUP_ID, "bitbucket-webapp");
     }
 
     @Override
@@ -127,7 +162,7 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     @Override
     public ProductArtifact getTestResourcesArtifact()
     {
-        return new ProductArtifact("com.atlassian.bitbucket.server", "bitbucket-it-resources");
+        return new ProductArtifact(GROUP_ID, "bitbucket-it-resources");
     }
 
     @Override
