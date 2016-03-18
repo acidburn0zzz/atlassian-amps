@@ -68,7 +68,6 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
                             .flatMap(dependencyManager -> dependencyManager.getDependencies()
                                     .stream()
                                     .filter(dep -> dep.getGroupId().equals("com.atlassian.bitbucket.search"))
-                                    .filter(dep -> dep.getArtifactId().equals("search-plugin"))
                                     .findFirst()
                                     .flatMap(dependency -> Optional.ofNullable(dependency.getVersion()))))
                     .ifPresent(version -> additionalPlugins.add(new ProductArtifact("com.atlassian.bitbucket.search",
