@@ -18,7 +18,7 @@
                 <plugin>
                     <groupId>com.atlassian.maven.plugins</groupId>
                     <artifactId>maven-amps-plugin</artifactId>
-                    <version>6.2.2-SNAPSHOT</version>
+                    <version>6.2.5-SNAPSHOT</version>
                     <extensions>true</extensions>
                     <configuration>
                         <products>

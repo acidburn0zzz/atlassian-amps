@@ -69,4 +69,26 @@ public class ProductArtifact
     {
         return new StringBuilder(groupId).append(":").append(artifactId).append(":").append(version).append(":").append(type).toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ProductArtifact)) return false;
+        ProductArtifact that = (ProductArtifact) o;
+
+        if (groupId != null ? !groupId.equals(that.groupId) : that.groupId != null) return false;
+        if (artifactId != null ? !artifactId.equals(that.artifactId) : that.artifactId != null) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+        return type != null ? type.equals(that.type) : that.type == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = groupId != null ? groupId.hashCode() : 0;
+        result = 31 * result + (artifactId != null ? artifactId.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        return result;
+    }
 }

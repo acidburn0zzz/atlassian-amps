@@ -190,6 +190,16 @@ public class Product
     private String quickReloadVersion;
 
     /**
+     * If PluginViewer should be used.
+     */
+    private Boolean enablePluginViewer;
+
+    /**
+     * PluginViewer version should be used.
+     */
+    private String pluginViewerVersion;
+
+    /**
      * Flag to indicate whether or not to enable automatic bundling of PDE.
      */
     private Boolean enablePde;
@@ -345,6 +355,8 @@ public class Product
         prod.setDevToolboxVersion(devToolboxVersion == null ? product.getDevToolboxVersion() : devToolboxVersion);
         prod.setEnableQuickReload(enableQuickReload == null ? product.isEnableQuickReload() : enableQuickReload);
         prod.setQuickReloadVersion(quickReloadVersion == null ? product.getQuickReloadVersion() : quickReloadVersion);
+        prod.setEnablePluginViewer(enablePluginViewer == null ? product.isEnablePluginViewer() : enablePluginViewer);
+        prod.setPluginViewerVersion(pluginViewerVersion == null ? product.getPluginViewerVersion() : pluginViewerVersion);
         prod.setEnablePde(enablePde == null ? product.isEnablePde() : enablePde);
         prod.setPdeVersion(pdeVersion == null ? product.getPdeVersion() : pdeVersion);
         prod.setRestVersion(restVersion == null ? product.getRestVersion() : restVersion);
@@ -809,6 +821,22 @@ public class Product
     public void setEnableQuickReload(final Boolean enableQuickReload)
     {
         this.enableQuickReload = enableQuickReload;
+    }
+
+    public String getPluginViewerVersion() {
+        return pluginViewerVersion;
+    }
+
+    public void setPluginViewerVersion(String pluginViewerVersion) {
+        this.pluginViewerVersion = pluginViewerVersion;
+    }
+
+    public Boolean isEnablePluginViewer() {
+        return enablePluginViewer;
+    }
+
+    public void setEnablePluginViewer(final Boolean enablePluginViewer) {
+        this.enablePluginViewer = enablePluginViewer;
     }
 
     public String getDevToolboxVersion()
