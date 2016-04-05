@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -330,6 +331,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         artifacts = new ArrayList<ProductArtifact>();
         artifacts.addAll(getDefaultBundledPlugins());
         artifacts.addAll(ctx.getBundledArtifacts());
+        artifacts.addAll(getAdditionalPlugins(ctx));
 
         addArtifactsToDirectory(artifacts, bundledPluginsDir);
 
@@ -362,6 +364,10 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     abstract protected Collection<? extends ProductArtifact> getDefaultLibPlugins();
     abstract protected File getBundledPluginPath(Product ctx, File appDir);
     abstract protected File getUserInstalledPluginsDirectory(Product product, File webappDir, File homeDir);
+
+    protected List<ProductArtifact> getAdditionalPlugins(Product ctx) throws MojoExecutionException {
+        return Collections.emptyList();
+    }
 
     protected String getLog4jPropertiesPath()
     {
