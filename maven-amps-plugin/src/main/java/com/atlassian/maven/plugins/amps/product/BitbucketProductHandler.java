@@ -29,7 +29,9 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     // Note FIRST_SEARCH_VERSION requires the qualifier a0 so that any SNAPSHOT, milestone or rc release are evaluated
     // as being 'later' then FIRST_SEARCH_VERSION (see org.apache.maven.artifact.versioning.ComparableVersion)
     private static final DefaultArtifactVersion FIRST_SEARCH_VERSION = new DefaultArtifactVersion("4.6.0-a0");
-    private static final String GROUP_ID = "com.atlassian.bitbucket.server";
+    private static final String SEARCH_GROUP_ID = "com.atlassian.bitbucket.search";
+    private static final String SERVER_GROUP_ID = "com.atlassian.bitbucket.server";
+
     private final MavenProjectLoader projectLoader;
 
     public BitbucketProductHandler(final MavenContext context, final MavenGoals goals, ArtifactFactory artifactFactory,
@@ -63,14 +65,14 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
         {
             // The version of search distribution should be the same as the search plugin.
             projectLoader.loadMavenProject(context.getExecutionEnvironment().getMavenSession(),
-                        artifactFactory.createParentArtifact(GROUP_ID, "bitbucket-parent", ctx.getVersion()), true)
+                        artifactFactory.createParentArtifact(SERVER_GROUP_ID, "bitbucket-parent", ctx.getVersion()), true)
                     .flatMap(mavenProject -> Optional.ofNullable(mavenProject.getDependencyManagement())
                             .flatMap(dependencyManager -> dependencyManager.getDependencies()
                                     .stream()
-                                    .filter(dep -> dep.getGroupId().equals("com.atlassian.bitbucket.search"))
+                                    .filter(dep -> dep.getGroupId().equals(SEARCH_GROUP_ID))
                                     .findFirst()
                                     .flatMap(dependency -> Optional.ofNullable(dependency.getVersion()))))
-                    .ifPresent(version -> additionalPlugins.add(new ProductArtifact("com.atlassian.bitbucket.search",
+                    .ifPresent(version -> additionalPlugins.add(new ProductArtifact(SEARCH_GROUP_ID,
                             "embedded-elasticsearch-plugin", version)));
         }
         return additionalPlugins;
@@ -79,14 +81,23 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     @Override
     public ProductArtifact getArtifact()
     {
-        return new ProductArtifact(GROUP_ID, "bitbucket-webapp");
+        return new ProductArtifact(SERVER_GROUP_ID, "bitbucket-webapp");
     }
 
     @Override
     public File getBundledPluginPath(Product ctx, File appDir)
     {
-        String bundledPluginPluginsPath = "WEB-INF/classes/bitbucket-bundled-plugins.zip";
-        return new File(appDir, bundledPluginPluginsPath);
+        // Starting from 4.8, bundled plugins are no longer a zip file. Instead, they're unpacked in the
+        // webapp itself. This way, first run doesn't need to pay the I/O cost to unpack them
+        File bundledPluginsDir = new File(appDir, "WEB-INF/atlassian-bundled-plugins");
+        if (bundledPluginsDir.isDirectory())
+        {
+            return bundledPluginsDir;
+        }
+
+        // If the atlassian-bundled-plugins directory doesn't exist, assume we're using an older version
+        // of Bitbucket Server where bundled plugins are still zipped up
+        return new File(appDir, "WEB-INF/classes/bitbucket-bundled-plugins.zip");
     }
 
     @Override
@@ -162,7 +173,7 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     @Override
     public ProductArtifact getTestResourcesArtifact()
     {
-        return new ProductArtifact(GROUP_ID, "bitbucket-it-resources");
+        return new ProductArtifact(SERVER_GROUP_ID, "bitbucket-it-resources");
     }
 
     @Override
@@ -179,6 +190,11 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
         return new File(new File(baseDir, "plugins"), "installed-plugins");
     }
 
+    private static String fixSlashes(final String path)
+    {
+        return path.replaceAll("\\\\", "/");
+    }
+
     private static class BitbucketPluginProvider extends AbstractPluginProvider
     {
 
@@ -188,10 +204,4 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
             return Collections.emptyList();
         }
     }
-
-    private static String fixSlashes(final String path)
-    {
-        return path.replaceAll("\\\\", "/");
-    }
-
 }
