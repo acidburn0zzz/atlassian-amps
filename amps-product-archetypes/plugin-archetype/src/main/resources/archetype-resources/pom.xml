@@ -111,7 +111,7 @@
             <plugin>
                 <groupId>com.atlassian.plugin</groupId>
                 <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
-                <version>${atlassian.spring.scanner.version}</version>
+                <version>\${atlassian.spring.scanner.version}</version>
                 <executions>
                     <execution>
                         <goals>
