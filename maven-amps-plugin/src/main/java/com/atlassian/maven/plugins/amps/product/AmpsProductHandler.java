@@ -110,11 +110,10 @@ public abstract class AmpsProductHandler implements ProductHandler
      * <ul>
      * <li>Removes all unnecessary files</li>
      * <li>Perform product-specific clean-up</li>
-     * <ul>
+     * </ul>
      * This is a reference implementation. It is probable that each application has a different set of directories to delete.
      * @param product the product details
      * @param snapshotDir an image of the home which will be zipped. This is not the working home, so you're free to remove files and parametrise them.
-     * @throws IOException
      */
     public void cleanupProductHomeForZip(Product product, File snapshotDir) throws MojoExecutionException, IOException
     {
@@ -208,7 +207,7 @@ public abstract class AmpsProductHandler implements ProductHandler
 
     /**
      * Lists parameters which must be replaced in the configuration files of the home directory.
-     * <p/>
+     * <p>
      * Used reversely when reading / when creating a home zip.
      */
     public List<ConfigFileUtils.Replacement> getReplacements(Product product)

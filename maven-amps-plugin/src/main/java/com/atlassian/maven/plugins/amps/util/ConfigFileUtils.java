@@ -126,7 +126,7 @@ public class ConfigFileUtils
 
         /**
          * Replace the key with the value when unzipping a home. This is the normal meaning of
-         * a replacement, {@code key -> value}
+         * a replacement, {@code key -&gt; value}
          */
         private final boolean applyWhenUnzipping;
 
@@ -137,8 +137,7 @@ public class ConfigFileUtils
 
         /**
          * Represents a key to be replaced in the configuration files.
-         *
-         * <p/>
+         * <p>
          * <b>Important</b>: If your value is short, such as "/", "", "true", "false", please set reversible=false.
          * When zipping a home, config files are parsed and everything is replaced back with keys, such as %PRODUCT_HOME_DIR%.
          * If you provide a string with false positives, you may parametrise too many variables.

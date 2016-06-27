@@ -305,10 +305,6 @@ public class JiraProductHandler extends AbstractWebappProductHandler
      * </dataSource>
      * }
      * </pre>
-     * @param homeDir
-     * @param dbType
-     * @param schema
-     * @throws MojoExecutionException
      */
     @VisibleForTesting
     protected void updateDbConfigXml(final File homeDir, final JiraDatabaseType dbType, final String schema)

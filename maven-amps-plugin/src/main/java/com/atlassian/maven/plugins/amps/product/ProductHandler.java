@@ -47,7 +47,7 @@ public interface ProductHandler
 
     /**
      * Lists parameters which must be replaced in the configuration files of the home directory.
-     * <p/>
+     * <p>
      * Replacements returned by this method are guaranteed to be reversed when creating the home zip.
      *
      * @return a mutable list of replacements
@@ -57,7 +57,7 @@ public interface ProductHandler
     /**
      * List the configuration files. Used when doing a snapshot to reopen on another
      * machine, with different port, context path, path, instanceId
-     * <p/>
+     * <p>
      * Files returned by this method are guaranteed to be reversed when creating the home zip.
      *
      * @param snapshotCopyDir A snapshot equivalent to the home in most cases. It is a copy of the folder: {@link #getSnapshotDirectory(Product)}
@@ -69,7 +69,7 @@ public interface ProductHandler
     /**
      * Snapshots the home directory. The goal is that the state is totally restored if we restart the application
      * with this minimal snapshot.
-     * <p/>
+     * <p>
      * It must call {@link #cleanupProductHomeForZip(Product, File)} to clean up the snapshot.
      *
      *
@@ -86,7 +86,7 @@ public interface ProductHandler
      * <ul>
      * <li>Removes all unnecessary files</li>
      * <li>Perform product-specific clean-up</li>
-     * <ul>
+     * </ul>
      * @param product the product details
      * @param homeDirectory an image of the home directory. This is not the current home, so you're free to remove files and parametrise them.
      */

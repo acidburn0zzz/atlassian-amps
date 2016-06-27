@@ -25,7 +25,6 @@ public class ZipUtils
      * Ungzips and extracts the specified tar.gz file into the specified directory.
      * @param targz the tar.gz file to use
      * @param destDir the directory to contain the extracted contents
-     * @throws IOException
      */
     public static void untargz(final File targz, final String destDir) throws IOException
     {
@@ -39,7 +38,6 @@ public class ZipUtils
      * @param destDir the directory to contain the extracted contents
      * @param leadingPathSegmentsToTrim the number of leading path segments to remove from the
      *                                  extracted path
-     * @throws IOException
      */
     public static void untargz(final File targz, final String destDir, int leadingPathSegmentsToTrim) throws IOException
     {
@@ -111,7 +109,6 @@ public class ZipUtils
      * @param leadingPathSegmentsToTrim
      *            number of root folders to skip. Example: If all files are in generated-resources/home/*,
      *            then you may want to skip 2 folders.
-     * @throws IOException
      */
     public static void unzip(final File zipFile, final String destDir, int leadingPathSegmentsToTrim) throws IOException
     {
@@ -133,7 +130,6 @@ public class ZipUtils
      *            structure from the zip file
      * @param pattern
      *            pattern that must be meet by zip entry to be extracted
-     * @throws IOException
      */
     public static void unzip(final File zipFile, final String destDir, final int leadingPathSegmentsToTrim,
                              final boolean flatten, final Pattern pattern) throws IOException

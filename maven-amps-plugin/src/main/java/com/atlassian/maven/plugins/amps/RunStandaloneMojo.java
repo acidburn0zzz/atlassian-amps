@@ -1,6 +1,12 @@
 package com.atlassian.maven.plugins.amps;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -16,11 +22,6 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Properties;
 
 import static java.util.Collections.singletonList;
 

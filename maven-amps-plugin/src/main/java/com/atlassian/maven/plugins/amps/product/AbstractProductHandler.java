@@ -249,7 +249,6 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
      * @param ctx the product's details
      * @param homeDir the home directory
      * @param explodedWarDir the directory containing the exploded WAR of the application
-     * @throws MojoExecutionException
      */
     protected void customiseInstance(Product ctx, File homeDir, File explodedWarDir) throws MojoExecutionException
     {
@@ -535,12 +534,9 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     public abstract ProductArtifact getArtifact();
     
     /**
-     * Returns the directory where jars listed in  <libArtifacts> are
+     * Returns the directory where jars listed in &lt;libArtifacts&gt; are
      * copied. Default is "WEB-INF/lib"
-     * 
-     * @return
      */
-    
     protected String getLibArtifactTargetDir() 
     {
     	return "WEB-INF/lib";

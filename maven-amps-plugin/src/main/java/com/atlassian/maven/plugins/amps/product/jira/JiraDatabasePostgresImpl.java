@@ -153,7 +153,6 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
      * @param url JDBC URL to parse
      * @param defaults Default properties
      * @return Properties with elements added from the url
-     * @exception SQLException
      */
     public Properties parseURL(String url, Properties defaults) throws SQLException
     {
