@@ -144,7 +144,7 @@
           <type>pom</type>
           <scope>runtime</scope>
         </dependency>
-        
+
         <!-- func test framework -->
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
@@ -157,7 +157,7 @@
             <version>1.1.1</version>
         </dependency>
 
-        
+
         <!-- minification -->
         <dependency>
             <groupId>com.google.javascript</groupId>
