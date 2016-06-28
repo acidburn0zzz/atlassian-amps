@@ -64,8 +64,8 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
         if (new DefaultArtifactVersion(ctx.getVersion()).compareTo(FIRST_SEARCH_VERSION) >= 0)
         {
             // The version of search distribution should be the same as the search plugin.
-            projectLoader.loadMavenProject(context.getExecutionEnvironment().getMavenSession(),
-                        artifactFactory.createParentArtifact(SERVER_GROUP_ID, "bitbucket-parent", ctx.getVersion()), true)
+            projectLoader.loadMavenProject(context.getExecutionEnvironment().getMavenSession(), context.getProject(),
+                        artifactFactory.createParentArtifact(SERVER_GROUP_ID, "bitbucket-parent", ctx.getVersion()))
                     .flatMap(mavenProject -> Optional.ofNullable(mavenProject.getDependencyManagement())
                             .flatMap(dependencyManager -> dependencyManager.getDependencies()
                                     .stream()

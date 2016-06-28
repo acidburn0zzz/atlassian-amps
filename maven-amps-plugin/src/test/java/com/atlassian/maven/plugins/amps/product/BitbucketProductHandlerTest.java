@@ -25,7 +25,6 @@ import java.util.Optional;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -70,7 +69,7 @@ public class BitbucketProductHandlerTest {
         DependencyManagement dependencyManagement = mock(DependencyManagement.class);
         Dependency searchDependency = mock(Dependency.class);
 
-        when(mavenProjectLoader.loadMavenProject(any(MavenSession.class), any(Artifact.class), anyBoolean()))
+        when(mavenProjectLoader.loadMavenProject(any(MavenSession.class), any(MavenProject.class), any(Artifact.class)))
                 .thenReturn(Optional.of(mavenProject));
         when(mavenProject.getDependencyManagement()).thenReturn(dependencyManagement);
         when(dependencyManagement.getDependencies()).thenReturn(Collections.singletonList(searchDependency));
