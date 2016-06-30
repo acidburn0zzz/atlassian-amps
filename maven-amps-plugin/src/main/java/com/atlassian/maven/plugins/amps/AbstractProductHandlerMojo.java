@@ -4,7 +4,6 @@ import com.atlassian.maven.plugins.amps.product.ProductHandler;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
@@ -32,9 +31,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.atlassian.maven.plugins.amps.MavenGoals.warnDeprecated;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_DEV_TOOLBOX_VERSION;
-import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_FASTDEV_VERSION;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PDE_VERSION;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PDK_VERSION;
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_PLUGIN_VIEWER_VERSION;
@@ -229,18 +226,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     private String productDataPath;
 
     /**
-     * If FastDev should be enabled
-     */
-    @Parameter(property = "fastdev.enable", defaultValue = "true")
-    protected boolean enableFastdev;
-
-    /**
-     * The version of FastDev to bundle
-     */
-    @Parameter(property = "fastdev.version", defaultValue = DEFAULT_FASTDEV_VERSION)
-    protected String fastdevVersion;
-
-    /**
      * If DevToolbox should be enabled
      */
     @Parameter(property = "devtoolbox.enable", defaultValue = "true")
@@ -421,7 +406,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected List<Product> products = new ArrayList<>();
 
     /**
-     * A map of {instanceId -> Product}, initialized by {@link #createProductContexts()}.
+     * A map of {instanceId -&gt; Product}, initialized by {@link #createProductContexts()}.
      * Cannot be set by the user.
      */
     private Map<String, Product> productMap;
@@ -497,9 +482,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setSalVersion(salVersion);
         ctx.setPdkVersion(pdkVersion);
         ctx.setWebConsoleVersion(webConsoleVersion);
-
-        ctx.setEnableFastdev(enableFastdev);
-        ctx.setFastdevVersion(fastdevVersion);
 
         ctx.setEnableQuickReload(enableQuickReload);
         ctx.setQuickReloadVersion(quickReloadVersion);
@@ -637,16 +619,6 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         if (product.getWebConsoleVersion() == null)
         {
             product.setWebConsoleVersion(DEFAULT_WEB_CONSOLE_VERSION);
-        }
-
-        if (product.isEnableFastdev() == null)
-        {
-            product.setEnableFastdev(true);
-        }
-
-        if (product.getFastdevVersion() == null)
-        {
-            product.setFastdevVersion(DEFAULT_FASTDEV_VERSION);
         }
 
         if (product.isEnableDevToolbox() == null)
@@ -823,11 +795,10 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     }
 
     /**
-     * Builds the map {instanceId -> Product bean}, based on: <ul>
+     * Builds the map {instanceId -&gt; Product bean}, based on: <ul>
      * <li>the {@literal <products>} tag</li>
      * <li>the configuration values inherited from the {@literal <configuration>} tag
      * </ul>
-     * @throws MojoExecutionException
      */
     Map<String, Product> createProductContexts() throws MojoExecutionException
     {
@@ -840,19 +811,15 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         for (Product ctx : Lists.newArrayList(productMap.values()))
         {
-            ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals,artifactFactory);
+            ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals, artifactFactory);
             setDefaultValues(ctx, handler);
-            if (ctx.isEnableFastdev())
-            {
-                warnDeprecated(getLog());
-            }
         }
 
         return productMap;
     }
 
     /**
-     * Returns the map { instanceId -> Product } with initialized values.
+     * Returns the map { instanceId -&gt; Product } with initialized values.
      */
     protected Map<String, Product> getProductContexts() throws MojoExecutionException
     {

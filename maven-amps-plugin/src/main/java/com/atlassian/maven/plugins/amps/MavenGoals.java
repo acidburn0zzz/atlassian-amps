@@ -164,86 +164,6 @@ public class MavenGoals
             executionEnvironment());
     }
 
-    public static void warnDeprecated(Log log) {
-        log.warn("");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        log.warn("");
-        log.warn(">>>  WARNING: atlas-cli and fastdev are DEPRECATED in favour of QuickReload  <<<");
-        log.warn("");
-        log.warn(">>>  WARNING: Support for atlas-cli and fastdev will be completely removed in the next AMPS version.  <<<");
-        log.warn("");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        log.warn("");
-    }
-
-    public void startCli(final PluginInformation pluginInformation, final int port) throws MojoExecutionException
-    {
-        warnDeprecated(log);
-        final String groupId = pluginInformation.getGroupId();
-        final String artifactId = pluginInformation.getArtifactId();
-
-        final List<Element> configs = new ArrayList<Element>();
-        configs.add(element(name("commands"),
-                element(name("pi"),
-                        groupId + ":" + artifactId + ":copy-bundled-dependencies" + " "
-                                + groupId + ":" + artifactId + ":compress-resources" + " "
-                                + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
-                                + groupId + ":" + artifactId + ":filter-plugin-descriptor" + " "
-                                + "compile" + " "
-                                + groupId + ":" + artifactId + ":generate-manifest" + " "
-                                + groupId + ":" + artifactId + ":validate-manifest" + " "
-                                + groupId + ":" + artifactId + ":jar" + " "
-                                + "org.apache.maven.plugins:maven-install-plugin:install" + " "
-                                + groupId + ":" + artifactId + ":install"),
-                element(name("tpi"),
-                        groupId + ":" + artifactId + ":copy-bundled-dependencies" + " "
-                                + groupId + ":" + artifactId + ":compress-resources" + " "
-                                + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
-                                + groupId + ":" + artifactId + ":filter-plugin-descriptor" + " "
-                                + "compile" + " "
-                                + groupId + ":" + artifactId + ":generate-manifest" + " "
-                                + "org.apache.maven.plugins:maven-resources-plugin:testResources" + " "
-                                + groupId + ":" + artifactId + ":filter-test-plugin-descriptor" + " "
-                                +groupId + ":" + artifactId + ":copy-test-bundled-dependencies" + " "
-                                + "org.apache.maven.plugins:maven-compiler-plugin:testCompile" + " "
-                                + groupId + ":" + artifactId + ":generate-test-manifest" + " "
-                                + groupId + ":" + artifactId + ":validate-manifest" + " "
-                                + groupId + ":" + artifactId + ":validate-test-manifest" + " "
-                                + groupId + ":" + artifactId + ":jar" + " "
-                                + groupId + ":" + artifactId + ":test-jar" + " "
-                                + "org.apache.maven.plugins:maven-install-plugin:install" + " "
-                                + groupId + ":" + artifactId + ":install" + " "
-                                + groupId + ":" + artifactId + ":test-install"),
-                element(name("package"),
-                        groupId + ":" + artifactId + ":copy-bundled-dependencies" + " "
-                                + groupId + ":" + artifactId + ":compress-resources" + " "
-                                + "org.apache.maven.plugins:maven-resources-plugin:resources" + " "
-                                + groupId + ":" + artifactId + ":filter-plugin-descriptor" + " "
-                                + "compile" + " "
-                                + groupId + ":" + artifactId + ":generate-manifest" + " "
-                                + groupId + ":" + artifactId + ":validate-manifest" + " "
-                                + groupId + ":" + artifactId + ":jar" + " ")));
-        if (port > 0)
-        {
-            configs.add(element(name("port"), String.valueOf(port)));
-        }
-        executeMojo(
-                plugin(
-                        groupId("org.twdata.maven"),
-                        artifactId("maven-cli-plugin"),
-                        version(pluginArtifactIdToVersionMap.get("maven-cli-plugin"))
-                ),
-                goal("execute"),
-                configuration(configs.toArray(new Element[configs.size()])),
-                executionEnvironment());
-    }
-
     public void createPlugin(final String productId, AmpsCreatePluginPrompter createPrompter) throws MojoExecutionException
     {
         CreatePluginProperties props = null;
@@ -1148,15 +1068,15 @@ public class MavenGoals
     /**
      * Cargo waits (org.codehaus.cargo.container.tomcat.internal.AbstractCatalinaInstalledLocalContainer#waitForCompletion(boolean waitForStarting)) for 3 ports, but the AJP and RMI ports may
      * not be correct (see below), so we configure it to wait on the HTTP port only.
-     *
+     * <P>
      * Since we're not configuring the AJP port it defaults to 8009. This port might have been taken by a different application (the container will still come up though, see
      * "INFO: Port busy 8009 java.net.BindException: Address already in use" in the log). Thus we don't want to wait for it because it might be still open also the container
      * is shut down.
-     *
+     * <P>
      * The RMI port is randomly chosen (see startWebapp), thus we don't have any information close at hand. As a future optimisation, e.g. when we move away from cargo to let's say
      * Apache's Tomcat Maven Plugin we could retrieve the actual configuration from the server.xml on shutdown and thus know exactly for what which port to wait until it gets closed.
      * We could do that already in cargo (e.g. container/tomcat6x/<productHome>/conf/server.xml) but that means that we have to support all the containers we are supporting with cargo.
-     *
+     * <P>
      * Since the HTTP port is the only one that interests us, we set all three ports to this one when calling stop. But since that may be randomly chosen as well we might be waiting
      * for the wrong port to get closed. Since this is the minor use case, one has to either accept the timeout if the default port is open, or configure product.stop.timeout to 0 in
      * order to skip the wait.
@@ -1173,7 +1093,7 @@ public class MavenGoals
 
     /**
      * THIS USED TO Decide whether to use the org.twdata.maven.cargo-maven2-plugin or the org.codehaus.cargo.cargo-maven2-plugin.
-     * <p/>
+     * <p>
      * This has now been changed to just return the codehaus version since there are new features/fixes we need and the twdata version is no longer useful.
      */
     protected Plugin cargo(Product context)
@@ -1484,20 +1404,6 @@ public class MavenGoals
         );
     }
 
-    public void installIdeaPlugin() throws MojoExecutionException
-    {
-        executeMojo(
-                plugin(
-                        groupId("org.twdata.maven"),
-                        artifactId("maven-cli-plugin"),
-                        version(pluginArtifactIdToVersionMap.get("maven-cli-plugin"))
-                ),
-                goal("idea"),
-                configuration(),
-                executionEnvironment()
-        );
-    }
-
     public File copyDist(final File targetDirectory, final ProductArtifact artifact) throws MojoExecutionException
     {
         return copyZip(targetDirectory, artifact, "test-dist.zip");
@@ -1730,7 +1636,7 @@ public class MavenGoals
      * The artifact will be deployed using the name and version of the current project,
      * as in if your artifactId is 'MyProject', it will be MyProject-1.0-SNAPSHOT.jar,
      * overriding any artifact created at compilation time.
-     *
+     * <P>
      * Attached artifacts get installed (at install phase) and deployed (at deploy phase)
      * @param file the file
      * @param type the type of the file, default 'jar'

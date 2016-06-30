@@ -31,13 +31,12 @@ import org.codehaus.plexus.archiver.jar.ManifestException;
 /**
  * Generates the obr artifact, containing the plugin, its dependencies, and the obr XML file.  The OBR file looks like
  * this:
- * <p/>
  * <pre>
  * this-plugin.jar
  * obr.xml
  * dependencies/required-plugin.jar
  * </pre>
- * <p/>
+ * <p>
  * All plugins in the root directory will be installed, while the ones in the "dependencies" directory will be installed
  * only if they are needed.
  */
@@ -54,8 +53,8 @@ public class GenerateObrArtifactMojo extends AbstractAmpsMojo
     private JarArchiver jarArchiver;
 
     /**
-     * The archive configuration to use. See <a href="http://maven.apache.org/shared/maven-archiver/index.html">Maven
-     * Archiver Reference</a>.
+     * The archive configuration to use.
+     * @see <a href="http://maven.apache.org/shared/maven-archiver/index.html">Maven Archiver Reference</a>
      */
     @Parameter
     private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
@@ -76,7 +75,7 @@ public class GenerateObrArtifactMojo extends AbstractAmpsMojo
     protected File outputDirectory;
 
     /**
-     * The filename to be used for the generated archive file.  The "-obr" suffix will be appended.
+     * The filename to be used for the generated archive file. The "-obr" suffix will be appended.
      */
     @Parameter(property = "project.build.finalName")
     protected String finalName;
@@ -112,7 +111,7 @@ public class GenerateObrArtifactMojo extends AbstractAmpsMojo
 
     /**
      * @param obrDir Directory containing the files to go into the obr zip
-     * @throws MojoExecutionException If something goes wrong
+     * @throws MojoExecutionException If anything goes wrong
      */
     private void generateObrZip(File obrDir) throws MojoExecutionException
     {

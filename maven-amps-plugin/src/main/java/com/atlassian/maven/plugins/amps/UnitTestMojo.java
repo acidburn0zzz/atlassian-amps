@@ -29,8 +29,8 @@ public class UnitTestMojo extends AbstractAmpsMojo
 
     /**
      * Sets the excludedGroups element in surefire. This will allow your unit tests to be excluded
-     * depending on the value of this element. See {@link http://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#excludedGroups}
-     * Defaults to null.
+     * depending on the value of this element. Defaults to null.
+     * @see <a href="http://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#excludedGroups">excludedGroups</a>
      *
      * @since 4.1.5
      */

@@ -6,14 +6,14 @@
     <parent>
 		<groupId>com.atlassian.amps</groupId>
 		<artifactId>atlassian-amps-product-archetypes</artifactId>
-		<version>6.2.7-SNAPSHOT</version>
+		<version>7.0.0-SNAPSHOT</version>
 	</parent>
 
     <groupId>com.atlassian.maven.archetypes</groupId>
     <artifactId>fecru-plugin-archetype</artifactId>
 
     <packaging>jar</packaging>
-    
+
     <name>Atlassian Crucible Plugin Archetype</name>
     <description>This archetype can be used to create a new Atlassian FishEye / Crucible plugin project</description>
 </project>

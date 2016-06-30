@@ -43,23 +43,11 @@ import jline.ANSIBuffer;
 public class PrettyPrompter implements Prompter
 {
 
-    //maven-cli-plugin uses an old version jline that has ansi codes in package scope.
-    //re-defining them in public here
     public static final int OFF = 0;
     public static final int BOLD = 1;
-    public static final int UNDERSCORE = 4;
-    public static final int BLINK = 5;
-    public static final int REVERSE = 7;
-    public static final int CONCEALED = 8;
-    public static final int FG_BLACK = 30;
     public static final int FG_RED = 31;
     public static final int FG_GREEN = 32;
     public static final int FG_YELLOW = 33;
-    public static final int FG_BLUE = 34;
-    public static final int FG_MAGENTA = 35;
-    public static final int FG_CYAN = 36;
-    public static final int FG_WHITE = 37;
-    public static final char ESC = 27;
 
 
     /**

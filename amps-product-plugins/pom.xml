@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>6.2.7-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>atlassian-amps-product-plugins</artifactId>
@@ -176,7 +176,7 @@
                 </plugins>
             </build>
             <properties>
-                <invoker.test>!cliTest,*Test</invoker.test>
+                <invoker.test>*Test</invoker.test>
             </properties>
          </profile>
      </profiles>
