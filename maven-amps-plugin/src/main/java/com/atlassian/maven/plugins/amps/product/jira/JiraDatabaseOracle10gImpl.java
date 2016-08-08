@@ -1,21 +1,21 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
-import java.io.File;
-
 import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.product.ImportMethod;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import java.io.File;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
-public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
+public class JiraDatabaseOracle10gImpl extends AbstractJiraDatabase
 {
 
     private static final String DATA_PUMP_DIR = "DATA_PUMP_DIR";
+
     private static final String DROP_AND_CREATE_USER =
             "DECLARE\n"
                     + "    v_count INTEGER := 0;\n"
@@ -40,8 +40,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
                     + "END;\n"
                     + "/";
 
-
-    public JiraDatabaseOracleImpl(DataSource dataSource)
+    public JiraDatabaseOracle10gImpl(final DataSource dataSource)
     {
         super(dataSource);
     }
@@ -74,7 +73,7 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
     {
         final String dumpFileDirectoryPath = (new File(getDataSource().getDumpFilePath())).getParent();
         final String username = getDataSource().getUsername();
-        final String dropAndCreateUser = String.format(DROP_AND_CREATE_USER,
+        return String.format(DROP_AND_CREATE_USER,
                 // drop user if exists
                 username, username,
                 // create user with default tablespace
@@ -82,7 +81,6 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
                 , DATA_PUMP_DIR, dumpFileDirectoryPath,
                 DATA_PUMP_DIR, username
         );
-        return dropAndCreateUser;
     }
 
     @Override
@@ -128,15 +126,25 @@ public class JiraDatabaseOracleImpl extends AbstractJiraDatabase
     @Override
     public Xpp3Dom getPluginConfiguration()
     {
-        // In Oracle database , User and Schema are quite the same concept, create/drop user also create/drop schema.
-        String sql = getDropAndCreateUser();
-        getLog().info("Oracle initialization database sql: " + sql);
-        Xpp3Dom pluginConfiguration = systemDatabaseConfiguration();
-        pluginConfiguration.addChild(
-                element(name("sqlCommand"), sql).toDom()
-        );
-        pluginConfiguration.addChild(element(name("delimiter"), "/").toDom());
-        pluginConfiguration.addChild(element(name("delimiterType"), "row").toDom());
-        return pluginConfiguration;
+        // In Oracle, "user" and "schema" are almost the same concept; create/drop user also creates/drops schema.
+        final String sql = getDropAndCreateUser();
+        getLog().info("Oracle initialization database SQL: " + sql);
+        final Xpp3Dom sqlPluginConfiguration = systemDatabaseConfiguration();
+        addChild(sqlPluginConfiguration, "sqlCommand", sql);
+        addChild(sqlPluginConfiguration, "delimiter", "/");
+        addChild(sqlPluginConfiguration, "delimiterType", "row");
+        return sqlPluginConfiguration;
+    }
+
+    /**
+     * Adds a child node with the given name and value to the given DOM node.
+     *
+     * @param parentNode the node to receive a new child
+     * @param childName the name of the new child node
+     * @param childValue the value of the new child node
+     */
+    private static void addChild(final Xpp3Dom parentNode, final String childName, final String childValue)
+    {
+        parentNode.addChild(element(name(childName), childValue).toDom());
     }
 }

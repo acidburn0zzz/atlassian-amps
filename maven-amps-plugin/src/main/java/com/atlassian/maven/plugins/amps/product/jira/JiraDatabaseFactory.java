@@ -39,8 +39,8 @@ public final class JiraDatabaseFactory
             case MYSQL:
                 jiraDatabase = new JiraDatabaseMysqlImpl(dataSource);
                 break;
-            case ORACLE:
-                jiraDatabase = new JiraDatabaseOracleImpl(dataSource);
+            case ORACLE_10G:
+                jiraDatabase = new JiraDatabaseOracle10gImpl(dataSource);
                 break;
             case MSSQL:
             case MSSQL_JTDS:

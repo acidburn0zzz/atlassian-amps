@@ -1,26 +1,36 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
+import javax.annotation.Nullable;
+
 /**
  * Mapping database type by database uri prefix and database driver Please refer to the JIRA database documentation at
- * the following URL: http://www.atlassian.com/software/jira/docs/latest/databases/index.html
+ * the following URL: https://confluence.atlassian.com/display/AdminJIRAServer071/Supported+platforms
  */
-public enum JiraDatabaseType
-{
+public enum JiraDatabaseType {
+
     HSQL("hsql", true, "jdbc:hsqldb", "org.hsqldb.jdbcDriver", "org.hsqldb:hsqldb"),
     H2("h2", true, "jdbc:h2", "org.h2.Driver", "com.h2database:h2"),
     MYSQL("mysql", false, "jdbc:mysql", "com.mysql.jdbc.Driver", "mysql:mysql-connector-java"),
     POSTGRES("postgres72", true, "jdbc:postgresql", "org.postgresql.Driver", "org.postgresql:postgresql"),
-    ORACLE("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "com.oracle:ojdbc6"),
+    ORACLE_10G("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "com.oracle:ojdbc6"),
     MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds:jtds"),
     MSSQL_JTDS("mssql", true, "jdbc:jtds", "net.sourceforge.jtds.jdbc.Driver", "net.sourceforge.jtds:jtds");
 
-    public static JiraDatabaseType getDatabaseType(String uriPrefix, String driverClassName)
+    /**
+     * Returns the {@link JiraDatabaseType} with the given JDBC URL prefix and driver class.
+     *
+     * @param uriPrefix the URL prefix to match upon
+     * @param driverClassName the driver class to match upon
+     * @return null if there is no such enum value
+     */
+    @Nullable
+    public static JiraDatabaseType getDatabaseType(final String uriPrefix, final String driverClassName)
     {
-        for (JiraDatabaseType databaseType : values())
+        for (final JiraDatabaseType dbType : values())
         {
-            if (databaseType.accept(uriPrefix) && databaseType.driverClassName.equals(driverClassName))
+            if (dbType.accept(uriPrefix) && dbType.driverClassName.equals(driverClassName))
             {
-                return databaseType;
+                return dbType;
             }
         }
         return null;
@@ -33,7 +43,7 @@ public enum JiraDatabaseType
     private final String driverClassName;
     private final String libArtifact;
 
-    private JiraDatabaseType(final String dbType, final boolean hasSchema, final String uriPrefix, final String driverClassName, final String libArtifact)
+    JiraDatabaseType(final String dbType, final boolean hasSchema, final String uriPrefix, final String driverClassName, final String libArtifact)
     {
         this.dbType = dbType;
         this.hasSchema = hasSchema;

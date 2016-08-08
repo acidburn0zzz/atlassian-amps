@@ -79,14 +79,14 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void oracleDatabaseFactory() throws Exception
+    public void oracle10gDatabaseFactory() throws Exception
     {
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getUrl()).thenReturn("jdbc:oracle:thin:@localhost:1521:XE");
         when(dataSource.getDriver()).thenReturn("oracle.jdbc.OracleDriver");
         final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
-        assertThat("Database implementation must be Oracle", jiraDatabase, instanceOf(JiraDatabaseOracleImpl.class));
+        assertThat("Database implementation must be Oracle 10g", jiraDatabase, instanceOf(JiraDatabaseOracle10gImpl.class));
     }
 
     @Test
