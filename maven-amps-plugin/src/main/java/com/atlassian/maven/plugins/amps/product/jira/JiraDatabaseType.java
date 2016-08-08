@@ -2,6 +2,8 @@ package com.atlassian.maven.plugins.amps.product.jira;
 
 import javax.annotation.Nullable;
 
+import static java.util.Arrays.stream;
+
 /**
  * Mapping database type by database uri prefix and database driver Please refer to the JIRA database documentation at
  * the following URL: https://confluence.atlassian.com/display/AdminJIRAServer071/Supported+platforms
@@ -17,7 +19,7 @@ public enum JiraDatabaseType {
     MSSQL_JTDS("mssql", true, "jdbc:jtds", "net.sourceforge.jtds.jdbc.Driver", "net.sourceforge.jtds:jtds");
 
     /**
-     * Returns the {@link JiraDatabaseType} with the given JDBC URL prefix and driver class.
+     * Returns the first {@link JiraDatabaseType} with the given JDBC URL prefix and driver class.
      *
      * @param uriPrefix the URL prefix to match upon
      * @param driverClassName the driver class to match upon
@@ -26,14 +28,11 @@ public enum JiraDatabaseType {
     @Nullable
     public static JiraDatabaseType getDatabaseType(final String uriPrefix, final String driverClassName)
     {
-        for (final JiraDatabaseType dbType : values())
-        {
-            if (dbType.accept(uriPrefix) && dbType.driverClassName.equals(driverClassName))
-            {
-                return dbType;
-            }
-        }
-        return null;
+        return stream(values())
+                .filter(dbType -> dbType.accept(uriPrefix))
+                .filter(dbType -> dbType.driverClassName.equals(driverClassName))
+                .findFirst()
+                .orElse(null);
     }
 
     private final String dbType;
