@@ -37,7 +37,6 @@ import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.MYS
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.ORACLE_10G;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.POSTGRES;
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -175,7 +174,7 @@ public class TestJiraProductHandler
         final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
         final Product product = new Product();
         product.setInstanceId("jira");
-        product.setDataSources(emptyList());
+        product.setDataSources(newArrayList());
 
         // when
         product.setAwaitFullInitialization(true);
