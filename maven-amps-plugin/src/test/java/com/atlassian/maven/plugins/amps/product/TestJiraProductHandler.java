@@ -24,6 +24,7 @@ import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_FROM_4_1;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UNZIPPED;
@@ -35,9 +36,11 @@ import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.MSS
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.MSSQL_JTDS;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.MYSQL;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.ORACLE_10G;
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.ORACLE_12C;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.POSTGRES;
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.getDatabaseType;
 import static com.google.common.collect.Lists.newArrayList;
-import static org.hamcrest.CoreMatchers.equalTo;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
@@ -45,7 +48,6 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -113,6 +115,12 @@ public class TestJiraProductHandler
     public void updateDBConfigXmlForOracle10g() throws Exception
     {
         testUpdateDbConfigXml(ORACLE_10G);
+    }
+
+    @Test
+    public void updateDBConfigXmlForOracle12c() throws Exception
+    {
+        testUpdateDbConfigXml(ORACLE_12C);
     }
 
     @Test
@@ -239,32 +247,35 @@ public class TestJiraProductHandler
     @Test
     public void getDatabaseTypeWithNull() throws Exception
     {
-        final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType(null, null);
-        assertNull(dbType);
+        final Optional<JiraDatabaseType> dbType = getDatabaseType(null, null);
 
-
+        assertThat(dbType, is(empty()));
     }
+
     @Test
     public void getDatabaseTypePostgresUriAndDriver() throws Exception
     {
-        final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType("jdbc:postgresql://localhost:5432/amps-test", "org.postgresql.Driver");
-        assertNotNull(dbType);
-        assertThat("Database type must be postgres72", dbType.getDbType(), equalTo(POSTGRES.getDbType()));
+        final Optional<JiraDatabaseType> dbType =
+                getDatabaseType("jdbc:postgresql://localhost:5432/amps-test", "org.postgresql.Driver");
+
+        assertThat(dbType, is(Optional.of(POSTGRES.getDbType())));
     }
 
     @Test
     public void getDatabaseTypeMssqlUriAndDriver() throws Exception
     {
-        final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType("jdbc:sqlserver://amps-test", "com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        assertNotNull(dbType);
-        assertEquals(dbType.getDbType(), MSSQL.getDbType());
+        final Optional<JiraDatabaseType> dbType =
+                getDatabaseType("jdbc:sqlserver://amps-test", "com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
+        assertThat(dbType, is(Optional.of(MSSQL.getDbType())));
     }
 
     @Test
     public void getDatabaseTypeMssqlUriAndAcrossDriver() throws Exception
     {
-        final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType("jdbc:sqlserver://amps-test;user=MyUserName;password=*****;", "net.sourceforge.jtds.jdbc.Driver");
-        assertNull(dbType);
+        final Optional<JiraDatabaseType> dbType = getDatabaseType(
+                "jdbc:sqlserver://amps-test;user=MyUserName;password=*****;", "net.sourceforge.jtds.jdbc.Driver");
+        assertThat(dbType, is(empty()));
     }
 
     @Test

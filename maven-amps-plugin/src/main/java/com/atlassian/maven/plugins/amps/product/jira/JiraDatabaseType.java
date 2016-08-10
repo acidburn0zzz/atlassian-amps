@@ -1,8 +1,14 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
+import com.atlassian.maven.plugins.amps.DataSource;
+
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Optional;
+import java.util.function.Function;
 
 import static java.util.Arrays.stream;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Mapping database type by database uri prefix and database driver Please refer to the JIRA database documentation at
@@ -10,29 +16,37 @@ import static java.util.Arrays.stream;
  */
 public enum JiraDatabaseType {
 
-    HSQL("hsql", true, "jdbc:hsqldb", "org.hsqldb.jdbcDriver", "org.hsqldb:hsqldb"),
-    H2("h2", true, "jdbc:h2", "org.h2.Driver", "com.h2database:h2"),
-    MYSQL("mysql", false, "jdbc:mysql", "com.mysql.jdbc.Driver", "mysql:mysql-connector-java"),
-    POSTGRES("postgres72", true, "jdbc:postgresql", "org.postgresql.Driver", "org.postgresql:postgresql"),
-    ORACLE_10G("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "com.oracle:ojdbc6"),
-    MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds:jtds"),
-    MSSQL_JTDS("mssql", true, "jdbc:jtds", "net.sourceforge.jtds.jdbc.Driver", "net.sourceforge.jtds:jtds");
+    HSQL("hsql", true, "jdbc:hsqldb", "org.hsqldb.jdbcDriver", "org.hsqldb:hsqldb", ds -> null),
+
+    H2("h2", true, "jdbc:h2", "org.h2.Driver", "com.h2database:h2", ds -> null),
+
+    MYSQL("mysql", false, "jdbc:mysql", "com.mysql.jdbc.Driver", "mysql:mysql-connector-java", JiraDatabaseMysqlImpl::new),
+
+    POSTGRES("postgres72", true, "jdbc:postgresql", "org.postgresql.Driver", "org.postgresql:postgresql", JiraDatabasePostgresImpl::new),
+
+    ORACLE_10G("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "com.oracle:ojdbc6", JiraDatabaseOracle10gImpl::new),
+
+    ORACLE_12C("oracle12c", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "com.oracle:ojdbc7", JiraDatabaseOracle12cImpl::new),
+
+    MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds:jtds", JiraDatabaseMssqlImpl::new),
+
+    MSSQL_JTDS("mssql", true, "jdbc:jtds", "net.sourceforge.jtds.jdbc.Driver", "net.sourceforge.jtds:jtds", JiraDatabaseMssqlImpl::new);
 
     /**
      * Returns the first {@link JiraDatabaseType} with the given JDBC URL prefix and driver class.
      *
      * @param uriPrefix the URL prefix to match upon
      * @param driverClassName the driver class to match upon
-     * @return null if there is no such enum value
+     * @return the matching database type, if one exists
+     * @since version 6.2.7
      */
-    @Nullable
-    public static JiraDatabaseType getDatabaseType(final String uriPrefix, final String driverClassName)
+    @Nonnull
+    public static Optional<JiraDatabaseType> getDatabaseType(final String uriPrefix, final String driverClassName)
     {
         return stream(values())
                 .filter(dbType -> dbType.accept(uriPrefix))
                 .filter(dbType -> dbType.driverClassName.equals(driverClassName))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     private final String dbType;
@@ -41,14 +55,17 @@ public enum JiraDatabaseType {
     private final String uriPrefix;
     private final String driverClassName;
     private final String libArtifact;
+    private final Function<DataSource, JiraDatabase> jiraDbSupplier;
 
-    JiraDatabaseType(final String dbType, final boolean hasSchema, final String uriPrefix, final String driverClassName, final String libArtifact)
+    JiraDatabaseType(final String dbType, final boolean hasSchema, final String uriPrefix, final String driverClassName,
+                     final String libArtifact, @Nonnull final Function<DataSource, JiraDatabase> jiraDbSupplier)
     {
         this.dbType = dbType;
         this.hasSchema = hasSchema;
         this.uriPrefix = uriPrefix;
         this.driverClassName = driverClassName;
         this.libArtifact = libArtifact;
+        this.jiraDbSupplier = requireNonNull(jiraDbSupplier);
     }
 
     /**
@@ -75,6 +92,17 @@ public enum JiraDatabaseType {
     public String getLibArtifact()
     {
         return libArtifact;
+    }
+
+    /**
+     * Returns the appropriate type of {@link JiraDatabase} for this {@link JiraDatabaseType}.
+     *
+     * @param dataSource the JIRA data source
+     * @return see above
+     */
+    @Nullable
+    public JiraDatabase getJiraDatabase(final DataSource dataSource) {
+        return jiraDbSupplier.apply(dataSource);
     }
 
     @Override
