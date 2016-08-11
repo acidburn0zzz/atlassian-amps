@@ -1,18 +1,15 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
 import com.atlassian.maven.plugins.amps.DataSource;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.commons.io.FileUtils.toFile;
+import static java.util.Objects.requireNonNull;
 
 public class JiraDatabaseOracle12cImpl extends AbstractJiraOracleDatabase
 {
@@ -32,10 +29,10 @@ public class JiraDatabaseOracle12cImpl extends AbstractJiraOracleDatabase
     }
 
     private String readFileToString(final String name) {
-        final URL fileUrl = getClass().getResource(name);
-        final File file = toFile(fileUrl);
+        final InputStream fileStream = getClass().getResourceAsStream(name);
+        requireNonNull(fileStream, format("Could not find '%s' on classpath of %s", name, getClass().getName()));
         try {
-            return FileUtils.readFileToString(file, UTF_8);
+            return IOUtils.toString(fileStream, UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
