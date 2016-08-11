@@ -3,12 +3,15 @@ package com.atlassian.maven.plugins.amps.product.jira;
 import com.atlassian.maven.plugins.amps.DataSource;
 import org.apache.commons.io.IOUtils;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.singletonMap;
 import static java.util.Objects.requireNonNull;
 
 public class JiraDatabaseOracle12cImpl extends AbstractJiraOracleDatabase
@@ -36,5 +39,12 @@ public class JiraDatabaseOracle12cImpl extends AbstractJiraOracleDatabase
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Nonnull
+    @Override
+    protected Map<String, String> getDriverProperties() {
+        // See http://www.oracle.com/technetwork/database/enterprise-edition/jdbc-faq-090281.html#05_11
+        return singletonMap("internal_logon", "SYSDBA");
     }
 }
