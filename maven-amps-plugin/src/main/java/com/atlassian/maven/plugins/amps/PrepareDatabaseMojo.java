@@ -64,10 +64,9 @@ public class PrepareDatabaseMojo extends AbstractTestGroupsHandlerMojo
                     {
                         case 1:
                             final DataSource dataSource = dataSources.get(0);
-                            final JiraDatabaseType databaseType = getDatabaseType(dataSource.getUrl(), dataSource.getDriver())
+                            final JiraDatabaseType databaseType = getDatabaseType(dataSource)
                                     .orElseThrow(() -> new MojoExecutionException(
-                                            "Could not detect database type, please check your database driver: " +
-                                                    dataSource.getDriver() + " and database url: " + dataSource.getUrl()));
+                                            "Could not detect database type for dataSource: " + dataSource));
                             // need to be clever here: add database artifact for maven-sql-plugin to execute sql
                             // if we have configured database library in product artifacts then we have 2 solutions:
                             // 1. check groupId, artifactId of all product's libraries contain

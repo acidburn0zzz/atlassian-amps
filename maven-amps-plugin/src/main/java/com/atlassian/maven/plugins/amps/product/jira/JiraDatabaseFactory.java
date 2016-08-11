@@ -1,7 +1,9 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
 import com.atlassian.maven.plugins.amps.DataSource;
+import com.sun.xml.txw2.IllegalSignatureException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.getDatabaseType;
@@ -27,13 +29,13 @@ public final class JiraDatabaseFactory
      * Returns the {@link JiraDatabase} for the given {@link DataSource}.
      *
      * @param dataSource the data source
-     * @return null if the database cannot be obtained
+     * @throws IllegalStateException if the database can't be obtained
      */
-    @Nullable
+    @Nonnull
     public JiraDatabase getJiraDatabase(final DataSource dataSource)
     {
-        return getDatabaseType(dataSource.getUrl(), dataSource.getDriver())
+        return getDatabaseType(dataSource)
                 .map(dbType -> dbType.getJiraDatabase(dataSource))
-                .orElse(null);
+                .orElseThrow(() -> new IllegalSignatureException("No DB type for " + dataSource));
     }
 }

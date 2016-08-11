@@ -270,8 +270,8 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         if (ctx.getDataSources().size() == 1)
         {
             final DataSource ds = ctx.getDataSources().get(0);
-            final JiraDatabaseType dbType = getDatabaseType(ds.getUrl(), ds.getDriver()).orElseThrow(
-                    () -> new MojoExecutionException("The DataSource configuration was not correct, review DataSource url and driver"));
+            final JiraDatabaseType dbType = getDatabaseType(ds).orElseThrow(
+                    () -> new MojoExecutionException("Could not find database type for " + ds));
             updateDbConfigXml(homeDir, dbType, ds.getSchema());
         }
         else if (ctx.getDataSources().size() > 1)

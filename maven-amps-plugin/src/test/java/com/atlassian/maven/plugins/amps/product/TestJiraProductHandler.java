@@ -5,7 +5,6 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Build;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.dom4j.Node;
@@ -24,7 +23,6 @@ import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_FROM_4_1;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UNZIPPED;
@@ -38,9 +36,7 @@ import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.MYS
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.ORACLE_10G;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.ORACLE_12C;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.POSTGRES;
-import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.getDatabaseType;
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
@@ -245,47 +241,13 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void getDatabaseTypeWithNull() throws Exception
+    public void dbconfigXmlNotCreatedWhenAlreadyExists() throws Exception
     {
-        final Optional<JiraDatabaseType> dbType = getDatabaseType(null, null);
-
-        assertThat(dbType, is(empty()));
-    }
-
-    @Test
-    public void getDatabaseTypePostgresUriAndDriver() throws Exception
-    {
-        final Optional<JiraDatabaseType> dbType =
-                getDatabaseType("jdbc:postgresql://localhost:5432/amps-test", "org.postgresql.Driver");
-
-        assertThat(dbType, is(Optional.of(POSTGRES.getDbType())));
-    }
-
-    @Test
-    public void getDatabaseTypeMssqlUriAndDriver() throws Exception
-    {
-        final Optional<JiraDatabaseType> dbType =
-                getDatabaseType("jdbc:sqlserver://amps-test", "com.microsoft.sqlserver.jdbc.SQLServerDriver");
-
-        assertThat(dbType, is(Optional.of(MSSQL.getDbType())));
-    }
-
-    @Test
-    public void getDatabaseTypeMssqlUriAndAcrossDriver() throws Exception
-    {
-        final Optional<JiraDatabaseType> dbType = getDatabaseType(
-                "jdbc:sqlserver://amps-test;user=MyUserName;password=*****;", "net.sourceforge.jtds.jdbc.Driver");
-        assertThat(dbType, is(empty()));
-    }
-
-    @Test
-    public void dbconfigXmlNotCreatedWhenAlreadyExists() throws MojoExecutionException, IOException
-    {
-        File f = new File(tempHome, FILENAME_DBCONFIG);
+        final File f = new File(tempHome, FILENAME_DBCONFIG);
         FileUtils.writeStringToFile(f, "Original contents");
         JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
 
-        String after = FileUtils.readFileToString(f);
+        final String after = FileUtils.readFileToString(f);
         assertEquals("Original contents", after);
     }
 

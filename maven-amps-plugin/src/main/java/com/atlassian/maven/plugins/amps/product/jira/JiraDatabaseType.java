@@ -24,28 +24,35 @@ public enum JiraDatabaseType {
 
     POSTGRES("postgres72", true, "jdbc:postgresql", "org.postgresql.Driver", "org.postgresql:postgresql", JiraDatabasePostgresImpl::new),
 
-    ORACLE_10G("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "com.oracle:ojdbc6", JiraDatabaseOracle10gImpl::new),
+    // Has to appear before 10g as it is more stringent (checks the driver artifact)
+    ORACLE_12C("oracle12c", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "com.oracle:ojdbc7", JiraDatabaseOracle12cImpl::new) {
 
-    ORACLE_12C("oracle12c", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "com.oracle:ojdbc7", JiraDatabaseOracle12cImpl::new),
+        @Override
+        boolean matches(final DataSource dataSource) {
+            return super.matches(dataSource) &&
+                    dataSource.getLibArtifacts().stream().anyMatch(driver -> "ojdbc7".equals(driver.getArtifactId()));
+        }
+    },
+
+    // Not checking the driver artifact as that could break existing datasources that don't define it
+    ORACLE_10G("oracle10g", false, "jdbc:oracle", "oracle.jdbc.OracleDriver", "com.oracle:ojdbc6", JiraDatabaseOracle10gImpl::new),
 
     MSSQL("mssql", true, "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds:jtds", JiraDatabaseMssqlImpl::new),
 
     MSSQL_JTDS("mssql", true, "jdbc:jtds", "net.sourceforge.jtds.jdbc.Driver", "net.sourceforge.jtds:jtds", JiraDatabaseMssqlImpl::new);
 
     /**
-     * Returns the first {@link JiraDatabaseType} with the given JDBC URL prefix and driver class.
+     * Returns the {@link JiraDatabaseType} for the given {@link DataSource}.
      *
-     * @param uriPrefix the URL prefix to match upon
-     * @param driverClassName the driver class to match upon
-     * @return the matching database type, if one exists
+     * @param dataSource the datasource for which to get the type
+     * @return the first matching database type, if one exists
      * @since version 6.2.7
      */
     @Nonnull
-    public static Optional<JiraDatabaseType> getDatabaseType(final String uriPrefix, final String driverClassName)
+    public static Optional<JiraDatabaseType> getDatabaseType(final DataSource dataSource)
     {
         return stream(values())
-                .filter(dbType -> dbType.accept(uriPrefix))
-                .filter(dbType -> dbType.driverClassName.equals(driverClassName))
+                .filter(dbType -> dbType.matches(dataSource))
                 .findFirst();
     }
 
@@ -66,6 +73,16 @@ public enum JiraDatabaseType {
         this.driverClassName = driverClassName;
         this.libArtifact = libArtifact;
         this.jiraDbSupplier = requireNonNull(jiraDbSupplier);
+    }
+
+    /**
+     * Indicates whether this db type matches the given data source.
+     *
+     * @param dataSource the data source to check against
+     * @return see above
+     */
+    boolean matches(final DataSource dataSource) {
+        return accept(dataSource.getUrl()) && driverClassName.equals(dataSource.getDriver());
     }
 
     /**
