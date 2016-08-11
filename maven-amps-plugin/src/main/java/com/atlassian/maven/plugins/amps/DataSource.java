@@ -1,12 +1,13 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 import static com.google.common.base.Objects.firstNonNull;
+import static org.apache.commons.lang.builder.ToStringBuilder.reflectionToString;
+import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 /**
  * Definition of a datasource.
@@ -335,9 +336,7 @@ public class DataSource
     @Override
     public String toString()
     {
-        return "DataSource [url=" + url + ", driver=" + driver + ", username=" + username + ", password=" + password + ", jndi=" + jndi + ", type=" + type
-                + ", transactionSupport=" + transactionSupport + ", properties=" + properties + ", cargoString=" + cargoString + ", libArtifacts="
-                + libArtifacts + "]";
+        // Used in error messages, etc.
+        return reflectionToString(this, SHORT_PREFIX_STYLE);
     }
-
 }
