@@ -97,6 +97,13 @@ public abstract class AbstractJiraOracleDatabase extends AbstractJiraDatabase
         return sqlPluginConfiguration;
     }
 
+    /**
+     * Subclasses should return the SQL (or PL/SQL) command(s) necessary to
+     * drop and recreate the JIRA user (i.e. schema). It can be assumed that
+     * there is a SYSDBA session in progress.
+     *
+     * @return a valid SQL string
+     */
     protected abstract String getSqlToDropAndCreateUser();
 
     /**
