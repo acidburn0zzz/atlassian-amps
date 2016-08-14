@@ -126,9 +126,12 @@ public abstract class AbstractJiraOracleDatabase extends AbstractJiraDatabase
     }
 
     /**
-     * Subclasses can override this method to set any desired driver
-     * properties for the sql-maven-plugin to pass on to JDBC. This
-     * implementation returns an empty map.
+     * Subclasses can override this method to set any desired driver properties
+     * for the sql-maven-plugin to pass on to JDBC. This implementation returns
+     * an empty map. Note that the <code>SqlExecMojo</code> in the
+     * sql-maven-plugin already sets the "user" and "password" properties to the
+     * values of that mojo's "username" and "password" fields, so you don't need
+     * to set these properties in the method below.
      *
      * @return the desired property names and values
      * @see java.sql.DriverManager#getConnection(String, Properties)
