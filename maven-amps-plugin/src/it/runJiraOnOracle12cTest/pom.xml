@@ -1,0 +1,85 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.atlassian.amps.it</groupId>
+    <artifactId>maven-jira-plugin-run-on-oracle12c-test</artifactId>
+    <version>testing</version>
+    <packaging>atlassian-plugin</packaging>
+
+    <name>TestRunJiraOnOracle12c</name>
+    <description>Tests that AMPS can run JIRA on Oracle RDBMS 12c, including importing a dump file</description>
+
+    <properties>
+        <oracle.jdbc.version>12.1.0.1</oracle.jdbc.version>
+        <!-- From https://extranet.atlassian.com/display/RELENG/HOWTO+-+Connect+to+a+specified+database+inside+a+Bamboo+plan -->
+        <oracle.host>localhost</oracle.host>
+        <oracle.port>1521</oracle.port>
+        <oracle.sid>test</oracle.sid>
+        <oracle.system.username>oracle</oracle.system.username>
+        <oracle.system.password>oracle</oracle.system.password>
+        <!-- Details of the PDB we use for JIRA (arbitrary) -->
+        <oracle.jira.password>jira_pwd</oracle.jira.password>
+        <oracle.jira.username>jira_user</oracle.jira.username>
+        <!-- The name of JIRA's pluggable database (set by AMPS) -->
+        <oracle.jira.service>JIRA_PDB</oracle.jira.service>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>maven-jira-plugin</artifactId>
+                <version>6.2.7-SNAPSHOT</version>
+                <extensions>true</extensions>
+                <dependencies>
+                    <dependency>
+                        <!-- Allows AMPS to talk to the database -->
+                        <groupId>com.oracle</groupId>
+                        <artifactId>ojdbc7</artifactId>
+                        <version>${oracle.jdbc.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <importMethod>impdp</importMethod>
+                    <products>
+                        <product>
+                            <id>jira</id>
+                            <version>${jira.version}</version>
+                            <dataPath>
+                                ${basedir}/target/test-classes/oracle-home-dir.zip
+                            </dataPath>
+                            <libArtifacts>
+                                <libArtifact>
+                                    <!-- Allows JIRA to talk to the database -->
+                                    <groupId>com.oracle</groupId>
+                                    <artifactId>ojdbc7</artifactId>
+                                    <version>${oracle.jdbc.version}</version>
+                                </libArtifact>
+                            </libArtifacts>
+                            <dataSources>
+                                <dataSource>
+                                    <jndi>jdbc/JiraDS</jndi>
+                                    <driver>oracle.jdbc.OracleDriver</driver>
+
+                                    <!-- Properties used by the sql-maven-plugin to create and populate the JIRA PDB -->
+                                    <!-- When connecting to the root container, we use a SID-based URL -->
+                                    <defaultDatabase>jdbc:oracle:thin:@${oracle.host}:${oracle.port}:${oracle.sid}</defaultDatabase>
+                                    <systemUsername>${oracle.system.username}</systemUsername>
+                                    <systemPassword>${oracle.system.password}</systemPassword>
+                                    <dumpFilePath>${project.basedir}/src/test/resources/jira_70_oracle_11g_dump.dmp</dumpFilePath>
+
+                                    <!-- Properties used by JIRA to connect to its PDB -->
+                                    <!-- When connecting to a PDB, we use the "service name" URL format -->
+                                    <url>jdbc:oracle:thin:@${oracle.host}:${oracle.port}/${oracle.jira.service}</url>
+                                    <username>${oracle.jira.username}</username>
+                                    <password>${oracle.jira.password}</password>
+                                </dataSource>
+                            </dataSources>
+                        </product>
+                    </products>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
