@@ -18,15 +18,13 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 import java.io.File;
@@ -34,14 +32,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.jar.Manifest;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import static com.atlassian.maven.plugins.amps.MavenGoals.AJP_PORT_PROPERTY;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
@@ -55,6 +52,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeastOnce;
@@ -137,28 +135,25 @@ public class TestMavenGoals
         when(executionEnvironment.getMavenProject()).thenReturn(project);
         when(executionEnvironment.getMavenSession()).thenReturn(session);
         when(executionEnvironment.getBuildPluginManager()).thenReturn(buildPluginManager);
-        when(buildPluginManager.loadPlugin(any(Plugin.class), any(List.class), any(RepositorySystemSession.class))).thenReturn(pluginDescriptor);
+        when(buildPluginManager.loadPlugin(any(Plugin.class), anyListOf(RemoteRepository.class), any(RepositorySystemSession.class)))
+                .thenReturn(pluginDescriptor);
         when(pluginDescriptor.getMojo(anyString())).thenReturn(mojoDescriptor);
         when(mojoDescriptor.getMojoConfiguration()).thenReturn(new DefaultPlexusConfiguration(""));
         when(mojoDescriptor.getParameters()).thenReturn(params);
 
         Mockito.doCallRealMethod().when(executionEnvironment).executeMojo(any(Plugin.class), any(String.class), any(Xpp3Dom.class));
         Mockito.doCallRealMethod().when(project).getGoalConfiguration(anyString(), anyString(), anyString(), anyString());
-        Mockito.doAnswer(new Answer<Object>()
-        {
-            public Object answer(InvocationOnMock invocation)
+        Mockito.doAnswer(invocation -> {
+            final Object[] args = invocation.getArguments();
+            if (null != args[1])
             {
-                final Object[] args = invocation.getArguments();
-                if (null != args[1])
+                final Xpp3Dom finalConfig = ((MojoExecution) args[1]).getConfiguration();
+                if (null != finalConfig && finalConfig != internalConfig)
                 {
-                    final Xpp3Dom finalConfig = ((MojoExecution) args[1]).getConfiguration();
-                    if (null != finalConfig && finalConfig != internalConfig)
-                    {
-                        throw new RuntimeException("Global Cargo is still there");
-                    }
+                    throw new RuntimeException("Global Cargo is still there");
                 }
-                return "ok";
             }
+            return "ok";
         }).when(buildPluginManager).executeMojo(any(MavenSession.class), any(MojoExecution.class));
         // Invoke
         goals.executeMojoExcludeProductCargoConfig(internalCargo, "start", internalConfig, executionEnvironment);
@@ -169,11 +164,8 @@ public class TestMavenGoals
     @Test
     public void testPickFreePort() throws IOException
     {
-        ServerSocket socket = null;
-        try
+        try (final ServerSocket ignored = new ServerSocket(16829))
         {
-            socket = new ServerSocket(16829);
-
             // Pick any
             int port = goals.pickFreePort(0);
             assertTrue(16829 != port);
@@ -187,29 +179,26 @@ public class TestMavenGoals
             // Pick free
             assertEquals(16828, goals.pickFreePort(16828));
         }
-        finally
-        {
-            socket.close();
-        }
     }
 
     @Test
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void testGenerateMinimalManifest() throws Exception
     {
-        File tempDir = File.createTempFile("TestMavenGoals", "dir");
+        final File tempDir = File.createTempFile("TestMavenGoals", "dir");
         tempDir.delete();
         tempDir.mkdir();
 
         when(build.getOutputDirectory()).thenReturn(tempDir.getAbsolutePath());
 
-        Map<String, String> attrs = ImmutableMap.of("Attribute-A", "aaa", "Attribute-B", "bbb");
+        final Map<String, String> attrs = ImmutableMap.of("Attribute-A", "aaa", "Attribute-B", "bbb");
 
         goals.generateMinimalManifest(attrs);
 
-        File mf = file(tempDir.getAbsolutePath(), "META-INF", "MANIFEST.MF");
+        final File mf = file(tempDir.getAbsolutePath(), "META-INF", "MANIFEST.MF");
         assertTrue(mf.exists());
 
-        Manifest m = new Manifest(new FileInputStream(mf));
+        final Manifest m = new Manifest(new FileInputStream(mf));
         assertEquals("aaa", m.getMainAttributes().getValue("Attribute-A"));
         assertEquals("bbb", m.getMainAttributes().getValue("Attribute-B"));
         assertNull(m.getMainAttributes().getValue("Bundle-SymbolicName"));
@@ -309,7 +298,7 @@ public class TestMavenGoals
         when(product.getContextPath()).thenReturn("/context");
         when(war.getPath()).thenReturn("/");
 
-        goals.startWebapp(productInstanceId, war, new HashMap<String, String>(), new ArrayList<ProductArtifact>(), product);
+        goals.startWebapp(productInstanceId, war, new HashMap<>(), new ArrayList<>(), product);
 
         verify(product).getRmiPort();
         verify(product).getAjpPort();
