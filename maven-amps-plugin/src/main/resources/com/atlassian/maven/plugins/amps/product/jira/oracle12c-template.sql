@@ -1,4 +1,4 @@
--- To run this script, you need to connect using the username "SYS AS SYSDBA"
+-- This script must be run as a user with the "SYSDBA" role
 DECLARE
   v_count INTEGER := 0;
   v_sid VARCHAR2(20);
