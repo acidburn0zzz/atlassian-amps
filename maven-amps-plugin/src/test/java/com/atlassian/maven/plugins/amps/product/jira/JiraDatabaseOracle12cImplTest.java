@@ -36,7 +36,7 @@ public class JiraDatabaseOracle12cImplTest {
 
         // Check
         assertThat(sqlToDropAndCreateUser, is(
-                "-- To run this script, you need to connect using the username \"SYS AS SYSDBA\"\n" +
+                "-- This script must be run as a user with the \"SYSDBA\" role\n" +
                 "DECLARE\n" +
                 "  v_count INTEGER := 0;\n" +
                 "  v_sid VARCHAR2(20);\n" +

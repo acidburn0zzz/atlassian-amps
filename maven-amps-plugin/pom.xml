@@ -72,9 +72,10 @@
             <artifactId>maven-compat</artifactId>
             <version>${bundled.maven.version}</version>
         </dependency>
-        <dependency><!-- Version required by mojo-executor -->
+        <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
+            <!-- Version required by mojo-executor -->
             <version>3.0.15</version>
         </dependency>
 
