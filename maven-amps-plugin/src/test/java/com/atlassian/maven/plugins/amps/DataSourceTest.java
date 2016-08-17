@@ -1,9 +1,12 @@
 package com.atlassian.maven.plugins.amps;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class DataSourceTest
 {
@@ -28,13 +31,13 @@ public class DataSourceTest
     public void testCreateCargoString()
     {
         assertEquals("cargo.datasource.url=aUrl" +
-        		"|cargo.datasource.driver=aDriver" +
-        		"|cargo.datasource.username=aUsername" +
-        		"|cargo.datasource.password=aPassword" +
-        		"|cargo.datasource.jndi=aJndi" +
-        		"|cargo.datasource.type=aType" +
-        		"|cargo.datasource.transactionsupport=aTransactionSupport" +
-        		"|cargo.datasource.properties=aProperties", ds.getCargoString());
+                "|cargo.datasource.driver=aDriver" +
+                "|cargo.datasource.username=aUsername" +
+                "|cargo.datasource.password=aPassword" +
+                "|cargo.datasource.jndi=aJndi" +
+                "|cargo.datasource.type=aType" +
+                "|cargo.datasource.transactionsupport=aTransactionSupport" +
+                "|cargo.datasource.properties=aProperties", ds.getCargoString());
     }
     
     @Test
@@ -88,12 +91,26 @@ public class DataSourceTest
         ds.useForUnsetValues(defaultValues);
         
         assertEquals("cargo.datasource.url=b" +
-        		"|cargo.datasource.driver=c" +
-        		"|cargo.datasource.username=d" +
-        		"|cargo.datasource.password=e" +
-        		"|cargo.datasource.jndi=a" +
-        		"|cargo.datasource.type=f" +
-        		"|cargo.datasource.transactionsupport=g" +
-        		"|cargo.datasource.properties=h", ds.getCargoString());
+                "|cargo.datasource.driver=c" +
+                "|cargo.datasource.username=d" +
+                "|cargo.datasource.password=e" +
+                "|cargo.datasource.jndi=a" +
+                "|cargo.datasource.type=f" +
+                "|cargo.datasource.transactionsupport=g" +
+                "|cargo.datasource.properties=h", ds.getCargoString());
+    }
+
+    @Test
+    public void toStringShouldNotIncludeAnyPasswords() {
+        // Set up
+        final String password = "verboten!";
+        ds.setPassword(password);
+        ds.setSystemPassword(password);
+
+        // Invoke
+        final String toString = ds.toString();
+
+        // Check
+        assertThat(toString, not(containsString(password)));
     }
 }

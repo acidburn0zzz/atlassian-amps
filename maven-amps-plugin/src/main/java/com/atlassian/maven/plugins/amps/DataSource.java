@@ -2,10 +2,12 @@ package com.atlassian.maven.plugins.amps;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 import java.util.List;
 
 import static com.google.common.base.Objects.firstNonNull;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
@@ -16,6 +18,7 @@ import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
  */
 public class DataSource
 {
+    private static final String[] FIELDS_TO_EXCLUDE_FROM_TO_STRING = { "password", "systemPassword" };
 
     /**
      * Connection url, such as "jdbc:h2:file:/path/to/database/file"
@@ -131,22 +134,26 @@ public class DataSource
 
     public String getCargoString()
     {
-        if (cargoString != null)
+        if (cargoString != null) {
             return cargoString;
-        
-        List<String> cargoProperties = Lists.newArrayList();
+        }
+
+        final List<String> cargoProperties = Lists.newArrayList();
         cargoProperties.add("cargo.datasource.url=" + firstNonNull(url, ""));
         cargoProperties.add("cargo.datasource.driver=" + firstNonNull(driver, ""));
         cargoProperties.add("cargo.datasource.username=" + firstNonNull(username, ""));
         cargoProperties.add("cargo.datasource.password=" + firstNonNull(password, ""));
         cargoProperties.add("cargo.datasource.jndi=" + firstNonNull(jndi, ""));
-        if (!StringUtils.isBlank(type))
+        if (!isBlank(type)) {
             cargoProperties.add("cargo.datasource.type=" + type);
-        if (!StringUtils.isBlank(transactionSupport))
+        }
+        if (!isBlank(transactionSupport)) {
             cargoProperties.add("cargo.datasource.transactionsupport=" + transactionSupport);
-        if (!StringUtils.isBlank(properties))
+        }
+        if (!isBlank(properties)) {
             cargoProperties.add("cargo.datasource.properties=" + properties);
-        
+        }
+
         cargoString = StringUtils.join(cargoProperties, "|");
         return cargoString;
     }
@@ -334,9 +341,10 @@ public class DataSource
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         // Used in error messages, etc.
-        return reflectionToString(this, SHORT_PREFIX_STYLE);
+        return new ReflectionToStringBuilder(this, SHORT_PREFIX_STYLE)
+                .setExcludeFieldNames(FIELDS_TO_EXCLUDE_FROM_TO_STRING)
+                .toString();
     }
 }
