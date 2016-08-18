@@ -13,7 +13,7 @@
                 <artifactId>${invoker.artifactId}</artifactId>
                 <version>${project.version}</version>
                 <configuration>
-                	<encoding>UTF-16</encoding>
+                    <encoding>UTF-16</encoding>
                 </configuration>
             </plugin>
         </plugins>

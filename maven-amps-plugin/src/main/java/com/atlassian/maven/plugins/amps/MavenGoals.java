@@ -1288,7 +1288,7 @@ public class MavenGoals
         final String dumpFilePath = dataSource.getDumpFilePath();
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
-        final Xpp3Dom configDropCreateSchema = jiraDatabase.getPluginConfiguration();
+        final Xpp3Dom sqlMavenPluginConfiguration = jiraDatabase.getPluginConfiguration();
         final List<Dependency> libs = jiraDatabase.getDependencies();
         final Plugin sqlMaven = plugin(
                 groupId("org.codehaus.mojo"),
@@ -1299,7 +1299,7 @@ public class MavenGoals
         executeMojo(
                 sqlMaven,
                 goal("execute"),
-                configDropCreateSchema,
+                sqlMavenPluginConfiguration,
                 executionEnvironment()
         );
         if (StringUtils.isNotEmpty(dumpFilePath))

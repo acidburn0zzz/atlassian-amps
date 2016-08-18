@@ -1,5 +1,27 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import com.atlassian.maven.plugins.amps.DataSource;
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Node;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,30 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import com.atlassian.maven.plugins.amps.DataSource;
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Node;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
-
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.getDatabaseType;
 import static com.atlassian.maven.plugins.amps.util.ConfigFileUtils.RegexReplacement;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static java.lang.String.format;
@@ -271,15 +270,9 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         if (ctx.getDataSources().size() == 1)
         {
             final DataSource ds = ctx.getDataSources().get(0);
-            JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType(ds.getUrl(), ds.getDriver());
-            if (null != dbType)
-            {
-                updateDbConfigXml(homeDir, dbType, ds.getSchema());
-            }
-            else
-            {
-                throw new MojoExecutionException("The DataSource configuration was not correct, review DataSource url and driver");
-            }
+            final JiraDatabaseType dbType = getDatabaseType(ds).orElseThrow(
+                    () -> new MojoExecutionException("Could not find database type for " + ds));
+            updateDbConfigXml(homeDir, dbType, ds.getSchema());
         }
         else if (ctx.getDataSources().size() > 1)
         {

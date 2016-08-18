@@ -1,28 +1,14 @@
 package com.atlassian.maven.plugins.amps.product;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-
-import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
-
-import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Build;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,13 +17,26 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.w3c.dom.Document;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_FROM_4_1;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UNZIPPED;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_UPTO_4_0;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.FILENAME_DBCONFIG;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.INSTALLED_PLUGINS_DIR;
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.PLUGINS_DIR;
-import static org.hamcrest.CoreMatchers.equalTo;
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.MSSQL;
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.MSSQL_JTDS;
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.MYSQL;
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.ORACLE_10G;
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.ORACLE_12C;
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.POSTGRES;
+import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
@@ -45,14 +44,14 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class TestJiraProductHandler
 {
-    static File tempHome;
+    private static File tempHome;
+
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -64,7 +63,7 @@ public class TestJiraProductHandler
     @Before
     public void createTemporaryHomeDirectory() throws IOException
     {
-        File f = File.createTempFile("temp-jira-", "-home");
+        final File f = File.createTempFile("temp-jira-", "-home");
         if (!f.delete())
         {
             throw new IOException();
@@ -109,33 +108,39 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void updateDBConfigXmlForOracle() throws Exception
+    public void updateDBConfigXmlForOracle10g() throws Exception
     {
-        testUpdateDbConfigXml(JiraDatabaseType.ORACLE);
+        testUpdateDbConfigXml(ORACLE_10G);
+    }
+
+    @Test
+    public void updateDBConfigXmlForOracle12c() throws Exception
+    {
+        testUpdateDbConfigXml(ORACLE_12C);
     }
 
     @Test
     public void updateDBConfigXmlForMysql() throws Exception
     {
-        testUpdateDbConfigXml(JiraDatabaseType.MYSQL);
+        testUpdateDbConfigXml(MYSQL);
     }
 
     @Test
     public void updateDBConfigXmlForPostgres() throws Exception
     {
-        testUpdateDbConfigXml(JiraDatabaseType.POSTGRES);
+        testUpdateDbConfigXml(POSTGRES);
     }
 
     @Test
     public void updateDBConfigXmlForMssql() throws Exception
     {
-        testUpdateDbConfigXml(JiraDatabaseType.MSSQL);
+        testUpdateDbConfigXml(MSSQL);
     }
 
     @Test
     public void updateDBConfigXmlForMssqlJTDS() throws Exception
     {
-        testUpdateDbConfigXml(JiraDatabaseType.MSSQL_JTDS);
+        testUpdateDbConfigXml(MSSQL_JTDS);
     }
 
     @Test
@@ -149,7 +154,7 @@ public class TestJiraProductHandler
         final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
         final Product product = new Product();
         product.setInstanceId("jira");
-        product.setDataSources(Lists.<DataSource>newArrayList());
+        product.setDataSources(newArrayList());
 
         // when
         product.setAwaitFullInitialization(null);
@@ -173,7 +178,7 @@ public class TestJiraProductHandler
         final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
         final Product product = new Product();
         product.setInstanceId("jira");
-        product.setDataSources(Lists.<DataSource>newArrayList());
+        product.setDataSources(newArrayList());
 
         // when
         product.setAwaitFullInitialization(true);
@@ -236,44 +241,13 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void getDatabaseTypeWithNull() throws Exception
+    public void dbconfigXmlNotCreatedWhenAlreadyExists() throws Exception
     {
-        final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType(null, null);
-        assertNull(dbType);
-
-
-    }
-    @Test
-    public void getDatabaseTypePostgresUriAndDriver() throws Exception
-    {
-        final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType("jdbc:postgresql://localhost:5432/amps-test", "org.postgresql.Driver");
-        assertNotNull(dbType);
-        assertThat("Database type must be postgres72", dbType.getDbType(), equalTo(JiraDatabaseType.POSTGRES.getDbType()));
-    }
-
-    @Test
-    public void getDatabaseTypeMssqlUriAndDriver() throws Exception
-    {
-        final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType("jdbc:sqlserver://amps-test", "com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        assertNotNull(dbType);
-        assertEquals(dbType.getDbType(), JiraDatabaseType.MSSQL.getDbType());
-    }
-
-    @Test
-    public void getDatabaseTypeMssqlUriAndAcrossDriver() throws Exception
-    {
-        final JiraDatabaseType dbType = JiraDatabaseType.getDatabaseType("jdbc:sqlserver://amps-test;user=MyUserName;password=*****;", "net.sourceforge.jtds.jdbc.Driver");
-        assertNull(dbType);
-    }
-
-    @Test
-    public void dbconfigXmlNotCreatedWhenAlreadyExists() throws MojoExecutionException, IOException
-    {
-        File f = new File(tempHome, FILENAME_DBCONFIG);
+        final File f = new File(tempHome, FILENAME_DBCONFIG);
         FileUtils.writeStringToFile(f, "Original contents");
         JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
 
-        String after = FileUtils.readFileToString(f);
+        final String after = FileUtils.readFileToString(f);
         assertEquals("Original contents", after);
     }
 
@@ -315,6 +289,7 @@ public class TestJiraProductHandler
     public void bundledPluginsShouldBeUnzippedIfPresent()
     {
         final File bundledPluginsDir = new File(tempHome, BUNDLED_PLUGINS_UNZIPPED);
+        //noinspection ResultOfMethodCallIgnored
         bundledPluginsDir.mkdirs();
         assertTrue(bundledPluginsDir.exists());
         assertBundledPluginPath("6.3", tempHome, bundledPluginsDir);
