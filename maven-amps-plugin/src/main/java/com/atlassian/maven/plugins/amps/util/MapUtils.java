@@ -8,7 +8,7 @@ import static java.util.stream.Collectors.joining;
 /**
  * {@link java.util.Map}-related utility methods.
  *
- * @since 6.3.7
+ * @since 6.2.7
  */
 public final class MapUtils {
 
