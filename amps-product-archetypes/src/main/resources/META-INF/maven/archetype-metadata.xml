@@ -53,7 +53,7 @@
         </requiredProperty>
 
         <requiredProperty key="refappVersion">
-            <defaultValue>${refapp.version}</defaultValue>
+            <defaultValue>3.3.6</defaultValue>
         </requiredProperty>
         <requiredProperty key="refappDataVersion">
             <defaultValue>${refapp.data.version}</defaultValue>
