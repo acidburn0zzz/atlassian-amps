@@ -43,6 +43,26 @@ public class RunCloudMojo extends AbstractAmpsMojo
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
+
+        this.getLog().warn("");
+        this.getLog().warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        this.getLog().warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        this.getLog().warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        this.getLog().warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        this.getLog().warn("");
+        this.getLog().warn(">>> WARNING: atlas-run-cloud is no longer the supported method for <<<");
+        this.getLog().warn(">>> developing a cloud add-on.                                     <<<");
+        this.getLog().warn(">>> See: http://developer.atlassian.com/connect for more info      <<<");
+        this.getLog().warn("");
+        this.getLog().warn(">>> WARNING: Support for atlas-run-cloud will be completely remo-  <<<");
+        this.getLog().warn(">>> ved in the next AMPS version.                                  <<<");
+        this.getLog().warn("");
+        this.getLog().warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        this.getLog().warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        this.getLog().warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        this.getLog().warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        this.getLog().warn("");
+
         if (!SUPPORTED_PRODUCTS.contains(application))
         {
             throw new IllegalArgumentException("Unknown application: '" + application + "' Valid values: " + SUPPORTED_PRODUCTS);
