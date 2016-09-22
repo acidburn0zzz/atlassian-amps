@@ -4,6 +4,9 @@ import static com.atlassian.maven.plugins.amps.util.FileUtils.copyDirectory;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.doesFileNameMatchArtifact;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.OSUtils.isWindows;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import junit.framework.TestCase;
 
@@ -65,5 +68,16 @@ public class TestFileUtils extends TestCase
     private static File tempDirectory()
     {
         return new File(new File(System.getProperty("java.io.tmpdir")), UUID.randomUUID().toString());
+    }
+
+    public void testReadFileToString()
+    {
+        // Invoke
+        final String actualText = FileUtils.readFileToString("TestFileUtils.txt", getClass(), UTF_8);
+
+        // Check
+        final String expectedText = "\nThis file is for reading by TestFileUtils#testReadFileToString.\n" +
+                "It has multiple lines, and leading/trailing whitespace.\n";
+        assertThat(actualText, is(expectedText));
     }
 }
