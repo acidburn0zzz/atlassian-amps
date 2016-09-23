@@ -3,12 +3,18 @@ package com.atlassian.maven.plugins.amps;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.support.DatabaseMetaDataCallback;
+import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.jdbc.support.MetaDataAccessException;
 
+import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Optional;
 
+import static com.atlassian.maven.plugins.amps.util.PropertyUtils.parse;
 import static com.google.common.base.Objects.firstNonNull;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 /**
@@ -341,10 +347,40 @@ public class DataSource
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         // Used in error messages, etc.
         return new ReflectionToStringBuilder(this, SHORT_PREFIX_STYLE)
                 .setExcludeFieldNames(FIELDS_TO_EXCLUDE_FROM_TO_STRING)
                 .toString();
+    }
+
+    /**
+     * Returns the JDBC data source for this instance, connecting as the configured
+     * system user and applying any configured driver properties.
+     *
+     * @return see above
+     */
+    public javax.sql.DataSource getJdbcDataSource()
+    {
+        final DriverManagerDataSource dataSource = new DriverManagerDataSource(url, systemUsername, systemPassword);
+        dataSource.setConnectionProperties(parse(properties, '=', ';'));
+        return dataSource;
+    }
+
+    /**
+     * Queries this data source for its JDBC metadata and applies the given callback.
+     *
+     * @param callback the callback to apply
+     * @return the non-null return value of the callback, or none if null or there was an error
+     */
+    public <T> Optional<T> getJdbcMetaData(@Nonnull final DatabaseMetaDataCallback callback) {
+        try {
+            @SuppressWarnings("unchecked")
+            final T metaData = (T) JdbcUtils.extractDatabaseMetaData(getJdbcDataSource(), callback);
+            return Optional.ofNullable(metaData);
+        } catch (final ClassCastException | MetaDataAccessException e) {
+            return Optional.empty();
+        }
     }
 }
