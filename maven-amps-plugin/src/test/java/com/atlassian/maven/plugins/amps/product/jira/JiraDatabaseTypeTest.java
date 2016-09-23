@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps.product.jira;
 import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.LibArtifact;
 import org.junit.Test;
+import org.springframework.jdbc.support.DatabaseMetaDataCallback;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -13,8 +14,10 @@ import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.ORA
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.POSTGRES;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.getDatabaseType;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,6 +39,7 @@ public class JiraDatabaseTypeTest {
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getDriver()).thenReturn(driverClass);
         when(dataSource.getUrl()).thenReturn(url);
+        when(dataSource.getJdbcMetaData(any(DatabaseMetaDataCallback.class))).thenReturn(empty());
         if (driverArtifactId != null) {
             final LibArtifact driver = mock(LibArtifact.class);
             when(driver.getArtifactId()).thenReturn(driverArtifactId);
@@ -69,9 +73,19 @@ public class JiraDatabaseTypeTest {
     }
 
     @Test
-    public void shouldRecogniseOracle12gArtifactId()
+    public void shouldRecogniseOracle12gFromJdbcMetadata()
     {
-        assertDbType("jdbc:oracle:thin:@localhost:1521:XE", "oracle.jdbc.OracleDriver", "ojdbc7", ORACLE_12C);
+        // Set up
+        final DataSource dataSource =
+                mockDataSource("jdbc:oracle:thin:@localhost:1521:XE", "oracle.jdbc.OracleDriver", "ojdbc7");
+        final String dummyDbVersion = JiraDatabaseType.ORACLE_12C_VERSION_PREFIX + " some random suffix";
+        when(dataSource.getJdbcMetaData(any(DatabaseMetaDataCallback.class))).thenReturn(Optional.of(dummyDbVersion));
+
+        // Invoke
+        final Optional<JiraDatabaseType> dbType = getDatabaseType(dataSource);
+
+        // Check
+        assertThat(dbType, is(Optional.of(ORACLE_12C)));
     }
 
     @Test
