@@ -77,23 +77,24 @@ public enum JiraDatabaseType {
 
     /**
      * Indicates whether this db type matches the given data source.
+     * This implementation checks the URL prefix and the driver class.
      *
      * @param dataSource the data source to check against
      * @return see above
      */
     boolean matches(final DataSource dataSource) {
-        return accept(dataSource.getUrl()) && driverClassName.equals(dataSource.getDriver());
+        return startsWithExpectedPrefix(dataSource.getUrl()) && driverClassName.equals(dataSource.getDriver());
     }
 
     /**
-     * Checks whether the URI starts with the prefix associated with the database
+     * Checks whether the given URI starts with the expected prefix for this type of database
      *
      * @param uri the give URI for connecting to the database
      * @return {@code true} if the URI is valid for this instance of data source factory
      */
-    private boolean accept(String uri)
+    private boolean startsWithExpectedPrefix(final String uri)
     {
-        return null != uri && uri.trim().startsWith(uriPrefix);
+        return uri != null && uri.trim().startsWith(uriPrefix);
     }
 
     public String getDbType()
