@@ -26,6 +26,10 @@ public class DataSource
 {
     private static final String[] FIELDS_TO_EXCLUDE_FROM_TO_STRING = { "password", "systemPassword" };
 
+    private static final char PROPERTY_DELIMITER = ';';
+
+    private static final char PROPERTY_KEY_VALUE_DELIMITER = '=';
+
     /**
      * Connection url, such as "jdbc:h2:file:/path/to/database/file"
      */
@@ -361,10 +365,9 @@ public class DataSource
      *
      * @return see above
      */
-    public javax.sql.DataSource getJdbcDataSource()
-    {
+    public javax.sql.DataSource getJdbcDataSource() {
         final DriverManagerDataSource dataSource = new DriverManagerDataSource(url, systemUsername, systemPassword);
-        dataSource.setConnectionProperties(parse(properties, '=', ';'));
+        dataSource.setConnectionProperties(parse(properties, PROPERTY_KEY_VALUE_DELIMITER, PROPERTY_DELIMITER));
         return dataSource;
     }
 
