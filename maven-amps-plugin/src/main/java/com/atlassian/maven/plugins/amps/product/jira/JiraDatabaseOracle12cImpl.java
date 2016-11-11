@@ -5,12 +5,9 @@ import com.atlassian.maven.plugins.amps.util.FileUtils;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.annotation.Nonnull;
 import java.io.File;
-import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.singletonMap;
 
 public class JiraDatabaseOracle12cImpl extends AbstractJiraOracleDatabase {
 
@@ -27,6 +24,8 @@ public class JiraDatabaseOracle12cImpl extends AbstractJiraOracleDatabase {
     }
 
     private String getTenantedModeDropAndCreateUserQuery() {
+        // N.B. dropping a CDB requires the SYSDBA privilege
+        // See http://www.oracle.com/technetwork/database/enterprise-edition/jdbc-faq-090281.html#05_11
         // Note to people running Oracle on another machine or in a VM:
         // Oracle will try to resolve this dump file path relative to its own filesystem.
         final String dumpFileDirectoryPath = (new File(getDataSource().getDumpFilePath())).getParent();
@@ -45,12 +44,5 @@ public class JiraDatabaseOracle12cImpl extends AbstractJiraOracleDatabase {
         final JdbcOperations jdbcOperations = new JdbcTemplate(getDataSource().getJdbcDataSource());
         final String isCdb = jdbcOperations.queryForObject("select cdb from v$database", String.class);
         return isCdb == null || isCdb.toLowerCase().startsWith("n");
-    }
-
-    @Nonnull
-    @Override
-    protected Map<String, String> getDriverProperties() {
-        // See http://www.oracle.com/technetwork/database/enterprise-edition/jdbc-faq-090281.html#05_11
-        return singletonMap("internal_logon", "SYSDBA");
     }
 }

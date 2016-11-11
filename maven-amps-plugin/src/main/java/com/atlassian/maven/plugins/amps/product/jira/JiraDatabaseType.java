@@ -32,6 +32,7 @@ public enum JiraDatabaseType {
 
         @Override
         boolean matches(final DataSource dataSource) {
+            dataSource.addProperty("internal_logon", "SYSDBA");
             return super.matches(dataSource) &&
                     JiraDatabaseType.dbVersionMatches(
                             dataSource, version -> version.startsWith(ORACLE_12C_VERSION_PREFIX));
