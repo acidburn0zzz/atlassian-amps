@@ -31,10 +31,9 @@ public class JiraDatabaseOracle12cImpl extends AbstractJiraOracleDatabase {
      * @return see above
      */
     private String getTenantedModeDropAndCreateUserQuery() {
-        // N.B. dropping a CDB requires the SYSDBA privilege
-        // See http://www.oracle.com/technetwork/database/enterprise-edition/jdbc-faq-090281.html#05_11
-        // Note to people running Oracle on another machine or in a VM:
-        // Oracle will try to resolve this dump file path relative to its own filesystem.
+        // Note that because Oracle tries to resolve this dump file path relative to its own
+        // file system, the data import will only work if AMPS and Oracle are running on the
+        // same machine (or the path is valid on both machines by virtue of file sharing).
         final String dumpFileDirectoryPath = (new File(getDataSource().getDumpFilePath())).getParent();
         return FileUtils.readFileToString("oracle12c-template.sql", getClass(), UTF_8)
                 .replace("v_data_pump_dir", dumpFileDirectoryPath)
