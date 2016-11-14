@@ -367,7 +367,8 @@ public class DataSource
      * @return see above
      */
     public javax.sql.DataSource getJdbcDataSource() {
-        final DriverManagerDataSource dataSource = new DriverManagerDataSource(url, systemUsername, systemPassword);
+        final DriverManagerDataSource dataSource =
+                new DriverManagerDataSource(defaultDatabase, systemUsername, systemPassword);
         dataSource.setConnectionProperties(parse(properties, PROPERTY_KEY_VALUE_DELIMITER, PROPERTY_DELIMITER));
         return dataSource;
     }
