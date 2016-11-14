@@ -17,12 +17,19 @@ public class JiraDatabaseOracle12cImpl extends AbstractJiraOracleDatabase {
 
     protected String getSqlToDropAndCreateUser() {
         if (oracleInStandaloneMode()) {
-            // Use the "classic mode" user management query
+            // Use the "classic mode" user management query; does not require SYSDBA privilege
             return new JiraDatabaseOracle10gImpl(getDataSource()).getSqlToDropAndCreateUser();
         }
         return getTenantedModeDropAndCreateUserQuery();
     }
 
+    /**
+     * Returns the "drop and create user" query for use in CDB (tenanted) mode. Because this query
+     * requires the SYSDBA privilege, the AMPS datasource must be configured with a <code>systemUsername</code>
+     * that has that privilege, e.g. <code>SYS AS SYSDBA</code>.
+     *
+     * @return see above
+     */
     private String getTenantedModeDropAndCreateUserQuery() {
         // N.B. dropping a CDB requires the SYSDBA privilege
         // See http://www.oracle.com/technetwork/database/enterprise-edition/jdbc-faq-090281.html#05_11
