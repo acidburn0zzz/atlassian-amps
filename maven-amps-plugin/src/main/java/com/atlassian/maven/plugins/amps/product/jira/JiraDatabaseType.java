@@ -44,6 +44,12 @@ public enum JiraDatabaseType {
 
     MSSQL_JTDS("mssql", true, "jdbc:jtds", "net.sourceforge.jtds.jdbc.Driver", JiraDatabaseMssqlImpl::new);
 
+    /**
+     * The string that the database product version needs to start with
+     * in order for the {@link #ORACLE_12C} db type to be detected.
+     *
+     * @see DatabaseMetaData#getDatabaseProductVersion
+     */
     public static final String ORACLE_12C_VERSION_PREFIX = "Oracle Database 12c";
 
     /**

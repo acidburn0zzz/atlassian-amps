@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -112,5 +114,56 @@ public class DataSourceTest
 
         // Check
         assertThat(toString, not(containsString(password)));
+    }
+
+    @Test
+    public void shouldAddFirstProperty() {
+        // Set up
+        ds = new DataSource();
+
+        // Invoke
+        ds.addProperty("foo", "bar");
+
+        // Check
+        assertThat(ds.getProperties(), is("foo=bar"));
+    }
+
+    @Test
+    public void shouldAddSecondProperty() {
+        // Set up
+        ds = new DataSource();
+        ds.setProperties("p1=v1");
+
+        // Invoke
+        ds.addProperty("p2", "v2");
+
+        // Check
+        assertThat(ds.getProperties(), is("p1=v1;p2=v2"));
+    }
+
+    @Test
+    public void sqlPluginJdbcDriverPropertiesShouldDefaultToEmptyString() {
+        // Set up
+        ds = new DataSource();
+
+        // Invoke
+        final String driverProperties = ds.getSqlPluginJdbcDriverProperties();
+
+        // Check
+        assertThat(driverProperties, isEmptyString());
+    }
+
+    @Test
+    public void sqlPluginJdbcDriverPropertiesShouldUseCorrectDelimiter() {
+        // Set up
+        ds = new DataSource();
+        ds.addProperty("p1", "v1");
+        ds.addProperty("p2", "v2");
+
+        // Invoke
+        final String driverProperties = ds.getSqlPluginJdbcDriverProperties();
+
+        // Check
+        assertThat(driverProperties, is("p1=v1,p2=v2"));
     }
 }
