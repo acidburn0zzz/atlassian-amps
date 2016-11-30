@@ -2066,7 +2066,12 @@ public class MavenGoals
          */
         public String getInstallDirectory(String buildDir)
         {
-            return getRootDirectory(buildDir) + File.separator + getArtifactId() + "-" + getVersion();
+            String installDirectory = getRootDirectory(buildDir) + File.separator + getArtifactId() + "-";
+            String version = getVersion();
+            if (version.endsWith("-atlassian-hosted") && !new File(installDirectory + version).exists()) {
+                version = version.substring(0, version.indexOf("-atlassian-hosted"));
+            }
+            return installDirectory + version;
         }
 
         /**
