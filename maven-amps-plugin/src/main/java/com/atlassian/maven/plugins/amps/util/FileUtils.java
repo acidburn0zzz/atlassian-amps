@@ -1,14 +1,22 @@
 package com.atlassian.maven.plugins.amps.util;
 
+import org.apache.commons.io.IOUtils;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.List;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.io.FileUtils.copyFile;
 
-public class FileUtils
+public final class FileUtils
 {
+    private FileUtils() {}
+
     public static File file(String parent, String... kids)
     {
         return file(new File(parent), kids);
@@ -114,4 +122,26 @@ public class FileUtils
         }
     }
 
+    /**
+     * Reads the given file to a String.
+     *
+     * @param name the name of the file to read
+     * @param loadingClass the class loading the file
+     * @param encoding the encoding to use
+     * @return the contents of the file as a String
+     * @see Class#getResourceAsStream(java.lang.String)
+     */
+    @ParametersAreNonnullByDefault
+    public static String readFileToString(final String name, final Class<?> loadingClass, final Charset encoding)
+    {
+        final InputStream fileStream = loadingClass.getResourceAsStream(name);
+        requireNonNull(fileStream, format("Could not find '%s' on classpath of %s", name, loadingClass.getName()));
+        try
+        {
+            return IOUtils.toString(fileStream, encoding);
+        } catch (final IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 }

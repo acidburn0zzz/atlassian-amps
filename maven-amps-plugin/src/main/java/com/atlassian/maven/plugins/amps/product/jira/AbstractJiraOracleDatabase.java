@@ -5,14 +5,9 @@ import com.atlassian.maven.plugins.amps.product.ImportMethod;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import javax.annotation.Nonnull;
 import java.io.File;
-import java.util.Map;
-import java.util.Properties;
 
 import static com.atlassian.maven.plugins.amps.product.ImportMethod.IMPDP;
-import static com.atlassian.maven.plugins.amps.util.MapUtils.join;
-import static java.util.Collections.emptyMap;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
@@ -100,7 +95,7 @@ public abstract class AbstractJiraOracleDatabase extends AbstractJiraDatabase
         addChild(sqlPluginConfiguration, "sqlCommand", sql);
         addChild(sqlPluginConfiguration, "delimiter", "/");
         addChild(sqlPluginConfiguration, "delimiterType", "row");
-        addChild(sqlPluginConfiguration, "driverProperties", join(getDriverProperties(), "=", ","));
+        addChild(sqlPluginConfiguration, "driverProperties", getDataSource().getSqlPluginJdbcDriverProperties());
         return sqlPluginConfiguration;
     }
 
@@ -123,21 +118,5 @@ public abstract class AbstractJiraOracleDatabase extends AbstractJiraDatabase
     private static void addChild(final Xpp3Dom parentNode, final String childName, final String childValue)
     {
         parentNode.addChild(element(name(childName), childValue).toDom());
-    }
-
-    /**
-     * Subclasses can override this method to set any desired driver properties
-     * for the sql-maven-plugin to pass on to JDBC. This implementation returns
-     * an empty map. Note that the <code>SqlExecMojo</code> in the
-     * sql-maven-plugin already sets the "user" and "password" properties to the
-     * values of that mojo's "username" and "password" fields, so you don't need
-     * to set these properties in the method below.
-     *
-     * @return the desired property names and values
-     * @see java.sql.DriverManager#getConnection(String, Properties)
-     */
-    @Nonnull
-    protected Map<String, String> getDriverProperties() {
-        return emptyMap();
     }
 }

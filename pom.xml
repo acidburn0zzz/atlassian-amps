@@ -10,7 +10,7 @@
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>6.2.9-SNAPSHOT</version>
+    <version>6.2.11-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
@@ -97,6 +97,7 @@
         <invoker.artifactId>maven-${invoker.product}-plugin</invoker.artifactId>
         <invoker.groupId>com.atlassian.maven.plugins</invoker.groupId>
         <invoker.product>amps</invoker.product>
+        <spring.version>4.3.2.RELEASE</spring.version>
     </properties>
 
     <dependencyManagement>
@@ -158,6 +159,11 @@
                 <version>${jtds.version}</version>
                 <scope>provided</scope>
                 <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${spring.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
