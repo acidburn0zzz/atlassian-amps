@@ -44,8 +44,8 @@ public class CreateMojo extends AbstractProductHandlerMojo
         // first try to get manual version
         Application a = getManualVersion(pid);
         if (a != null) {
-            getLog().info("using manually-entered latest stable product version: " + a.latest);
-            getLog().info("using manually-entered latest stable data version: " + a.data);
+            getLog().info("using latest stable product version: " + a.latest);
+            getLog().info("using latest stable data version: " + a.data);
             stableVersion = a.latest;
             stableDataVersion = a.data;
         } else {
