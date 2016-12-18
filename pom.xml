@@ -85,7 +85,7 @@
         <stash.version>3.11.1</stash.version>
         <stash.data.version>${stash.version}</stash.data.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
-        <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
+        <atlassian.spring.scanner.version>2.0.0</atlassian.spring.scanner.version>
         <maven.cli.version>1.0.11</maven.cli.version>
         <postgres.version>9.0-801.jdbc4</postgres.version>
         <mysql.version>5.1.32</mysql.version>
