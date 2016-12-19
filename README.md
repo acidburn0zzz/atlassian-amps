@@ -4,6 +4,7 @@
 
 * [How to Release][2]
 * [Issues][1]
+* [How to Change Default Product/Data Version][3]
 * [EcoBAC](https://ecosystem-bamboo.internal.atlassian.com/browse/AMPS)
 
 ## Using the Plugin SDK
@@ -31,3 +32,4 @@ Atlassian developers, please see [The Platform Rules of Engagement (go/proe)](ht
 
 [1]: https://ecosystem.atlassian.net/browse/AMPS
 [2]: https://extranet.atlassian.com/pages/viewpage.action?pageId=2130217184
+[3]: https://extranet.atlassian.com/display/DEVNET/HOWTO%3A+Change+the+default+product+version+generated+by+AMPS
