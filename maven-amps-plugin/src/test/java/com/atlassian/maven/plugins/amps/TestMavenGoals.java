@@ -307,7 +307,8 @@ public class TestMavenGoals
         when(product.getContextPath()).thenReturn("/context");
         when(war.getPath()).thenReturn("/");
 
-        goals.startWebapp(productInstanceId, war, new HashMap<String, String>(), new ArrayList<ProductArtifact>(), product);
+        goals.startWebapp(productInstanceId, war, new HashMap<String, String>(),
+                new ArrayList<ProductArtifact>(), new ArrayList<ProductArtifact>(), product);
 
         verify(product).getRmiPort();
         verify(product).getAjpPort();

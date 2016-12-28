@@ -104,6 +104,12 @@ public class BitbucketProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
+    public List<ProductArtifact> getExtraProductDeployables(Product ctx)
+    {
+        return Collections.emptyList();
+    }
+
+    @Override
     public List<Replacement> getReplacements(Product ctx)
     {
         return super.getReplacements(ctx);
