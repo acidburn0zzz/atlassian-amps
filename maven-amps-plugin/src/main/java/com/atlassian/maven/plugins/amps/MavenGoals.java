@@ -125,6 +125,7 @@ public class MavenGoals
                 put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","1.7"));
                 put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.3"));
                 put("maven-deploy-plugin", overrides.getProperty("maven-deploy-plugin","2.4"));
+                put("maven-release-plugin", overrides.getProperty("maven-release-plugin", "2.5.3"));
 
                 // You can't actually override the version a plugin if defined in the project, so these don't actually do
                 // anything, since the super pom already defines versions.
@@ -1775,7 +1776,6 @@ public class MavenGoals
                 configuration(
                         element(name("arguments"), args)
                         ,element(name("autoVersionSubmodules"),"true")
-                        ,element(name("useReleaseProfile"),"true")
                 ),
                 executionEnvironment()
         );
@@ -1788,7 +1788,8 @@ public class MavenGoals
                 ),
                 goal("perform"),
                 configuration(
-                        element(name("arguments"), args)
+                        element(name("arguments"), args),
+                        element(name("useReleaseProfile"),"true")
                 ),
                 executionEnvironment()
         );
