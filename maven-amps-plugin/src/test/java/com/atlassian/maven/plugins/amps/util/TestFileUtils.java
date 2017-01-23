@@ -76,8 +76,9 @@ public class TestFileUtils extends TestCase
         final String actualText = FileUtils.readFileToString("TestFileUtils.txt", getClass(), UTF_8);
 
         // Check
-        final String expectedText = "\nThis file is for reading by TestFileUtils#testReadFileToString.\n" +
-                "It has multiple lines, and leading/trailing whitespace.\n";
+        String sep = System.getProperty("line.separator");
+        final String expectedText = sep + "This file is for reading by TestFileUtils#testReadFileToString." + sep +
+                "It has multiple lines, and leading/trailing whitespace." + sep;
         assertThat(actualText, is(expectedText));
     }
 }
