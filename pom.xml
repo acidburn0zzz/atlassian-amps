@@ -64,26 +64,26 @@
         <maven.compiler.target>8</maven.compiler.target>
         <build.maven.version>3.0.5</build.maven.version>
         <bundled.maven.version>3.2.1</bundled.maven.version>
-        <refapp.version>3.0.0</refapp.version>
-        <refapp.data.version>3.0.0</refapp.data.version>
+        <refapp.version>3.3.6</refapp.version>
+        <refapp.data.version>3.3.6</refapp.data.version>
         <platform.version>3.0.0</platform.version>
-        <confluence.version>5.8.10</confluence.version>
-        <confluence.data.version>5.8.10</confluence.data.version>
-        <jira.version>6.4.7</jira.version>
-        <jira.data.version>6.4.7</jira.data.version>
+        <confluence.version>5.10.7</confluence.version>
+        <confluence.data.version>5.10.5</confluence.data.version>
+        <jira.version>7.2.2</jira.version>
+        <jira.data.version>7.2.2</jira.data.version>
         <fugue.version>1.0</fugue.version>
         <guava.osgi.version>10.0.1</guava.osgi.version>
-        <bamboo.version>5.9.2</bamboo.version>
-        <bamboo.data.version>5.9.2</bamboo.data.version>
+        <bamboo.version>5.13.2</bamboo.version>
+        <bamboo.data.version>5.13.2</bamboo.data.version>
         <bitbucket.version>4.0.2</bitbucket.version>
         <bitbucket.data.version>${bitbucket.version}</bitbucket.data.version>
         <fecru.version>3.9.1-20150910131426</fecru.version>
         <fecru.data.version>3.9.1-20150910131426</fecru.data.version>
-        <crowd.version>2.8.3</crowd.version>
-        <crowd.data.version>2.8.3</crowd.data.version>
+        <crowd.version>2.10.1</crowd.version>
+        <crowd.data.version>2.10.1</crowd.data.version>
         <clover.version>3.1.7</clover.version>
-        <stash.version>3.11.1</stash.version>
-        <stash.data.version>${stash.version}</stash.data.version>
+        <stash.version>3.11.6</stash.version>
+        <stash.data.version>3.11.6</stash.data.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
         <maven.cli.version>1.0.11</maven.cli.version>
