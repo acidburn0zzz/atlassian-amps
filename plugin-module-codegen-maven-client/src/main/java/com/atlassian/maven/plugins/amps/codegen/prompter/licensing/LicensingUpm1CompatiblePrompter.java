@@ -27,6 +27,13 @@ public class LicensingUpm1CompatiblePrompter extends AbstractModulePrompter<Lice
     {
         showExamplesPrompt = true;
 
+        boolean b = promptForBoolean("WARNING: This process applies to UPM versions prior to 2.0 only.\n" +
+                "This will be deprecated in the next major AMPS release.\n"
+                + "Proceed anyway?");
+        if (!b) {
+            throw new PrompterException("Not continuing further");
+        }
+
         String className = promptJavaClassname("Enter License Servlet Classname", "LicenseServlet");
         String packageName = promptJavaPackagename("Enter Package Name", getDefaultBasePackage() + ".servlet");
         String licenseServletPath = prompt("Enter License Servlet URL Path (not including /plugins/servlet/)",
