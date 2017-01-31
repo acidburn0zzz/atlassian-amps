@@ -88,12 +88,6 @@ public class BambooProductHandler extends AbstractWebappProductHandler
         return Collections.emptyList();
     }
 
-    @Override
-    public List<ProductArtifact> getExtraProductDeployables(Product ctx)
-    {
-        return Collections.emptyList();
-    }
-
     public File getBundledPluginPath(Product ctx, File appDir)
     {
         // the zip became a directory in 5.9, so if the directory exists, use it, otherwise fall back to the old behaviour.
