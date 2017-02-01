@@ -78,9 +78,9 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
 
     protected abstract List<ProductArtifact> getExtraContainerDependencies();
 
-    protected List<ProductArtifact> getExtraProductDeployables(Product ctx) {
-        return Collections.emptyList();
-    }
+//    protected List<ProductArtifact> getExtraProductDeployables(Product ctx) {
+//        return Collections.emptyList();
+//    }
 
     @Override
     protected Map<String, String> getSystemProperties(Product ctx)
