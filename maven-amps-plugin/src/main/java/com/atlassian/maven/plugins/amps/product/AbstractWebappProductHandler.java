@@ -2,7 +2,6 @@ package com.atlassian.maven.plugins.amps.product;
 
 import java.io.File;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -78,9 +77,7 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
 
     protected abstract List<ProductArtifact> getExtraContainerDependencies();
 
-    protected List<ProductArtifact> getExtraProductDeployables(Product ctx) {
-        return Collections.emptyList();
-    }
+    protected abstract List<ProductArtifact> getExtraProductDeployables(Product ctx);
 
     @Override
     protected Map<String, String> getSystemProperties(Product ctx)
