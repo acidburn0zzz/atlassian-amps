@@ -2,11 +2,9 @@ package com.atlassian.maven.plugins.amps.product;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -71,10 +69,6 @@ public interface ProductHandler
      * @return a mutable list of files
      */
     List<File> getConfigFiles(Product product, File snapshotCopyDir);
-
-    default List<ProductArtifact> getExtraProductDeployables(Product ctx) {
-        return Collections.emptyList();
-    }
 
     /**
      * Snapshots the home directory. The goal is that the state is totally restored if we restart the application
