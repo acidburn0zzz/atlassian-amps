@@ -21,8 +21,12 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 public class ConfluenceProductHandler extends AbstractWebappProductHandler
 {
+    // system property to override deploying the synchrony-proxy webapp
+    public static final String REQUIRE_SYNCHRONY_PROXY = "require.synchrony.proxy";
     private final ProductArtifact synchronyProxy = new ProductArtifact("com.atlassian.synchrony", "synchrony-proxy", "RELEASE", "war");
 
     public ConfluenceProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
@@ -92,7 +96,12 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
 
     private boolean shouldDeploySynchronyProxy(Product ctx)
     {
-        return Character.getNumericValue(ctx.getVersion().charAt(0)) >= 6;
+        boolean synchronyProxyRequired = true;
+        if (isNotBlank(System.getProperty(REQUIRE_SYNCHRONY_PROXY))) {
+            synchronyProxyRequired = Boolean.parseBoolean(System.getProperty(REQUIRE_SYNCHRONY_PROXY));
+        }
+
+        return Character.getNumericValue(ctx.getVersion().charAt(0)) >= 6 && synchronyProxyRequired;
     }
 
     @Override
