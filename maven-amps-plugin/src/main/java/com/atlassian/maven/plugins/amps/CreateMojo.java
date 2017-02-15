@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * Creates a new plugin
@@ -44,14 +45,10 @@ public class CreateMojo extends AbstractProductHandlerMojo
         // first try to get manual version
         Application a = getManualVersion(pid);
         if (a != null) {
-            if (StringUtils.isNotBlank(a.latest)) {
-                getLog().info("using stable product version: " + a.latest);
-                getMavenContext().getExecutionEnvironment().getMavenSession().getExecutionProperties().setProperty(pid + "Version", a.latest);
-            }
-            if (StringUtils.isNotBlank(a.data)) {
-                getLog().info("using stable data version: " + a.data);
-                getMavenContext().getExecutionEnvironment().getMavenSession().getExecutionProperties().setProperty(pid + "DataVersion", a.data);
-            }
+            getLog().info("using stable product version: " + a.latest);
+            getMavenContext().getExecutionEnvironment().getMavenSession().getExecutionProperties().setProperty(pid + "Version", a.latest);
+            getLog().info("using stable data version: " + a.data);
+            getMavenContext().getExecutionEnvironment().getMavenSession().getExecutionProperties().setProperty(pid + "DataVersion", a.data);
         } else {
             // use the old way (grab version from artifact)
             Product ctx = getProductContexts().get(pid);
@@ -78,48 +75,23 @@ public class CreateMojo extends AbstractProductHandlerMojo
     }
 
     /**
-     * @param searchString  The name of a product (refapp, jira, confluence, etc)
+     * @param   product     The name of a product (refapp, jira, confluence, etc)
      * @return  An Application object holding latest stable/data version strings
      *          and some other bits of information.
      *          Possibly null if we cannot find it in the xml file.
      */
-    private Application getManualVersion(String searchString) {
-
-        XMLInputFactory f = XMLInputFactory.newInstance();
-        try (InputStream versionsStream = CreateMojo.class.getClassLoader().getResourceAsStream("application-versions.xml")) {
-            XMLEventReader r = f.createXMLEventReader(versionsStream);
-            Application a = new Application();
-            String name = "";
-            while (r.hasNext()) {
-                XMLEvent e = r.nextEvent();
-                switch (e.getEventType()) {
-                    case XMLStreamConstants.START_ELEMENT:
-                        name = e.asStartElement().getName().getLocalPart();
-                        if (name.equalsIgnoreCase("application"))
-                            a = new Application();
-                        break;
-                    case XMLStreamConstants.END_ELEMENT:
-                        if (e.asEndElement().getName().getLocalPart().equalsIgnoreCase("application") &&
-                                a.name.equals(searchString))
-                            return a;
-                        name = "";
-                        break;
-                    case XMLStreamConstants.CHARACTERS:
-                        String s = e.asCharacters().getData().trim();
-                        if (name.equalsIgnoreCase("name"))
-                            a.name = s;
-                        else if (name.equalsIgnoreCase("latest"))
-                            a.latest = s;
-                        else if (name.equalsIgnoreCase("data"))
-                            a.data = s;
-                        else if (name.equalsIgnoreCase("mvn-artifact"))
-                            a.mvnArtifact = s;
-                        break;
-                }
-            }
-        } catch (IOException|XMLStreamException e) {
-            // this can either be from closing the stream of an invalid XML file
-            // either way we just ignore it
+    private Application getManualVersion(String product) {
+        try (InputStream is = getClass().getResourceAsStream("/app.properties")) {
+            Properties p = new Properties();
+            p.load(is);
+            Application retval = new Application();
+            retval.latest = p.getProperty(product + ".version");
+            retval.data = p.getProperty(product + ".data.version");
+            if (retval.latest == null || retval.data == null)
+                return null;
+            return retval;
+        } catch (IOException e) {
+            // just ignore and fall out to return null
         }
         return null;
     }
