@@ -2,7 +2,7 @@ package com.atlassian.maven.plugins.amps.product;
 
 import java.io.File;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -10,23 +10,15 @@ import com.atlassian.maven.plugins.amps.MavenContext;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.factory.DefaultArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 
 import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
-import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
-import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
 
 public abstract class AbstractWebappProductHandler extends AbstractProductHandler
 {
@@ -68,7 +60,8 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
     @Override
     protected final int startApplication(Product ctx, File app, File homeDir, Map<String, String> properties) throws MojoExecutionException
     {
-        return goals.startWebapp(ctx.getInstanceId(), app, properties, getExtraContainerDependencies(), ctx);
+        return goals.startWebapp(ctx.getInstanceId(), app, properties,
+                getExtraContainerDependencies(), getExtraProductDeployables(ctx), ctx);
     }
 
     @Override
@@ -84,6 +77,10 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
     }
 
     protected abstract List<ProductArtifact> getExtraContainerDependencies();
+
+    protected List<ProductArtifact> getExtraProductDeployables(Product ctx) {
+        return Collections.emptyList();
+    }
 
     @Override
     protected Map<String, String> getSystemProperties(Product ctx)
