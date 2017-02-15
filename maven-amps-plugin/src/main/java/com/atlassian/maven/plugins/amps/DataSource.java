@@ -1,12 +1,22 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.support.DatabaseMetaDataCallback;
+import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.jdbc.support.MetaDataAccessException;
 
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Optional;
+
+import static com.atlassian.maven.plugins.amps.util.PropertyUtils.parse;
 import static com.google.common.base.Objects.firstNonNull;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.trimToEmpty;
+import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 /**
  * Definition of a datasource.
@@ -15,6 +25,11 @@ import static com.google.common.base.Objects.firstNonNull;
  */
 public class DataSource
 {
+    private static final String[] FIELDS_TO_EXCLUDE_FROM_TO_STRING = { "password", "systemPassword" };
+
+    private static final char PROPERTY_DELIMITER = ';';
+
+    private static final char PROPERTY_KEY_VALUE_DELIMITER = '=';
 
     /**
      * Connection url, such as "jdbc:h2:file:/path/to/database/file"
@@ -130,22 +145,26 @@ public class DataSource
 
     public String getCargoString()
     {
-        if (cargoString != null)
+        if (cargoString != null) {
             return cargoString;
-        
-        List<String> cargoProperties = Lists.newArrayList();
+        }
+
+        final List<String> cargoProperties = Lists.newArrayList();
         cargoProperties.add("cargo.datasource.url=" + firstNonNull(url, ""));
         cargoProperties.add("cargo.datasource.driver=" + firstNonNull(driver, ""));
         cargoProperties.add("cargo.datasource.username=" + firstNonNull(username, ""));
         cargoProperties.add("cargo.datasource.password=" + firstNonNull(password, ""));
         cargoProperties.add("cargo.datasource.jndi=" + firstNonNull(jndi, ""));
-        if (!StringUtils.isBlank(type))
+        if (!isBlank(type)) {
             cargoProperties.add("cargo.datasource.type=" + type);
-        if (!StringUtils.isBlank(transactionSupport))
+        }
+        if (!isBlank(transactionSupport)) {
             cargoProperties.add("cargo.datasource.transactionsupport=" + transactionSupport);
-        if (!StringUtils.isBlank(properties))
+        }
+        if (!isBlank(properties)) {
             cargoProperties.add("cargo.datasource.properties=" + properties);
-        
+        }
+
         cargoString = StringUtils.join(cargoProperties, "|");
         return cargoString;
     }
@@ -335,9 +354,63 @@ public class DataSource
     @Override
     public String toString()
     {
-        return "DataSource [url=" + url + ", driver=" + driver + ", username=" + username + ", password=" + password + ", jndi=" + jndi + ", type=" + type
-                + ", transactionSupport=" + transactionSupport + ", properties=" + properties + ", cargoString=" + cargoString + ", libArtifacts="
-                + libArtifacts + "]";
+        // Used in error messages, etc.
+        return new ReflectionToStringBuilder(this, SHORT_PREFIX_STYLE)
+                .setExcludeFieldNames(FIELDS_TO_EXCLUDE_FROM_TO_STRING)
+                .toString();
     }
 
+    /**
+     * Returns the JDBC data source for this instance, connecting as the configured
+     * system user and applying any configured driver properties.
+     *
+     * @return see above
+     */
+    public javax.sql.DataSource getJdbcDataSource() {
+        final DriverManagerDataSource dataSource =
+                new DriverManagerDataSource(defaultDatabase, systemUsername, systemPassword);
+        dataSource.setConnectionProperties(parse(properties, PROPERTY_KEY_VALUE_DELIMITER, PROPERTY_DELIMITER));
+        return dataSource;
+    }
+
+    /**
+     * Queries this data source for its JDBC metadata and applies the given callback.
+     *
+     * @param callback the callback to apply
+     * @return the non-null return value of the callback, or none if null or there was an error
+     */
+    public <T> Optional<T> getJdbcMetaData(@Nonnull final DatabaseMetaDataCallback callback) {
+        try {
+            @SuppressWarnings("unchecked")
+            final T metaData = (T) JdbcUtils.extractDatabaseMetaData(getJdbcDataSource(), callback);
+            return Optional.ofNullable(metaData);
+        } catch (final ClassCastException | MetaDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Adds the given JDBC driver property.
+     *
+     * @param name the property name
+     * @param value the property value
+     */
+    public void addProperty(final String name, final String value) {
+        final String newProperty = name + PROPERTY_KEY_VALUE_DELIMITER + value;
+        if (isBlank(properties)) {
+            properties = newProperty;
+        } else {
+            properties += PROPERTY_DELIMITER + newProperty;
+        }
+    }
+
+    /**
+     * Returns the JDBC driver properties in the <a href="http://www.mojohaus.org/sql-maven-plugin/execute-mojo.html#driverProperties">
+     * format required by the <code>sql-maven-plugin</code></a>.
+     *
+     * @return see above
+     */
+    public String getSqlPluginJdbcDriverProperties() {
+        return trimToEmpty(properties).replace(PROPERTY_DELIMITER, ',');
+    }
 }

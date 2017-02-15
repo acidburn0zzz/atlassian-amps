@@ -1,6 +1,7 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
 import java.io.File;
+import java.util.Optional;
 
 import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.product.ImportMethod;
@@ -13,6 +14,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -79,14 +81,15 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void oracleDatabaseFactory() throws Exception
+    public void oracle10gDatabaseFactory() throws Exception
     {
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getUrl()).thenReturn("jdbc:oracle:thin:@localhost:1521:XE");
         when(dataSource.getDriver()).thenReturn("oracle.jdbc.OracleDriver");
+        when(dataSource.getJdbcMetaData(any())).thenReturn(Optional.empty());
         final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
-        assertThat("Database implementation must be Oracle", jiraDatabase, instanceOf(JiraDatabaseOracleImpl.class));
+        assertThat("Database implementation must be Oracle 10g", jiraDatabase, instanceOf(JiraDatabaseOracle10gImpl.class));
     }
 
     @Test
@@ -256,6 +259,7 @@ public class JiraDatabaseTest
         when(dataSource.getPassword()).thenReturn("jira_pwd");
         when(dataSource.getDriver()).thenReturn("oracle.jdbc.OracleDriver");
         when(dataSource.getDumpFilePath()).thenReturn("/usr/home/oracle.bak");
+        when(dataSource.getJdbcMetaData(any())).thenReturn(Optional.empty());
         final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
 
         // execute

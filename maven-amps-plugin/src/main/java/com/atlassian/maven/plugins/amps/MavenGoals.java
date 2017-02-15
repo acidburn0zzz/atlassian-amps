@@ -91,7 +91,7 @@ public class MavenGoals
             put("tomcat5x", new Container("tomcat5x", "org.apache.tomcat", "apache-tomcat", "5.5.36"));
             put("tomcat6x", new Container("tomcat6x", "org.apache.tomcat", "apache-tomcat", "6.0.41"));
             put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.52", "windows-x64"));
-            put("tomcat8x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.0.9", "windows-x64"));
+            put("tomcat8x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.0.36-atlassian-hosted", "windows-x64"));
             put("resin3x", new Container("resin3x", "com.caucho", "resin", "3.0.26"));
             put("jboss42x", new Container("jboss42x", "org.jboss.jbossas", "jbossas", "4.2.3.GA"));
             put("jetty6x", new Container("jetty6x"));
@@ -125,6 +125,7 @@ public class MavenGoals
                 put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","1.7"));
                 put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.3"));
                 put("maven-deploy-plugin", overrides.getProperty("maven-deploy-plugin","2.4"));
+                put("maven-release-plugin", overrides.getProperty("maven-release-plugin", "2.5.3"));
 
                 // You can't actually override the version a plugin if defined in the project, so these don't actually do
                 // anything, since the super pom already defines versions.
@@ -1208,7 +1209,7 @@ public class MavenGoals
         final String dumpFilePath = dataSource.getDumpFilePath();
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final JiraDatabase jiraDatabase = factory.getJiraDatabase(dataSource);
-        final Xpp3Dom configDropCreateSchema = jiraDatabase.getPluginConfiguration();
+        final Xpp3Dom sqlMavenPluginConfiguration = jiraDatabase.getPluginConfiguration();
         final List<Dependency> libs = jiraDatabase.getDependencies();
         final Plugin sqlMaven = plugin(
                 groupId("org.codehaus.mojo"),
@@ -1219,7 +1220,7 @@ public class MavenGoals
         executeMojo(
                 sqlMaven,
                 goal("execute"),
-                configDropCreateSchema,
+                sqlMavenPluginConfiguration,
                 executionEnvironment()
         );
         if (StringUtils.isNotEmpty(dumpFilePath))
@@ -1681,7 +1682,6 @@ public class MavenGoals
                 configuration(
                         element(name("arguments"), args)
                         ,element(name("autoVersionSubmodules"),"true")
-                        ,element(name("useReleaseProfile"),"true")
                 ),
                 executionEnvironment()
         );
@@ -1694,7 +1694,8 @@ public class MavenGoals
                 ),
                 goal("perform"),
                 configuration(
-                        element(name("arguments"), args)
+                        element(name("arguments"), args),
+                        element(name("useReleaseProfile"),"true")
                 ),
                 executionEnvironment()
         );
@@ -2013,7 +2014,12 @@ public class MavenGoals
          */
         public String getInstallDirectory(String buildDir)
         {
-            return getRootDirectory(buildDir) + File.separator + getArtifactId() + "-" + getVersion();
+            String installDirectory = getRootDirectory(buildDir) + File.separator + getArtifactId() + "-";
+            String version = getVersion();
+            if (version.endsWith("-atlassian-hosted") && !new File(installDirectory + version).exists()) {
+                version = version.substring(0, version.indexOf("-atlassian-hosted"));
+            }
+            return installDirectory + version;
         }
 
         /**

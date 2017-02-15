@@ -1,0 +1,3 @@
+
+This file is for reading by TestFileUtils#testReadFileToString.
+It has multiple lines, and leading/trailing whitespace.

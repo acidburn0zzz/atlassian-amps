@@ -38,7 +38,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
     private String updateVersion;
 
     /**
-     * If present, use this file as the SDK archive instead of trying to download it from PAC.
+     * If present, use this file as the SDK archive instead of trying to download it from MPAC.
      */
     @Parameter(property = "sdk.archive.path")
     private String sdkArchivePath;

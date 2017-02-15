@@ -1,18 +1,19 @@
 package com.atlassian.maven.plugins.amps;
 
 
-import java.util.List;
-
-import com.atlassian.maven.plugins.amps.product.ImportMethod;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
+import java.util.List;
+
+import static com.atlassian.maven.plugins.amps.product.ImportMethod.SQL;
+import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.getDatabaseType;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 /**
  * Run the pre integration tests prepare data.
@@ -51,23 +52,21 @@ public class PrepareDatabaseMojo extends AbstractTestGroupsHandlerMojo
         }
         final MavenGoals goals = getMavenGoals();
         final List<ProductExecution> productExecutions = getProductExecutions();
-        if (null != productExecutions)
+        if (productExecutions != null)
         {
-            for (ProductExecution productExecution : productExecutions)
+            for (final ProductExecution productExecution : productExecutions)
             {
                 // clear dirty data for JIRA to run integration test
                 if (ProductHandlerFactory.JIRA.equals(productExecution.getProduct().getId()))
                 {
-                    List<DataSource> dataSources = productExecution.getProduct().getDataSources();
+                    final List<DataSource> dataSources = productExecution.getProduct().getDataSources();
                     switch (dataSources.size())
                     {
                         case 1:
-                            DataSource dataSource = dataSources.get(0);
-                            JiraDatabaseType databaseType = JiraDatabaseType.getDatabaseType(dataSource.getUrl(), dataSource.getDriver());
-                            if (null == databaseType)
-                            {
-                                throw new MojoExecutionException("Could not detect database type, please check your database driver: " + dataSource.getDriver() + " and database url: " + dataSource.getUrl());
-                            }
+                            final DataSource dataSource = dataSources.get(0);
+                            final JiraDatabaseType databaseType = getDatabaseType(dataSource)
+                                    .orElseThrow(() -> new MojoExecutionException(
+                                            "Could not detect database type for dataSource: " + dataSource));
                             // need to be clever here: add database artifact for maven-sql-plugin to execute sql
                             // if we have configured database library in product artifacts then we have 2 solutions:
                             // 1. check groupId, artifactId of all product's libraries contain
@@ -75,59 +74,60 @@ public class PrepareDatabaseMojo extends AbstractTestGroupsHandlerMojo
                             // 2. add all of product artifacts to dependencies (safety but redundant the others product libraries)
                             // fail-back we add default database library by detected database type above when: not config product artifacts
                             // or product's artifacts groupId, artifactId does not contain database name
-                            if (null == productExecution.getProduct().getLibArtifacts() || productExecution.getProduct().getLibArtifacts().size() == 0)
+                            final List<ProductArtifact> libArtifacts = productExecution.getProduct().getLibArtifacts();
+                            if (libArtifacts == null || libArtifacts.isEmpty())
                             {
-                                throw new MojoExecutionException("Product library artifact is empty, please provide library for database: " + databaseType.toString());
+                                throw new MojoExecutionException("Product library artifact is empty, please provide library for database: " + databaseType);
                             }
-                            for (ProductArtifact productArtifact : productExecution.getProduct().getLibArtifacts())
+                            for (ProductArtifact productArtifact : libArtifacts)
                             {
-                                dataSource.getLibArtifacts().add(new LibArtifact(productArtifact.getGroupId(), productArtifact.getArtifactId(), productArtifact.getVersion()));
+                                dataSource.getLibArtifacts().add(new LibArtifact(
+                                        productArtifact.getGroupId(), productArtifact.getArtifactId(), productArtifact.getVersion()));
                             }
                             populateDatasourceParameter(dataSource);
                             goals.runPreIntegrationTest(dataSource);
                             break;
                         case 0:
-                            getLog().info("Missing configuration dataSource for pre-integration-test");
+                            getLog().info("No dataSource configured for pre-integration-test");
                             break;
                         default:
-                            getLog().info("Multiple dataSources does not support. Configuration has: " + dataSources.size() + " dataSources below");
+                            getLog().info("Multiple dataSources not supported. Configuration has these " + dataSources.size() + " dataSources:");
                             for (DataSource dbSource : dataSources)
                             {
                                 getLog().info("Database URL: " + dbSource.getUrl());
                             }
-                            getLog().info("Could not support multiple dataSource");
                     }
                 }
             }
         }
     }
 
-    private void populateDatasourceParameter(DataSource dataSource)
+    private void populateDatasourceParameter(final DataSource dataSource)
     {
-        if (StringUtils.isNotEmpty(defaultDatabase))
+        if (isNotEmpty(defaultDatabase))
         {
             dataSource.setDefaultDatabase(defaultDatabase);
         }
-        if (StringUtils.isNotEmpty(systemUsername))
+        if (isNotEmpty(systemUsername))
         {
             dataSource.setSystemUsername(systemUsername);
         }
-        if (StringUtils.isNotEmpty(systemPassword))
+        if (isNotEmpty(systemPassword))
         {
             dataSource.setSystemPassword(systemPassword);
         }
-        if (StringUtils.isNotEmpty(dumpFilePath))
+        if (isNotEmpty(dumpFilePath))
         {
             dataSource.setDumpFilePath(dumpFilePath);
         }
-        if (StringUtils.isNotEmpty(importMethod))
+        if (isNotEmpty(importMethod))
         {
             dataSource.setImportMethod(importMethod);
         }
         else
         {
             // default is import standard sql
-            dataSource.setImportMethod(ImportMethod.SQL.getMethod());
+            dataSource.setImportMethod(SQL.getMethod());
         }
         getLog().info("Pre-integration-test import method: " + dataSource.getImportMethod());
     }
