@@ -5,7 +5,7 @@ package com.atlassian.maven.plugins.amps;
  */
 public class ProductArtifact
 {
-    private String groupId, artifactId, version, type;
+    private String groupId, artifactId, version, type, path;
 
     public ProductArtifact() {
     }
@@ -28,6 +28,14 @@ public class ProductArtifact
         this.artifactId = artifactId;
         this.version = version;
         this.type = type;
+    }
+
+    public ProductArtifact(final String groupId, final String artifactId, final String version, final String type, final String path) {
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
+        this.type = type;
+        this.path = path;
     }
 
     public String getGroupId() {
@@ -62,6 +70,16 @@ public class ProductArtifact
     public void setType(String type)
     {
         this.type = type;
+    }
+
+    public void setPath(String path)
+    {
+        this.path = path;
+    }
+
+    public String getPath()
+    {
+        return this.path;
     }
 
     @Override
