@@ -780,6 +780,29 @@ public class MavenGoals
         return webappWarFile;
     }
 
+    public void unpackWebappWar(final File targetDirectory, final ProductArtifact artifact)
+            throws MojoExecutionException
+    {
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("unpack"),
+                configuration(
+                        element(name("artifactItems"),
+                                element(name("artifactItem"),
+                                        element(name("groupId"), artifact.getGroupId()),
+                                        element(name("artifactId"), artifact.getArtifactId()),
+                                        element(name("type"), "war"),
+                                        element(name("version"), artifact.getVersion()))),
+                        element(name("outputDirectory"), targetDirectory.getPath())
+                ),
+                executionEnvironment()
+        );
+    }
+
     public File copyArtifact(final String targetFileName, final File targetDirectory,
                              final ProductArtifact artifact, String type) throws MojoExecutionException
     {
@@ -1397,47 +1420,20 @@ public class MavenGoals
 
     int pickFreePort(final int requestedPort)
     {
-        ServerSocket socket = null;
-        try
+        try (final ServerSocket socket = new ServerSocket(requestedPort))
         {
-            socket = new ServerSocket(requestedPort);
             return requestedPort > 0 ? requestedPort : socket.getLocalPort();
         }
         catch (final IOException e)
         {
             // happens if the requested port is taken, so we need to pick a new one
-            ServerSocket zeroSocket = null;
-            try
+            try (final ServerSocket zeroSocket = new ServerSocket(0))
             {
-                zeroSocket = new ServerSocket(0);
                 return zeroSocket.getLocalPort();
             }
             catch (final IOException ex)
             {
                 throw new RuntimeException("Error opening socket", ex);
-            }
-            finally
-            {
-                closeSocket(zeroSocket);
-            }
-        }
-        finally
-        {
-            closeSocket(socket);
-        }
-    }
-
-    private void closeSocket(ServerSocket socket)
-    {
-        if (socket != null)
-        {
-            try
-            {
-                socket.close();
-            }
-            catch (final IOException e)
-            {
-                throw new RuntimeException("Error closing socket", e);
             }
         }
     }
