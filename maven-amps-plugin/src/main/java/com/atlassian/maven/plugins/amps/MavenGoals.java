@@ -34,12 +34,16 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,6 +67,7 @@ import java.util.regex.Matcher;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.getJiraDatabaseFactory;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
+import static org.apache.maven.archetype.common.util.Format.getPrettyFormat;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -91,7 +96,7 @@ public class MavenGoals
             put("tomcat5x", new Container("tomcat5x", "org.apache.tomcat", "apache-tomcat", "5.5.36"));
             put("tomcat6x", new Container("tomcat6x", "org.apache.tomcat", "apache-tomcat", "6.0.41"));
             put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.52", "windows-x64"));
-            put("tomcat8x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.0.36-atlassian-hosted", "windows-x64"));
+            put("tomcat8x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.0.38-atlassian-hosted", "windows-x64"));
             put("resin3x", new Container("resin3x", "com.caucho", "resin", "3.0.26"));
             put("jboss42x", new Container("jboss42x", "org.jboss.jbossas", "jbossas", "4.2.3.GA"));
             put("jetty6x", new Container("jetty6x"));
@@ -976,6 +981,8 @@ public class MavenGoals
                 unpackContainer(container);
             }
         }
+
+        skipManifestScan(containerDir);
 
         final int rmiPort = pickFreePort(webappContext.getRmiPort());
         final int actualAjpPort = pickFreePort(webappContext.getAjpPort());
@@ -2124,6 +2131,39 @@ public class MavenGoals
         public String getConfigDirectory(String buildDir, String productId)
         {
             return getRootDirectory(buildDir) + File.separator + "cargo-" + productId + "-home";
+        }
+    }
+
+    /**
+     * configure tomcat to skip scanning jars. So it stops printing:
+     * WARNING: Failed to scan [file:.../common/lib/commons-cli.jar] from classloader hierarchy
+     * java.io.FileNotFoundException: .../common/lib/commons-cli.jar (No such file or directory)
+     * ...
+     * all over the logs. That way it's easier to get stats on Error/Exception in CI to troubleshoot rootcauses of test failures.
+     */
+    private void skipManifestScan(final File containerDir) {
+        for (File child : containerDir.listFiles()) {
+            for (File grandChild : child.listFiles()) {
+                if (grandChild.getAbsolutePath().endsWith("conf")) {
+                    File serverXml = new File(grandChild.getAbsolutePath() + File.separator + "server.xml");
+                    try {
+                        SAXBuilder builder = new SAXBuilder();
+                        Document doc = builder.build(serverXml);
+                        builder.getClass();
+
+                        doc.getRootElement()
+                                .getChild("Service")
+                                .getChild("Engine")
+                                .getChild("Host").addContent(new org.jdom.Element("JarScanner").setAttribute("scanManifest", "false"));
+
+                        XMLOutputter outputter = new XMLOutputter();
+                        outputter.output(doc, new FileWriter(serverXml));
+                        log.info(String.format("%s was modified", serverXml.getAbsolutePath()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 }
