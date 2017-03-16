@@ -24,16 +24,24 @@ import javax.management.ReflectionException;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
 
 /**
@@ -42,12 +50,13 @@ import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
 public class BitbucketProductHandler extends AbstractProductHandler {
 
     private static final String ADMIN_OBJECT_NAME = "org.springframework.boot:type=Admin,name=SpringApplication";
+    private static final int DEFAULT_JMX_PORT = 7995;
     // Note: Versions require an "-a0" qualifier so that milestone, rc and snapshot releases are evaluated as
     // being 'later' (see org.apache.maven.artifact.versioning.ComparableVersion.StringItem)
     private static final DefaultArtifactVersion FIRST_SEARCH_VERSION = new DefaultArtifactVersion("4.6.0-a0");
     private static final DefaultArtifactVersion FIRST_SPRING_BOOT_VERSION = new DefaultArtifactVersion("5.0.0-a0");
-    private static final String JMX_PORT = "7991";
-    private static final String JMX_URL = "service:jmx:rmi:///jndi/rmi://127.0.0.1:" + JMX_PORT + "/jmxrmi";
+    private static final String JMX_PORT_FILE = "jmx-port";
+    private static final String JMX_URL_FORMAT = "service:jmx:rmi:///jndi/rmi://127.0.0.1:%1$d/jmxrmi";
     private static final String SEARCH_GROUP_ID = "com.atlassian.bitbucket.search";
     private static final String SERVER_GROUP_ID = "com.atlassian.bitbucket.server";
 
@@ -150,13 +159,6 @@ public class BitbucketProductHandler extends AbstractProductHandler {
                 .put("baseurl.display", baseUrl)
                 .put("bitbucket.home", fixSlashes(getHomeDirectory(ctx).getPath()))
                 .put("johnson.spring.lifecycle.synchronousStartup", Boolean.TRUE.toString());
-        if (isSpringBoot(ctx)) {
-            //For 5.0.0+, setup Spring Boot. In order to shut the application down after it's
-            //started we need to enable JMX
-            builder.put("com.sun.management.jmxremote.authenticate", Boolean.FALSE.toString())
-                    .put("com.sun.management.jmxremote.port", JMX_PORT)
-                    .put("com.sun.management.jmxremote.ssl", Boolean.FALSE.toString());
-        }
 
         return builder.build();
     }
@@ -181,9 +183,10 @@ public class BitbucketProductHandler extends AbstractProductHandler {
     @Override
     public void stop(Product ctx) throws MojoExecutionException {
         if (isSpringBoot(ctx)) {
-            boolean connected = false;
+            int jmxPort = readJmxPort(ctx);
 
-            try (JMXConnector connector = createConnector()) {
+            boolean connected = false;
+            try (JMXConnector connector = createConnector(jmxPort)) {
                 MBeanServerConnection connection = connector.getMBeanServerConnection();
                 connected = true; // Connected successfully, so an exception most likely means success
 
@@ -228,12 +231,11 @@ public class BitbucketProductHandler extends AbstractProductHandler {
 
         File baseDir = getBaseDirectory(ctx);
         if (isSpringBoot(ctx)) {
-            // For Spring Boot, use maven-dependency-plugin to unpack the war file, rather than
-            // copying it over
-            File bootDir = new File(baseDir, "app");
-            goals.unpackWebappWar(bootDir, artifact);
+            // For Spring Boot, use maven-dependency-plugin to unpack the war file, rather than copying it over
+            File appDir = new File(baseDir, "app");
+            goals.unpackWebappWar(appDir, artifact);
 
-            return bootDir;
+            return appDir;
         }
 
         return goals.copyWebappWar(ctx.getId(), baseDir, artifact);
@@ -253,9 +255,12 @@ public class BitbucketProductHandler extends AbstractProductHandler {
     protected int startApplication(Product ctx, File app, File homeDir, Map<String, String> properties)
             throws MojoExecutionException {
         if (isSpringBoot(ctx)) {
-            AntJavaExecutorThread javaThread = startJavaThread(ctx, app, properties);
+            int jmxPort = pickJmxPort(ctx);
 
-            return waitUntilReady(ctx, javaThread);
+            AntJavaExecutorThread javaThread = startJavaThread(ctx, app, addJmxProperties(properties, jmxPort));
+            waitUntilReady(javaThread, jmxPort, ctx.getStartupTimeout());
+
+            return ctx.getHttpPort();
         }
 
         // For Bitbucket Server 4.x, deploy the webapp to Tomcat using Cargo
@@ -267,6 +272,20 @@ public class BitbucketProductHandler extends AbstractProductHandler {
         return true;
     }
 
+    private static Map<String, String> addJmxProperties(Map<String, String> properties, int jmxPort) {
+        Map<String, String> updatedProperties = new HashMap<>(properties);
+        updatedProperties.put("com.sun.management.jmxremote.authenticate", "false");
+        updatedProperties.put("com.sun.management.jmxremote.port", String.valueOf(jmxPort));
+        updatedProperties.put("com.sun.management.jmxremote.ssl", "false");
+        // On Java 8u102 and newer, setting jmxremote.host will cause JMX to only listen on localhost. In
+        // addition, rmi.server.hostname is explicitly set to localhost to match. Without both connecting
+        // to JMX via TCP/IP fails in some environments.
+        updatedProperties.put("com.sun.management.jmxremote.host", "127.0.0.1");
+        updatedProperties.put("java.rmi.server.hostname", "127.0.0.1");
+
+        return updatedProperties;
+    }
+
     private static String fixSlashes(String path) {
         return path.replaceAll("\\\\", "/");
     }
@@ -275,10 +294,48 @@ public class BitbucketProductHandler extends AbstractProductHandler {
         return new DefaultArtifactVersion(ctx.getVersion()).compareTo(FIRST_SPRING_BOOT_VERSION) >= 0;
     }
 
-    private JMXConnector createConnector() throws IOException {
-        JMXServiceURL serviceURL = new JMXServiceURL(JMX_URL);
+    private JMXConnector createConnector(int jmxPort) throws IOException {
+        JMXServiceURL serviceURL = new JMXServiceURL(String.format(JMX_URL_FORMAT, jmxPort));
 
         return JMXConnectorFactory.connect(serviceURL);
+    }
+
+    private int pickJmxPort(Product ctx) throws MojoExecutionException {
+        // If the configured HTTP port is the default JMX port, skip the default and select a random port.
+        // Checking if the port is available will likely succeed, but startup would still fail because JMX
+        // would take the port before the HTTP connector was opened
+        int jmxPort = pickFreePort(DEFAULT_JMX_PORT == ctx.getHttpPort() ? 0 : DEFAULT_JMX_PORT);
+        if (jmxPort != DEFAULT_JMX_PORT) {
+            // If the default JMX port wasn't available, write the randomly-selected port to a file in the
+            // product's base directory. This makes it available later when the product is stopped
+            Path jmxFile = getBaseDirectory(ctx).toPath().resolve(JMX_PORT_FILE);
+
+            try {
+                Files.write(jmxFile, String.valueOf(jmxPort).getBytes(StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                // If the port file cannot be written, it won't be possible to shut the product down later
+                // if it's started, so fail instead
+                throw new MojoExecutionException("JMX port " + DEFAULT_JMX_PORT + " is not available, and the " +
+                        "automatically-selected replacement could not be written to " + jmxFile.toAbsolutePath(), e);
+            }
+        }
+
+        return jmxPort;
+    }
+
+    private int readJmxPort(Product ctx) throws MojoExecutionException {
+        Path jmxFile = getBaseDirectory(ctx).toPath().resolve(JMX_PORT_FILE);
+
+        try (BufferedReader reader = Files.newBufferedReader(jmxFile, StandardCharsets.UTF_8)) {
+            return Integer.parseInt(reader.readLine());
+        } catch (FileNotFoundException | NoSuchFileException e) {
+            // If the JMX port was not written to a file, assume the default is in use
+            return DEFAULT_JMX_PORT;
+        } catch (IOException e) {
+            throw new MojoExecutionException("The JMX port could not be read from " + jmxFile.toAbsolutePath(), e);
+        } catch (NumberFormatException e) {
+            throw new MojoExecutionException("The JMX port in " + jmxFile.toAbsolutePath() + " is not valid", e);
+        }
     }
 
     private AntJavaExecutorThread startJavaThread(Product ctx, File app, Map<String, String> properties) {
@@ -308,19 +365,19 @@ public class BitbucketProductHandler extends AbstractProductHandler {
         return javaThread;
     }
 
-    private int waitUntilReady(Product ctx, AntJavaExecutorThread javaThread) throws MojoExecutionException {
-        long timeout = System.currentTimeMillis() + ctx.getStartupTimeout();
+    private void waitUntilReady(AntJavaExecutorThread javaThread, int jmxPort, int wait) throws MojoExecutionException {
+        long timeout = System.currentTimeMillis() + wait;
         while (System.currentTimeMillis() < timeout) {
             if (javaThread.isFinished()) {
                 throw new MojoExecutionException("Bitbucket Server failed to start", javaThread.getBuildException());
             }
 
-            try (JMXConnector connector = createConnector()) {
+            try (JMXConnector connector = createConnector(jmxPort)) {
                 MBeanServerConnection connection = connector.getMBeanServerConnection();
 
                 Boolean ready = (Boolean) connection.getAttribute(new ObjectName(ADMIN_OBJECT_NAME), "Ready");
                 if (Boolean.TRUE.equals(ready)) {
-                    return ctx.getHttpPort();
+                    return;
                 }
             } catch (AttributeNotFoundException e) {
                 // Unexpected change to Spring Boot's "Admin" MXBean?

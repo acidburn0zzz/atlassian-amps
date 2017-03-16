@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
@@ -63,6 +62,7 @@ import java.util.regex.Matcher;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.getJiraDatabaseFactory;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
+import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -797,7 +797,11 @@ public class MavenGoals
                                         element(name("artifactId"), artifact.getArtifactId()),
                                         element(name("type"), "war"),
                                         element(name("version"), artifact.getVersion()))),
-                        element(name("outputDirectory"), targetDirectory.getPath())
+                        element(name("outputDirectory"), targetDirectory.getPath()),
+                        //Overwrite needs to be enabled or unpack won't unpack multiple copies
+                        //of the same dependency GAV, _even to different output directories_
+                        element(name("overWriteReleases"), "true"),
+                        element(name("overWriteSnapshots"), "true")
                 ),
                 executionEnvironment()
         );
@@ -1416,26 +1420,6 @@ public class MavenGoals
             throw new IllegalArgumentException("Container " + containerId + " not supported");
         }
         return container;
-    }
-
-    int pickFreePort(final int requestedPort)
-    {
-        try (final ServerSocket socket = new ServerSocket(requestedPort))
-        {
-            return requestedPort > 0 ? requestedPort : socket.getLocalPort();
-        }
-        catch (final IOException e)
-        {
-            // happens if the requested port is taken, so we need to pick a new one
-            try (final ServerSocket zeroSocket = new ServerSocket(0))
-            {
-                return zeroSocket.getLocalPort();
-            }
-            catch (final IOException ex)
-            {
-                throw new RuntimeException("Error opening socket", ex);
-            }
-        }
     }
 
     public void installPlugin(PdkParams pdkParams)
