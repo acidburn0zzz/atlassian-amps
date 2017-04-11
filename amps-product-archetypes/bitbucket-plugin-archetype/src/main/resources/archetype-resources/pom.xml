@@ -165,12 +165,13 @@
         </plugins>
     </build>
     <properties>
+        <bitbucket.data.version>${bitbucketVersion}</bitbucket.data.version>
+        <bitbucket.version>${bitbucketVersion}</bitbucket.version>
+
         <amps.version>${project.version}</amps.version>
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
         <atlassian.plugin.key>\${project.groupId}.\${project.artifactId}</atlassian.plugin.key>
         <atlassian.spring.scanner.version>${atlassian.spring.scanner.version}</atlassian.spring.scanner.version>
-        <bitbucket.data.version>${bitbucketVersion}</bitbucket.data.version>
-        <bitbucket.version>${bitbucketVersion}</bitbucket.version>
         <commons.lang3.version>${commons.lang3.version}</commons.lang3.version>
         <gson.version>${gson.version}</gson.version>
         <javax.inject.version>${javax.inject.version}</javax.inject.version>
@@ -178,4 +179,5 @@
         <junit.libversion>${junit.libversion}</junit.libversion>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
     </properties>
+    
 </project>
