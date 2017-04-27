@@ -43,6 +43,9 @@ import java.util.Optional;
 
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.apache.commons.lang.StringUtils.defaultString;
 
 /**
  * @since 6.1.0
@@ -63,6 +66,7 @@ public class BitbucketProductHandler extends AbstractProductHandler {
     private final MavenProjectLoader projectLoader;
     private final JavaTaskFactory taskFactory;
 
+    @SuppressWarnings("deprecation")
     public BitbucketProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory,
                                    MavenProjectLoader projectLoader) {
         super(context, goals, new BitbucketPluginProvider(), artifactFactory);
@@ -152,7 +156,15 @@ public class BitbucketProductHandler extends AbstractProductHandler {
 
     @Override
     public Map<String, String> getSystemProperties(Product ctx) {
-        String baseUrl = MavenGoals.getBaseUrl(ctx, ctx.getHttpPort());
+        //Previously, this used MavenGoals.getBaseURL(ctx, ctx.getHttpPort()) which, with those arguments, should
+        //generate the same base URL as the new Product.getBaseUrL() method will _unless HTTPS is enabled_. Unlike
+        //MavenGoals.getBaseURL, Product.getBaseUrl takes whether HTTPS is enabled into consideration; MavenGoals
+        //always builds an HTTP URL.
+        //For 4.x, which uses MavenGoals.startWebapp, it's possible the instance will come up on a different port,
+        //if the configured port is already in use.
+        //For 5+, which is built using Spring Boot, the instance will either come up on the configured port or, if
+        //it's already in use, will fail to start.
+        String baseUrl = ctx.getBaseUrl();
 
         ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String>builder()
                 .put("baseurl", baseUrl)
@@ -255,12 +267,13 @@ public class BitbucketProductHandler extends AbstractProductHandler {
     protected int startApplication(Product ctx, File app, File homeDir, Map<String, String> properties)
             throws MojoExecutionException {
         if (isSpringBoot(ctx)) {
-            int jmxPort = pickJmxPort(ctx);
+            int connectorPort = ctx.isHttps() ? ctx.getHttpsPort() : ctx.getHttpPort();
+            int jmxPort = pickJmxPort(ctx, connectorPort);
 
             AntJavaExecutorThread javaThread = startJavaThread(ctx, app, addJmxProperties(properties, jmxPort));
             waitUntilReady(javaThread, jmxPort, ctx.getStartupTimeout());
 
-            return ctx.getHttpPort();
+            return connectorPort;
         }
 
         // For Bitbucket Server 4.x, deploy the webapp to Tomcat using Cargo
@@ -294,17 +307,43 @@ public class BitbucketProductHandler extends AbstractProductHandler {
         return new DefaultArtifactVersion(ctx.getVersion()).compareTo(FIRST_SPRING_BOOT_VERSION) >= 0;
     }
 
+    /**
+     * Normalizes Tomcat's range of supported {@code CertificateVerification} settings to their Spring Boot
+     * {@code Ssl} equivalents.
+     * <p>
+     * Note: Spring Boot's {@code ClientAuth} enumeration does not support Tomcat's {@code OPTIONAL_NO_CA}
+     * setting. If that is the requested value, client auth will not be enabled.
+     *
+     * @param value the Tomcat value to map
+     * @return the mapped Spring Boot value, which may be {@code empty()} if client auth should not be configured
+     */
+    private static Optional<String> normalizeClientAuth(String value) {
+        switch (defaultString(value)) {
+            case "need": // Tomcat doesn't support this. It's allowed because Spring Boot does
+            case "require":
+            case "required":
+            case "true":
+            case "yes":
+                return of("need");
+            case "optional":
+            case "want":
+                return of("want");
+            default:
+                return empty();
+        }
+    }
+
     private JMXConnector createConnector(int jmxPort) throws IOException {
         JMXServiceURL serviceURL = new JMXServiceURL(String.format(JMX_URL_FORMAT, jmxPort));
 
         return JMXConnectorFactory.connect(serviceURL);
     }
 
-    private int pickJmxPort(Product ctx) throws MojoExecutionException {
+    private int pickJmxPort(Product ctx, int connectorPort) throws MojoExecutionException {
         // If the configured HTTP port is the default JMX port, skip the default and select a random port.
         // Checking if the port is available will likely succeed, but startup would still fail because JMX
         // would take the port before the HTTP connector was opened
-        int jmxPort = pickFreePort(DEFAULT_JMX_PORT == ctx.getHttpPort() ? 0 : DEFAULT_JMX_PORT);
+        int jmxPort = pickFreePort(DEFAULT_JMX_PORT == connectorPort ? 0 : DEFAULT_JMX_PORT);
         if (jmxPort != DEFAULT_JMX_PORT) {
             // If the default JMX port wasn't available, write the randomly-selected port to a file in the
             // product's base directory. This makes it available later when the product is stopped
@@ -343,15 +382,31 @@ public class BitbucketProductHandler extends AbstractProductHandler {
 
         // Set the unpacked application directory as the classpath. This will allow Java to find the
         // WarLauncher, which in turn will use the manifest to assemble the real classpath
-        java.createClasspath()
-                .createPathElement().setLocation(app);
+        java.createClasspath().createPathElement().setLocation(app);
 
         java.createJvmarg().setLine(ctx.getJvmArgs());
         java.createJvmarg().setLine(ctx.getDebugArgs()); // If debug args aren't set, nothing happens
 
-        // Set the context path and port based on the product configuration
+        if (ctx.isHttps()) {
+            java.createArg().setValue("--server.port=" + ctx.getHttpsPort());
+
+            // If HTTPS was enabled, in addition to setting the port SSL also needs to be configured
+            java.createArg().setValue("--server.ssl.enabled=true");
+            java.createArg().setValue("--server.ssl.key-alias=" + ctx.getHttpsKeyAlias());
+            java.createArg().setValue("--server.ssl.key-store=" + ctx.getHttpsKeystoreFile());
+            java.createArg().setValue("--server.ssl.key-store-password=" + ctx.getHttpsKeystorePass());
+            java.createArg().setValue("--server.ssl.protocol=" + ctx.getHttpsSSLProtocol());
+
+            // Client auth requires special handling, to map from the various values Tomcat accepts to
+            // their equivalent Spring Boot value. Tomcat's native values aren't supported
+            normalizeClientAuth(ctx.getHttpsClientAuth())
+                    .ifPresent(clientAuth -> java.createArg().setValue("--server.ssl.client-auth=" + clientAuth));
+        } else {
+            // Otherwise, for HTTP, just set the port
+            java.createArg().setValue("--server.port=" + ctx.getHttpPort());
+        }
+        // Set the context path for the application
         java.createArg().setValue("--server.contextPath=" + ctx.getContextPath());
-        java.createArg().setValue("--server.port=" + ctx.getHttpPort());
         // Enable Spring Boot's admin JMX endpoints, which can be used to wait for the application
         // to start and to shut it down gracefully later
         java.createArg().setValue("--spring.application.admin.enabled=true");
