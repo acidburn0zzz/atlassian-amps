@@ -1083,8 +1083,20 @@ public class Product
     @Override
     public String toString()
     {
-        return "Product " + id + " [instanceId=" + instanceId
-				+ ", " + getProtocol() + "://" + server + ":" + httpPort + contextPath + "]";
+        return "Product " + id + " [instanceId=" + instanceId + ", " + getBaseUrl() + "]";
+    }
+
+    /**
+     * Returns a formatted base URL <i>based on the configured properties</i>. It's possible this is <i>not</i>
+     * the effective base URL when the product is actually started. For example, if the configured port is in
+     * use, some mojos may pick a random port to start on instead.
+     *
+     * @return the <i>configured</i> base URL
+     * @since 6.3
+     */
+    public String getBaseUrl()
+    {
+        return getProtocol() + "://" + server + ":" + (isHttps() ? httpsPort : httpPort) + contextPath;
     }
 
     /**
@@ -1093,7 +1105,19 @@ public class Product
      */
     public String getProtocol()
     {
-        return useHttps != null && useHttps ? "https" : "http";
+        return isHttps() ? "https" : "http";
+    }
+
+    /**
+     * A version of {@link #getUseHttps()} which never returns {@code null}. If {@code useHttps} was not set, it
+     * is assumed to be {@code false}.
+     *
+     * @return {@code true} if {@link #getUseHttps()} is {@code Boolean.TRUE}; otherwise, {@code false}
+     * @since 6.3
+     */
+    public boolean isHttps()
+    {
+        return Boolean.TRUE.equals(useHttps);
     }
 
     public Boolean isAwaitFullInitialization() {

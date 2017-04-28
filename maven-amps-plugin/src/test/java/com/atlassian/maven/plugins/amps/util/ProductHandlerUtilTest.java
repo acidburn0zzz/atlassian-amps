@@ -3,14 +3,38 @@ package com.atlassian.maven.plugins.amps.util;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.List;
 
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.toArtifacts;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ProductHandlerUtilTest
 {
+    @Test
+    public void testPickFreePort() throws IOException
+    {
+        try (final ServerSocket ignored = new ServerSocket(16829))
+        {
+            // Pick any
+            int port = ProductHandlerUtil.pickFreePort(0);
+            assertTrue(16829 != port);
+            assertTrue(port > 0);
+
+            // Pick taken
+            port = ProductHandlerUtil.pickFreePort(16829);
+            assertTrue(16829 != port);
+            assertTrue(port > 0);
+
+            // Pick free
+            assertEquals(16828, ProductHandlerUtil.pickFreePort(16828));
+        }
+    }
+
     @Test
     public void toArtifactsShouldReturnEmptyArrayForBlankString() throws Exception
     {
