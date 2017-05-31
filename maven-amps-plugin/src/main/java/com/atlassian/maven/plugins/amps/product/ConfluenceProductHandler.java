@@ -27,6 +27,7 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
 {
     // system property to override deploying the synchrony-proxy webapp
     public static final String REQUIRE_SYNCHRONY_PROXY = "require.synchrony.proxy";
+    public static final String SYNCHRONY_PROXY_VERSION = "synchrony.proxy.version";
     private final ProductArtifact synchronyProxy = new ProductArtifact("com.atlassian.synchrony", "synchrony-proxy", "RELEASE", "war");
 
     public ConfluenceProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
@@ -116,6 +117,11 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
         if (!shouldDeploySynchronyProxy(ctx))
         {
             return;
+        }
+
+        // check if version is specified
+        if (isNotBlank(System.getProperty(SYNCHRONY_PROXY_VERSION))) {
+            synchronyProxy.setVersion(System.getProperty(SYNCHRONY_PROXY_VERSION));
         }
 
         // check for latest stable version if version not specified
