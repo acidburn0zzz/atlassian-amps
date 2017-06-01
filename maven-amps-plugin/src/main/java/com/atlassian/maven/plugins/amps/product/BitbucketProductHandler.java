@@ -277,7 +277,7 @@ public class BitbucketProductHandler extends AbstractProductHandler {
         }
 
         // For Bitbucket Server 4.x, deploy the webapp to Tomcat using Cargo
-        return goals.startWebapp(ctx.getInstanceId(), app, properties, Collections.emptyList(), ctx);
+        return goals.startWebapp(ctx.getInstanceId(), app, properties, Collections.emptyList(), Collections.emptyList(), ctx);
     }
 
     @Override

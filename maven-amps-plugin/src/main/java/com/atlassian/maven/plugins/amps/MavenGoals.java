@@ -984,7 +984,9 @@ public class MavenGoals
         }
     }
 
-    public int startWebapp(final String productInstanceId, final File war, final Map<String, String> systemProperties, final List<ProductArtifact> extraContainerDependencies,
+    public int startWebapp(final String productInstanceId, final File war, final Map<String, String> systemProperties,
+                           final List<ProductArtifact> extraContainerDependencies,
+                           final List<ProductArtifact> extraProductDeployables,
                            final Product webappContext) throws MojoExecutionException
     {
         final Container container = findContainer(webappContext.getContainerId());
@@ -1039,6 +1041,26 @@ public class MavenGoals
             ));
         }
 
+        final List<Element> deployables = new ArrayList<>();
+        deployables.add(element(name("deployable"),
+                element(name("groupId"), "foo"),
+                element(name("artifactId"), "bar"),
+                element(name("type"), "war"),
+                element(name("location"), war.getPath()),
+                element(name("properties"),
+                        element(name("context"), webappContext.getContextPath())
+                )
+        ));
+        for (final ProductArtifact extra : extraProductDeployables)
+        {
+            deployables.add(element(name("deployable"),
+                    element(name("groupId"), extra.getGroupId()),
+                    element(name("artifactId"), extra.getArtifactId()),
+                    element(name("type"), extra.getType()),
+                    element(name("location"), extra.getPath())
+            ));
+        }
+
         for (DataSource dataSource : webappContext.getDataSources())
         {
             for (ProductArtifact containerDependency : dataSource.getLibArtifacts())
@@ -1063,17 +1085,7 @@ public class MavenGoals
                 cargo,
                 goal("start"),
                 configurationWithoutNullElements(
-                        element(name("deployables"),
-                                element(name("deployable"),
-                                        element(name("groupId"), "foo"),
-                                        element(name("artifactId"), "bar"),
-                                        element(name("type"), "war"),
-                                        element(name("location"), war.getPath()),
-                                        element(name("properties"),
-                                                element(name("context"), webappContext.getContextPath())
-                                        )
-                                )
-                        ),
+                        element(name("deployables"), deployables.toArray(new Element[deployables.size()])),
                         waitElement(cargo), // This may be null
                         element(name("container"),
                                 element(name("containerId"), container.getId()),
