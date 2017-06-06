@@ -393,6 +393,7 @@ public class BitbucketProductHandler extends AbstractProductHandler {
             // If HTTPS was enabled, in addition to setting the port SSL also needs to be configured
             java.createArg().setValue("--server.ssl.enabled=true");
             java.createArg().setValue("--server.ssl.key-alias=" + ctx.getHttpsKeyAlias());
+            java.createArg().setValue("--server.ssl.key-password=" + ctx.getHttpsKeystorePass());
             java.createArg().setValue("--server.ssl.key-store=" + ctx.getHttpsKeystoreFile());
             java.createArg().setValue("--server.ssl.key-store-password=" + ctx.getHttpsKeystorePass());
             java.createArg().setValue("--server.ssl.protocol=" + ctx.getHttpsSSLProtocol());
