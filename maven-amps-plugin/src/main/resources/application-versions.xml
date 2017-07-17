@@ -37,4 +37,9 @@
         <latest>2.11.2</latest>
         <data>2.11.2</data>
     </application>
+    <application>
+        <name>fecru</name>
+        <latest>3.9.1-20150910131426</latest>
+        <data>3.9.1-20150910131426</data>
+    </application>
 </applications>
