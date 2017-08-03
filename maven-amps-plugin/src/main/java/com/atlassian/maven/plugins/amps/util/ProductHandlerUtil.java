@@ -8,6 +8,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -16,6 +17,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
@@ -58,6 +60,35 @@ public final class ProductHandlerUtil
     }
 
     /**
+     * Picks a free port, preferring the requested port if it's available. If a {@code bindAddress} is provided, the
+     * selected port will be verified against that interface.
+     * <p>
+     * If the requested port is {@code 0}, or the requested port is already in use, a {@code ServerSocket} is used
+     * to select a random open port on the system. If an open port can be found, it is returned.
+     *
+     * @param requestedPort the preferred port, or {@code 0} to select a random port
+     * @param bindAddress   the local address to bind to, which may be {@code null} to bind to any interface
+     * @return the selected port
+     * @since 6.3.4
+     */
+    public static int pickFreePort(final int requestedPort, @Nullable final InetAddress bindAddress)
+    {
+        try (final ServerSocket socket = new ServerSocket(requestedPort, 1, bindAddress))
+        {
+            return requestedPort == 0 ? socket.getLocalPort() : requestedPort;
+        }
+        catch (final IOException e)
+        {
+            if (requestedPort == 0)
+            {
+                throw new RuntimeException("Error opening socket", e);
+            }
+
+            return pickFreePort(0, bindAddress);
+        }
+    }
+
+    /**
      * Picks a free port, preferring the requested port if it's available.
      * <p>
      * If the requested port is {@code 0}, or the requested port is already in use, a {@code ServerSocket} is used
@@ -69,19 +100,7 @@ public final class ProductHandlerUtil
      */
     public static int pickFreePort(final int requestedPort)
     {
-        try (final ServerSocket socket = new ServerSocket(requestedPort))
-        {
-            return requestedPort == 0 ? socket.getLocalPort() : requestedPort;
-        }
-        catch (final IOException e)
-        {
-            if (requestedPort == 0)
-            {
-                throw new RuntimeException("Error opening socket", e);
-            }
-
-            return pickFreePort(0);
-        }
+        return pickFreePort(requestedPort, null);
     }
 
     /**
