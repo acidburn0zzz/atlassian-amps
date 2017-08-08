@@ -29,6 +29,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -303,6 +305,25 @@ public class BitbucketProductHandler extends AbstractProductHandler {
         return path.replaceAll("\\\\", "/");
     }
 
+    /**
+     * Gets the local loopback address.
+     * <p>
+     * This method exists because {@link InetAddress#getLoopbackAddress()} may return an IPv6-style loopback address
+     * on systems which support IPv6. Since {@link #addJmxProperties} explicitly configures RMI to run on 127.0.0.1,
+     * and {@link #JMX_URL_FORMAT} is hard-coded for the same, we always want an IPv4-style address. If that address
+     * fails for any reason, we fall back on {@link InetAddress#getLoopbackAddress()}.
+     *
+     * @return the loopback address
+     * @since 6.3.4
+     */
+    private static InetAddress getLoopbackAddress() {
+        try {
+            return InetAddress.getByAddress("localhost", new byte[]{0x7f,0x00,0x00,0x01});
+        } catch (UnknownHostException e) {
+            return InetAddress.getLoopbackAddress();
+        }
+    }
+
     private static boolean isSpringBoot(Product ctx) {
         return new DefaultArtifactVersion(ctx.getVersion()).compareTo(FIRST_SPRING_BOOT_VERSION) >= 0;
     }
@@ -343,7 +364,7 @@ public class BitbucketProductHandler extends AbstractProductHandler {
         // If the configured HTTP port is the default JMX port, skip the default and select a random port.
         // Checking if the port is available will likely succeed, but startup would still fail because JMX
         // would take the port before the HTTP connector was opened
-        int jmxPort = pickFreePort(DEFAULT_JMX_PORT == connectorPort ? 0 : DEFAULT_JMX_PORT);
+        int jmxPort = pickFreePort(DEFAULT_JMX_PORT == connectorPort ? 0 : DEFAULT_JMX_PORT, getLoopbackAddress());
         if (jmxPort != DEFAULT_JMX_PORT) {
             // If the default JMX port wasn't available, write the randomly-selected port to a file in the
             // product's base directory. This makes it available later when the product is stopped
