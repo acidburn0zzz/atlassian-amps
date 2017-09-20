@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
@@ -19,12 +20,15 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 public class ConfluenceProductHandler extends AbstractWebappProductHandler
 {
+    private final static TreeMap<ComparableVersion, String> synchronyProxyVersions = new TreeMap<>();
+
     // system property to override deploying the synchrony-proxy webapp
     public static final String REQUIRE_SYNCHRONY_PROXY = "require.synchrony.proxy";
     public static final String SYNCHRONY_PROXY_VERSION = "synchrony.proxy.version";
@@ -33,6 +37,8 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
     public ConfluenceProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
         super(context, goals, new ConfluencePluginProvider(),artifactFactory);
+        synchronyProxyVersions.put(new ComparableVersion("6.4.10000"), "1.0.17");
+        synchronyProxyVersions.put(new ComparableVersion("10000"), "RELEASE");
     }
 
     public String getId()
@@ -116,12 +122,28 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
     {
         if (!shouldDeploySynchronyProxy(ctx))
         {
+            log.debug("Synchrony proxy is disabled or not supported");
             return;
         }
 
+        log.debug("Resolving synchrony proxy version for Confluence " + ctx.getVersion());
         // check if version is specified
-        if (isNotBlank(System.getProperty(SYNCHRONY_PROXY_VERSION))) {
+        if (isNotBlank(System.getProperty(SYNCHRONY_PROXY_VERSION)))
+        {
+            log.debug("Synchrony proxy version is already set in system variable ("
+                    + System.getProperty(SYNCHRONY_PROXY_VERSION) + ")");
             synchronyProxy.setVersion(System.getProperty(SYNCHRONY_PROXY_VERSION));
+        }
+        else
+        {
+            log.debug("Synchrony proxy version is not set. Attempting to set corresponding version");
+            Map.Entry<ComparableVersion, String> synchronyProxyVersion =
+                    synchronyProxyVersions.ceilingEntry(new ComparableVersion(ctx.getVersion()));
+            if(synchronyProxyVersion != null)
+            {
+                synchronyProxy.setVersion(synchronyProxyVersion.getValue());
+                log.debug("Synchrony proxy version is set to " + synchronyProxyVersion.getValue());
+            }
         }
 
         // check for latest stable version if version not specified
