@@ -18,24 +18,16 @@ public class ProductContainerVersionMapper
     private static final String TOMCAT6X = "tomcat6x";
     private static final String TOMCAT7X = "tomcat7x";
     private static final String TOMCAT8X = "tomcat8x";
-    private static final String TOMCAT85X = "tomcat85x";
 
     static
     {
         //Most apps
         populateVersionMapForProduct(ProductHandlerFactory.BAMBOO, "0", "5.1.0", "5.10.0");
         populateVersionMapForProduct(ProductHandlerFactory.CONFLUENCE, "0", "5.5", "5.8");
+        populateVersionMapForProduct(ProductHandlerFactory.CROWD, "0", "2.7.0", "" + Integer.MAX_VALUE);
         populateVersionMapForProduct(ProductHandlerFactory.JIRA, "0", "5.2", "7.0.0");
         populateVersionMapForProduct(ProductHandlerFactory.REFAPP, "0", "2.21.0", "3.0.0");
         populateVersionMapForProduct(ProductHandlerFactory.STASH, "0", "2.0.0", "3.3.0");
-
-        //Crowd ships on Tomcat 8.5 since 3.1.0
-        TreeMap<ComparableVersion, String> crowdVersions = new TreeMap<>();
-        crowdVersions.put(new ComparableVersion("0"), TOMCAT6X);
-        crowdVersions.put(new ComparableVersion("2.7.0"), TOMCAT7X);
-        crowdVersions.put(new ComparableVersion("3.1.0"), TOMCAT85X);
-        productMapping.put(ProductHandlerFactory.CROWD, crowdVersions);
-
         //Bitbucket only supports Tomcat8
         TreeMap<ComparableVersion, String> versions = new TreeMap<>();
         versions.put(new ComparableVersion("4.0.0"), TOMCAT8X);

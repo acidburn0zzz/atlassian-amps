@@ -29,7 +29,7 @@ public class TestProductContainerVersionMapper
     {
         assertThat(ProductContainerVersionMapper.containerForProductVersion("crowd", "1"), is("tomcat6x"));
         assertThat(ProductContainerVersionMapper.containerForProductVersion("crowd", "2.7"), is("tomcat7x"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("crowd", "3.1.0"), is("tomcat85x"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("crowd", "5.11.0"), is("tomcat7x"));
     }
 
     @Test
