@@ -29,8 +29,6 @@ import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -162,26 +160,6 @@ public class TestMavenGoals
     }
 
     @Test
-    public void testPickFreePort() throws IOException
-    {
-        try (final ServerSocket ignored = new ServerSocket(16829))
-        {
-            // Pick any
-            int port = goals.pickFreePort(0);
-            assertTrue(16829 != port);
-            assertTrue(port > 0);
-
-            // Pick taken
-            port = goals.pickFreePort(16829);
-            assertTrue(16829 != port);
-            assertTrue(port > 0);
-
-            // Pick free
-            assertEquals(16828, goals.pickFreePort(16828));
-        }
-    }
-
-    @Test
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void testGenerateMinimalManifest() throws Exception
     {
@@ -298,7 +276,7 @@ public class TestMavenGoals
         when(product.getContextPath()).thenReturn("/context");
         when(war.getPath()).thenReturn("/");
 
-        goals.startWebapp(productInstanceId, war, new HashMap<>(), new ArrayList<>(), product);
+        goals.startWebapp(productInstanceId, war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
 
         verify(product).getRmiPort();
         verify(product).getAjpPort();

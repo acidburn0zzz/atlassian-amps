@@ -131,12 +131,11 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
 
             // Actually start the product
             long startTime = System.nanoTime();
-            String protocol = product.getProtocol();
             int actualHttpPort = productHandler.start(product);
             long durationSeconds = TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - startTime);
 
             // Log the success message
-            StartupInformation message = new StartupInformation(product, "started successfully", protocol, actualHttpPort, durationSeconds);
+            StartupInformation message = new StartupInformation(product, "started successfully", actualHttpPort, durationSeconds);
             if (!parallel)
             {
                 getLog().info(message.toString());
@@ -253,16 +252,13 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
      */
     private static class StartupInformation
     {
-        private String protocol;
-        int actualHttpPort;
-        long durationSeconds;
-        Product product;
-        String event;
+        private int actualHttpPort;
+        private long durationSeconds;
+        private String event;
+        private Product product;
 
-        public StartupInformation(final Product product, final String event, final String protocol, final int actualHttpPort, final long durationSeconds)
+        public StartupInformation(final Product product, final String event, final int actualHttpPort, final long durationSeconds)
         {
-            super();
-            this.protocol = protocol;
             this.actualHttpPort = actualHttpPort;
             this.product = product;
             this.event = event;
@@ -276,7 +272,7 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
                     + (Boolean.FALSE.equals(product.getSynchronousStartup()) ? " (asynchronously)" : ""), durationSeconds);
             if (actualHttpPort != 0)
             {
-                message += " at " + this.protocol + "://" + product.getServer() + ":" + actualHttpPort + (product.getContextPath().equals("ROOT") ? "" : product.getContextPath());
+                message += " at " + product.getProtocol() + "://" + product.getServer() + ":" + actualHttpPort + (product.getContextPath().equals("ROOT") ? "" : product.getContextPath());
             }
             return message;
         }

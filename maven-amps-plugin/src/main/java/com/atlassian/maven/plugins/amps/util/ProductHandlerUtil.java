@@ -5,8 +5,10 @@ import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -15,7 +17,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -27,8 +31,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import org.apache.maven.plugin.logging.Log;
 
 public final class ProductHandlerUtil
 {
@@ -55,6 +57,50 @@ public final class ProductHandlerUtil
             final String version = (items.length == 3 ? items[2].trim() : "LATEST");
             return new ProductArtifact(groupId, artifactId, version);
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * Picks a free port, preferring the requested port if it's available. If a {@code bindAddress} is provided, the
+     * selected port will be verified against that interface.
+     * <p>
+     * If the requested port is {@code 0}, or the requested port is already in use, a {@code ServerSocket} is used
+     * to select a random open port on the system. If an open port can be found, it is returned.
+     *
+     * @param requestedPort the preferred port, or {@code 0} to select a random port
+     * @param bindAddress   the local address to bind to, which may be {@code null} to bind to any interface
+     * @return the selected port
+     * @since 6.3.4
+     */
+    public static int pickFreePort(final int requestedPort, @Nullable final InetAddress bindAddress)
+    {
+        try (final ServerSocket socket = new ServerSocket(requestedPort, 1, bindAddress))
+        {
+            return requestedPort == 0 ? socket.getLocalPort() : requestedPort;
+        }
+        catch (final IOException e)
+        {
+            if (requestedPort == 0)
+            {
+                throw new RuntimeException("Error opening socket", e);
+            }
+
+            return pickFreePort(0, bindAddress);
+        }
+    }
+
+    /**
+     * Picks a free port, preferring the requested port if it's available.
+     * <p>
+     * If the requested port is {@code 0}, or the requested port is already in use, a {@code ServerSocket} is used
+     * to select a random open port on the system. If an open port can be found, it is returned.
+     *
+     * @param requestedPort the preferred port, or {@code 0} to select a random port
+     * @return the selected port
+     * @since 6.3
+     */
+    public static int pickFreePort(final int requestedPort)
+    {
+        return pickFreePort(requestedPort, null);
     }
 
     /**
@@ -150,6 +196,7 @@ public final class ProductHandlerUtil
     {
         public final HostnameVerifier verifier;
         public final SSLSocketFactory sslSocketFactory;
+
         public SSLFactoryAndVerifier(HostnameVerifier verifier, SSLSocketFactory factory)
         {
             this.verifier = verifier;
@@ -189,5 +236,4 @@ public final class ProductHandlerUtil
         }
         return Optional.empty();
     }
-
 }

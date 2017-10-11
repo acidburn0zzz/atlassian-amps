@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
@@ -63,6 +62,7 @@ import java.util.regex.Matcher;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.getJiraDatabaseFactory;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
+import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -701,6 +701,33 @@ public class MavenGoals
         return webappWarFile;
     }
 
+    public void unpackWebappWar(final File targetDirectory, final ProductArtifact artifact)
+            throws MojoExecutionException
+    {
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-dependency-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
+                ),
+                goal("unpack"),
+                configuration(
+                        element(name("artifactItems"),
+                                element(name("artifactItem"),
+                                        element(name("groupId"), artifact.getGroupId()),
+                                        element(name("artifactId"), artifact.getArtifactId()),
+                                        element(name("type"), "war"),
+                                        element(name("version"), artifact.getVersion()))),
+                        element(name("outputDirectory"), targetDirectory.getPath()),
+                        //Overwrite needs to be enabled or unpack won't unpack multiple copies
+                        //of the same dependency GAV, _even to different output directories_
+                        element(name("overWriteReleases"), "true"),
+                        element(name("overWriteSnapshots"), "true")
+                ),
+                executionEnvironment()
+        );
+    }
+
     public File copyArtifact(final String targetFileName, final File targetDirectory,
                              final ProductArtifact artifact, String type) throws MojoExecutionException
     {
@@ -878,7 +905,9 @@ public class MavenGoals
         }
     }
 
-    public int startWebapp(final String productInstanceId, final File war, final Map<String, String> systemProperties, final List<ProductArtifact> extraContainerDependencies,
+    public int startWebapp(final String productInstanceId, final File war, final Map<String, String> systemProperties,
+                           final List<ProductArtifact> extraContainerDependencies,
+                           final List<ProductArtifact> extraProductDeployables,
                            final Product webappContext) throws MojoExecutionException
     {
         final Container container = findContainer(webappContext.getContainerId());
@@ -933,6 +962,26 @@ public class MavenGoals
             ));
         }
 
+        final List<Element> deployables = new ArrayList<>();
+        deployables.add(element(name("deployable"),
+                element(name("groupId"), "foo"),
+                element(name("artifactId"), "bar"),
+                element(name("type"), "war"),
+                element(name("location"), war.getPath()),
+                element(name("properties"),
+                        element(name("context"), webappContext.getContextPath())
+                )
+        ));
+        for (final ProductArtifact extra : extraProductDeployables)
+        {
+            deployables.add(element(name("deployable"),
+                    element(name("groupId"), extra.getGroupId()),
+                    element(name("artifactId"), extra.getArtifactId()),
+                    element(name("type"), extra.getType()),
+                    element(name("location"), extra.getPath())
+            ));
+        }
+
         for (DataSource dataSource : webappContext.getDataSources())
         {
             for (ProductArtifact containerDependency : dataSource.getLibArtifacts())
@@ -957,17 +1006,7 @@ public class MavenGoals
                 cargo,
                 goal("start"),
                 configurationWithoutNullElements(
-                        element(name("deployables"),
-                                element(name("deployable"),
-                                        element(name("groupId"), "foo"),
-                                        element(name("artifactId"), "bar"),
-                                        element(name("type"), "war"),
-                                        element(name("location"), war.getPath()),
-                                        element(name("properties"),
-                                                element(name("context"), webappContext.getContextPath())
-                                        )
-                                )
-                        ),
+                        element(name("deployables"), deployables.toArray(new Element[deployables.size()])),
                         waitElement(cargo), // This may be null
                         element(name("container"),
                                 element(name("containerId"), container.getId()),
@@ -1314,53 +1353,6 @@ public class MavenGoals
             throw new IllegalArgumentException("Container " + containerId + " not supported");
         }
         return container;
-    }
-
-    int pickFreePort(final int requestedPort)
-    {
-        ServerSocket socket = null;
-        try
-        {
-            socket = new ServerSocket(requestedPort);
-            return requestedPort > 0 ? requestedPort : socket.getLocalPort();
-        }
-        catch (final IOException e)
-        {
-            // happens if the requested port is taken, so we need to pick a new one
-            ServerSocket zeroSocket = null;
-            try
-            {
-                zeroSocket = new ServerSocket(0);
-                return zeroSocket.getLocalPort();
-            }
-            catch (final IOException ex)
-            {
-                throw new RuntimeException("Error opening socket", ex);
-            }
-            finally
-            {
-                closeSocket(zeroSocket);
-            }
-        }
-        finally
-        {
-            closeSocket(socket);
-        }
-    }
-
-    private void closeSocket(ServerSocket socket)
-    {
-        if (socket != null)
-        {
-            try
-            {
-                socket.close();
-            }
-            catch (final IOException e)
-            {
-                throw new RuntimeException("Error closing socket", e);
-            }
-        }
     }
 
     public void installPlugin(PdkParams pdkParams)

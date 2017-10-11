@@ -212,7 +212,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     {
         return Arrays.asList(
                 new ProductArtifact("hsqldb", "hsqldb", "1.8.0.5"),
-                new ProductArtifact("jta", "jta", "1.0.1"),
+                new ProductArtifact("javax.transaction", "jta", "1.0.1B"),
                 new ProductArtifact("ots-jts", "ots-jts", "1.0"),
 
                 // for data source and transaction manager providers

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
@@ -17,15 +18,27 @@ import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.plugin.MojoExecutionException;
+
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 public class ConfluenceProductHandler extends AbstractWebappProductHandler
 {
+    private final static TreeMap<ComparableVersion, String> synchronyProxyVersions = new TreeMap<>();
+
+    // system property to override deploying the synchrony-proxy webapp
+    public static final String REQUIRE_SYNCHRONY_PROXY = "require.synchrony.proxy";
+    public static final String SYNCHRONY_PROXY_VERSION = "synchrony.proxy.version";
+    private final ProductArtifact synchronyProxy = new ProductArtifact("com.atlassian.synchrony", "synchrony-proxy", "RELEASE", "war");
 
     public ConfluenceProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
         super(context, goals, new ConfluencePluginProvider(),artifactFactory);
+        synchronyProxyVersions.put(new ComparableVersion("6.4.10000"), "1.0.17");
+        synchronyProxyVersions.put(new ComparableVersion("10000"), "RELEASE");
     }
 
     public String getId()
@@ -86,6 +99,71 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
     public List<ProductArtifact> getExtraContainerDependencies()
     {
         return Collections.emptyList();
+    }
+
+    private boolean shouldDeploySynchronyProxy(Product ctx)
+    {
+        boolean synchronyProxyRequired = true;
+        if (isNotBlank(System.getProperty(REQUIRE_SYNCHRONY_PROXY))) {
+            synchronyProxyRequired = Boolean.parseBoolean(System.getProperty(REQUIRE_SYNCHRONY_PROXY));
+        }
+
+        return Character.getNumericValue(ctx.getVersion().charAt(0)) >= 6 && synchronyProxyRequired;
+    }
+
+    @Override
+    public List<ProductArtifact> getExtraProductDeployables(Product ctx)
+    {
+        return shouldDeploySynchronyProxy(ctx) ? Arrays.asList(synchronyProxy) : Collections.emptyList();
+    }
+
+    @Override
+    protected void customiseInstance(Product ctx, File homeDir, File explodedWarDir) throws MojoExecutionException
+    {
+        if (!shouldDeploySynchronyProxy(ctx))
+        {
+            log.debug("Synchrony proxy is disabled or not supported");
+            return;
+        }
+
+        log.debug("Resolving synchrony proxy version for Confluence " + ctx.getVersion());
+        // check if version is specified
+        if (isNotBlank(System.getProperty(SYNCHRONY_PROXY_VERSION)))
+        {
+            log.debug("Synchrony proxy version is already set in system variable ("
+                    + System.getProperty(SYNCHRONY_PROXY_VERSION) + ")");
+            synchronyProxy.setVersion(System.getProperty(SYNCHRONY_PROXY_VERSION));
+        }
+        else
+        {
+            log.debug("Synchrony proxy version is not set. Attempting to set corresponding version");
+            Map.Entry<ComparableVersion, String> synchronyProxyVersion =
+                    synchronyProxyVersions.ceilingEntry(new ComparableVersion(ctx.getVersion()));
+            if(synchronyProxyVersion != null)
+            {
+                synchronyProxy.setVersion(synchronyProxyVersion.getValue());
+                log.debug("Synchrony proxy version is set to " + synchronyProxyVersion.getValue());
+            }
+        }
+
+        // check for latest stable version if version not specified
+        if (Artifact.RELEASE_VERSION.equals(synchronyProxy.getVersion()) ||
+                Artifact.LATEST_VERSION.equals(synchronyProxy.getVersion()))
+        {
+            log.debug("determining latest stable synchrony-proxy version...");
+            Artifact warArtifact = artifactFactory.createProjectArtifact(synchronyProxy.getGroupId(),
+                    synchronyProxy.getArtifactId(), synchronyProxy.getVersion());
+            String stableVersion = ctx.getArtifactRetriever().getLatestStableVersion(warArtifact);
+
+            log.debug("using latest stable synchrony-proxy version: " + stableVersion);
+            synchronyProxy.setVersion(stableVersion);
+        }
+
+        // copy synchrony-proxy webapp war to target
+        File confInstall = getBaseDirectory(ctx);
+        File war = goals.copyWebappWar("synchrony-proxy", new File(confInstall, "synchrony-proxy"), synchronyProxy);
+
+        synchronyProxy.setPath(war.getPath());
     }
 
     @Override
