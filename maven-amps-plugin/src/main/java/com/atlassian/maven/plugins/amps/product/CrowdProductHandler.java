@@ -79,7 +79,7 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
     {
         return Arrays.asList(
                 new ProductArtifact("hsqldb", "hsqldb", "1.8.0.7"),
-                new ProductArtifact("jta", "jta", "1.0.1B"),
+                new ProductArtifact("javax.transaction", "jta", "1.0.1B"),
                 new ProductArtifact("javax.mail", "mail", "1.4"),
                 new ProductArtifact("javax.activation", "activation", "1.0.2")
         );
