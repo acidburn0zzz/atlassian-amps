@@ -71,7 +71,14 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
     @Override
     public File getUserInstalledPluginsDirectory(final Product product, final File webappDir, final File homeDir)
     {
-        return new File(homeDir, "plugins");
+        final File sharedHomeDir = new File(homeDir, "shared");
+        if (sharedHomeDir.exists())
+        {
+            return new File(sharedHomeDir, "plugins");
+        }
+        else {
+            return new File(homeDir, "plugins");
+        }
     }
 
     @Override
@@ -79,7 +86,7 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
     {
         return Arrays.asList(
                 new ProductArtifact("hsqldb", "hsqldb", "1.8.0.7"),
-                new ProductArtifact("javax.transaction", "jta", "1.0.1B"),
+                new ProductArtifact("javax.transaction", "jta", "1.1"),
                 new ProductArtifact("javax.mail", "mail", "1.4"),
                 new ProductArtifact("javax.activation", "activation", "1.0.2")
         );
@@ -112,6 +119,9 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
 
         try
         {
+            ConfigFileUtils.replaceAll(new File(homeDir, "shared/crowd.cfg.xml"),
+                    "jdbc:hsqldb:.*/(crowd-)?home/database/defaultdb",
+                    "jdbc:hsqldb:" + getHomeDirectory(ctx).getCanonicalPath().replace("\\", "/") + "/database/defaultdb");
             ConfigFileUtils.replaceAll(new File(homeDir, "crowd.cfg.xml"),
                     "jdbc:hsqldb:.*/(crowd-)?home/database/defaultdb",
                     "jdbc:hsqldb:" + getHomeDirectory(ctx).getCanonicalPath().replace("\\", "/") + "/database/defaultdb");
@@ -191,6 +201,7 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
         List<File> configFiles = super.getConfigFiles(product, snapshotDir);
         configFiles.add(new File(snapshotDir, "database.log"));
         configFiles.add(new File(snapshotDir, "crowd.cfg.xml"));
+        configFiles.add(new File(snapshotDir, "shared/crowd.cfg.xml"));
         configFiles.add(new File(snapshotDir, "crowd.properties"));
         return configFiles;
     }

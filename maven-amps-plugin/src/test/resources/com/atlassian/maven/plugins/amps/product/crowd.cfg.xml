@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application-configuration>
+    <setupStep>complete</setupStep>
+    <setupType>install.new</setupType>
+    <buildNumber>745</buildNumber>
+    <properties>
+        <property name="crowd.server.id">BVWC-I31P-GFZQ-HR2C</property>
+        <property name="hibernate.c3p0.acquire_increment">1</property>
+        <property name="hibernate.c3p0.idle_test_period">100</property>
+        <property name="hibernate.c3p0.max_size">15</property>
+        <property name="hibernate.c3p0.max_statements">0</property>
+        <property name="hibernate.c3p0.min_size">0</property>
+        <property name="hibernate.c3p0.timeout">30</property>
+        <property name="hibernate.connection.driver_class">org.hsqldb.jdbcDriver</property>
+        <property name="hibernate.connection.password"></property>
+        <property name="hibernate.connection.url">jdbc:hsqldb:/opt/bamboo-home/bla/crowd-home/database/defaultdb</property>
+        <property name="hibernate.connection.username">sa</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>
+        <property name="hibernate.setup">true</property>
+        <property name="license">blablabla</property>
+    </properties>
+</application-configuration>
