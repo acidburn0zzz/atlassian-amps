@@ -34,8 +34,8 @@
     <application>
         <name>crowd</name>
         <mvn-artifact>atlassian-crowd</mvn-artifact>
-        <latest>2.11.2</latest>
-        <data>2.11.2</data>
+        <latest>3.0.0</latest>
+        <data>3.0.0</data>
     </application>
     <application>
         <name>fecru</name>
