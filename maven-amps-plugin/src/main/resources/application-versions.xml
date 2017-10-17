@@ -2,8 +2,8 @@
 <applications>
     <application>
         <name>jira</name>
-        <latest>7.4.0</latest>
-        <data>7.4.0</data>
+        <latest>7.5.0</latest>
+        <data>7.5.0</data>
     </application>
     <application>
         <name>stash</name>
