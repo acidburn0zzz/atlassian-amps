@@ -217,8 +217,8 @@ public class ResourcesMinifier
      *                                  or destination file.
      */
     private boolean maybeCopyPreminifiedFileToDest(final File sourceFile,
-                                                  final File destFile,
-                                                  final MinifierParameters minifierParameters) throws MojoExecutionException
+                                                   final File destFile,
+                                                   final MinifierParameters minifierParameters) throws MojoExecutionException
     {
 
         final Log log = minifierParameters.getLog();
