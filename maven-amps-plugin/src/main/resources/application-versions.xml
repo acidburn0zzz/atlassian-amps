@@ -17,8 +17,8 @@
     </application>
     <application>
         <name>confluence</name>
-        <latest>6.2.3</latest>
-        <data>6.2.3</data>
+        <latest>6.4.0</latest>
+        <data>6.4.0</data>
     </application>
     <application>
         <name>refapp</name>
