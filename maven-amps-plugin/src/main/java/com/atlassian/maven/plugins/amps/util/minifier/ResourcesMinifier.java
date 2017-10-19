@@ -206,7 +206,17 @@ public class ResourcesMinifier
         log.info(numberOfMinifiedFile + " Javascript file(s) were minified into target directory " + destDir.getAbsolutePath());
     }
 
-    public boolean maybeCopyPreminifiedFileToDest(final File sourceFile,
+    /**
+     * If the file is determined to be already minified (by .min.js or -min.js extension), then it will
+     * just copy the file to the destination.
+     * @param sourceFile            Source file
+     * @param destFile              Target file
+     * @param minifierParameters    Minifier parameters are constructed higher in the call-chain
+     * @return true if and only if the file name ends with .min.js or -min.js
+     * @throws MojoExecutionException If an IOException is encountered reading or writing the source
+     *                                  or destination file.
+     */
+    private boolean maybeCopyPreminifiedFileToDest(final File sourceFile,
                                                   final File destFile,
                                                   final MinifierParameters minifierParameters) throws MojoExecutionException
     {
@@ -226,7 +236,7 @@ public class ResourcesMinifier
         }
         catch (IOException e)
         {
-            throw new MojoExecutionException("IOException when trying to copy preminified file to target", e);
+            throw new MojoExecutionException("IOException when trying to copy pre-minified file to target", e);
         }
 
     }
