@@ -28,8 +28,8 @@
     </application>
     <application>
         <name>bamboo</name>
-        <latest>6.0.2</latest>
-        <data>6.0.2</data>
+        <latest>6.2.2</latest>
+        <data>6.2.2</data>
     </application>
     <application>
         <name>crowd</name>
