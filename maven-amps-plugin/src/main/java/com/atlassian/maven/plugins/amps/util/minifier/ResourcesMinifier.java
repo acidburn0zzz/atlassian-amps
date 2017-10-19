@@ -229,6 +229,7 @@ public class ResourcesMinifier
             {
                 log.debug(String.format("Copying pre-minified file '%s' to destination since file ends in '.min.js' or '-min.js'.", fileName));
                 final Charset cs = minifierParameters.getCs();
+                FileUtils.forceMkdir(destFile.getParentFile());
                 FileUtils.writeStringToFile(destFile, FileUtils.readFileToString(sourceFile, cs), cs);
                 return true;
             }
