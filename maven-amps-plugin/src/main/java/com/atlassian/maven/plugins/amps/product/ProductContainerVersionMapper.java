@@ -24,31 +24,35 @@ public class ProductContainerVersionMapper
     {
         //Most apps
         populateVersionMapForProduct(ProductHandlerFactory.BAMBOO, "0", "5.1.0", "5.10.0");
+        populateVersionMapForProduct(ProductHandlerFactory.BITBUCKET, null, null, "4.0.0");
         populateVersionMapForProduct(ProductHandlerFactory.CONFLUENCE, "0", "5.5", "5.8");
-        populateVersionMapForProduct(ProductHandlerFactory.JIRA, "0", "5.2", "7.0.0");
+        populateVersionMapForProduct(ProductHandlerFactory.CROWD, "0", "2.7.0", null, "3.1.0");
+        populateVersionMapForProduct(ProductHandlerFactory.JIRA, "0", "5.2", "7.0.0", "7.3.0");
         populateVersionMapForProduct(ProductHandlerFactory.REFAPP, "0", "2.21.0", "3.0.0");
         populateVersionMapForProduct(ProductHandlerFactory.STASH, "0", "2.0.0", "3.3.0");
+    }
 
-        //Crowd ships on Tomcat 8.5 since 3.1.0
-        TreeMap<ComparableVersion, String> crowdVersions = new TreeMap<>();
-        crowdVersions.put(new ComparableVersion("0"), TOMCAT6X);
-        crowdVersions.put(new ComparableVersion("2.7.0"), TOMCAT7X);
-        crowdVersions.put(new ComparableVersion("3.1.0"), TOMCAT85X);
-        productMapping.put(ProductHandlerFactory.CROWD, crowdVersions);
-
-        //Bitbucket only supports Tomcat8
+    private static void populateVersionMapForProduct(final String productId, final String tomcat6Version, final String tomcat7Version, final String tomcat8Version, final String tomcat85Version)
+    {
         TreeMap<ComparableVersion, String> versions = new TreeMap<>();
-        versions.put(new ComparableVersion("4.0.0"), TOMCAT8X);
-        productMapping.put(ProductHandlerFactory.BITBUCKET, versions);
+        if (tomcat6Version != null) {
+            versions.put(new ComparableVersion(tomcat6Version), TOMCAT6X);
+        }
+        if (tomcat7Version != null) {
+            versions.put(new ComparableVersion(tomcat7Version), TOMCAT7X);
+        }
+        if (tomcat8Version != null) {
+            versions.put(new ComparableVersion(tomcat8Version), TOMCAT8X);
+        }
+        if (tomcat85Version != null) {
+            versions.put(new ComparableVersion(tomcat85Version), TOMCAT85X);
+        }
+        productMapping.put(productId, versions);
     }
 
     private static void populateVersionMapForProduct(final String productId, final String tomcat6Version, final String tomcat7Version, final String tomcat8Version)
     {
-        TreeMap<ComparableVersion, String> versions = new TreeMap<>();
-        versions.put(new ComparableVersion(tomcat6Version), TOMCAT6X);
-        versions.put(new ComparableVersion(tomcat7Version), TOMCAT7X);
-        versions.put(new ComparableVersion(tomcat8Version), TOMCAT8X);
-        productMapping.put(productId, versions);
+        populateVersionMapForProduct(productId, tomcat6Version, tomcat7Version, tomcat8Version, null);
     }
 
     public static String containerForProductVersion(String productId, String version)
