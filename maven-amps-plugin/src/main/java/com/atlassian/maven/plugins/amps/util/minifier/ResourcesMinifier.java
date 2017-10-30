@@ -185,6 +185,11 @@ public class ResourcesMinifier
                     continue;
                 }
 
+                if(maybeCopyPreminifiedFileToDest(sourceFile, destFile, minifierParameters))
+                {
+                    continue;
+                }
+
                 log.debug("compressing to " + destFile.getAbsolutePath());
                 if(useClosure)
                 {
@@ -199,6 +204,42 @@ public class ResourcesMinifier
             }
         }
         log.info(numberOfMinifiedFile + " Javascript file(s) were minified into target directory " + destDir.getAbsolutePath());
+    }
+
+    /**
+     * If the file is determined to be already minified (by .min.js or -min.js extension), then it will
+     * just copy the file to the destination.
+     * @param sourceFile            Source file
+     * @param destFile              Target file
+     * @param minifierParameters    Minifier parameters are constructed higher in the call-chain
+     * @return true if and only if the file name ends with .min.js or -min.js
+     * @throws MojoExecutionException If an IOException is encountered reading or writing the source
+     *                                  or destination file.
+     */
+    private boolean maybeCopyPreminifiedFileToDest(final File sourceFile,
+                                                   final File destFile,
+                                                   final MinifierParameters minifierParameters) throws MojoExecutionException
+    {
+
+        final Log log = minifierParameters.getLog();
+        try
+        {
+            final String fileName = sourceFile.getName();
+            if (fileName.endsWith(".min.js") || fileName.endsWith("-min.js"))
+            {
+                log.debug(String.format("Copying pre-minified file '%s' to destination since file ends in '.min.js' or '-min.js'.", fileName));
+                final Charset cs = minifierParameters.getCs();
+                FileUtils.forceMkdir(destFile.getParentFile());
+                FileUtils.writeStringToFile(destFile, FileUtils.readFileToString(sourceFile, cs), cs);
+                return true;
+            }
+            return false;
+        }
+        catch (IOException e)
+        {
+            throw new MojoExecutionException("IOException when trying to copy pre-minified file to target", e);
+        }
+
     }
 
     public void processCss(File resourceDir, File destDir, List<String> includes, List<String> excludes, MinifierParameters minifierParameters) throws MojoExecutionException

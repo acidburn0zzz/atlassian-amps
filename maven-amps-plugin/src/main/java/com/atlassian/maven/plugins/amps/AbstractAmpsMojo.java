@@ -96,6 +96,12 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
      */
     @Parameter(property = "closure.js.compiler", defaultValue = "false")
     protected boolean closureJsCompiler;
+
+    /**
+     * If true, will skip files ending in -min.js or .min.js
+     */
+    @Parameter(property = "js.compiler.skip.minified", defaultValue = "false")
+    protected boolean skipMinifiedJs;
     
     @Component
     private AmpsPluginVersionChecker ampsPluginVersionChecker;
