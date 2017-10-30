@@ -4,7 +4,7 @@
 
     <parent>
         <groupId>com.atlassian.pom</groupId>
-        <artifactId>public-pom</artifactId>
+        <artifactId>closedsource-pom</artifactId>
         <version>4.0.21</version>
     </parent>
 
