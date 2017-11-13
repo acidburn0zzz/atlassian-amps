@@ -1,7 +1,7 @@
 package ${PACKAGE};
 
-import com.atlassian.bitbucket.scm.hook.*;
-import com.atlassian.bitbucket.repository.hook.*;
+import com.atlassian.bitbucket.hook.*;
+import com.atlassian.bitbucket.hook.repository.*;
 import com.atlassian.bitbucket.repository.*;
 
 import java.util.Collection;
@@ -18,7 +18,7 @@ public class ${CLASSNAME} implements PreReceiveRepositoryHook
         {
             if (refChange.getType() == RefChangeType.DELETE)
             {
-                hookResponse.err().println("The ref '" + refChange.getRefId() + "' cannot be deleted.");
+                hookResponse.err().println("The ref '" + refChange.getRef().getId() + "' cannot be deleted.");
                 return false;
             }
         }
