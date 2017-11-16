@@ -43,12 +43,12 @@ public class JvmArgsFixTest
     public void testDefaults() throws Exception
     {
         // testing if what is put in defaults() is what is actually meant - plain text here
-         Assert.assertEquals("-Xmx512m -XX:MaxPermSize=256m", JvmArgsFix.defaults().apply(null));
+         Assert.assertEquals("-Xmx768m -XX:MaxPermSize=256m -Xms384m", JvmArgsFix.defaults().apply(null));
     }
 
     @Test
     public void testDefaultsOverride() throws Exception
     {
-         Assert.assertEquals("-XmxSOMETHING -XX:MaxPermSize=STH", JvmArgsFix.defaults().with("-XX:MaxPermSize=", "STH").apply("-XmxSOMETHING"));
+         Assert.assertEquals("-XmxSOMETHING -XX:MaxPermSize=STH -Xms384m", JvmArgsFix.defaults().with("-XX:MaxPermSize=", "STH").apply("-XmxSOMETHING"));
     }
 }
