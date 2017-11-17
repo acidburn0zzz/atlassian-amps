@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 
@@ -19,6 +20,7 @@ public class ProductContainerVersionMapper
     private static final String TOMCAT7X = "tomcat7x";
     private static final String TOMCAT8X = "tomcat8x";
     private static final String TOMCAT85X = "tomcat85x";
+    private static final String TOMCAT85_6 = "tomcat85_6";
 
     static
     {
@@ -27,9 +29,24 @@ public class ProductContainerVersionMapper
         populateVersionMapForProduct(ProductHandlerFactory.BITBUCKET, null, null, "4.0.0");
         populateVersionMapForProduct(ProductHandlerFactory.CONFLUENCE, "0", "5.5", "5.8");
         populateVersionMapForProduct(ProductHandlerFactory.CROWD, "0", "2.7.0", null, "3.1.0");
-        populateVersionMapForProduct(ProductHandlerFactory.JIRA, "0", "5.2", "7.0.0", "7.3.0");
+        populateVersionMapForProduct(ProductHandlerFactory.JIRA, ImmutableMap.of(
+                "0", "tomcat6x",
+                "5.2", "tomcat7x",
+                "7.0.0", "tomcat8x",
+                "7.3.0", "tomcat85_6"
+                )
+        );
         populateVersionMapForProduct(ProductHandlerFactory.REFAPP, "0", "2.21.0", "3.0.0");
         populateVersionMapForProduct(ProductHandlerFactory.STASH, "0", "2.0.0", "3.3.0");
+    }
+
+    private static <K, V> void populateVersionMapForProduct(String productId, ImmutableMap<String, String> productToTomcatVersions) {
+        TreeMap<ComparableVersion, String> versions = new TreeMap<>();
+        for (String productVersion : productToTomcatVersions.keySet()) {
+            versions.put(new ComparableVersion(productVersion), productToTomcatVersions.get(productVersion));
+        }
+
+        productMapping.put(productId, versions);
     }
 
     private static void populateVersionMapForProduct(final String productId, final String tomcat6Version, final String tomcat7Version, final String tomcat8Version, final String tomcat85Version)
