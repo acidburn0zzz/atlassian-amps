@@ -115,8 +115,8 @@ public class TestJiraProductHandler
     public void itShouldSetNewJvmArgsForJira7_7_0AndHigher() throws Exception
     {
         newArrayList(
-                getNewProduct("7.7.0-ALPHA"), getNewProduct("7.7.0-SNAPSHOT"), getNewProduct("7.7-EAP01"), getNewProduct("7.7.0"),
-                getNewProduct("7.7.1-SNAPSHOT"), getNewProduct("7.7.2"), getNewProduct("7.8-rc1"), getNewProduct("7.8"))
+                newProduct("7.7.0-ALPHA"), newProduct("7.7.0-SNAPSHOT"), newProduct("7.7-EAP01"), newProduct("7.7.0"),
+                newProduct("7.7.1-SNAPSHOT"), newProduct("7.7.2"), newProduct("7.8-rc1"), newProduct("7.8"))
         .forEach(product -> {
             productHandler.fixJvmArgs(product);
             assertThat(format("Jira version %s does not have the correct Xmx", product.getVersion()), product.getJvmArgs(), containsString("-Xmx768m"));
@@ -128,7 +128,7 @@ public class TestJiraProductHandler
     public void itShouldUseDefaultJvmArgsForLowerThanJira7_7_0() throws Exception
     {
         newArrayList(
-                getNewProduct("7.6.0"), getNewProduct("7.6.19-SNAPSHOT"), getNewProduct("7.1"))
+                newProduct("7.6.0"), newProduct("7.6.19-SNAPSHOT"), newProduct("7.1"))
         .forEach(product -> {
             productHandler.fixJvmArgs(product);
             assertThat(format("Jira version %s does not have the correct Xmx", product.getVersion()), product.getJvmArgs(), containsString("-Xmx512m"));
@@ -194,7 +194,7 @@ public class TestJiraProductHandler
 
     @Test
     public void shouldByDefaultForceJiraSynchronousStartup() throws IOException {
-        final Product product = getNewProduct();
+        final Product product = newProduct();
         final Map<String, String> systemProperties = productHandler.getSystemProperties(product);
 
         // then
@@ -206,7 +206,7 @@ public class TestJiraProductHandler
 
     @Test
     public void shouldPassAwaitInitializationFlagFromProduct() throws IOException {
-        final Product product = getNewProduct();
+        final Product product = newProduct();
         final Map<String, String> systemPropertiesWithAwait = productHandler.getSystemProperties(product);
 
         product.setAwaitFullInitialization(false);
@@ -336,13 +336,13 @@ public class TestJiraProductHandler
         assertBundledPluginPath("not.a.version", TEMP_HOME, bundledPluginsZip);
     }
 
-    private Product getNewProduct(String version) {
-        final Product product = getNewProduct();
+    private Product newProduct(String version) {
+        final Product product = newProduct();
         product.setVersion(version);
         return product;
     }
 
-    private Product getNewProduct() {
+    private Product newProduct() {
         final Product product = new Product();
         product.setInstanceId("jira");
         product.setDataSources(newArrayList());
