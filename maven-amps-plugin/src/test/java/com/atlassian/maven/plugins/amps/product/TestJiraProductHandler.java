@@ -15,6 +15,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,6 +40,8 @@ import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.ORA
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.ORACLE_12C;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.POSTGRES;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.String.format;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
@@ -48,12 +53,22 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TestJiraProductHandler
 {
-    private static File tempHome;
-
+    private static File TEMP_HOME;
+    
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    
+    @Mock
+    private MavenContext mavenContext;
+    @Mock
+    private MavenProject mavenProject;
+    @Mock
+    private Build build;
+
+    private JiraProductHandler productHandler;
 
     private static File createTempDir(final String subPath)
     {
@@ -61,6 +76,15 @@ public class TestJiraProductHandler
     }
 
     @Before
+    public void setUp() throws Exception {
+        when(build.getDirectory()).thenReturn(temporaryFolder.newFolder("jira").getAbsolutePath());
+        when(mavenProject.getBuild()).thenReturn(build);
+        when(mavenContext.getProject()).thenReturn(mavenProject);
+        productHandler = new JiraProductHandler(mavenContext, null, null);
+
+        createTemporaryHomeDirectory();
+    }
+
     public void createTemporaryHomeDirectory() throws IOException
     {
         final File f = File.createTempFile("temp-jira-", "-home");
@@ -74,29 +98,54 @@ public class TestJiraProductHandler
             throw new IOException();
         }
 
-        tempHome = f;
+        TEMP_HOME = f;
     }
 
     @After
     public void deleteTemporaryHomeDirectoryAndContents() throws Exception
     {
-        if (tempHome != null)
+        if (TEMP_HOME != null)
         {
-            FileUtils.deleteDirectory(tempHome);
-            tempHome = null;
+            FileUtils.deleteDirectory(TEMP_HOME);
+            TEMP_HOME = null;
         }
+    }
+
+    @Test
+    public void itShouldSetNewJvmArgsForJira7_7_0AndHigher() throws Exception
+    {
+        newArrayList(
+                getNewProduct("7.7.0-ALPHA"), getNewProduct("7.7.0-SNAPSHOT"), getNewProduct("7.7-EAP01"), getNewProduct("7.7.0"),
+                getNewProduct("7.7.1-SNAPSHOT"), getNewProduct("7.7.2"), getNewProduct("7.8-rc1"), getNewProduct("7.8"))
+        .forEach(product -> {
+            productHandler.fixJvmArgs(product);
+            assertThat(format("Jira version %s does not have the correct Xmx", product.getVersion()), product.getJvmArgs(), containsString("-Xmx768m"));
+            assertThat(format("Jira version %s does not have the correct Xms", product.getVersion()), product.getJvmArgs(), containsString("-Xms384m"));
+        });
+    }
+
+    @Test
+    public void itShouldUseDefaultJvmArgsForLowerThanJira7_7_0() throws Exception
+    {
+        newArrayList(
+                getNewProduct("7.6.0"), getNewProduct("7.6.19-SNAPSHOT"), getNewProduct("7.1"))
+        .forEach(product -> {
+            productHandler.fixJvmArgs(product);
+            assertThat(format("Jira version %s does not have the correct Xmx", product.getVersion()), product.getJvmArgs(), containsString("-Xmx512m"));
+            assertThat(format("Jira version %s has Xms set and should not", product.getVersion()), product.getJvmArgs(), not(containsString("-Xms384m")));
+        });
     }
 
     @Test
     public void dbconfigXmlCreatedWithCorrectPath() throws Exception
     {
-        JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
+        JiraProductHandler.createDbConfigXmlIfNecessary(TEMP_HOME);
 
-        File f = new File(tempHome, FILENAME_DBCONFIG);
+        File f = new File(TEMP_HOME, FILENAME_DBCONFIG);
         assertTrue("The config file is created: " + FILENAME_DBCONFIG, f.exists());
         assertTrue("And it's a regular file", f.isFile());
 
-        File dbFile = new File(tempHome, "database");
+        File dbFile = new File(TEMP_HOME, "database");
 
         Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
 
@@ -145,19 +194,7 @@ public class TestJiraProductHandler
 
     @Test
     public void shouldByDefaultForceJiraSynchronousStartup() throws IOException {
-        final MavenContext mockMavenContext = mock(MavenContext.class);
-        MavenProject projectMock = mock(MavenProject.class);
-        Build buildMock = mock(Build.class);
-        when(buildMock.getDirectory()).thenReturn(temporaryFolder.newFolder("jira").getAbsolutePath());
-        when(projectMock.getBuild()).thenReturn(buildMock);
-        when(mockMavenContext.getProject()).thenReturn(projectMock);
-        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
-        final Product product = new Product();
-        product.setInstanceId("jira");
-        product.setDataSources(newArrayList());
-
-        // when
-        product.setAwaitFullInitialization(null);
+        final Product product = getNewProduct();
         final Map<String, String> systemProperties = productHandler.getSystemProperties(product);
 
         // then
@@ -169,19 +206,7 @@ public class TestJiraProductHandler
 
     @Test
     public void shouldPassAwaitInitializationFlagFromProduct() throws IOException {
-        final MavenContext mockMavenContext = mock(MavenContext.class);
-        MavenProject projectMock = mock(MavenProject.class);
-        Build buildMock = mock(Build.class);
-        when(buildMock.getDirectory()).thenReturn(temporaryFolder.newFolder("jira").getAbsolutePath());
-        when(projectMock.getBuild()).thenReturn(buildMock);
-        when(mockMavenContext.getProject()).thenReturn(projectMock);
-        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
-        final Product product = new Product();
-        product.setInstanceId("jira");
-        product.setDataSources(newArrayList());
-
-        // when
-        product.setAwaitFullInitialization(true);
+        final Product product = getNewProduct();
         final Map<String, String> systemPropertiesWithAwait = productHandler.getSystemProperties(product);
 
         product.setAwaitFullInitialization(false);
@@ -201,19 +226,18 @@ public class TestJiraProductHandler
     private void testUpdateDbConfigXml(JiraDatabaseType dbType) throws Exception
     {
         // Create default dbconfig.xml
-        JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
+        JiraProductHandler.createDbConfigXmlIfNecessary(TEMP_HOME);
         // Setup
-        final File f = new File(tempHome, FILENAME_DBCONFIG);
+        final File f = new File(TEMP_HOME, FILENAME_DBCONFIG);
         final String schema = "test-schema";
         final SAXReader reader = new SAXReader();
         org.dom4j.Document dbConfigXml = reader.read(f);
-        final MavenContext mockMavenContext = mock(MavenContext.class);
-        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
+
         // Check default db type
         assertEquals("hsql", getDbType(dbConfigXml));
         assertEquals("PUBLIC", getDbSchema(dbConfigXml));
         // Invoke: update dbconfig.xml
-        productHandler.updateDbConfigXml(tempHome, dbType, schema);
+        productHandler.updateDbConfigXml(TEMP_HOME, dbType, schema);
         dbConfigXml = reader.read(f);
         // Check
         assertEquals(dbType.getDbType(), getDbType(dbConfigXml));
@@ -243,9 +267,9 @@ public class TestJiraProductHandler
     @Test
     public void dbconfigXmlNotCreatedWhenAlreadyExists() throws Exception
     {
-        final File f = new File(tempHome, FILENAME_DBCONFIG);
+        final File f = new File(TEMP_HOME, FILENAME_DBCONFIG);
         FileUtils.writeStringToFile(f, "Original contents");
-        JiraProductHandler.createDbConfigXmlIfNecessary(tempHome);
+        JiraProductHandler.createDbConfigXmlIfNecessary(TEMP_HOME);
 
         final String after = FileUtils.readFileToString(f);
         assertEquals("Original contents", after);
@@ -269,10 +293,6 @@ public class TestJiraProductHandler
             final File localHome, final String sharedHomePath, final File expectedParentDir)
     {
         // Set up
-        final MavenProject mockMavenProject = mock(MavenProject.class);
-        final MavenContext mockMavenContext = mock(MavenContext.class);
-        when(mockMavenContext.getProject()).thenReturn(mockMavenProject);
-        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
         final Product mockProduct = mock(Product.class);
         when(mockProduct.getSharedHome()).thenReturn(sharedHomePath);
 
@@ -288,42 +308,54 @@ public class TestJiraProductHandler
     @Test
     public void bundledPluginsShouldBeUnzippedIfPresent()
     {
-        final File bundledPluginsDir = new File(tempHome, BUNDLED_PLUGINS_UNZIPPED);
+        final File bundledPluginsDir = new File(TEMP_HOME, BUNDLED_PLUGINS_UNZIPPED);
         //noinspection ResultOfMethodCallIgnored
         bundledPluginsDir.mkdirs();
         assertTrue(bundledPluginsDir.exists());
-        assertBundledPluginPath("6.3", tempHome, bundledPluginsDir);
+        assertBundledPluginPath("6.3", TEMP_HOME, bundledPluginsDir);
     }
 
     @Test
     public void bundledPluginsLocationCorrectFor41()
     {
-        final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_FROM_4_1);
-        assertBundledPluginPath("4.1", tempHome, bundledPluginsZip);
+        final File bundledPluginsZip = new File(TEMP_HOME, BUNDLED_PLUGINS_FROM_4_1);
+        assertBundledPluginPath("4.1", TEMP_HOME, bundledPluginsZip);
     }
 
     @Test
     public void bundledPluginsLocationCorrectFor40()
     {
-        final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_UPTO_4_0);
-        assertBundledPluginPath("4.0", tempHome, bundledPluginsZip);
+        final File bundledPluginsZip = new File(TEMP_HOME, BUNDLED_PLUGINS_UPTO_4_0);
+        assertBundledPluginPath("4.0", TEMP_HOME, bundledPluginsZip);
     }
 
     @Test
     public void bundledPluginsLocationCorrectForFallback()
     {
-        final File bundledPluginsZip = new File(tempHome, BUNDLED_PLUGINS_FROM_4_1);
-        assertBundledPluginPath("not.a.version", tempHome, bundledPluginsZip);
+        final File bundledPluginsZip = new File(TEMP_HOME, BUNDLED_PLUGINS_FROM_4_1);
+        assertBundledPluginPath("not.a.version", TEMP_HOME, bundledPluginsZip);
+    }
+
+    private Product getNewProduct(String version) {
+        final Product product = getNewProduct();
+        product.setVersion(version);
+        return product;
+    }
+
+    private Product getNewProduct() {
+        final Product product = new Product();
+        product.setInstanceId("jira");
+        product.setDataSources(newArrayList());
+        product.setAwaitFullInitialization(null);
+        return product;
     }
 
     private void assertBundledPluginPath(final String version, final File appDir, final File expectedPath)
     {
         // Set up
-
         final Log mockLog = mock(Log.class);
-        final MavenContext mockMavenContext = mock(MavenContext.class);
-        when(mockMavenContext.getLog()).thenReturn(mockLog);
-        final JiraProductHandler productHandler = new JiraProductHandler(mockMavenContext, null, null);
+        when(mavenContext.getLog()).thenReturn(mockLog);
+        final JiraProductHandler productHandler = new JiraProductHandler(mavenContext, null, null);
         final Product mockProduct = mock(Product.class);
         when(mockProduct.getVersion()).thenReturn(version);
 

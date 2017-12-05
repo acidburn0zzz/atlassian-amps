@@ -27,7 +27,7 @@ public class JvmArgsFix
 
     public static JvmArgsFix defaults()
     {
-        return new JvmArgsFix(ImmutableMap.of("-Xmx", "768m", "-XX:MaxPermSize=", "256m", "-Xms", "384m"));
+        return new JvmArgsFix(ImmutableMap.<String, String>of("-Xmx", "512m", "-XX:MaxPermSize=", "256m"));
     }
 
     public static JvmArgsFix empty()
