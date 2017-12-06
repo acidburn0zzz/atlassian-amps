@@ -7,6 +7,7 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -14,6 +15,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -95,6 +97,22 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     public String getId()
     {
         return "jira";
+    }
+
+    @Override
+    protected void fixJvmArgs(Product ctx) {
+        // In JIRA 7.7+ we have a HealthCheck that requires min / max memory to be set to a certain minimums or it can block startup.
+        if (new ComparableVersion(ctx.getVersion()).compareTo(new ComparableVersion("7.7.0-ALPHA")) >= 0)
+        {
+            ctx.setJvmArgs(JvmArgsFix.empty()
+                    .with("-Xmx", "768m")
+                    .with("-Xms", "384m")
+                    .apply(ctx.getJvmArgs()));
+        }
+        else
+        {
+            super.fixJvmArgs(ctx);
+        }
     }
 
     @Override
