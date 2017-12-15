@@ -2,8 +2,8 @@
 <applications>
     <application>
         <name>jira</name>
-        <latest>7.5.0</latest>
-        <data>7.5.0</data>
+        <latest>7.6.1</latest>
+        <data>7.6.1</data>
     </application>
     <application>
         <name>stash</name>
@@ -12,13 +12,13 @@
     </application>
     <application>
         <name>bitbucket</name>
-        <latest>5.4.1</latest>
-        <data>5.4.1</data>
+        <latest>5.6.0</latest>
+        <data>5.6.0</data>
     </application>
     <application>
         <name>confluence</name>
-        <latest>6.4.0</latest>
-        <data>6.4.0</data>
+        <latest>6.6.0</latest>
+        <data>6.6.0</data>
     </application>
     <application>
         <name>refapp</name>
