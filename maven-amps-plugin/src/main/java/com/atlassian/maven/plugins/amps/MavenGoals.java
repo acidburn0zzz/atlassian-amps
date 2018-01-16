@@ -2,6 +2,7 @@ package com.atlassian.maven.plugins.amps;
 
 import aQute.bnd.osgi.Constants;
 import com.atlassian.maven.plugins.amps.product.ImportMethod;
+import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabase;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory;
 import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
@@ -264,7 +265,10 @@ public class MavenGoals
                     ,systemProps.getProperty("package")
                     );
         }
-
+        // If the product becoming invoked is stash, then print deprecation warning
+        if(productId.equals(ProductHandlerFactory.STASH)) {
+            printStashDeprecationWarning(this.log);
+        }
         if(null == props)
         {
             try
@@ -276,6 +280,7 @@ public class MavenGoals
                 throw new MojoExecutionException("Unable to gather properties",e);
             }
         }
+
 
         if(null != props)
         {
@@ -352,6 +357,15 @@ public class MavenGoals
                 }
             }
         }
+    }
+
+    private void printStashDeprecationWarning(Log log) {
+        log.warn(">>");
+        log.warn(">>");
+        log.warn("Deprecation Warning: You are using references to Stash. Stash has been deprecated and replaced " +
+                "with Bitbucket Cloud. Please update your references.");
+        log.warn(">>");
+        log.warn(">>");
     }
 
     /**

@@ -9,8 +9,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.mockito.Mock;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -34,13 +36,14 @@ public class CreateMojo extends AbstractProductHandlerMojo
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
+        Log log = getMavenContext().getLog();
+
         trackFirstRunIfNeeded();
 
         getGoogleTracker().track(GoogleAmpsTracker.CREATE_PLUGIN);
 
         // this is the name of a product (refapp, jira, confluence, etc)
         String pid = getProductId();
-
         // first try to get manual version
         Application a = getManualVersion(pid);
         if (a != null) {
