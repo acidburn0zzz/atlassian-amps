@@ -359,13 +359,21 @@ public class MavenGoals
         }
     }
 
-    private void printStashDeprecationWarning(Log log) {
-        log.warn(">>");
-        log.warn(">>");
-        log.warn("Deprecation Warning: You are using references to Stash. Stash has been deprecated and replaced " +
-                "with Bitbucket Cloud. Please update your references.");
-        log.warn(">>");
-        log.warn(">>");
+    public static void printStashDeprecationWarning(Log log) {
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+
+        log.warn(">>> WARNING: Since version 4.0, Stash has been rebranded. Stash is <<<");
+        log.warn(">>> now known as Bitbucket Server. Running stash commands will re- <<<");
+        log.warn(">>> sult in a plugin for a version which is now EOL.               <<<");
+        log.warn(">>> For the latest version of Bitbucket server, please use the co- <<<");
+        log.warn(">>> rresponding bitbucket command.                                 <<<");
+        log.warn(">>> Eg.  atlas-create-bitbucket-plugin or mvn bitbucket:create     <<<");
+        log.warn(">>> Stash commands will be deprecated in the next major version.   <<<");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
     }
 
     /**
