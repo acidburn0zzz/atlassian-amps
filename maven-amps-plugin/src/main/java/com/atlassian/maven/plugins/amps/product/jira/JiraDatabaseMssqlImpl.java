@@ -125,7 +125,7 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
             {
                 for(DriverPropertyInfo driverPropertyInfo : driverPropertyInfos)
                 {
-                    if ("DATABASENAME".equals(driverPropertyInfo.name))
+                    if ("DATABASENAME".equalsIgnoreCase(driverPropertyInfo.name))
                     {
                         return driverPropertyInfo.value;
                     }

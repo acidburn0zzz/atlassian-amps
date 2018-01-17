@@ -31,6 +31,10 @@
             <artifactId>jtds</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.atlassian.core</groupId>
             <artifactId>atlassian-core</artifactId>
             <version>4.0</version>

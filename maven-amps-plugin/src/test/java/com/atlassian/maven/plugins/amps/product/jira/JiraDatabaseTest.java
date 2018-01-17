@@ -49,13 +49,23 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mssqlDatabaseName() throws Exception
+    public void mssqlJtdsDatabaseName() throws Exception
     {
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getDriver()).thenReturn("net.sourceforge.jtds.jdbc.Driver");
         final JiraDatabaseMssqlImpl mssql = new JiraDatabaseMssqlImpl(dataSource);
         assertThat("database name should be : ddd", mssql.getDatabaseName("jdbc:jtds:sqlserver://localhost:1433/ddd"), equalTo("ddd"));
         assertThat("database name should be : eeee", mssql.getDatabaseName("jdbc:jtds:sybase://127.0.0.1/eeee;autoCommit=false"), equalTo("eeee"));
+    }
+
+    @Test
+    public void mssqlDatabaseName() throws Exception
+    {
+        final DataSource dataSource = mock(DataSource.class);
+        when(dataSource.getDriver()).thenReturn("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        final JiraDatabaseMssqlImpl mssql = new JiraDatabaseMssqlImpl(dataSource);
+        assertThat("database name should be : ddd", mssql.getDatabaseName("jdbc:sqlserver://localhost:1433;databaseName=ddd"), equalTo("ddd"));
+        assertThat("database name should be : eeee", mssql.getDatabaseName("jdbc:sqlserver://127.0.0.1;databaseName=eeee;autoCommit=false"), equalTo("eeee"));
     }
 
     @Test
