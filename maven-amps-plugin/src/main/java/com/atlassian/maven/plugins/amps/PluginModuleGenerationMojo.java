@@ -55,7 +55,7 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
         trackFirstRunIfNeeded();
         Log log = getLog();
         //can't figure out how to get plexus to fire a method after injection, so doing it here
-        pluginModulePrompterFactory.setLog(getLog());
+        pluginModulePrompterFactory.setLog(log);
         try
         {
             pluginModulePrompterFactory.scanForPrompters();
@@ -68,7 +68,7 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
 
         String productId = getProductId();
         if (productId.equals(ProductHandlerFactory.STASH)) {
-            getLog().info(productId);
+            log.info(productId);
             MavenGoals.printStashDeprecationWarning(log);
 
         }
@@ -91,7 +91,7 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
                 .exists())
         {
             String message = "Couldn't find the atlassian-plugin.xml, please run this goal in an atlassian plugin project root.";
-            getLog().error(message);
+            log.error(message);
             throw new MojoExecutionException(message);
         }
 
