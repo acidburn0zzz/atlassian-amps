@@ -265,7 +265,7 @@ public class MavenGoals
                     ,systemProps.getProperty("package")
                     );
         }
-        // If the product becoming invoked is stash, then print deprecation warning
+        // Stash plugins are deprecated, we need to direct plugin devs to use create bitbucket plugins instead
         if(productId.equals(ProductHandlerFactory.STASH)) {
             printStashDeprecationWarning(this.log);
         }
