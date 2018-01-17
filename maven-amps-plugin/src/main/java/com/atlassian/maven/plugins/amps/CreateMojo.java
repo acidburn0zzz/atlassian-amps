@@ -34,8 +34,6 @@ public class CreateMojo extends AbstractProductHandlerMojo
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
-        Log log = getMavenContext().getLog();
-
         trackFirstRunIfNeeded();
 
         getGoogleTracker().track(GoogleAmpsTracker.CREATE_PLUGIN);
