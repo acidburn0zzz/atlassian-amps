@@ -280,8 +280,7 @@ public class MavenGoals
                 throw new MojoExecutionException("Unable to gather properties",e);
             }
         }
-
-
+        
         if(null != props)
         {
             ExecutionEnvironment execEnv = executionEnvironment();
