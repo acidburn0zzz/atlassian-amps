@@ -1,13 +1,12 @@
 package com.atlassian.maven.plugins.amps.product.jira;
 
-import java.io.File;
-import java.util.Optional;
-
 import com.atlassian.maven.plugins.amps.DataSource;
 import com.atlassian.maven.plugins.amps.product.ImportMethod;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.util.Optional;
 
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.getJiraDatabaseFactory;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -18,19 +17,16 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class JiraDatabaseTest
-{
+public class JiraDatabaseTest {
     private static JiraDatabaseFactory factory;
 
     @Before
-    public void setup()
-    {
+    public void setup() {
         factory = getJiraDatabaseFactory();
     }
 
     @Test
-    public void postgresDatabaseName() throws Exception
-    {
+    public void postgresDatabaseName() throws Exception {
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getDriver()).thenReturn("org.postgresql.Driver");
         final JiraDatabasePostgresImpl postgres = new JiraDatabasePostgresImpl(dataSource);
@@ -41,8 +37,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mysqlDatabaseName() throws Exception
-    {
+    public void mysqlDatabaseName() throws Exception {
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getDriver()).thenReturn("com.mysql.jdbc.Driver");
         final JiraDatabaseMysqlImpl mysql = new JiraDatabaseMysqlImpl(dataSource);
@@ -51,8 +46,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mssqlDatabaseName() throws Exception
-    {
+    public void mssqlJtdsDatabaseName() throws Exception {
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getDriver()).thenReturn("net.sourceforge.jtds.jdbc.Driver");
         final JiraDatabaseMssqlImpl mssql = new JiraDatabaseMssqlImpl(dataSource);
@@ -61,8 +55,16 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void postgresDatabaseFactory() throws Exception
-    {
+    public void mssqlDatabaseName() throws Exception {
+        final DataSource dataSource = mock(DataSource.class);
+        when(dataSource.getDriver()).thenReturn("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        final JiraDatabaseMssqlImpl mssql = new JiraDatabaseMssqlImpl(dataSource);
+        assertThat("database name should be : ddd", mssql.getDatabaseName("jdbc:sqlserver://localhost:1433;databaseName=ddd"), equalTo("ddd"));
+        assertThat("database name should be : eeee", mssql.getDatabaseName("jdbc:sqlserver://127.0.0.1;databaseName=eeee;autoCommit=false"), equalTo("eeee"));
+    }
+
+    @Test
+    public void postgresDatabaseFactory() throws Exception {
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getUrl()).thenReturn("jdbc:postgresql://host/eeee");
         when(dataSource.getDriver()).thenReturn("org.postgresql.Driver");
@@ -71,8 +73,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mysqlDatabaseFactory() throws Exception
-    {
+    public void mysqlDatabaseFactory() throws Exception {
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getUrl()).thenReturn("jdbc:mysql://localhost:3306/ffffff");
         when(dataSource.getDriver()).thenReturn("com.mysql.jdbc.Driver");
@@ -81,8 +82,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void oracle10gDatabaseFactory() throws Exception
-    {
+    public void oracle10gDatabaseFactory() throws Exception {
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getUrl()).thenReturn("jdbc:oracle:thin:@localhost:1521:XE");
@@ -93,8 +93,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mssqlDatabaseFactory() throws Exception
-    {
+    public void mssqlDatabaseFactory() throws Exception {
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getUrl()).thenReturn("jdbc:sqlserver://host/eeee");
@@ -104,8 +103,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mssqlJtdsDatabaseFactory() throws Exception
-    {
+    public void mssqlJtdsDatabaseFactory() throws Exception {
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getUrl()).thenReturn("jdbc:jtds:sqlserver://localhost:1433/ppppp");
@@ -115,8 +113,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mssqlGenerateImportDatabaseSQL() throws Exception
-    {
+    public void mssqlGenerateImportDatabaseSQL() throws Exception {
         // setup
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final DataSource dataSource = mock(DataSource.class);
@@ -137,8 +134,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void postgresGenerateInitDatabaseSQL() throws Exception
-    {
+    public void postgresGenerateInitDatabaseSQL() throws Exception {
         // expected result
         final String expectedSQLGenerated = "DROP DATABASE IF EXISTS \"jiradb\";"
                 + "DROP USER IF EXISTS \"jira_user\";"
@@ -164,8 +160,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mssqlGenerateInitDatabaseSQL() throws Exception
-    {
+    public void mssqlGenerateInitDatabaseSQL() throws Exception {
         // expected result
         final String expectedSQLGenerated = "USE [master]; \n"
                 + "IF EXISTS(SELECT * FROM SYS.DATABASES WHERE name='jiradb') \n"
@@ -198,8 +193,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mysqlGenerateInitDatabaseSQL() throws Exception
-    {
+    public void mysqlGenerateInitDatabaseSQL() throws Exception {
         // expected result
         final String expectedSQLGenerated = "DROP DATABASE IF EXISTS `jiradb`;\n"
                 + "GRANT USAGE ON *.* TO `jira_user`@localhost;\n"
@@ -225,8 +219,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void oracleGenerateInitDatabaseSQL() throws Exception
-    {
+    public void oracleGenerateInitDatabaseSQL() throws Exception {
         // expected result
         final String dataPumpDir = File.separatorChar + "usr" + File.separatorChar + "home";
         String expectedSQLGenerated = "DECLARE\n"
@@ -271,8 +264,7 @@ public class JiraDatabaseTest
 
 
     @Test
-    public void testImportMethodCaseInsensitively() throws Exception
-    {
+    public void testImportMethodCaseInsensitively() throws Exception {
         final ImportMethod IMPDP = ImportMethod.getValueOf("IMPDP");
         final ImportMethod impdp = ImportMethod.getValueOf("impdp");
         final ImportMethod iMpdp = ImportMethod.getValueOf("iMpdp");
