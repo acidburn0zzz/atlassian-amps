@@ -280,7 +280,7 @@ public class MavenGoals
                 throw new MojoExecutionException("Unable to gather properties",e);
             }
         }
-        
+
         if(null != props)
         {
             ExecutionEnvironment execEnv = executionEnvironment();
@@ -358,7 +358,7 @@ public class MavenGoals
         }
     }
 
-    public static void printStashDeprecationWarning(Log log) {
+    static void printStashDeprecationWarning(Log log) {
         log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
