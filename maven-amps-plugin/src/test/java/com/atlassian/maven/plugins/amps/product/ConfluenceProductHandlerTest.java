@@ -4,6 +4,7 @@ import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.XmlOverride;
 import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.junit.After;
@@ -11,10 +12,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
+import java.util.Collection;
 
 import static com.atlassian.maven.plugins.amps.product.ConfluenceProductHandler.SYNCHRONY_PROXY_VERSION;
 import static org.hamcrest.CoreMatchers.is;
@@ -46,8 +49,10 @@ public class ConfluenceProductHandlerTest {
     private Product ctx;
     @Mock
     private ArtifactRetriever artifactRetriever;
-    private String oldSynchronyProxyEnv;
+    @Captor
+    ArgumentCaptor<Collection<XmlOverride>> expectedOverridesCaptor;
 
+    private String oldSynchronyProxyEnv;
 
     @Before
     public void setUp() throws Exception {
@@ -115,5 +120,28 @@ public class ConfluenceProductHandlerTest {
         ArgumentCaptor<ProductArtifact> synchronyProxyArtifactCaptor = ArgumentCaptor.forClass(ProductArtifact.class);
         verify(goals, times(1)).copyWebappWar(anyString(), any(File.class), synchronyProxyArtifactCaptor.capture());
         assertThat(synchronyProxyArtifactCaptor.getValue().getVersion(), is(LATEST_SYNCHRONY_PROXY_VERSION));
+    }
+
+    @Test
+    public void testCustomiseInstanceForServerXmlOverrides() throws Exception {
+        // Setup
+        when(ctx.getVersion()).thenReturn("6.5.0-SNAPSHOT");
+        when(ctx.getArtifactRetriever()).thenReturn(artifactRetriever);
+        when(artifactRetriever.getLatestStableVersion(anyObject())).thenReturn(LATEST_SYNCHRONY_PROXY_VERSION);
+        when(goals.copyWebappWar(anyString(), anyObject(), anyObject())).thenReturn(new File("./"));
+        ConfluenceProductHandler spied = spy(confluenceProductHandler);
+        doReturn(new File("./")).when(spied).getBaseDirectory(ctx);
+
+        // Execute
+        spied.customiseInstance(ctx, new File("./"), new File("./"));
+
+        // Verify
+        verify(ctx, times(1)).setCargoXmlOverrides(expectedOverridesCaptor.capture());
+        assertThat(expectedOverridesCaptor.getValue().size(), is(1));
+        XmlOverride xmlOverride = expectedOverridesCaptor.getValue().stream().findFirst().get();
+        assertThat(xmlOverride.getFile(), is("conf/server.xml"));
+        assertThat(xmlOverride.getAttributeName(), is("maxThreads"));
+        assertThat(xmlOverride.getxPathExpression(), is("//Connector"));
+        assertThat(xmlOverride.getValue(), is("48"));
     }
 }
