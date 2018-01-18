@@ -2,6 +2,7 @@ package com.atlassian.maven.plugins.amps;
 
 import aQute.bnd.osgi.Constants;
 import com.atlassian.maven.plugins.amps.product.ImportMethod;
+import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabase;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory;
 import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
@@ -264,7 +265,10 @@ public class MavenGoals
                     ,systemProps.getProperty("package")
                     );
         }
-
+        // Stash plugins are deprecated, we need to direct plugin devs to use create bitbucket plugins instead
+        if(productId.equals(ProductHandlerFactory.STASH)) {
+            printStashDeprecationWarning(this.log);
+        }
         if(null == props)
         {
             try
@@ -352,6 +356,23 @@ public class MavenGoals
                 }
             }
         }
+    }
+
+    static void printStashDeprecationWarning(Log log) {
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+
+        log.warn(">>> WARNING: Since version 4.0, Stash has been rebranded. Stash is <<<");
+        log.warn(">>> now known as Bitbucket Server. Running stash commands will re- <<<");
+        log.warn(">>> sult in a plugin for a version which is now EOL.               <<<");
+        log.warn(">>> For the latest version of Bitbucket server, please use the co- <<<");
+        log.warn(">>> rresponding bitbucket command.                                 <<<");
+        log.warn(">>> Eg.  atlas-create-bitbucket-plugin or mvn bitbucket:create     <<<");
+        log.warn(">>> Stash commands will be deprecated in the next major version.   <<<");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
     }
 
     /**
