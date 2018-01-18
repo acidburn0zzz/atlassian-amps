@@ -17,8 +17,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -40,7 +39,6 @@ public class CreateMojo extends AbstractProductHandlerMojo
 
         // this is the name of a product (refapp, jira, confluence, etc)
         String pid = getProductId();
-
         // first try to get manual version
         Application a = getManualVersion(pid);
         if (a != null) {
