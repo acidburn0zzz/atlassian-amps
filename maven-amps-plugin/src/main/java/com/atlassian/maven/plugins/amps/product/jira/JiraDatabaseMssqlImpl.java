@@ -101,8 +101,12 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
     }
 
     /**
-     * reference jtds documentation url http://jtds.sourceforge.net/faq.html The URL format for jTDS is:
+     * Reference jtds documentation url http://jtds.sourceforge.net/faq.html The URL format for jTDS is:
      * jdbc:jtds:<server_type>://<server>[:<port>][/<database>][;<property>=<value>[;...]]
+     *
+     * For Microsoft's sql server driver url https://docs.microsoft.com/en-us/sql/connect/jdbc/building-the-connection-url format is:
+     * jdbc:sqlserver://[<serverName>[\<instanceName>][:<portNumber>]][;<property>=<value>[;...]]
+     * eg. jdbc:sqlserver://localhost:1433;databaseName=AdventureWorks;integratedSecurity=true; +
      * @param url
      * @return database name
      */
@@ -115,7 +119,7 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
         }
         catch (ClassNotFoundException e)
         {
-            throw new MojoExecutionException("Could not load JTDS MSSQL database library to classpath");
+            throw new MojoExecutionException("Could not load MSSQL database library to classpath");
         }
         try
         {
@@ -125,7 +129,7 @@ public class JiraDatabaseMssqlImpl extends AbstractJiraDatabase
             {
                 for(DriverPropertyInfo driverPropertyInfo : driverPropertyInfos)
                 {
-                    if ("DATABASENAME".equals(driverPropertyInfo.name))
+                    if ("DATABASENAME".equalsIgnoreCase(driverPropertyInfo.name))
                     {
                         return driverPropertyInfo.value;
                     }
