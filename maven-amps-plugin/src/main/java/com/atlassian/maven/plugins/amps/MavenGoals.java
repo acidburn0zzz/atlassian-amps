@@ -49,12 +49,14 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.jar.Manifest;
@@ -939,16 +941,13 @@ public class MavenGoals
 
     private static Xpp3Dom configurationWithoutNullElements(Element... elements)
     {
-        List<Element> nonNullElements = new ArrayList<Element>();
-        for (Element e : elements)
-        {
-            if (e != null)
-            {
-                nonNullElements.add(e);
-            }
-        }
+        return configuration(removeNullElements(elements));
+    }
 
-        return configuration(nonNullElements.toArray(new Element[nonNullElements.size()]));
+    private static Element[] removeNullElements(Element... elements) {
+        return Arrays.stream(elements)
+                     .filter(Objects::nonNull)
+                     .toArray(Element[]::new);
     }
 
     private Plugin bndPlugin()
@@ -1084,11 +1083,11 @@ public class MavenGoals
                                 element(name("dependencies"), deps.toArray(new Element[deps.size()])),
                                 element(name("timeout"), String.valueOf(startupTimeout))
                         ),
-                        element(name("configuration"),
-                                element(name("home"), container.getConfigDirectory(getBuildDirectory(), productInstanceId)),
-                                element(name("type"), "standalone"),
-                                element(name("properties"), props.toArray(new Element[props.size()])),
-                                xmlReplacementsElement(webappContext.getCargoXmlOverrides()) // This may be null
+                        element(name("configuration"), removeNullElements(
+                                    element(name("home"), container.getConfigDirectory(getBuildDirectory(), productInstanceId)),
+                                    element(name("type"), "standalone"),
+                                    element(name("properties"), props.toArray(new Element[props.size()])),
+                                    xmlReplacementsElement(webappContext.getCargoXmlOverrides())) // This may be null
 
                         ),
                         // Fix issue AMPS copy 2 War files to container
