@@ -127,14 +127,14 @@
 
         <!-- google tracking -->
         <dependency>
-            <groupId>com.dmurph</groupId>
-            <artifactId>JGoogleAnalyticsTracker</artifactId>
-            <version>1.2.1-atlassian</version>
+          <groupId>com.dmurph</groupId>
+          <artifactId>JGoogleAnalyticsTracker</artifactId>
+          <version>1.2.1-atlassian</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-nop</artifactId>
-            <version>1.6.2</version>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-nop</artifactId>
+          <version>1.6.2</version>
         </dependency>
 
         <dependency>
@@ -144,11 +144,11 @@
         </dependency>
 
         <dependency>
-            <groupId>com.atlassian.amps</groupId>
-            <artifactId>standalone</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>runtime</scope>
+          <groupId>com.atlassian.amps</groupId>
+          <artifactId>standalone</artifactId>
+          <version>${project.version}</version>
+          <type>pom</type>
+          <scope>runtime</scope>
         </dependency>
 
         <!-- func test framework -->
