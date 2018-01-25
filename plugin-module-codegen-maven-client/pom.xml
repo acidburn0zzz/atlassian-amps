@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>6.3.14-MNSTR-1367-jira01</version>
+        <version>6.3.14-SNAPSHOT</version>
     </parent>
 
     <artifactId>plugin-module-codegen-maven-client</artifactId>
