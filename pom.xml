@@ -51,12 +51,6 @@
         <system>Bamboo</system>
         <url>https://ecosystem-bamboo.internal.atlassian.com/browse/AMPS</url>
     </ciManagement>
-    <distributionManagement>
-        <site>
-            <id>atlassian-documentation</id>
-            <url>scpexe://docs-app.internal.atlassian.com/var/www/domains/docs.atlassian.com/${project.artifactId}/${project.version}</url>
-        </site>
-    </distributionManagement>
 
     <properties>
         <javadoc.additional.params>-Xdoclint:none</javadoc.additional.params>
@@ -91,6 +85,7 @@
         <mysql.version>5.1.32</mysql.version>
         <oracle.version>11.2.0.2.0</oracle.version>
         <jtds.version>1.2.4</jtds.version>
+        <mssql.version>6.2.2.jre8</mssql.version>
         <release.profiles>release,installer-win,installer-linux,installer-osx</release.profiles>
         <release.arguments>-Pinstaller-win,installer-osx,installer-linux</release.arguments>
         <javadoc.additional.params>-Xdoclint:none</javadoc.additional.params>
@@ -157,6 +152,13 @@
                 <groupId>net.sourceforge.jtds</groupId>
                 <artifactId>jtds</artifactId>
                 <version>${jtds.version}</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>mssql-jdbc</artifactId>
+                <version>${mssql.version}</version>
                 <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
