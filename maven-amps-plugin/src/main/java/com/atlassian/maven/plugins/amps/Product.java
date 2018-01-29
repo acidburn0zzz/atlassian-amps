@@ -3,8 +3,10 @@ package com.atlassian.maven.plugins.amps;
 import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
 import org.apache.commons.lang.StringUtils;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -242,6 +244,11 @@ public class Product
     private Map<String,Object> systemProperties = new HashMap<String,Object>();
 
     /**
+     * The Cargo XML overrides for the product
+     */
+    private Collection<XmlOverride> cargoXmlOverrides;
+
+    /**
      * File the container should log to.
      */
     private String output;
@@ -404,6 +411,7 @@ public class Product
         prod.setShutdownTimeout(shutdownTimeout == 0 ? product.getShutdownTimeout() : shutdownTimeout);
         prod.setSynchronousStartup(synchronousStartup == null ? product.getSynchronousStartup() : synchronousStartup);
         prod.setSharedHome(sharedHome == null ? product.getSharedHome() : sharedHome);
+        prod.setCargoXmlOverrides(cargoXmlOverrides == null ? product.getCargoXmlOverrides() : cargoXmlOverrides);
 
         // https related properties
         prod.setHttpsPort(httpsPort == 0 ? product.getHttpsPort() : httpsPort);
@@ -1126,5 +1134,18 @@ public class Product
 
     public void setAwaitFullInitialization(Boolean awaitFullInitialization) {
         this.awaitFullInitialization = awaitFullInitialization;
+    }
+
+    /**
+     * Returns any configuration overrides that should be passed on cargo start.
+     * @since 6.3
+     */
+    @Nullable
+    public Collection<XmlOverride> getCargoXmlOverrides() {
+        return cargoXmlOverrides;
+    }
+
+    public void setCargoXmlOverrides(final Collection<XmlOverride> cargoXmlOverrides) {
+        this.cargoXmlOverrides = cargoXmlOverrides;
     }
 }

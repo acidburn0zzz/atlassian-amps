@@ -50,11 +50,14 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.jar.Manifest;
@@ -959,16 +962,13 @@ public class MavenGoals
 
     private static Xpp3Dom configurationWithoutNullElements(Element... elements)
     {
-        List<Element> nonNullElements = new ArrayList<Element>();
-        for (Element e : elements)
-        {
-            if (e != null)
-            {
-                nonNullElements.add(e);
-            }
-        }
+        return configuration(removeNullElements(elements));
+    }
 
-        return configuration(nonNullElements.toArray(new Element[nonNullElements.size()]));
+    private static Element[] removeNullElements(Element... elements) {
+        return Arrays.stream(elements)
+                     .filter(Objects::nonNull)
+                     .toArray(Element[]::new);
     }
 
     private Plugin bndPlugin()
@@ -1056,13 +1056,7 @@ public class MavenGoals
         final String baseUrl = getBaseUrl(webappContext, actualHttpPort);
         sysProps.add(element(name("baseurl"), baseUrl));
 
-        final List<Element> deps = new ArrayList<Element>();
-        for (final ProductArtifact dep : extraContainerDependencies)
-        {
-            deps.add(element(name("dependency"),
-                    element(name("location"), webappContext.getArtifactRetriever().resolve(dep))
-            ));
-        }
+        final List<Element> deps = extractDependencies(extraContainerDependencies, webappContext);
 
         final List<Element> deployables = new ArrayList<>();
         deployables.add(element(name("deployable"),
@@ -1074,6 +1068,7 @@ public class MavenGoals
                         element(name("context"), webappContext.getContextPath())
                 )
         ));
+
         for (final ProductArtifact extra : extraProductDeployables)
         {
             deployables.add(element(name("deployable"),
@@ -1082,16 +1077,6 @@ public class MavenGoals
                     element(name("type"), extra.getType()),
                     element(name("location"), extra.getPath())
             ));
-        }
-
-        for (DataSource dataSource : webappContext.getDataSources())
-        {
-            for (ProductArtifact containerDependency : dataSource.getLibArtifacts())
-            {
-                deps.add(element(name("dependency"),
-                        element(name("location"), webappContext.getArtifactRetriever().resolve(containerDependency))
-                        ));
-            }
         }
 
         final List<Element> props =
@@ -1119,10 +1104,11 @@ public class MavenGoals
                                 element(name("dependencies"), deps.toArray(new Element[deps.size()])),
                                 element(name("timeout"), String.valueOf(startupTimeout))
                         ),
-                        element(name("configuration"),
-                                element(name("home"), container.getConfigDirectory(getBuildDirectory(), productInstanceId)),
-                                element(name("type"), "standalone"),
-                                element(name("properties"), props.toArray(new Element[props.size()]))
+                        element(name("configuration"), removeNullElements(
+                                    element(name("home"), container.getConfigDirectory(getBuildDirectory(), productInstanceId)),
+                                    element(name("type"), "standalone"),
+                                    element(name("properties"), props.toArray(new Element[props.size()])),
+                                    xmlReplacementsElement(webappContext.getCargoXmlOverrides())) // This may be null
 
                         ),
                         // Fix issue AMPS copy 2 War files to container
@@ -1136,11 +1122,49 @@ public class MavenGoals
         return actualHttpPort;
     }
 
+    private List<Element> extractDependencies(final List<ProductArtifact> extraContainerDependencies, final Product webappContext) throws MojoExecutionException {
+        final List<Element> deps = new ArrayList<>();
+
+        for (final ProductArtifact dep : extraContainerDependencies)
+        {
+            deps.add(element(name("dependency"),
+                    element(name("location"), webappContext.getArtifactRetriever().resolve(dep))
+            ));
+        }
+
+        for (DataSource dataSource : webappContext.getDataSources())
+        {
+            for (ProductArtifact containerDependency : dataSource.getLibArtifacts())
+            {
+                deps.add(element(name("dependency"),
+                        element(name("location"), webappContext.getArtifactRetriever().resolve(containerDependency))
+                ));
+            }
+        }
+        return deps;
+    }
+
+    private Element xmlReplacementsElement(final Collection<XmlOverride> cargoXmlOverrides) {
+        if (cargoXmlOverrides == null) {
+            return null;
+        }
+
+        Element[] xmlReplacementsElements = cargoXmlOverrides.stream().map(xmlOverride ->
+                element(name("xmlReplacement"),
+                        element(name("file"), xmlOverride.getFile()),
+                        element(name("xpathExpression"), xmlOverride.getxPathExpression()),
+                        element(name("attributeName"), xmlOverride.getAttributeName()),
+                        element(name("value"), xmlOverride.getValue()))
+        ).toArray(Element[]::new);
+
+        return element(name("xmlReplacements"), xmlReplacementsElements);
+    }
+
     @VisibleForTesting
     List<Element> getConfigurationProperties(final Map<String, String> systemProperties,
             final Product webappContext, final int rmiPort, final int actualHttpPort, final int actualAjpPort, final String protocol)
     {
-        final List<Element> props = new ArrayList<Element>();
+        final List<Element> props = new ArrayList<>();
         for (final Map.Entry<String, String> entry : systemProperties.entrySet())
         {
             props.add(element(name(entry.getKey()), entry.getValue()));
