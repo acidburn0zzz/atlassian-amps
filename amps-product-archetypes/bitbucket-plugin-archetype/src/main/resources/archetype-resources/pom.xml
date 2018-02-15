@@ -168,7 +168,7 @@
         <bitbucket.data.version>${bitbucketVersion}</bitbucket.data.version>
         <bitbucket.version>${bitbucketVersion}</bitbucket.version>
 
-        <amps.version>\${dollar}{project.version}</amps.version>
+        <amps.version>${project.version}</amps.version>
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
         <atlassian.plugin.key>\${dollar}{project.groupId}.\${dollar}{project.artifactId}</atlassian.plugin.key>
         <atlassian.spring.scanner.version>${atlassian.spring.scanner.version}</atlassian.spring.scanner.version>
