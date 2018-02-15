@@ -1,2 +1,0 @@
-${project.groupId}:maven-amps-plugin:${project.version}:run-cloud -Dapplication=jira-software -DskipAllPrompts=true -DskipAllPrompts=true
-clean -DskipAllPrompts=true -Dapplication=jira-software -Dwait=false -Dmaven.clean.failOnError=false
