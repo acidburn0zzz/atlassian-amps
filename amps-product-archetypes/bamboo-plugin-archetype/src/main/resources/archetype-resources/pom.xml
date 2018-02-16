@@ -26,7 +26,7 @@
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
         <atlassian.spring.scanner.version>${atlassian.spring.scanner.version}</atlassian.spring.scanner.version>
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
-        <atlassian.plugin.key>\${project.groupId}.\${project.artifactId}</atlassian.plugin.key>
+        <atlassian.plugin.key>\${dollar}{project.groupId}.\${dollar}{project.artifactId}</atlassian.plugin.key>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -43,14 +43,14 @@
         <dependency>
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-annotation</artifactId>
-            <version>\${atlassian.spring.scanner.version}</version>
+            <version>\${dollar}{atlassian.spring.scanner.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-runtime</artifactId>
-            <version>\${atlassian.spring.scanner.version}</version>
+            <version>\${dollar}{atlassian.spring.scanner.version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -104,7 +104,7 @@
                     <!-- See here for an explanation of default instructions: -->
                     <!-- https://developer.atlassian.com/docs/advanced-topics/configuration-of-instructions-in-atlassian-plugins -->
                     <instructions>
-                        <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
+                        <Atlassian-Plugin-Key>\${dollar}{atlassian.plugin.key}</Atlassian-Plugin-Key>
 
                         <!-- Add package to export here -->
                         <Export-Package>
@@ -127,7 +127,7 @@
             <plugin>
                 <groupId>com.atlassian.plugin</groupId>
                 <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
-                <version>\${atlassian.spring.scanner.version}</version>
+                <version>\${dollar}{atlassian.spring.scanner.version}</version>
                 <executions>
                     <execution>
                         <goals>
