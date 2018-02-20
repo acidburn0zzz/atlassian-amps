@@ -203,10 +203,10 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
 
         if (wait)
         {
-            getLog().info("Type Ctrl-D to shutdown gracefully");
-            getLog().info("Type Ctrl-C to exit");
+            getLog().info("Type Ctrl-C to shutdown");
             try
             {
+                // Handles Ctrl-D commands
                 for (int r; (r=System.in.read()) != -1;)
                 {
                     getLog().info(Integer.toString(r));
