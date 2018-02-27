@@ -10,7 +10,6 @@ import org.apache.maven.model.locator.DefaultModelLocator;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -20,7 +19,6 @@ import org.apache.maven.project.ProjectBuildingResult;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -33,7 +31,7 @@ import static java.util.Collections.singletonList;
 /**
  * Run the webapp without a plugin project
  */
-@Mojo(name = "run-standalone", requiresProject = false, defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+@Mojo(name = "run-standalone", requiresProject = false)
 public class RunStandaloneMojo extends AbstractProductHandlerMojo
 {
     private final String
