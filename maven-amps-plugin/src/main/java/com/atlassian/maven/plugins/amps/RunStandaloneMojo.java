@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps;
 
+import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
@@ -9,6 +10,7 @@ import org.apache.maven.model.locator.DefaultModelLocator;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -17,22 +19,26 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Collections.singletonList;
 
 /**
  * Run the webapp without a plugin project
  */
-@Mojo(name = "run-standalone", requiresProject = false)
+@Mojo(name = "run-standalone", requiresProject = false, defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
 public class RunStandaloneMojo extends AbstractProductHandlerMojo
 {
     private final String
-        GROUP_ID = "com.atlassian.amps",
-        ARTIFACT_ID = "standalone";
+            GROUP_ID = "com.atlassian.amps",
+            ARTIFACT_ID = "standalone";
 
     @Component
     private ProjectBuilder projectBuilder;
@@ -53,9 +59,9 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo
         getUpdateChecker().check();
 
         promptForEmailSubscriptionIfNeeded();
-        
+
         trackFirstRunIfNeeded();
-        
+
         getGoogleTracker().track(GoogleAmpsTracker.RUN_STANDALONE);
 
         try
@@ -72,7 +78,6 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo
             Plugin plugin = (Plugin) mgmt.getPluginsAsMap().get("com.atlassian.maven.plugins:maven-amps-plugin");
 
             configuration = (Xpp3Dom) plugin.getConfiguration();
-
             goals.executeAmpsRecursively(getPluginInformation().getVersion(), getAmpsGoal(), configuration);
         }
         catch (Exception e)
@@ -99,7 +104,24 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo
 
         // Only the inner execution in com.atlassian.amps:standalone has the actual latest version that will be used if
         // they didn't specify a version number. Too hard to restructure; 'LATEST' is better than nothing.
-        final String productVersion = getPropertyOrDefault(systemProperties, "product.version", "LATEST");
+        String productVersion = getPropertyOrDefault(systemProperties, "product.version", "LATEST");
+
+        // If we're building FECRU, not using LATEST and have entered a short version name then get the full version name
+        if (product.equals(ProductHandlerFactory.FECRU) && productVersion != "LATEST" && !Pattern.matches(".*[0-9]{14}$",productVersion)) {
+            String fullProductVersion = getFullVersion(productVersion);
+            getLog().error("=======================================================================");
+            getLog().error("You entered: "+productVersion+" as your version, this is not a version.");
+            if (fullProductVersion != null) {
+                getLog().error("Did you mean?: " + fullProductVersion);
+                getLog().error("Please re-run with the correct version (atlas-run-standalone --product fecru -v " + fullProductVersion + ")");
+            } else {
+                getLog().error("There is no valid full version of "+productVersion+". Please double check your input");
+                getLog().error("The full list of versions can be found at: " +
+                        "https://maven.atlassian.com/content/repositories/atlassian-public/com/atlassian/fecru/amps-fecru/");
+            }
+            getLog().error("=======================================================================");
+            System.exit(1);
+        }
 
         File base = new File("amps-standalone-" + product + "-" + productVersion).getAbsoluteFile();
 
@@ -108,7 +130,6 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo
         // hack #1 from before
         pbr.setRemoteRepositories(oldSession.getCurrentProject().getRemoteArtifactRepositories());
         pbr.setPluginArtifactRepositories(oldSession.getCurrentProject().getPluginArtifactRepositories());
-
         pbr.getSystemProperties().setProperty("project.basedir", base.getPath());
 
         ProjectBuildingResult result = projectBuilder.build(getStandaloneArtifact(), false, pbr);
@@ -122,11 +143,39 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo
         result.getProject().setFile(new DefaultModelLocator().locatePom(base));
 
         final MavenContext newContext = oldContext.with(
-            result.getProject(),
-            newReactor,
-            newSession);
+                result.getProject(),
+                newReactor,
+                newSession);
 
         return new MavenGoals(newContext);
+    }
+
+    private String getFullVersion(String versionInput) {
+        URLConnection connection = null;
+        String correctVersion = null;
+        BufferedReader in = null;
+        Matcher m;
+        try {
+            connection = new URL("https://maven.atlassian.com/content/repositories/atlassian-public/com/atlassian/fecru/amps-fecru/").openConnection();
+            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+//            response = connection.getInputStream();
+            String inputLine;
+            // Read each line of the page and parse it to see the version number
+            while ((inputLine = in.readLine()) != null) {
+                m = Pattern.compile(".*>("+versionInput+"-[0-9]{14}).*").matcher(inputLine);
+                if (m.matches()) {
+                    correctVersion = m.group(1);
+                }
+            }
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return correctVersion;
     }
 
     private String getPropertyOrDefault(Properties systemProperties, String property, String defaultValue) {
