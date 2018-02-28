@@ -39,9 +39,8 @@ import static java.util.Collections.singletonList;
  */
 @Mojo(name = "run-standalone", requiresProject = false)
 public class RunStandaloneMojo extends AbstractProductHandlerMojo {
-    private final String
-            GROUP_ID = "com.atlassian.amps",
-            ARTIFACT_ID = "standalone";
+    private final String GROUP_ID = "com.atlassian.amps";
+    private final String ARTIFACT_ID = "standalone";
 
     @Component
     private ProjectBuilder projectBuilder;
