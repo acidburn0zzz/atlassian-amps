@@ -105,7 +105,9 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo {
 
         // If we're building FECRU, not using LATEST and have entered a short version name then get the full version name
         if (product.equals(ProductHandlerFactory.FECRU) && productVersion != "LATEST" && !Pattern.matches(".*[0-9]{14}$", productVersion)) {
-            String fullProductVersionMessage = getFullVersion(productVersion).map((version) -> generateFullVersionMessage(productVersion, version)).orElseGet(() -> generateNoVersionMessage(productVersion));
+            String fullProductVersionMessage = getFullVersion(productVersion)
+                    .map((version) -> generateFullVersionMessage(productVersion, version))
+                    .orElseGet(() -> generateNoVersionMessage(productVersion));
             getLog().error("=======================================================================");
             getLog().error(fullProductVersionMessage);
             getLog().error("=======================================================================");
