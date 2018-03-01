@@ -150,7 +150,7 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo {
         return message;
     }
 
-    private Optional<String> getFullVersion(String versionInput) throws IOException {
+    protected Optional<String> getFullVersion(String versionInput) throws IOException {
         Pattern p = Pattern.compile(".*>(" + versionInput + "-[0-9]{14}).*");
         Matcher m;
         String correctVersion = null;
