@@ -8,7 +8,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.locator.DefaultModelLocator;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
@@ -22,13 +21,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,7 +51,7 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo {
         return "run";
     }
 
-    protected void doExecute() throws MojoExecutionException, MojoFailureException {
+    protected void doExecute() throws MojoExecutionException {
         getUpdateChecker().check();
 
         promptForEmailSubscriptionIfNeeded();
@@ -83,8 +80,7 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo {
     }
 
     protected MavenGoals createMavenGoals(ProjectBuilder projectBuilder)
-            throws MojoExecutionException, MojoFailureException, ProjectBuildingException,
-            IOException {
+            throws ProjectBuildingException, IOException {
         // overall goal here is to create a new MavenContext / MavenGoals for the standalone project
         final MavenContext oldContext = getMavenContext();
 
