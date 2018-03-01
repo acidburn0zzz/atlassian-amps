@@ -27,6 +27,7 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
@@ -52,20 +53,23 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         trackFirstRunIfNeeded();
-
+        Log log = getLog();
         //can't figure out how to get plexus to fire a method after injection, so doing it here
-        pluginModulePrompterFactory.setLog(getLog());
+        pluginModulePrompterFactory.setLog(log);
         try
         {
             pluginModulePrompterFactory.scanForPrompters();
         } catch (Exception e)
         {
             String message = "Error initializing Plugin Module Prompters";
-            getLog().error(message);
+            log.error(message);
             throw new MojoExecutionException(message);
         }
 
         String productId = getProductId();
+        if (productId.equals(ProductHandlerFactory.STASH)) {
+            MavenGoals.printStashDeprecationWarning(log);
+        }
 
         MavenProject project = getMavenContext().getProject();
         File javaDir = getJavaSourceRoot(project);
@@ -85,7 +89,7 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
                 .exists())
         {
             String message = "Couldn't find the atlassian-plugin.xml, please run this goal in an atlassian plugin project root.";
-            getLog().error(message);
+            log.error(message);
             throw new MojoExecutionException(message);
         }
 

@@ -1,3 +1,4 @@
+#set( $dollar = '$' )
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -22,7 +23,7 @@
             <dependency>
                 <groupId>com.atlassian.bitbucket.server</groupId>
                 <artifactId>bitbucket-parent</artifactId>
-                <version>\${bitbucket.version}</version>
+                <version>\${dollar}{bitbucket.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -58,27 +59,27 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>\${junit.libversion}</version>
+            <version>\${dollar}{junit.libversion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>\${commons.lang3.version}</version>
+            <version>\${dollar}{commons.lang3.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-annotation</artifactId>
-            <version>\${atlassian.spring.scanner.version}</version>
+            <version>\${dollar}{atlassian.spring.scanner.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
-            <version>\${javax.inject.version}</version>
+            <version>\${dollar}{javax.inject.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -86,19 +87,19 @@
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-osgi-testrunner</artifactId>
-            <version>\${plugin.testrunner.version}</version>
+            <version>\${dollar}{plugin.testrunner.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
-            <version>\${jsr311.version}</version>
+            <version>\${dollar}{jsr311.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>\${gson.version}</version>
+            <version>\${dollar}{gson.version}</version>
         </dependency>
     </dependencies>
 
@@ -107,19 +108,19 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>bitbucket-maven-plugin</artifactId>
-                <version>\${amps.version}</version>
+                <version>\${dollar}{amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <products>
                         <product>
                             <id>bitbucket</id>
                             <instanceId>bitbucket</instanceId>
-                            <version>\${bitbucket.version}</version>
-                            <dataVersion>\${bitbucket.data.version}</dataVersion>
+                            <version>\${dollar}{bitbucket.version}</version>
+                            <dataVersion>\${dollar}{bitbucket.data.version}</dataVersion>
                         </product>
                     </products>
                     <instructions>
-                        <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
+                        <Atlassian-Plugin-Key>\${dollar}{atlassian.plugin.key}</Atlassian-Plugin-Key>
 
                         <!-- Add package to export here -->
                         <Export-Package>
@@ -142,7 +143,7 @@
             <plugin>
                 <groupId>com.atlassian.plugin</groupId>
                 <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
-                <version>\${atlassian.spring.scanner.version}</version>
+                <version>\${dollar}{atlassian.spring.scanner.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -169,7 +170,7 @@
 
         <amps.version>${project.version}</amps.version>
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
-        <atlassian.plugin.key>\${project.groupId}.\${project.artifactId}</atlassian.plugin.key>
+        <atlassian.plugin.key>\${dollar}{project.groupId}.\${dollar}{project.artifactId}</atlassian.plugin.key>
         <atlassian.spring.scanner.version>${atlassian.spring.scanner.version}</atlassian.spring.scanner.version>
         <commons.lang3.version>${commons.lang3.version}</commons.lang3.version>
         <gson.version>${gson.version}</gson.version>

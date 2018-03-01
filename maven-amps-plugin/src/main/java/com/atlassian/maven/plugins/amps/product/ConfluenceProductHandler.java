@@ -1,5 +1,18 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.XmlOverride;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.apache.maven.plugin.MojoExecutionException;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -8,20 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
-
-import com.google.common.collect.ImmutableMap;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.versioning.ComparableVersion;
-import org.apache.maven.plugin.MojoExecutionException;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -36,7 +35,7 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
 
     public ConfluenceProductHandler(MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
-        super(context, goals, new ConfluencePluginProvider(),artifactFactory);
+        super(context, goals, new ConfluencePluginProvider(), artifactFactory);
         synchronyProxyVersions.put(new ComparableVersion("6.4.10000"), "1.0.17");
         synchronyProxyVersions.put(new ComparableVersion("10000"), "RELEASE");
     }
@@ -120,6 +119,7 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
     @Override
     protected void customiseInstance(Product ctx, File homeDir, File explodedWarDir) throws MojoExecutionException
     {
+        ctx.setCargoXmlOverrides(serverXmlConfluenceOverride());
         if (!shouldDeploySynchronyProxy(ctx))
         {
             log.debug("Synchrony proxy is disabled or not supported");
@@ -164,6 +164,10 @@ public class ConfluenceProductHandler extends AbstractWebappProductHandler
         File war = goals.copyWebappWar("synchrony-proxy", new File(confInstall, "synchrony-proxy"), synchronyProxy);
 
         synchronyProxy.setPath(war.getPath());
+    }
+
+    private Collection<XmlOverride> serverXmlConfluenceOverride() {
+        return Collections.singletonList(new XmlOverride("conf/server.xml", "//Connector", "maxThreads", "48"));
     }
 
     @Override
