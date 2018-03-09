@@ -99,6 +99,23 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
 
     protected void startProducts(List<ProductExecution> productExecutions) throws MojoExecutionException
     {
+        if (wait) {
+            getLog().debug("=======> ADDING SHUTDOWN HOOK\n");
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    getLog().info("Running Shutdown Hook");
+                    try {
+                        stopProducts(productExecutions);
+                    } catch (MojoExecutionException e) {
+                        e.printStackTrace();
+                        throw new RuntimeException("Unable to shut down products in shutdown hook");
+                    }
+                }
+            }));
+        }
+
+
         long globalStartTime = System.nanoTime();
         setParallelMode(productExecutions);
         List<StartupInformation> successMessages = Lists.newArrayList();
@@ -190,15 +207,15 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
 
         if (wait)
         {
-            getLog().info("Type Ctrl-D to shutdown gracefully");
-            getLog().info("Type Ctrl-C to exit");
+            getLog().info("Type Ctrl-C to shutdown gracefully");
             try
             {
-                while (System.in.read() != -1)
+                // Handles Ctrl-D commands
+                for (int r; (r=System.in.read()) != -1;)
                 {
                 }
             }
-            catch (final IOException e)
+            catch (final Exception e)
             {
                 // ignore
             }
