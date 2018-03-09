@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
@@ -514,15 +515,21 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     protected final Map<String, String> mergeSystemProperties(Product ctx)
     {
         final Map<String, String> properties = new HashMap<String, String>();
-
+        // Apply the base properties
         properties.putAll(getSystemProperties(ctx));
-        
         for (Map.Entry<String, Object> entry : ctx.getSystemPropertyVariables().entrySet())
         {
+            // Enter the System Property Variables from product context, overwriting duplicates
             properties.put(entry.getKey(), (String) entry.getValue());
+        }
+        Properties userProperties = context.getExecutionEnvironment().getMavenSession().getUserProperties();
+        for (String key : userProperties.stringPropertyNames()) {
+            // Overwrite the default system properties with user input arguments
+            properties.put(key, userProperties.getProperty(key));
         }
         return properties;
     }
+
 
     /**
      * System properties which are specific to the Product Handler
