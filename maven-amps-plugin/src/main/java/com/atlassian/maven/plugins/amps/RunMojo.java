@@ -289,7 +289,8 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
                     + (Boolean.FALSE.equals(product.getSynchronousStartup()) ? " (asynchronously)" : ""), durationSeconds);
             if (actualHttpPort != 0)
             {
-                message += " at " + product.getProtocol() + "://" + product.getServer() + ":" + actualHttpPort + (product.getContextPath().equals("ROOT") ? "" : product.getContextPath());
+                // product.getServer() replaced with localhost to make the link direct to the spun up product, may wish to use this again in the future
+                message += " at " + product.getProtocol() + "://" + "localhost" + ":" + actualHttpPort + (product.getContextPath().equals("ROOT") ? "" : product.getContextPath());
             }
             return message;
         }

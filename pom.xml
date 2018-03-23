@@ -284,7 +284,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -299,7 +299,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -386,7 +386,7 @@
             <id>nosdk</id>
             <properties>
                 <release.profiles>release</release.profiles>
-                <release.arguments />
+                <release.arguments/>
             </properties>
         </profile>
     </profiles>
