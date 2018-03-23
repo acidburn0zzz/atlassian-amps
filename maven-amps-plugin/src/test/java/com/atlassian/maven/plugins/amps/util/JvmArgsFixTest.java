@@ -7,30 +7,30 @@ import org.junit.Test;
 public class JvmArgsFixTest
 {
 
-    private JvmArgsFix testDefaults = JvmArgsFix.empty().with("-Xmx", "512m").with("-XX:MaxPermSize=", "256m");
+    private JvmArgsFix testDefaults = JvmArgsFix.empty().with("-Xmx", "512m");
 
     @Test
     public void testWithNullArgs() throws Exception
     {
-        Assert.assertEquals("-Xmx512m -XX:MaxPermSize=256m", testDefaults.apply(null));
+        Assert.assertEquals("-Xmx512m", testDefaults.apply(null));
     }
 
     @Test
     public void testWithEmptyArgs() throws Exception
     {
-        Assert.assertEquals("-Xmx512m -XX:MaxPermSize=256m", testDefaults.apply(""));
+        Assert.assertEquals("-Xmx512m", testDefaults.apply(""));
     }
 
     @Test
     public void testWithExistingUnrelated() throws Exception
     {
-        Assert.assertEquals("-XmsSOMETHING -Xmx512m -XX:MaxPermSize=256m", testDefaults.apply("-XmsSOMETHING"));
+        Assert.assertEquals("-XmsSOMETHING -Xmx512m", testDefaults.apply("-XmsSOMETHING"));
     }
 
     @Test
     public void testWithMx() throws Exception
     {
-        Assert.assertEquals("-XmxSOMETHING -XX:MaxPermSize=256m", testDefaults.apply("-XmxSOMETHING"));
+        Assert.assertEquals("-XmxSOMETHING", testDefaults.apply("-XmxSOMETHING"));
     }
 
     @Test
@@ -43,7 +43,7 @@ public class JvmArgsFixTest
     public void testDefaults() throws Exception
     {
         // testing if what is put in defaults() is what is actually meant - plain text here
-         Assert.assertEquals("-Xmx512m -XX:MaxPermSize=256m", JvmArgsFix.defaults().apply(null));
+         Assert.assertEquals("-Xmx512m", JvmArgsFix.defaults().apply(null));
     }
 
     @Test
