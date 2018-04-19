@@ -146,7 +146,7 @@ public class UpdateMojo extends AbstractAmpsMojo {
             File sdkHomeDir = new File(sdkHome);
             if (!sdkHomeDir.exists() || !sdkHomeDir.canWrite()) {
                 throw new MojoExecutionException("To update successfully, SDK home directory " + sdkHome +
-                    " must be writable by the current user.");
+                    " must be writable by the current user. The current user does not have appropriate permissions.");
             }
             getLog().debug("Detected current SDK install from ATLAS_HOME in " + sdkHomeDir.getAbsolutePath());
         }
