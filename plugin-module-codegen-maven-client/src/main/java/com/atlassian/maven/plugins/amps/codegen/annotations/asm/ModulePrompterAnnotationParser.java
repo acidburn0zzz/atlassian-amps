@@ -10,7 +10,7 @@ import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompterReg
 import com.atlassian.plugins.codegen.annotations.asm.AbstractAnnotationParser;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.objectweb.asm.*;
