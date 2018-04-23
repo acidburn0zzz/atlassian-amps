@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;

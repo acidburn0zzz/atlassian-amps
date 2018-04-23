@@ -47,7 +47,7 @@ import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreeP
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 /**
  * @since 6.1.0

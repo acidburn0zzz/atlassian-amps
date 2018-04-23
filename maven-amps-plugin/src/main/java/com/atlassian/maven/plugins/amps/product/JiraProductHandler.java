@@ -13,7 +13,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -43,7 +43,7 @@ import static com.atlassian.maven.plugins.amps.util.ConfigFileUtils.RegexReplace
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static java.lang.String.format;
 import static org.apache.commons.io.IOUtils.closeQuietly;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class JiraProductHandler extends AbstractWebappProductHandler
 {

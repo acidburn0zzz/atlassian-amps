@@ -11,7 +11,7 @@ import java.util.List;
 import com.atlassian.maven.plugins.amps.codegen.prompter.PrettyPrompter;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.EmailValidator;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;

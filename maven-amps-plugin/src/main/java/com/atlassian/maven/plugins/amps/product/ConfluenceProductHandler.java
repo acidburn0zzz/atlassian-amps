@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ConfluenceProductHandler extends AbstractWebappProductHandler
 {

@@ -6,7 +6,7 @@ import java.util.List;
 import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @since 3.6

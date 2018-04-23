@@ -6,7 +6,7 @@ import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.modules.common.TemplateContextItemModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.TemplateContextItemProperties;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 

@@ -1,7 +1,7 @@
 package com.atlassian.maven.plugins.amps;
 
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Execute;
