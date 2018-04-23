@@ -17,9 +17,8 @@ import org.apache.maven.project.MavenProject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.util.Collection;
@@ -27,9 +26,9 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,7 +56,6 @@ public class TestAbstractProductHandler
     private Product mockProduct;
 
     private AbstractProductHandler handlerUnderTest;
-    private ArgumentCaptor<Artifact> argument = ArgumentCaptor.forClass(Artifact.class);
 
     @Before
     public void setup() throws Exception
@@ -70,14 +68,13 @@ public class TestAbstractProductHandler
         handlerUnderTest = new AbstractProductHandler(mockMavenContext, mockMavenGals, mockPluginProvider, mockArtifactFactory)
         {
             @Override
-            protected File extractApplication(final Product ctx, final File homeDir) throws MojoExecutionException
+            protected File extractApplication(final Product ctx, final File homeDir)
             {
                 throw new UnsupportedOperationException("Not implemented");
             }
 
             @Override
             protected int startApplication(final Product ctx, final File app, final File homeDir, final Map<String, String> properties)
-                    throws MojoExecutionException
             {
                 throw new UnsupportedOperationException("Not implemented");
             }
@@ -137,7 +134,7 @@ public class TestAbstractProductHandler
             }
 
             @Override
-            public void stop(final Product ctx) throws MojoExecutionException
+            public void stop(final Product ctx)
             {
                 throw new UnsupportedOperationException("Not implemented");
             }
@@ -188,8 +185,8 @@ public class TestAbstractProductHandler
     private Artifact createArtifact(String groupId, String artifactId, String version)
     {
         ArtifactHandler handler = new DefaultArtifactHandler();
-        VersionRange versionRange = null;
-        if ( version == null )
+        VersionRange versionRange;
+        if (version == null)
         {
             versionRange = VersionRange.createFromVersion( Artifact.RELEASE_VERSION );
         }

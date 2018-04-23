@@ -18,7 +18,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.repository.RemoteRepository;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +49,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyListOf;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeastOnce;
@@ -76,6 +75,7 @@ public class TestMavenGoals
     private MavenGoals goals;
     @Mock private MojoExecutor.ExecutionEnvironment executionEnvironment;
     @Mock private MavenProject mavenProject;
+    @Mock private RepositorySystemSession repositorySession;
 
     @Before
     public void setUp()
@@ -133,11 +133,12 @@ public class TestMavenGoals
         when(executionEnvironment.getMavenProject()).thenReturn(project);
         when(executionEnvironment.getMavenSession()).thenReturn(session);
         when(executionEnvironment.getBuildPluginManager()).thenReturn(buildPluginManager);
-        when(buildPluginManager.loadPlugin(any(Plugin.class), anyListOf(RemoteRepository.class), any(RepositorySystemSession.class)))
+        when(buildPluginManager.loadPlugin(any(Plugin.class), anyList(), any(RepositorySystemSession.class)))
                 .thenReturn(pluginDescriptor);
         when(pluginDescriptor.getMojo(anyString())).thenReturn(mojoDescriptor);
         when(mojoDescriptor.getMojoConfiguration()).thenReturn(new DefaultPlexusConfiguration(""));
         when(mojoDescriptor.getParameters()).thenReturn(params);
+        when(session.getRepositorySession()).thenReturn(repositorySession);
 
         Mockito.doCallRealMethod().when(executionEnvironment).executeMojo(any(Plugin.class), any(String.class), any(Xpp3Dom.class));
         Mockito.doCallRealMethod().when(project).getGoalConfiguration(anyString(), anyString(), anyString(), anyString());
