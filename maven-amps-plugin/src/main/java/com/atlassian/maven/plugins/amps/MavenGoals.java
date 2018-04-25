@@ -123,14 +123,14 @@ public class MavenGoals
         {{
                 //overrides.getProperty(JUNIT_ARTIFACT_ID,"
                 put("maven-cli-plugin", overrides.getProperty("maven-cli-plugin","1.0.11"));
-                put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.4.7"));
+                put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.6.7"));
                 put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.3"));
-                put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
-                put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","2.5.3"));
-                put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.3.0"));
+                put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","3.0.1"));
+                put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","3.5.0"));
+                put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.3.1"));
                 put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","1.7"));
-                put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.3"));
-                put("maven-deploy-plugin", overrides.getProperty("maven-deploy-plugin","2.4"));
+                put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.5.2"));
+                put("maven-deploy-plugin", overrides.getProperty("maven-deploy-plugin","2.8.2"));
                 put("maven-release-plugin", overrides.getProperty("maven-release-plugin", "2.5.3"));
 
                 // You can't actually override the version a plugin if defined in the project, so these don't actually do
@@ -140,11 +140,11 @@ public class MavenGoals
                 put("maven-resources-plugin", overrides.getProperty("maven-resources-plugin","2.3"));
                 put("maven-jar-plugin", overrides.getProperty("maven-jar-plugin","2.2"));
                 //put("maven-surefire-plugin", "2.4.3");
-                put("maven-surefire-plugin", overrides.getProperty("maven-surefire-plugin","2.12.4"));
-                put("maven-failsafe-plugin", overrides.getProperty("maven-failsafe-plugin","2.12.4"));
+                put("maven-surefire-plugin", overrides.getProperty("maven-surefire-plugin","2.21.0"));
+                put("maven-failsafe-plugin", overrides.getProperty("maven-failsafe-plugin","2.21.0"));
                 put("maven-exec-plugin", overrides.getProperty("maven-exec-plugin","1.2.1"));
                 put("sql-maven-plugin", overrides.getProperty("sql-maven-plugin", "1.5"));
-                put("maven-javadoc-plugin", overrides.getProperty("maven-javadoc-plugin", "2.8.1"));
+                put("maven-javadoc-plugin", overrides.getProperty("maven-javadoc-plugin", "3.0.0"));
             }};
     }
 
@@ -974,18 +974,10 @@ public class MavenGoals
     private Plugin bndPlugin()
     {
         log.info("using maven-bundle-plugin v" + pluginArtifactIdToVersionMap.get("maven-bundle-plugin"));
-        // AMPS-1211: maven-bundle-plugin 2.5.3 broke manifest. Add bndlib dependency for work around solution
-        final Plugin bndPlugin = plugin(
+        return plugin(
                 groupId("org.apache.felix"),
                 artifactId("maven-bundle-plugin"),
-                version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
-        );
-        final Dependency bndLib = new Dependency();
-        bndLib.setGroupId(groupId("biz.aQute.bnd"));
-        bndLib.setArtifactId(artifactId("biz.aQute.bndlib"));
-        bndLib.setVersion(version("2.4.1-pr-916-atlassian-002"));
-        bndPlugin.addDependency(bndLib);
-        return bndPlugin;
+                version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin")));
     }
 
     /**
@@ -1178,8 +1170,8 @@ public class MavenGoals
             log.debug("cargo.protocol = " + protocol);
             props.add(element(name("cargo.protocol"), protocol));
 
-            log.debug("cargo.tomcat.connector.clientAuth = " + webappContext.getHttpsClientAuth().toString());
-            props.add(element(name("cargo.tomcat.connector.clientAuth"), webappContext.getHttpsClientAuth().toString()));
+            log.debug("cargo.tomcat.connector.clientAuth = " + webappContext.getHttpsClientAuth());
+            props.add(element(name("cargo.tomcat.connector.clientAuth"), webappContext.getHttpsClientAuth()));
 
             log.debug("cargo.tomcat.connector.sslProtocol = " +  webappContext.getHttpsSSLProtocol());
             props.add(element(name("cargo.tomcat.connector.sslProtocol"), webappContext.getHttpsSSLProtocol()));
@@ -1607,7 +1599,7 @@ public class MavenGoals
 
     public void generateTestBundleManifest(final Map<String, String> instructions, final Map<String, String> basicAttributes) throws MojoExecutionException
     {
-        final List<Element> instlist = new ArrayList<Element>();
+        final List<Element> instlist = new ArrayList<>();
         for (final Map.Entry<String, String> entry : instructions.entrySet())
         {
             instlist.add(element(entry.getKey(), entry.getValue()));
@@ -1858,7 +1850,7 @@ public class MavenGoals
 
         if(!restModules.isEmpty() && packagesPath.length() > 0)
         {
-            Set<String> docletPaths = new HashSet<String>();
+            Set<String> docletPaths = new HashSet<>();
             StringBuffer docletPath = new StringBuffer(File.pathSeparator + prj.getBuild().getOutputDirectory());
             String resourcedocPath = fixWindowsSlashes(prj.getBuild().getOutputDirectory() + File.separator + "resourcedoc.xml");
 
@@ -1886,11 +1878,11 @@ public class MavenGoals
             {
                 throw new MojoExecutionException("Dependencies must be resolved", e);
             }
-            String additionalParam =  "-output \"" + resourcedocPath + "\"";
-            if (jacksonModules != null)
-            {
-                additionalParam += " -modules \"" + jacksonModules + "\"";
-            }
+            Element outputOption = element(name("additionalOption"), "-output \"" + resourcedocPath + "\"");
+            Element[] additionalOptions = jacksonModules == null
+                    ? new Element[] {outputOption}
+                    : new Element[] {outputOption, element(name("additionalOption"), " -modules \"" + jacksonModules + "\"")};
+
             //AMPSDEV-127: 'generate-rest-docs' fails with JDK8 - invalid flag: -Xdoclint:all
             //Root cause: ResourceDocletJSON doclet does not support option doclint
             //Solution: Temporary remove global javadoc configuration(remove doclint)
@@ -1928,7 +1920,8 @@ public class MavenGoals
                                             element(name("version"), "2.6")
                                     )
                             ),
-                            element(name("additionalparam"), additionalParam),
+                            element(name("outputDirectory")),
+                            element(name("additionalOptions"), additionalOptions),
                             element(name("useStandardDocletOptions"),"false")
                     ),
                     executionEnvironment()
