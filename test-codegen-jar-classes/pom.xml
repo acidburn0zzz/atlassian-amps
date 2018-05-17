@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>6.3.17-SNAPSHOT</version>
+        <version>6.3.17-tomcat-7085-confluence-SNAPSHOT</version>
     </parent>
 
     <artifactId>test-codegen-jar-classes</artifactId>
