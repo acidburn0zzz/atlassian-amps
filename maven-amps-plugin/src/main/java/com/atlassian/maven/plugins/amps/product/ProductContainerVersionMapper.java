@@ -21,13 +21,14 @@ public class ProductContainerVersionMapper
     private static final String TOMCAT8X = "tomcat8x";
     private static final String TOMCAT85X = "tomcat85x";
     private static final String TOMCAT85_6 = "tomcat85_6";
+    private static final String TOMCAT9X = "tomcat9x";
 
     static
     {
         //Most apps
         populateVersionMapForProduct(ProductHandlerFactory.BAMBOO, "0", "5.1.0", "5.10.0");
         populateVersionMapForProduct(ProductHandlerFactory.BITBUCKET, null, null, "4.0.0");
-        populateVersionMapForProduct(ProductHandlerFactory.CONFLUENCE, "0", "5.5", "5.8");
+        populateVersionMapForProduct(ProductHandlerFactory.CONFLUENCE, "0", "5.5", "5.8", null, "6.10");
         populateVersionMapForProduct(ProductHandlerFactory.CROWD, "0", "2.7.0", null, "3.1.0");
         populateVersionMapForProduct(ProductHandlerFactory.JIRA, ImmutableMap.of(
                 "0", "tomcat6x",
@@ -49,7 +50,7 @@ public class ProductContainerVersionMapper
         productMapping.put(productId, versions);
     }
 
-    private static void populateVersionMapForProduct(final String productId, final String tomcat6Version, final String tomcat7Version, final String tomcat8Version, final String tomcat85Version)
+    private static void populateVersionMapForProduct(final String productId, final String tomcat6Version, final String tomcat7Version, final String tomcat8Version, final String tomcat85Version, final String tomcat9Version)
     {
         TreeMap<ComparableVersion, String> versions = new TreeMap<>();
         if (tomcat6Version != null) {
@@ -64,7 +65,15 @@ public class ProductContainerVersionMapper
         if (tomcat85Version != null) {
             versions.put(new ComparableVersion(tomcat85Version), TOMCAT85X);
         }
+        if (tomcat9Version != null) {
+            versions.put(new ComparableVersion(tomcat9Version), TOMCAT9X);
+        }
         productMapping.put(productId, versions);
+    }
+
+    private static void populateVersionMapForProduct(final String productId, final String tomcat6Version, final String tomcat7Version, final String tomcat8Version, final String tomcat85Version)
+    {
+        populateVersionMapForProduct(productId, tomcat6Version, tomcat7Version, tomcat8Version, tomcat85Version, null);
     }
 
     private static void populateVersionMapForProduct(final String productId, final String tomcat6Version, final String tomcat7Version, final String tomcat8Version)
