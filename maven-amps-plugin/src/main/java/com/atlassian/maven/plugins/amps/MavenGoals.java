@@ -95,7 +95,6 @@ public class MavenGoals
             put("tomcat5x", new Container("tomcat5x", "org.apache.tomcat", "apache-tomcat", "5.5.36"));
             put("tomcat6x", new Container("tomcat6x", "org.apache.tomcat", "apache-tomcat", "6.0.41"));
             put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.52", "windows-x64"));
-            put("tomcat7x_confluence", new Container("tomcat7x_confluence", "org.apache.tomcat", "apache-tomcat", "7.0.86.1-atlassian-hosted"));
             put("tomcat8x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.0.36-atlassian-hosted", "windows-x64"));
             put("tomcat85x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.20-atlassian-hosted", "windows-x64"));
             put("tomcat85_6", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.6-atlassian-hosted", "windows-x64"));
