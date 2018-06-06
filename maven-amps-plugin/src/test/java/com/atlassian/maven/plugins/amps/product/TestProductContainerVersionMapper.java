@@ -22,6 +22,7 @@ public class TestProductContainerVersionMapper
         assertVersion("confluence", "1", "tomcat6x");
         assertVersion("confluence", "5.5", "tomcat7x");
         assertVersion("confluence", "5.8.0", "tomcat8x");
+        assertVersion("confluence", "6.10.0", "tomcat9x");
     }
 
     @Test
