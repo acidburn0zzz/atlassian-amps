@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>6.3.17-AMPS-1446-Tomcat9-m01-81ce4fc</version>
+        <version>6.3.17-AMPS-1446-Tomcat9-m01-SNAPSHOT</version>
     </parent>
 
     <artifactId>atlassian-amps-product-plugins</artifactId>
