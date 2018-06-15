@@ -10,7 +10,7 @@
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>6.3.17-AMPS-1446-Tomcat9-m01-SNAPSHOT</version>
+    <version>6.3.17-AMPS-1446-Tomcat9-m02-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>

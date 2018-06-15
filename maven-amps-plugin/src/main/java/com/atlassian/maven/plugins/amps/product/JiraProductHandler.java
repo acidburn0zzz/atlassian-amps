@@ -198,7 +198,6 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         dataSource.setJndi("jdbc/JiraDS");
         dataSource.setUrl(format("jdbc:hsqldb:%s/database", jiraHome));
         dataSource.setDriver("org.hsqldb.jdbcDriver");
-        dataSource.setType("javax.sql.DataSource");
         dataSource.setUsername("sa");
         dataSource.setPassword("");
         return dataSource;
