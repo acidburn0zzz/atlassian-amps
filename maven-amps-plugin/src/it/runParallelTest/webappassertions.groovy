@@ -23,6 +23,13 @@ if ("start".equals(System.getProperty("step", "start")))
 }
 else if ("stop".equals(System.getProperty("step")))
 {
+    // as of Cargo 1.4.16 a bug was fixed which was causing a delay in the container shutting down
+    // see https://codehaus-cargo.atlassian.net/browse/CARGO-1337
+    // Confluence needs the extra time to shut down completely
+
+    println 'Sleep 10s... waiting for app to shut down completely'
+    sleep(10000)
+
     try {
         new HTTPBuilder("http://localhost:${amps['http.port']}${amps['context.path']}").request(GET) {
           response.success = { assert false, "The application should be down after amps:stop at http://localhost:${amps['http.port']}${amps['context.path']}" }
