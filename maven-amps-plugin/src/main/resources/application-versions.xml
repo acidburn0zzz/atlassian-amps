@@ -2,18 +2,18 @@
 <applications>
     <application>
         <name>jira</name>
-        <latest>7.7.1</latest>
-        <data>7.7.1</data>
+        <latest>7.10.0</latest>
+        <data>7.10.0</data>
     </application>
     <application>
         <name>bitbucket</name>
-        <latest>5.8.0</latest>
-        <data>5.8.0</data>
+        <latest>5.11.0</latest>
+        <data>5.11.0</data>
     </application>
     <application>
         <name>confluence</name>
-        <latest>6.7.1</latest>
-        <data>6.7.1</data>
+        <latest>6.10.0</latest>
+        <data>6.10.0</data>
     </application>
     <application>
         <name>refapp</name>
@@ -23,14 +23,14 @@
     </application>
     <application>
         <name>bamboo</name>
-        <latest>6.3.2</latest>
-        <data>6.3.2</data>
+        <latest>6.5.0</latest>
+        <data>6.5.0</data>
     </application>
     <application>
         <name>crowd</name>
         <mvn-artifact>atlassian-crowd</mvn-artifact>
-        <latest>3.1.2</latest>
-        <data>3.1.2</data>
+        <latest>3.2.0</latest>
+        <data>3.2.0</data>
     </application>
     <application>
         <name>fecru</name>
