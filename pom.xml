@@ -61,20 +61,20 @@
         <refapp.version>3.0.0</refapp.version>
         <refapp.data.version>3.0.0</refapp.data.version>
         <platform.version>3.0.0</platform.version>
-        <confluence.version>5.8.10</confluence.version>
-        <confluence.data.version>5.8.10</confluence.data.version>
-        <jira.version>6.4.7</jira.version>
-        <jira.data.version>6.4.7</jira.data.version>
+        <confluence.version>6.10.0</confluence.version>
+        <confluence.data.version>${confluence.version}</confluence.data.version>
+        <jira.version>7.10.0</jira.version>
+        <jira.data.version>${jira.version}</jira.data.version>
         <fugue.version>1.0</fugue.version>
         <guava.osgi.version>10.0.1</guava.osgi.version>
-        <bamboo.version>5.9.2</bamboo.version>
-        <bamboo.data.version>5.9.2</bamboo.data.version>
-        <bitbucket.version>4.0.2</bitbucket.version>
+        <bamboo.version>6.5.0</bamboo.version>
+        <bamboo.data.version>${bamboo.version}</bamboo.data.version>
+        <bitbucket.version>5.11.0</bitbucket.version>
         <bitbucket.data.version>${bitbucket.version}</bitbucket.data.version>
-        <fecru.version>3.9.1-20150910131426</fecru.version>
-        <fecru.data.version>3.9.1-20150910131426</fecru.data.version>
-        <crowd.version>2.8.3</crowd.version>
-        <crowd.data.version>2.8.3</crowd.data.version>
+        <fecru.version>4.5.0-20170908094439</fecru.version>
+        <fecru.data.version>${fecru.version}</fecru.data.version>
+        <crowd.version>3.2.0</crowd.version>
+        <crowd.data.version>${crowd.version}</crowd.data.version>
         <clover.version>3.1.7</clover.version>
         <stash.version>3.11.1</stash.version>
         <stash.data.version>${stash.version}</stash.data.version>
