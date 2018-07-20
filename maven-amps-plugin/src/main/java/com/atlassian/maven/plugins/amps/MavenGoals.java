@@ -1034,6 +1034,7 @@ public class MavenGoals
         else
         {
             actualHttpPort = pickFreePort(webappContext.getHttpPort());
+            webappContext.setHttpPort(actualHttpPort);
         }
 
         final List<Element> sysProps = new ArrayList<Element>();
@@ -1277,7 +1278,7 @@ public class MavenGoals
 
     public static String getBaseUrl(Product product, int actualHttpPort)
     {
-        return getBaseUrl(product.getServer(), product.getHttpPort(), product.getContextPath());
+        return getBaseUrl(product.getServer(), actualHttpPort, product.getContextPath());
     }
 
     private static String getBaseUrl(String server, int actualHttpPort, String contextPath)
