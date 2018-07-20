@@ -58,9 +58,9 @@
         <maven.compiler.target>8</maven.compiler.target>
         <build.maven.version>3.0.5</build.maven.version>
         <bundled.maven.version>3.2.1</bundled.maven.version>
-        <refapp.version>3.4.0-SNAPSHOT</refapp.version>
-        <refapp.data.version>3.4.0-SNAPSHOT</refapp.data.version>
-        <platform.version>3.0.0</platform.version>
+        <refapp.version>3.4.0-06fe4b0</refapp.version>
+        <refapp.data.version>3.4.0-06fe4b0</refapp.data.version>
+        <platform.version>3.4.0</platform.version>
         <confluence.version>5.8.10</confluence.version>
         <confluence.data.version>5.8.10</confluence.data.version>
         <jira.version>6.4.7</jira.version>

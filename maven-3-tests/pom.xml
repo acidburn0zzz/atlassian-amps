@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.atlassian.platform</groupId>
             <artifactId>platform-poms</artifactId>
-            <version>${refapp.version}</version>
+            <version>${platform.version}</version>
             <type>pom</type>
         </dependency>
         <dependency>
