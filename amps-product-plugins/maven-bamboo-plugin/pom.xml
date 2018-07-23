@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-product-plugins</artifactId>
-        <version>6.3.17-SNAPSHOT</version>
+        <version>1000.0.0-log4j2-SNAPSHOT</version>
     </parent>
 
     <groupId>com.atlassian.maven.plugins</groupId>

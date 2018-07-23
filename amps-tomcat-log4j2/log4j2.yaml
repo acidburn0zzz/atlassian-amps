@@ -1,0 +1,24 @@
+Configuration:
+  name: TomcatLogging
+  appenders:
+    Console:
+      name: STDOUT
+      target: SYSTEM_OUT
+      follow: false
+      direct: true
+      PatternLayout:
+        pattern: "-[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1.} - %msg ==%n"
+  Loggers:
+    logger:
+      - name: com.atlassian.plugin.osgi
+        level: info
+      - name: com.atlassian.confluence.osgi
+        level: info
+      - name: com.atlassian.confluence.setup
+        level: error
+      - name: com.atlassian.featureflag.client.api
+        level: error
+    Root:
+      level: INFO
+      AppenderRef:
+        - ref: STDOUT

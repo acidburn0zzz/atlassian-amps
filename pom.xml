@@ -10,7 +10,7 @@
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>6.3.17-SNAPSHOT</version>
+    <version>1000.0.0-log4j2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
@@ -35,6 +35,7 @@
         <module>maven-3-tests</module>
         <module>maven-amps-dispatcher-plugin</module>
         <module>amps-product-plugins</module>
+        <module>amps-tomcat-log4j2</module>
     </modules>
 
     <scm>
