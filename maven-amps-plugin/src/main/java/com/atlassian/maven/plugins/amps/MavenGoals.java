@@ -972,23 +972,6 @@ public class MavenGoals
                      .toArray(Element[]::new);
     }
 
-    private Plugin bndPlugin()
-    {
-        log.info("using maven-bundle-plugin v" + pluginArtifactIdToVersionMap.get("maven-bundle-plugin"));
-        // AMPS-1211: maven-bundle-plugin 2.5.3 broke manifest. Add bndlib dependency for work around solution
-        final Plugin bndPlugin = plugin(
-                groupId("org.apache.felix"),
-                artifactId("maven-bundle-plugin"),
-                version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
-        );
-        final Dependency bndLib = new Dependency();
-        bndLib.setGroupId(groupId("biz.aQute.bnd"));
-        bndLib.setArtifactId(artifactId("biz.aQute.bndlib"));
-        bndLib.setVersion(version("2.4.1-pr-916-atlassian-002"));
-        bndPlugin.addDependency(bndLib);
-        return bndPlugin;
-    }
-
     /**
      * Wrap execute Mojo function for temporary removing global Cargo configuration
      * before starting AMPS internal Cargo
@@ -1592,7 +1575,11 @@ public class MavenGoals
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
         executeMojo(
-                bndPlugin(),
+                plugin(
+                        groupId("org.apache.felix"),
+                        artifactId("maven-bundle-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
+                ),
                 goal("manifest"),
                 configuration(
                         element(name("supportedProjectTypes"),
@@ -1624,7 +1611,11 @@ public class MavenGoals
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
         executeMojo(
-                bndPlugin(),
+                plugin(
+                        groupId("org.apache.felix"),
+                        artifactId("maven-bundle-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
+                ),
                 goal("manifest"),
                 configuration(
                         element(name("manifestLocation"),"${project.build.testOutputDirectory}/META-INF"),
@@ -1748,7 +1739,11 @@ public class MavenGoals
     public void generateObrXml(File dep, File obrXml) throws MojoExecutionException
     {
         executeMojo(
-                bndPlugin(),
+                plugin(
+                        groupId("org.apache.felix"),
+                        artifactId("maven-bundle-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
+                ),
                 goal("install-file"),
                 configuration(
                         element(name("obrRepository"), obrXml.getPath()),
