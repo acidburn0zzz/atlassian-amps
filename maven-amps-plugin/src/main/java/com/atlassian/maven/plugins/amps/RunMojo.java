@@ -86,8 +86,6 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
 
         getAmpsPluginVersionChecker().checkAmpsVersionInPom(getAmpsPluginVersion(),getMavenContext().getProject());
 
-        promptForEmailSubscriptionIfNeeded();
-        
         trackFirstRunIfNeeded();
         
         getGoogleTracker().track(GoogleAmpsTracker.RUN);

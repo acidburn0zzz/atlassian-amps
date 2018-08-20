@@ -19,8 +19,9 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import jline.ANSIBuffer;
 
+
 /**
- * @since version
+ * No longer used in AMPS 6.3.19
  */
 public class AmpsEmailSubscriberImpl extends AbstractLogEnabled implements AmpsEmailSubscriber
 {

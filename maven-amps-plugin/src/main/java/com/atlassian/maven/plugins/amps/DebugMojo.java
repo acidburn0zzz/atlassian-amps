@@ -45,8 +45,6 @@ public class DebugMojo extends RunMojo
 
         getAmpsPluginVersionChecker().checkAmpsVersionInPom(getAmpsPluginVersion(),getMavenContext().getProject());
 
-        promptForEmailSubscriptionIfNeeded();
-        
         trackFirstRunIfNeeded();
         getGoogleTracker().track(GoogleAmpsTracker.DEBUG);
 

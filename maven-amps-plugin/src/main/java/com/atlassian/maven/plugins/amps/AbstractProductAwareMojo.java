@@ -11,8 +11,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
 {
     private static final String PREF_FIRSTRUN_PREFIX = "sdk-firstrun";
-    private static final String PREF_EMAIL_PREFIX = "sdk-email-subscribe";
-    
+
     /**
      * Product id
      */
@@ -116,9 +115,9 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
 
     }
 
-    protected void promptForEmailSubscriptionIfNeeded() throws MojoExecutionException
-    {
-        
+    // protected void promptForEmailSubscriptionIfNeeded() throws MojoExecutionException
+    //  {
+        /* TODO remove AMPSDEV-165
         if(!shouldSkipPrompts())
         {
             String emailCheckKey = PREF_EMAIL_PREFIX;
@@ -131,6 +130,7 @@ public abstract class AbstractProductAwareMojo extends AbstractAmpsMojo
                 getAmpsEmailSubscriber().promptForSubscription();
             }
         }
-    }
+        */
+    // }
 
 }

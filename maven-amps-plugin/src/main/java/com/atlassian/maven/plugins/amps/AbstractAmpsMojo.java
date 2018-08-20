@@ -106,9 +106,6 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     @Component
     private AmpsPluginVersionChecker ampsPluginVersionChecker;
 
-    @Component
-    private AmpsEmailSubscriber ampsEmailSubscriber;
-
     /**
      * Flag to skip all prompting so automated builds don't hang
      */
@@ -248,10 +245,11 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
         return ampsPluginVersionChecker;
     }
 
-    protected AmpsEmailSubscriber getAmpsEmailSubscriber()
-    {
-        return ampsEmailSubscriber;
-    }
+    // protected AmpsEmailSubscriber getAmpsEmailSubscriber()
+    // TODO remove AMPSDEV-165
+    //{
+    //    return ampsEmailSubscriber;
+    //}
 
     protected String getAmpsPluginVersion()
     {

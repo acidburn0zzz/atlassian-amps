@@ -54,8 +54,6 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo {
     protected void doExecute() throws MojoExecutionException {
         getUpdateChecker().check();
 
-        promptForEmailSubscriptionIfNeeded();
-
         trackFirstRunIfNeeded();
 
         getGoogleTracker().track(GoogleAmpsTracker.RUN_STANDALONE);

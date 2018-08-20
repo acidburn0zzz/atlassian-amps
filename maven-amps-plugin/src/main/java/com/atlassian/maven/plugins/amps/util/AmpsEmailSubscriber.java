@@ -6,7 +6,7 @@ import java.util.List;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 
 /**
- * @since version
+ * No longer used in AMPS 6.3.19
  */
 public interface AmpsEmailSubscriber
 {
