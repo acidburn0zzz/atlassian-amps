@@ -3,7 +3,6 @@ package com.atlassian.maven.plugins.amps;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriber;
 import com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
 import com.atlassian.maven.plugins.amps.util.UpdateChecker;
@@ -244,12 +243,6 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
         }
         return ampsPluginVersionChecker;
     }
-
-    // protected AmpsEmailSubscriber getAmpsEmailSubscriber()
-    // TODO remove AMPSDEV-165
-    //{
-    //    return ampsEmailSubscriber;
-    //}
 
     protected String getAmpsPluginVersion()
     {
