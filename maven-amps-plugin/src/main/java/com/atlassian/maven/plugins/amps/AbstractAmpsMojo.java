@@ -3,7 +3,6 @@ package com.atlassian.maven.plugins.amps;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriber;
 import com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
 import com.atlassian.maven.plugins.amps.util.UpdateChecker;
@@ -105,9 +104,6 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     
     @Component
     private AmpsPluginVersionChecker ampsPluginVersionChecker;
-
-    @Component
-    private AmpsEmailSubscriber ampsEmailSubscriber;
 
     /**
      * Flag to skip all prompting so automated builds don't hang
@@ -246,11 +242,6 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
             ampsPluginVersionChecker.skipPomCheck(true);
         }
         return ampsPluginVersionChecker;
-    }
-
-    protected AmpsEmailSubscriber getAmpsEmailSubscriber()
-    {
-        return ampsEmailSubscriber;
     }
 
     protected String getAmpsPluginVersion()
