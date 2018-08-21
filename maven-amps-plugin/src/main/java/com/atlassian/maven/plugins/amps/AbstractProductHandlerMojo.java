@@ -838,13 +838,17 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         // Products in the <products> tag inherit from the upper settings, e.g. when there's a <httpPort> tag for all products
         makeProductsInheritDefaultConfiguration(products, productMap);
 
+        boolean warnedDeprecated = false;
+
         for (Product ctx : Lists.newArrayList(productMap.values()))
         {
             ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals,artifactFactory);
             setDefaultValues(ctx, handler);
-            if (ctx.isEnableFastdev())
+
+            if (ctx.isEnableFastdev() && !warnedDeprecated)
             {
                 warnDeprecated(getLog());
+                warnedDeprecated = true;
             }
         }
 
