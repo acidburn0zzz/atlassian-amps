@@ -121,18 +121,6 @@
         </component>
 
         <component>
-            <role>com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriber</role>
-            <role-hint>amps email subscriber</role-hint>
-            <implementation>com.atlassian.maven.plugins.amps.util.AmpsEmailSubscriberImpl</implementation>
-            <requirements>
-                <requirement>
-                    <role>org.codehaus.plexus.components.interactivity.Prompter</role>
-                    <field-name>prompter</field-name>
-                </requirement>
-            </requirements>
-        </component>
-
-        <component>
             <role>com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter</role>
             <role-hint>amps create plugin prompter</role-hint>
             <implementation>com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompterImpl</implementation>
