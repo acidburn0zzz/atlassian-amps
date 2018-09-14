@@ -57,7 +57,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironmentM3;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -114,7 +114,7 @@ public class TestMavenGoals
                 )
         );
         // Mock objects
-        final ExecutionEnvironmentM3 executionEnvironment = mock(ExecutionEnvironmentM3.class);
+        final ExecutionEnvironment executionEnvironment = mock(ExecutionEnvironment.class);
         final BuildPluginManager buildPluginManager = mock(BuildPluginManager.class);
         final PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
         final MojoDescriptor mojoDescriptor = mock(MojoDescriptor.class);
@@ -132,14 +132,13 @@ public class TestMavenGoals
         when(project.getPlugin("org.codehaus.cargo:cargo-maven2-plugin")).thenReturn(globalCargo);
         when(executionEnvironment.getMavenProject()).thenReturn(project);
         when(executionEnvironment.getMavenSession()).thenReturn(session);
-        when(executionEnvironment.getBuildPluginManager()).thenReturn(buildPluginManager);
+        when(executionEnvironment.getPluginManager()).thenReturn(buildPluginManager);
         when(buildPluginManager.loadPlugin(any(Plugin.class), anyListOf(RemoteRepository.class), any(RepositorySystemSession.class)))
                 .thenReturn(pluginDescriptor);
         when(pluginDescriptor.getMojo(anyString())).thenReturn(mojoDescriptor);
         when(mojoDescriptor.getMojoConfiguration()).thenReturn(new DefaultPlexusConfiguration(""));
         when(mojoDescriptor.getParameters()).thenReturn(params);
 
-        Mockito.doCallRealMethod().when(executionEnvironment).executeMojo(any(Plugin.class), any(String.class), any(Xpp3Dom.class));
         Mockito.doCallRealMethod().when(project).getGoalConfiguration(anyString(), anyString(), anyString(), anyString());
         Mockito.doAnswer(invocation -> {
             final Object[] args = invocation.getArguments();

@@ -1,6 +1,6 @@
 package com.atlassian.plugins.codegen;
 
-import static com.atlassian.fugue.Option.some;
+import static io.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.ArtifactId.artifactId;
 import static com.atlassian.plugins.codegen.VersionId.version;
 import static com.google.common.base.Preconditions.checkNotNull;

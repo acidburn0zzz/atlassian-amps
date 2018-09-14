@@ -2,7 +2,7 @@ package com.atlassian.plugins.codegen;
 
 import java.util.List;
 
-import com.atlassian.fugue.Option;
+import io.atlassian.fugue.Option;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -13,7 +13,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
-import static com.atlassian.fugue.Option.some;
+import static io.atlassian.fugue.Option.some;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.junit.Assert.assertEquals;

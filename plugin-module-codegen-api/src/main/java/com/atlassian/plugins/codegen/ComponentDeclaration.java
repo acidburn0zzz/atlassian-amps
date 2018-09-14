@@ -2,13 +2,13 @@ package com.atlassian.plugins.codegen;
 
 import java.util.Map;
 
-import com.atlassian.fugue.Option;
+import io.atlassian.fugue.Option;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
-import static com.atlassian.fugue.Option.none;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.atlassian.fugue.Option.none;
 
 /**
  * Describes a &lt;component&gt; element that should be added to the plugin XML file.

@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.atlassian.fugue.Option;
 import com.atlassian.maven.plugins.amps.util.ClassUtils;
 import com.atlassian.maven.plugins.amps.util.WiredTestInfo;
 import com.atlassian.plugins.codegen.ClassId;
@@ -16,6 +15,7 @@ import com.atlassian.plugins.codegen.ComponentDeclaration;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.PluginXmlRewriter;
 import com.atlassian.plugins.codegen.util.ClassnameUtil;
+import io.atlassian.fugue.Option;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
