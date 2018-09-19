@@ -10,7 +10,7 @@
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>6.3.19-SNAPSHOT</version>
+    <version>6.3.19-CONFSRVDEV-7522</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
@@ -42,7 +42,7 @@
         <developerConnection>scm:git:git@bitbucket.org:atlassian/amps.git</developerConnection>
         <url>https://bitbucket.org/atlassian/amps</url>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
     <issueManagement>
         <system>JIRA</system>
         <url>https://ecosystem.atlassian.net/browse/AMPS</url>
