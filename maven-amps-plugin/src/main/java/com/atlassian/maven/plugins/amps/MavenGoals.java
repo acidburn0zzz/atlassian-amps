@@ -127,7 +127,7 @@ public class MavenGoals
                 put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.5.1"));
                 put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.3"));
                 put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
-                put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","2.5.3"));
+                put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","3.5.0"));
                 put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.3.0"));
                 put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","1.7"));
                 put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.3"));
@@ -975,18 +975,10 @@ public class MavenGoals
     private Plugin bndPlugin()
     {
         log.info("using maven-bundle-plugin v" + pluginArtifactIdToVersionMap.get("maven-bundle-plugin"));
-        // AMPS-1211: maven-bundle-plugin 2.5.3 broke manifest. Add bndlib dependency for work around solution
-        final Plugin bndPlugin = plugin(
+        return plugin(
                 groupId("org.apache.felix"),
                 artifactId("maven-bundle-plugin"),
-                version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
-        );
-        final Dependency bndLib = new Dependency();
-        bndLib.setGroupId(groupId("biz.aQute.bnd"));
-        bndLib.setArtifactId(artifactId("biz.aQute.bndlib"));
-        bndLib.setVersion(version("2.4.1-pr-916-atlassian-002"));
-        bndPlugin.addDependency(bndLib);
-        return bndPlugin;
+                version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin")));
     }
 
     /**
