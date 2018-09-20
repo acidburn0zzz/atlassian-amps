@@ -12,10 +12,10 @@ import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.StashPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 
-import static com.atlassian.fugue.Option.option;
 import static com.atlassian.plugins.codegen.ComponentImport.componentImport;
 import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 import static com.atlassian.plugins.codegen.modules.Dependencies.SLF4J;
+import static io.atlassian.fugue.Option.option;
 
 /**
  * @since 3.6

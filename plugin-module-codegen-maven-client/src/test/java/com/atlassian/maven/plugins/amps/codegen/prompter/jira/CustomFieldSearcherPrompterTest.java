@@ -1,22 +1,21 @@
 package com.atlassian.maven.plugins.amps.codegen.prompter.jira;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import com.atlassian.core.util.map.EasyMap;
 import com.atlassian.maven.plugins.amps.codegen.jira.CustomFieldSearcherFactory;
 import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter;
 import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractPrompterTest;
 import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompter;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.jira.CustomFieldSearcherProperties;
-
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import static com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter.MODULE_DESCRIP_PROMPT;
 import static com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter.MODULE_KEY_PROMPT;
@@ -56,7 +55,9 @@ public class CustomFieldSearcherPrompterTest extends AbstractPrompterTest
     {
         prompter = mock(Prompter.class);
         searcherFactory = new TestingCustomFieldSearcherFactory();
-        searcherFactory.setSearchers(EasyMap.build("TextSearcher", "com.atlassian.jira.issue.customfields.searchers.TextSearcher", "NumberSearcher", "com.atlassian.jira.issue.customfields.searchers.NumberSearcher"));
+        searcherFactory.setSearchers(ImmutableMap.of(
+                "NumberSearcher", "com.atlassian.jira.issue.customfields.searchers.NumberSearcher",
+                "TextSearcher", "com.atlassian.jira.issue.customfields.searchers.TextSearcher"));
     }
 
     @Test

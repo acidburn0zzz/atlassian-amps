@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps.codegen.prompter.common.web;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -14,7 +15,6 @@ import com.atlassian.plugins.codegen.modules.common.Conditions;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.web.AbstractWebFragmentProperties;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.junit.After;
@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
  */
 public abstract class AbstractWebFragmentPrompterTest<T extends AbstractWebFragmentProperties> extends AbstractPrompterTest
 {
-
     public static final String RESOURCE_NAME = "resourceCSS";
     public static final String RESOURCE_NAME_PATTERN = "templates/*.vm";
     public static final String DOWNLOAD_TYPE = "download";
@@ -61,8 +60,8 @@ public abstract class AbstractWebFragmentPrompterTest<T extends AbstractWebFragm
     @After
     public void resetProviders()
     {
-        contextProviderFactory.setProvidersMap(MapUtils.EMPTY_SORTED_MAP);
-        conditionFactory.setConditions(MapUtils.EMPTY_SORTED_MAP);
+        contextProviderFactory.setProvidersMap(Collections.emptySortedMap());
+        conditionFactory.setConditions(Collections.emptySortedMap());
     }
 
     @Before

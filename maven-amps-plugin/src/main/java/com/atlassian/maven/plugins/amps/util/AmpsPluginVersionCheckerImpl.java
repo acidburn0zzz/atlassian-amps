@@ -7,12 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import com.atlassian.fugue.Pair;
 import com.atlassian.maven.plugins.amps.codegen.prompter.PrettyPrompter;
 import com.atlassian.plugins.codegen.AmpsVersionUpdate;
 import com.atlassian.plugins.codegen.MavenProjectRewriter;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.ProjectRewriter;
+import io.atlassian.fugue.Pair;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;

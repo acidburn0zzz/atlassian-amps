@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.atlassian.fugue.Option.some;
+import static io.atlassian.fugue.Option.some;
 import static org.junit.Assert.assertEquals;
 
 /**

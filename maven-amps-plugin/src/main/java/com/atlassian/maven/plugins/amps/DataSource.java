@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.atlassian.maven.plugins.amps.util.PropertyUtils.parse;
-import static com.google.common.base.Objects.firstNonNull;
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;

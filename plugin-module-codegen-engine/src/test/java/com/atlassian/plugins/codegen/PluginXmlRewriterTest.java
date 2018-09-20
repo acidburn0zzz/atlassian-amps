@@ -10,7 +10,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
 import static com.atlassian.plugins.codegen.I18nString.i18nString;
 import static com.atlassian.plugins.codegen.ModuleDescriptor.moduleDescriptor;
@@ -21,6 +20,7 @@ import static com.atlassian.plugins.codegen.XmlMatchers.nodeCount;
 import static com.atlassian.plugins.codegen.XmlMatchers.nodeName;
 import static com.atlassian.plugins.codegen.XmlMatchers.nodeTextEquals;
 import static com.atlassian.plugins.codegen.XmlMatchers.nodes;
+import static io.atlassian.fugue.Option.some;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;

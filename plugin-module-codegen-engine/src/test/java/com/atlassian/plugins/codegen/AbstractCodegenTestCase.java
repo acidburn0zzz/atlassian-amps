@@ -10,9 +10,9 @@ import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 
-import static com.atlassian.fugue.Option.some;
-import static junit.framework.Assert.fail;
+import static io.atlassian.fugue.Option.some;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  *
