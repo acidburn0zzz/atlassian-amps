@@ -26,10 +26,10 @@ public class ProductContainerVersionMapper
     static
     {
         //Most apps
-        populateVersionMapForProduct(ProductHandlerFactory.BAMBOO, "0", "5.1.0", "5.10.0");
-        populateVersionMapForProduct(ProductHandlerFactory.BITBUCKET, null, null, "4.0.0");
+        populateVersionMapForProduct(ProductHandlerFactory.BAMBOO, "0", "5.1", "5.10");
+        populateVersionMapForProduct(ProductHandlerFactory.BITBUCKET, null, null, "1");
         populateVersionMapForProduct(ProductHandlerFactory.CONFLUENCE, "0", "5.5", "5.8", null, "6.10");
-        populateVersionMapForProduct(ProductHandlerFactory.CROWD, "0", "2.7.0", null, "3.1.0");
+        populateVersionMapForProduct(ProductHandlerFactory.CROWD, "0", "2.7", null, "3.1");
         populateVersionMapForProduct(ProductHandlerFactory.JIRA, ImmutableMap.of(
                 "0", "tomcat6x",
                 "5.2", "tomcat7x",

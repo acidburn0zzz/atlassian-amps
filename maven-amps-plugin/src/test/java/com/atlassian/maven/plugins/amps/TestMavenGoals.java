@@ -253,7 +253,7 @@ public class TestMavenGoals
     }
 
     @Test
-    public void TestStartWebappUsesPortsConfiguredFromProduct() throws Exception
+    public void testStartWebappUsesPortsConfiguredFromProduct() throws Exception
     {
         final MojoDescriptor mojoDescriptor = mock(MojoDescriptor.class);
         when(mojoDescriptor.getMojoConfiguration()).thenReturn(new DefaultPlexusConfiguration(""));
