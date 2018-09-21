@@ -38,7 +38,6 @@ public class ProductContainerVersionMapper
                 )
         );
         populateVersionMapForProduct(ProductHandlerFactory.REFAPP, "0", "2.21.0", "3.0.0", "5.0.0");
-        populateVersionMapForProduct(ProductHandlerFactory.STASH, "0", "2.0.0", "3.3.0");
     }
 
     private static <K, V> void populateVersionMapForProduct(String productId, ImmutableMap<String, String> productToTomcatVersions) {

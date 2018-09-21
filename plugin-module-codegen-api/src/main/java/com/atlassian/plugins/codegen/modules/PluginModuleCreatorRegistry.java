@@ -18,7 +18,6 @@ public interface PluginModuleCreatorRegistry
     String BITBUCKET = "bitbucket";
     String FECRU = "fecru";
     String CROWD = "crowd";
-    String STASH = "stash";
 
     void registerModuleCreator(String productId, PluginModuleCreator moduleCreator);
 

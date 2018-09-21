@@ -9,7 +9,6 @@ import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
-import com.atlassian.plugins.codegen.annotations.StashPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 
 import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.PROVIDED;
@@ -28,7 +27,6 @@ import static com.atlassian.plugins.codegen.modules.Dependencies.SERVLET_API;
 @BitbucketPluginModuleCreator
 @FeCruPluginModuleCreator
 @CrowdPluginModuleCreator
-@StashPluginModuleCreator
 public class RESTModuleCreator extends AbstractPluginModuleCreator<RESTProperties>
 {
     public static final String MODULE_NAME = "REST Plugin Module";

@@ -39,11 +39,6 @@
                                 <output>${project.build.directory}/jira-LATEST.log</output>
                             </product>
                             <product>
-                                <id>stash</id>
-                                <version>LATEST</version>
-                                <output>${project.build.directory}/stash-LATEST.log</output>
-                            </product>
-                            <product>
                                 <id>bamboo</id>
                                 <version>LATEST</version>
                                 <output>${project.build.directory}/bamboo-LATEST.log</output>

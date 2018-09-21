@@ -22,12 +22,11 @@ public class ProductHandlerFactory
     public static final String BITBUCKET = "bitbucket";
     public static final String FECRU = "fecru";
     public static final String CROWD = "crowd";
-    public static final String STASH = "stash";
     public static final String CTK_SERVER = "ctk-server";
 
 
     private static final List<String> PRODUCT_IDS = ImmutableList.of(
-            REFAPP, CONFLUENCE, JIRA, BAMBOO, BITBUCKET, FECRU, CROWD, STASH, CTK_SERVER);
+            REFAPP, CONFLUENCE, JIRA, BAMBOO, BITBUCKET, FECRU, CROWD, CTK_SERVER);
 
     public static ProductHandler create(String id, MavenContext context, MavenGoals goals, ArtifactFactory artifactFactory)
     {
@@ -58,10 +57,6 @@ public class ProductHandlerFactory
         else if (CROWD.equals(id))
         {
             return new CrowdProductHandler(context, goals,artifactFactory);
-        }
-        else if (STASH.equals(id))
-        {
-            return new StashProductHandler(context, goals,artifactFactory);
         }
         else if (CTK_SERVER.equals(id))
         {
