@@ -124,7 +124,7 @@ public class MavenGoals
         {{
                 //overrides.getProperty(JUNIT_ARTIFACT_ID,"
                 put("maven-cli-plugin", overrides.getProperty("maven-cli-plugin","1.0.11"));
-                put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.5.1"));
+                put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.6.10"));
                 put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.3"));
                 put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
                 put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","3.5.0"));
