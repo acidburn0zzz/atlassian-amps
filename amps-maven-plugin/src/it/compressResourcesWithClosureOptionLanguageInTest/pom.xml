@@ -1,0 +1,24 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.atlassian.amps.it</groupId>
+    <artifactId>amps-maven-plugin-compress-resources-test</artifactId>
+    <version>testing</version>
+    <name>TestCompressResources</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>${invoker.groupId}</groupId>
+                <artifactId>${invoker.artifactId}</artifactId>
+                <version>${project.version}</version>
+                <configuration>
+                    <closureJsCompiler>true</closureJsCompiler>
+                    <closureOptions>
+                        <languageIn>ECMASCRIPT5</languageIn>
+                    </closureOptions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,168 @@
+<component-set>
+    <components>
+        <component>
+            <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+            <role-hint>atlassian-plugin</role-hint>
+            <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+            <configuration>
+                <lifecycles>
+                    <lifecycle>
+                        <id>default</id>
+                        <phases>
+                            <process-resources>
+                                com.atlassian.maven.plugins:amps-maven-plugin:compress-resources,
+                                org.apache.maven.plugins:maven-resources-plugin:resources,
+                                com.atlassian.maven.plugins:amps-maven-plugin:filter-plugin-descriptor
+                            </process-resources>
+                            <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
+                            <process-classes>
+                                com.atlassian.maven.plugins:amps-maven-plugin:generate-rest-docs
+                            </process-classes>
+                            <generate-test-resources>
+                                org.apache.maven.plugins:maven-resources-plugin:testResources,
+                                com.atlassian.maven.plugins:amps-maven-plugin:filter-test-plugin-descriptor
+                            </generate-test-resources>
+                            <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+                            <test>com.atlassian.maven.plugins:amps-maven-plugin:unit-test</test>
+                            <prepare-package>
+                                com.atlassian.maven.plugins:amps-maven-plugin:copy-bundled-dependencies,
+                                com.atlassian.maven.plugins:amps-maven-plugin:copy-test-bundled-dependencies,
+                                com.atlassian.maven.plugins:amps-maven-plugin:generate-manifest,
+                                com.atlassian.maven.plugins:amps-maven-plugin:generate-test-manifest
+                            </prepare-package>
+                            <package>
+                                com.atlassian.maven.plugins:amps-maven-plugin:validate-manifest,
+                                com.atlassian.maven.plugins:amps-maven-plugin:jar,
+                                com.atlassian.maven.plugins:amps-maven-plugin:generate-obr-artifact,
+                                com.atlassian.maven.plugins:amps-maven-plugin:validate-test-manifest,
+                                com.atlassian.maven.plugins:amps-maven-plugin:test-jar
+                            </package>
+                            <pre-integration-test>
+                                com.atlassian.maven.plugins:amps-maven-plugin:prepare-database
+                            </pre-integration-test>
+                            <integration-test>
+                                com.atlassian.maven.plugins:amps-maven-plugin:integration-test
+                            </integration-test>
+                            <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+                            <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+                        </phases>
+                    </lifecycle>
+                </lifecycles>
+            </configuration>
+        </component>
+        <component>
+            <role>org.codehaus.plexus.components.interactivity.Prompter</role>
+            <role-hint>pretty-prompter</role-hint>
+            <implementation>com.atlassian.maven.plugins.amps.codegen.prompter.PrettyPrompter</implementation>
+            <requirements>
+                <requirement>
+                    <role>org.codehaus.plexus.components.interactivity.OutputHandler</role>
+                    <field-name>outputHandler</field-name>
+                </requirement>
+                <requirement>
+                    <role>org.codehaus.plexus.components.interactivity.InputHandler</role>
+                    <field-name>inputHandler</field-name>
+                </requirement>
+            </requirements>
+        </component>
+        <component>
+            <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+            <role-hint>atlassian-plugin</role-hint>
+            <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+            <configuration>
+                <type>atlassian-plugin</type>
+                <includesDependencies>true</includesDependencies>
+                <language>java</language>
+                <extension>jar</extension>
+                <addedToClasspath>true</addedToClasspath>
+            </configuration>
+        </component>
+        <component>
+            <role>com.atlassian.maven.plugins.amps.codegen.PluginModuleSelectionQueryer</role>
+            <role-hint>plugin module selector</role-hint>
+            <implementation>com.atlassian.maven.plugins.amps.codegen.DefaultPluginModuleSelectionQueryer</implementation>
+            <requirements>
+                <requirement>
+                    <role>org.codehaus.plexus.components.interactivity.Prompter</role>
+                    <field-name>prompter</field-name>
+                </requirement>
+            </requirements>
+        </component>
+
+        <component>
+            <role>com.atlassian.plugins.codegen.modules.PluginModuleCreatorFactory</role>
+            <role-hint>plugin module creator factory</role-hint>
+            <implementation>com.atlassian.plugins.codegen.PluginModuleCreatorFactoryImpl</implementation>
+        </component>
+
+        <component>
+            <role>com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompterFactory</role>
+            <role-hint>product module prompter factory</role-hint>
+            <implementation>com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompterFactoryImpl</implementation>
+            <requirements>
+                <requirement>
+                    <role>org.codehaus.plexus.components.interactivity.Prompter</role>
+                    <field-name>prompter</field-name>
+                </requirement>
+            </requirements>
+        </component>
+
+        <component>
+            <role>com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker</role>
+            <role-hint>amps pom version checker</role-hint>
+            <implementation>com.atlassian.maven.plugins.amps.util.AmpsPluginVersionCheckerImpl</implementation>
+            <requirements>
+                <requirement>
+                    <role>org.codehaus.plexus.components.interactivity.Prompter</role>
+                    <field-name>prompter</field-name>
+                </requirement>
+                
+            </requirements>
+        </component>
+
+        <component>
+            <role>com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter</role>
+            <role-hint>amps create plugin prompter</role-hint>
+            <implementation>com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompterImpl</implementation>
+            <requirements>
+                <requirement>
+                    <role>org.codehaus.plexus.components.interactivity.Prompter</role>
+                    <field-name>prompter</field-name>
+                </requirement>
+            </requirements>
+        </component>
+
+        <component>
+            <role>com.atlassian.maven.plugins.updater.SdkResource</role>
+            <role-hint>component for getting SDK versions from MPAC</role-hint>
+            <implementation>com.atlassian.maven.plugins.updater.MarketplaceSdkResource</implementation>
+        </component>
+
+        <component>
+            <role>com.atlassian.maven.plugins.updater.LocalSdk</role>
+            <role-hint>component for providing information about the currently installed SDK</role-hint>
+            <implementation>com.atlassian.maven.plugins.updater.FileSystemLocalSdk</implementation>
+        </component>
+
+        <component>
+            <role>com.atlassian.maven.plugins.amps.util.UpdateChecker</role>
+            <role-hint>amps email subscriber</role-hint>
+            <implementation>com.atlassian.maven.plugins.amps.util.UpdateCheckerImpl</implementation>
+            <requirements>
+                <requirement>
+                    <role>org.codehaus.plexus.components.interactivity.Prompter</role>
+                    <field-name>prompter</field-name>
+                </requirement>
+                <requirement>
+                    <role>com.atlassian.maven.plugins.updater.SdkResource</role>
+                    <field-name>sdkResource</field-name>
+                </requirement>
+                <requirement>
+                    <role>com.atlassian.maven.plugins.updater.LocalSdk</role>
+                    <field-name>localSdk</field-name>
+                </requirement>
+            </requirements>
+        </component>
+
+    </components>
+</component-set>

@@ -101,7 +101,7 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-fecru-plugin</artifactId>
+                <artifactId>fecru-maven-plugin</artifactId>
                 <version>\${dollar}{amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>

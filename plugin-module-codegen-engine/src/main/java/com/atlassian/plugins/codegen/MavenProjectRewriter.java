@@ -8,13 +8,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.atlassian.plugins.codegen.AmpsSystemPropertyVariable;
-import com.atlassian.plugins.codegen.ArtifactDependency;
-import com.atlassian.plugins.codegen.BundleInstruction;
-import com.atlassian.plugins.codegen.MavenPlugin;
-import com.atlassian.plugins.codegen.PluginProjectChangeset;
-import com.atlassian.plugins.codegen.ProjectRewriter;
-import com.atlassian.plugins.codegen.VersionId;
 import io.atlassian.fugue.Option;
 
 import com.google.common.base.Predicate;
@@ -53,13 +46,14 @@ public class MavenProjectRewriter implements ProjectRewriter
     private final Element root;
     
     private static final ImmutableSet<String> AMPS_PLUGIN_IDS =
-        ImmutableSet.of("maven-amps-plugin",
-                        "maven-bamboo-plugin",
-                        "maven-confluence-plugin",
-                        "maven-crowd-plugin",
-                        "maven-fecru-plugin",
-                        "maven-jira-plugin",
-                        "maven-refapp-plugin");
+        ImmutableSet.of("amps-maven-plugin",
+                        "bamboo-maven-plugin",
+                        "bitbucket-maven-plugin",
+                        "confluence-maven-plugin",
+                        "crowd-maven-plugin",
+                        "fecru-maven-plugin",
+                        "jira-maven-plugin",
+                        "refapp-maven-plugin");
     
     public MavenProjectRewriter(File pom) throws DocumentException, IOException
     {

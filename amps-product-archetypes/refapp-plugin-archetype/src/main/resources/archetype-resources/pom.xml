@@ -105,7 +105,7 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-refapp-plugin</artifactId>
+                <artifactId>refapp-maven-plugin</artifactId>
                 <version>\${dollar}{amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>

@@ -23,7 +23,7 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-amps-plugin</artifactId>
+                <artifactId>amps-maven-plugin</artifactId>
                 <configuration>
                     <instructions>
                         <Import-Package>

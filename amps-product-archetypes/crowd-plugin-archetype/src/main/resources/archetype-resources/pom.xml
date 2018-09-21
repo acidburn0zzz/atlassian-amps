@@ -107,7 +107,7 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-crowd-plugin</artifactId>
+                <artifactId>crowd-maven-plugin</artifactId>
                 <version>\${dollar}{amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
