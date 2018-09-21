@@ -37,7 +37,7 @@ public class ProductContainerVersionMapper
                 "7.3.0", "tomcat85_6"
                 )
         );
-        populateVersionMapForProduct(ProductHandlerFactory.REFAPP, "0", "2.21.0", "3.0.0");
+        populateVersionMapForProduct(ProductHandlerFactory.REFAPP, "0", "2.21.0", "3.0.0", "5.0.0");
         populateVersionMapForProduct(ProductHandlerFactory.STASH, "0", "2.0.0", "3.3.0");
     }
 
