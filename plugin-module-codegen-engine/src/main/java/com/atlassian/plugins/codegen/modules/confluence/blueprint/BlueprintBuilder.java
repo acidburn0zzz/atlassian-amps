@@ -12,11 +12,11 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
-import static com.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintI18nProperty.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintPromptEntry.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.BlueprintProperties.*;
 import static com.atlassian.plugins.codegen.modules.confluence.blueprint.ContentTemplateProperties.CONTENT_I18N_DEFAULT_VALUE;
+import static io.atlassian.fugue.Option.some;
 
 /**
  * Different to the {@link BlueprintModuleCreator}, the generator takes simple objects provided by the prompter

@@ -6,8 +6,8 @@ import com.atlassian.plugins.codegen.ComponentDeclaration;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
+import static io.atlassian.fugue.Option.some;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 

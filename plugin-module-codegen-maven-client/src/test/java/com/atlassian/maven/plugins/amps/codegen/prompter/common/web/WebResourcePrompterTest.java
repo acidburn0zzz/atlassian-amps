@@ -14,7 +14,7 @@ import com.atlassian.plugins.codegen.modules.common.web.WebResourceProperties;
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformation;
 
 import com.atlassian.plugins.codegen.modules.common.web.WebResourceTransformer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.junit.Before;

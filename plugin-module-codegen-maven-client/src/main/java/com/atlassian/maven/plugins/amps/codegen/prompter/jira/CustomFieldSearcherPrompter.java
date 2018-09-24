@@ -48,7 +48,7 @@ public class CustomFieldSearcherPrompter extends AbstractResourcePrompter<Custom
         props.setValidCustomFieldPackage(promptNotBlank("Enter Valid CustomField Package", getDefaultBasePackage()));
         props.setValidCustomFieldKey(promptNotBlank("Enter Valid CustomField Key"));
 
-        List<Resource> resources = new ArrayList<Resource>(1);
+        List<Resource> resources = new ArrayList<>(1);
 
         String templatePath = "/templates/customfields/" + props.getModuleKey() + "/";
 
@@ -94,8 +94,8 @@ public class CustomFieldSearcherPrompter extends AbstractResourcePrompter<Custom
         {
 
             StringBuilder contextQuery = new StringBuilder("Choose A Searcher Class\n");
-            List<String> indexChoices = new ArrayList<String>(searchers.size());
-            Map<String, String> indexedValues = new HashMap<String, String>();
+            List<String> indexChoices = new ArrayList<>(searchers.size() + 1);
+            Map<String, String> indexedValues = new HashMap<>();
             int index = 1;
             String strIndex;
             for (Map.Entry<String, String> entry : searchers.entrySet())

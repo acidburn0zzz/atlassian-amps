@@ -1,9 +1,9 @@
 package com.atlassian.plugins.codegen;
 
-import static com.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.ArtifactId.artifactId;
 import static com.atlassian.plugins.codegen.VersionId.version;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.atlassian.fugue.Option.some;
 
 /**
  * Describes a dependency on an external artifact that should be added to the POM.

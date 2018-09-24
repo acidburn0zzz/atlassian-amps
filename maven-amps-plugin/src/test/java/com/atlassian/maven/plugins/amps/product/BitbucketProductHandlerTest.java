@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 import java.util.Collections;
@@ -24,25 +24,22 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class BitbucketProductHandlerTest {
 
     @Mock
     private Product ctx;
-
     @Mock
     private MavenContext mavenContext;
-
     @Mock
     private MavenGoals mavenGoals;
-
     @Mock
     private ArtifactFactory artifactFactory;
-
     @Mock
     private MavenProjectLoader mavenProjectLoader;
 
@@ -68,6 +65,7 @@ public class BitbucketProductHandlerTest {
         MavenProject mavenProject = mock(MavenProject.class);
         DependencyManagement dependencyManagement = mock(DependencyManagement.class);
         Dependency searchDependency = mock(Dependency.class);
+        when(mavenContext.getProject()).thenReturn(mavenProject);
 
         when(mavenProjectLoader.loadMavenProject(any(MavenSession.class), any(MavenProject.class), any(Artifact.class)))
                 .thenReturn(Optional.of(mavenProject));
@@ -79,6 +77,8 @@ public class BitbucketProductHandlerTest {
         when(searchDependency.getArtifactId()).thenReturn(SEARCH_ARTIFACT_ID);
         when(searchDependency.getVersion()).thenReturn(SEARCH_VERSION);
 
+        Artifact parentArtifact = mock(Artifact.class);
+        when(artifactFactory.createParentArtifact(anyString(), anyString(), anyString())).thenReturn(parentArtifact);
     }
 
     private boolean pluginFoundInPluginList(List<ProductArtifact> pluginList) {

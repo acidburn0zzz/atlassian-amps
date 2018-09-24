@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 
 public class AmpsDefaults
 {
-    public static final String DEFAULT_CONTAINER = "tomcat6x";
+    public static final String DEFAULT_CONTAINER = "tomcat85x";
     public static final String DEFAULT_SERVER;
     public static final String DEFAULT_PDK_VERSION = "0.6";
     public static final String DEFAULT_WEB_CONSOLE_VERSION = "1.2.8";

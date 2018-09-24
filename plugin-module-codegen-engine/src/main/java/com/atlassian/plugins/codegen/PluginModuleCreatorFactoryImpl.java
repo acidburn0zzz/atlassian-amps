@@ -7,7 +7,7 @@ import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreatorFactory;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreatorRegistry;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @since 3.6

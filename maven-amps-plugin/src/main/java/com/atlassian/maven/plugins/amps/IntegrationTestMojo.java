@@ -6,7 +6,7 @@ import java.util.*;
 import com.atlassian.maven.plugins.amps.product.AmpsDefaults;
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;

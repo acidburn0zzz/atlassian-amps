@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -70,7 +70,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void postgresDatabaseFactory() throws Exception {
+    public void postgresDatabaseFactory() {
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getUrl()).thenReturn("jdbc:postgresql://host/eeee");
         when(dataSource.getDriver()).thenReturn("org.postgresql.Driver");
@@ -79,7 +79,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mysqlDatabaseFactory() throws Exception
+    public void mysqlDatabaseFactory()
     {
         final DataSource dataSource = mock(DataSource.class);
         when(dataSource.getUrl()).thenReturn("jdbc:mysql://localhost:3306/ffffff");
@@ -89,7 +89,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void oracle10gDatabaseFactory() throws Exception
+    public void oracle10gDatabaseFactory()
     {
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final DataSource dataSource = mock(DataSource.class);
@@ -101,7 +101,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mssqlDatabaseFactory() throws Exception
+    public void mssqlDatabaseFactory()
     {
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final DataSource dataSource = mock(DataSource.class);
@@ -112,7 +112,7 @@ public class JiraDatabaseTest
     }
 
     @Test
-    public void mssqlJtdsDatabaseFactory() throws Exception
+    public void mssqlJtdsDatabaseFactory()
     {
         final JiraDatabaseFactory factory = getJiraDatabaseFactory();
         final DataSource dataSource = mock(DataSource.class);
@@ -279,7 +279,7 @@ public class JiraDatabaseTest
 
 
     @Test
-    public void testImportMethodCaseInsensitively() throws Exception
+    public void testImportMethodCaseInsensitively()
     {
         final ImportMethod IMPDP = ImportMethod.getValueOf("IMPDP");
         final ImportMethod impdp = ImportMethod.getValueOf("impdp");
