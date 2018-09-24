@@ -42,6 +42,7 @@ public class TestProductContainerVersionMapper
         assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.2.9"), is("tomcat8x"));
         assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.3.0"), is("tomcat85_6"));
         assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.6.0"), is("tomcat85_6"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.12.3"), is("tomcat85x"));
     }
 
     @Test
