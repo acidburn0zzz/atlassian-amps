@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.atlassian.fugue.Option;
 import com.atlassian.plugins.codegen.AmpsSystemPropertyVariable;
 import com.atlassian.plugins.codegen.ArtifactDependency;
 import com.atlassian.plugins.codegen.BundleInstruction;
@@ -15,7 +16,6 @@ import com.atlassian.plugins.codegen.MavenPlugin;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.ProjectRewriter;
 import com.atlassian.plugins.codegen.VersionId;
-import io.atlassian.fugue.Option;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;

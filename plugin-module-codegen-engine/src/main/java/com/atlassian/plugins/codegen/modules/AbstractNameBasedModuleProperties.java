@@ -4,7 +4,7 @@ import com.atlassian.plugins.codegen.util.ClassnameUtil;
 
 import com.google.common.collect.ImmutableMap;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @since 3.6

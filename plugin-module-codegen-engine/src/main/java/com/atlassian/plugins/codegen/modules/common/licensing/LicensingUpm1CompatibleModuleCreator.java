@@ -21,6 +21,7 @@ import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletModuleCreator;
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletProperties;
 
+import static com.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.COMPILE;
 import static com.atlassian.plugins.codegen.ArtifactDependency.Scope.PROVIDED;
 import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
@@ -43,7 +44,6 @@ import static com.atlassian.plugins.codegen.modules.Dependencies.I18N_RESOLVER_I
 import static com.atlassian.plugins.codegen.modules.Dependencies.SAL_API;
 import static com.atlassian.plugins.codegen.modules.Dependencies.TEMPLATE_RENDERER_API;
 import static com.atlassian.plugins.codegen.modules.Dependencies.TEMPLATE_RENDERER_IMPORT;
-import static io.atlassian.fugue.Option.some;
 
 /**
  * @since 3.9

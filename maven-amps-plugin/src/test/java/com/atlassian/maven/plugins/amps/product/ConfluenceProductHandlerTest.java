@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
 import java.util.Collection;
@@ -22,8 +22,9 @@ import java.util.Collection;
 import static com.atlassian.maven.plugins.amps.product.ConfluenceProductHandler.SYNCHRONY_PROXY_VERSION;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -54,14 +55,14 @@ public class ConfluenceProductHandlerTest {
     private String oldSynchronyProxyEnv;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         oldSynchronyProxyEnv = System.getProperty(SYNCHRONY_PROXY_VERSION);
         when(context.getLog()).thenReturn(log);
         confluenceProductHandler = new ConfluenceProductHandler(context, goals, artifactFactory);
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
         if(oldSynchronyProxyEnv != null) {
             System.setProperty(SYNCHRONY_PROXY_VERSION, oldSynchronyProxyEnv);
         } else {
@@ -73,14 +74,14 @@ public class ConfluenceProductHandlerTest {
     public void testCustomiseInstanceBefore6() throws Exception {
         when(ctx.getVersion()).thenReturn("5.10.8");
         confluenceProductHandler.customiseInstance(ctx, new File("./"), new File("./"));
-        verify(goals, never()).copyWebappWar(anyString(), any(), any());
+        verify(goals, never()).copyWebappWar(anyString(), anyObject(), anyObject());
     }
 
     @Test
     public void testCustomiseInstanceBefore6_5() throws Exception {
         ConfluenceProductHandler spied = spy(confluenceProductHandler);
         when(ctx.getVersion()).thenReturn("6.4.0-SNAPSHOT");
-        when(goals.copyWebappWar(anyString(), any(), any())).thenReturn(new File("./"));
+        when(goals.copyWebappWar(anyString(), anyObject(), anyObject())).thenReturn(new File("./"));
         doReturn(new File("./")).when(spied).getBaseDirectory(ctx);
 
         spied.customiseInstance(ctx, new File("./"), new File("./"));
@@ -94,7 +95,7 @@ public class ConfluenceProductHandlerTest {
     public void testCustomiseInstanceOverridden() throws Exception {
         System.setProperty(SYNCHRONY_PROXY_VERSION, "1.0.16");
         when(ctx.getVersion()).thenReturn("6.4.0-SNAPSHOT");
-        when(goals.copyWebappWar(anyString(), any(), any())).thenReturn(new File("./"));
+        when(goals.copyWebappWar(anyString(), anyObject(), anyObject())).thenReturn(new File("./"));
         ConfluenceProductHandler spied = spy(confluenceProductHandler);
         doReturn(new File("./")).when(spied).getBaseDirectory(ctx);
 
@@ -109,8 +110,8 @@ public class ConfluenceProductHandlerTest {
     public void testCustomiseInstanceAfter6_5() throws Exception {
         when(ctx.getVersion()).thenReturn("6.5.0-SNAPSHOT");
         when(ctx.getArtifactRetriever()).thenReturn(artifactRetriever);
-        when(artifactRetriever.getLatestStableVersion(any())).thenReturn(LATEST_SYNCHRONY_PROXY_VERSION);
-        when(goals.copyWebappWar(anyString(), any(), any())).thenReturn(new File("./"));
+        when(artifactRetriever.getLatestStableVersion(anyObject())).thenReturn(LATEST_SYNCHRONY_PROXY_VERSION);
+        when(goals.copyWebappWar(anyString(), anyObject(), anyObject())).thenReturn(new File("./"));
         ConfluenceProductHandler spied = spy(confluenceProductHandler);
         doReturn(new File("./")).when(spied).getBaseDirectory(ctx);
 
@@ -126,8 +127,8 @@ public class ConfluenceProductHandlerTest {
         // Setup
         when(ctx.getVersion()).thenReturn("6.5.0-SNAPSHOT");
         when(ctx.getArtifactRetriever()).thenReturn(artifactRetriever);
-        when(artifactRetriever.getLatestStableVersion(any())).thenReturn(LATEST_SYNCHRONY_PROXY_VERSION);
-        when(goals.copyWebappWar(anyString(), any(), any())).thenReturn(new File("./"));
+        when(artifactRetriever.getLatestStableVersion(anyObject())).thenReturn(LATEST_SYNCHRONY_PROXY_VERSION);
+        when(goals.copyWebappWar(anyString(), anyObject(), anyObject())).thenReturn(new File("./"));
         ConfluenceProductHandler spied = spy(confluenceProductHandler);
         doReturn(new File("./")).when(spied).getBaseDirectory(ctx);
 

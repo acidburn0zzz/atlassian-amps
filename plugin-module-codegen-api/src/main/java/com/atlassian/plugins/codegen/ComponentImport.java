@@ -1,12 +1,12 @@
 package com.atlassian.plugins.codegen;
 
-import io.atlassian.fugue.Option;
+import com.atlassian.fugue.Option;
 
 import com.google.common.collect.ImmutableList;
 
 import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
+import static com.atlassian.fugue.Option.none;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.atlassian.fugue.Option.none;
 
 /**
  * Describes a &lt;component-import&gt; element that should be added to the plugin XML file.

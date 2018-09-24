@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -112,7 +112,7 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void itShouldSetNewJvmArgsForJira7_7_0AndHigher()
+    public void itShouldSetNewJvmArgsForJira7_7_0AndHigher() throws Exception
     {
         newArrayList(
                 newProduct("7.7.0-ALPHA"), newProduct("7.7.0-SNAPSHOT"), newProduct("7.7-EAP01"), newProduct("7.7.0"),
@@ -125,7 +125,7 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void itShouldUseDefaultJvmArgsForLowerThanJira7_7_0()
+    public void itShouldUseDefaultJvmArgsForLowerThanJira7_7_0() throws Exception
     {
         newArrayList(
                 newProduct("7.6.0"), newProduct("7.6.19-SNAPSHOT"), newProduct("7.1"))
@@ -193,7 +193,7 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void shouldByDefaultForceJiraSynchronousStartup() {
+    public void shouldByDefaultForceJiraSynchronousStartup() throws IOException {
         final Product product = newProduct();
         final Map<String, String> systemProperties = productHandler.getSystemProperties(product);
 
@@ -205,7 +205,7 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void shouldPassAwaitInitializationFlagFromProduct() {
+    public void shouldPassAwaitInitializationFlagFromProduct() throws IOException {
         final Product product = newProduct();
         final Map<String, String> systemPropertiesWithAwait = productHandler.getSystemProperties(product);
 
@@ -251,14 +251,14 @@ public class TestJiraProductHandler
         }
     }
 
-    private String getDbType(org.dom4j.Document dbConfigXml)
+    private String getDbType(org.dom4j.Document dbConfigXml) throws Exception
     {
 
         final Node dbTypeNode = dbConfigXml.selectSingleNode("//jira-database-config/database-type");
         return dbTypeNode == null ? "" : dbTypeNode.getStringValue();
     }
 
-    private String getDbSchema(org.dom4j.Document dbConfigXml)
+    private String getDbSchema(org.dom4j.Document dbConfigXml) throws Exception
     {
         final Node schemaNode = dbConfigXml.selectSingleNode("//jira-database-config/schema-name");
         return schemaNode == null ? "" : schemaNode.getStringValue();

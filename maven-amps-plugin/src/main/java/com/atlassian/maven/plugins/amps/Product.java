@@ -1,7 +1,7 @@
 package com.atlassian.maven.plugins.amps;
 
 import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;

@@ -12,12 +12,12 @@ import com.atlassian.maven.plugins.amps.util.VersionUtils;
 import com.atlassian.maven.plugins.amps.util.minifier.MinifierParameters;
 import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.archetype.common.DefaultPomManager;
 import org.apache.maven.archetype.common.MavenJDOMWriter;
 import org.apache.maven.archetype.common.util.Format;
@@ -35,7 +35,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
-import org.twdata.maven.mojoexecutor.MojoExecutor;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
@@ -54,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -85,57 +85,68 @@ public class MavenGoals
     @VisibleForTesting
     static final String AJP_PORT_PROPERTY = "cargo.tomcat.ajp.port";
 
-    @VisibleForTesting
-    final Map<String, String> defaultArtifactIdToVersionMap;
-
-    private final MavenContext ctx;
-    private final Map<String, Container> idToContainerMap = ImmutableMap.<String, Container>builder()
-            .put("tomcat5x", new Container("tomcat5x", "org.apache.tomcat", "apache-tomcat", "5.5.36"))
-            .put("tomcat6x", new Container("tomcat6x", "org.apache.tomcat", "apache-tomcat", "6.0.41"))
-            .put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.73", "windows-x64"))
-            .put("tomcat8x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.0.53-atlassian-hosted", "windows-x64"))
-            .put("tomcat85x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.33-atlassian-hosted", "windows-x64"))
-            .put("tomcat9x", new Container("tomcat9x", "org.apache.tomcat", "apache-tomcat", "9.0.11-atlassian-hosted", "windows-x64"))
-            .put("jetty6x", new Container("jetty6x"))
-            .put("jetty7x", new Container("jetty7x"))
-            .put("jetty8x", new Container("jetty8x"))
-            .put("jetty9x", new Container("jetty9x"))
-            .build();
     private final Log log;
+    @VisibleForTesting
+    final Map<String, String> pluginArtifactIdToVersionMap;
+    private final MavenContext ctx;
+
+    private final Map<String, Container> idToContainerMap = new HashMap<String, Container>()
+    {{
+            put("tomcat5x", new Container("tomcat5x", "org.apache.tomcat", "apache-tomcat", "5.5.36"));
+            put("tomcat6x", new Container("tomcat6x", "org.apache.tomcat", "apache-tomcat", "6.0.41"));
+            put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.52", "windows-x64"));
+            put("tomcat8x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.0.48-atlassian-hosted", "windows-x64"));
+            put("tomcat85x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.20-atlassian-hosted", "windows-x64"));
+            put("tomcat85_6", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.6-atlassian-hosted", "windows-x64"));
+            put("tomcat9x", new Container("tomcat9x", "org.apache.tomcat", "apache-tomcat", "9.0.8-atlassian-hosted", "windows-x64"));
+            put("resin3x", new Container("resin3x", "com.caucho", "resin", "3.0.26"));
+            put("jboss42x", new Container("jboss42x", "org.jboss.jbossas", "jbossas", "4.2.3.GA"));
+            put("jetty6x", new Container("jetty6x"));
+        }};
+
+    private final Map<String, String> defaultArtifactIdToVersionMap;
 
     public MavenGoals(final MavenContext ctx)
     {
         this.ctx = ctx;
 
-        defaultArtifactIdToVersionMap = Collections.unmodifiableMap(getArtifactIdToVersionMap(ctx));
-        log = ctx.getLog();
+        this.log = ctx.getLog();
+
+        this.defaultArtifactIdToVersionMap = Collections.unmodifiableMap(getArtifactIdToVersionMap(ctx));
+        this.pluginArtifactIdToVersionMap = defaultArtifactIdToVersionMap;
     }
 
     private Map<String,String> getArtifactIdToVersionMap(MavenContext ctx)
     {
         final Properties overrides = ctx.getVersionOverrides();
 
-        return ImmutableMap.<String, String>builder()
+        return new HashMap<String, String>()
+        {{
                 //overrides.getProperty(JUNIT_ARTIFACT_ID,"
-                .put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.3"))
-                .put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","3.0.0"))
-                .put("cargo-maven2-plugin", overrides.getProperty("cargo-maven2-plugin","1.6.10"))
-                .put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","3.0.1"))
-                .put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","3.5.0"))
-                .put("maven-cli-plugin", overrides.getProperty("maven-cli-plugin","1.0.11"))
-                .put("maven-dependency-plugin", overrides.getProperty("maven-dependency-plugin","3.1.1"))
-                .put("maven-deploy-plugin", overrides.getProperty("maven-deploy-plugin","2.8.2"))
-                .put("maven-exec-plugin", overrides.getProperty("maven-exec-plugin","1.2.1"))
-                .put("maven-failsafe-plugin", overrides.getProperty("maven-failsafe-plugin","2.22.0"))
-                .put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.5.2"))
-                .put("maven-jar-plugin", overrides.getProperty("maven-jar-plugin","3.0.2"))
-                .put("maven-javadoc-plugin", overrides.getProperty("maven-javadoc-plugin", "3.0.1"))
-                .put("maven-release-plugin", overrides.getProperty("maven-release-plugin", "2.5.3"))
-                .put("maven-resources-plugin", overrides.getProperty("maven-resources-plugin","2.6"))
-                .put("maven-surefire-plugin", overrides.getProperty("maven-surefire-plugin","2.22.0"))
-                .put("sql-maven-plugin", overrides.getProperty("sql-maven-plugin", "1.5"))
-                .put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.5.1"))
-                .build();
+                put("maven-cli-plugin", overrides.getProperty("maven-cli-plugin","1.0.11"));
+                put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.5.1"));
+                put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.3"));
+                put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
+                put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","3.5.0"));
+                put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.3.0"));
+                put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","1.7"));
+                put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.3"));
+                put("maven-deploy-plugin", overrides.getProperty("maven-deploy-plugin","2.4"));
+                put("maven-release-plugin", overrides.getProperty("maven-release-plugin", "2.5.3"));
+
+                // You can't actually override the version a plugin if defined in the project, so these don't actually do
+                // anything, since the super pom already defines versions.
+                // TODO upgrade maven-dependency-plugin to the version contains new feature overwriteFiles
+                put("maven-dependency-plugin", overrides.getProperty("maven-dependency-plugin","2.5.1"));
+                put("maven-resources-plugin", overrides.getProperty("maven-resources-plugin","2.3"));
+                put("maven-jar-plugin", overrides.getProperty("maven-jar-plugin","2.2"));
+                //put("maven-surefire-plugin", "2.4.3");
+                put("maven-surefire-plugin", overrides.getProperty("maven-surefire-plugin","2.12.4"));
+                put("maven-failsafe-plugin", overrides.getProperty("maven-failsafe-plugin","2.12.4"));
+                put("maven-exec-plugin", overrides.getProperty("maven-exec-plugin","1.2.1"));
+                put("sql-maven-plugin", overrides.getProperty("sql-maven-plugin", "1.5"));
+                put("maven-javadoc-plugin", overrides.getProperty("maven-javadoc-plugin", "2.8.1"));
+            }};
     }
 
     private ExecutionEnvironment executionEnvironment()
@@ -185,7 +196,7 @@ public class MavenGoals
         final String groupId = pluginInformation.getGroupId();
         final String artifactId = pluginInformation.getArtifactId();
 
-        final List<Element> configs = new ArrayList<>();
+        final List<Element> configs = new ArrayList<Element>();
         configs.add(element(name("commands"),
                 element(name("pi"),
                         groupId + ":" + artifactId + ":copy-bundled-dependencies" + " "
@@ -234,10 +245,10 @@ public class MavenGoals
                 plugin(
                         groupId("org.twdata.maven"),
                         artifactId("maven-cli-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-cli-plugin"))
+                        version(pluginArtifactIdToVersionMap.get("maven-cli-plugin"))
                 ),
                 goal("execute"),
-                configuration(configs.toArray(new Element[0])),
+                configuration(configs.toArray(new Element[configs.size()])),
                 executionEnvironment());
     }
 
@@ -249,7 +260,8 @@ public class MavenGoals
         if(systemProps.containsKey("groupId")
                 && systemProps.containsKey("artifactId")
                 && systemProps.containsKey("version")
-                && systemProps.containsKey("package"))
+                && systemProps.containsKey("package")
+                )
         {
             props = new CreatePluginProperties(systemProps.getProperty("groupId")
                     ,systemProps.getProperty("artifactId")
@@ -370,14 +382,23 @@ public class MavenGoals
     /**
      * Helper function to scan all generated folder and list all pom.xml files that need to be re-write to remove \r
      */
-    private void correctCrlf(String artifactId)
+    private void correctCrlf(String artifactId) throws MojoExecutionException
     {
         if (null != ctx && null != ctx.getProject()
             && null != ctx.getProject().getBasedir() && ctx.getProject().getBasedir().exists()) {
             File outputDirectoryFile = new File(ctx.getProject().getBasedir(), artifactId);
 
             if (outputDirectoryFile.exists()) {
-                FilenameFilter pomFilter = (dir, name) -> "pom.xml".equals(name);
+                FilenameFilter pomFilter = new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        if ("pom.xml".equals(name)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                };
 
                 File[] pomFiles = outputDirectoryFile.listFiles(pomFilter);
                 DefaultPomManager pomManager = new DefaultPomManager();
@@ -641,6 +662,21 @@ public class MavenGoals
                 closureOptions
         );
         ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), ctx.getProject().getBuild().getOutputDirectory(), closureParameters);
+        /*
+        executeMojo(
+                plugin(
+                        groupId("net.alchim31.maven"),
+                        artifactId("yuicompressor-maven-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("yuicompressor-maven-plugin"))
+                ),
+                goal("compress"),
+                configuration(
+                        element(name("suffix"), "-min"),
+                        element(name("jswarn"), "false")
+                ),
+                executionEnvironment()
+        );
+        */
     }
 
     public void filterPluginDescriptor() throws MojoExecutionException
@@ -938,13 +974,11 @@ public class MavenGoals
 
     private Plugin bndPlugin()
     {
-        String bundleVersion = defaultArtifactIdToVersionMap.get("maven-bundle-plugin");
-        log.info("using maven-bundle-plugin v" + bundleVersion);
-
+        log.info("using maven-bundle-plugin v" + pluginArtifactIdToVersionMap.get("maven-bundle-plugin"));
         return plugin(
                 groupId("org.apache.felix"),
                 artifactId("maven-bundle-plugin"),
-                version(bundleVersion));
+                version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin")));
     }
 
     /**
@@ -958,7 +992,7 @@ public class MavenGoals
         // remove application cargo plugin for avoiding amps standalone cargo merges configuration
         Plugin globalCargo = env.getMavenProject().getPlugin("org.codehaus.cargo:cargo-maven2-plugin");
         env.getMavenProject().getBuild().removePlugin(globalCargo);
-        MojoExecutor.executeMojo(internalCargo, goal, configuration, env);
+        env.executeMojo(internalCargo, goal, configuration);
         // restore application cargo plugin for maven next tasks
         if (null != globalCargo)
         {
@@ -1003,7 +1037,7 @@ public class MavenGoals
             actualHttpPort = pickFreePort(webappContext.getHttpPort());
         }
 
-        final List<Element> sysProps = new ArrayList<>();
+        final List<Element> sysProps = new ArrayList<Element>();
 
         for (final Map.Entry<String, String> entry : systemProperties.entrySet())
         {
@@ -1052,21 +1086,21 @@ public class MavenGoals
                 cargo,
                 goal("start"),
                 configurationWithoutNullElements(
-                        element(name("deployables"), deployables.toArray(new Element[0])),
+                        element(name("deployables"), deployables.toArray(new Element[deployables.size()])),
                         waitElement(cargo), // This may be null
                         element(name("container"),
                                 element(name("containerId"), container.getId()),
                                 element(name("type"), container.getType()),
                                 element(name("home"), container.getInstallDirectory(getBuildDirectory())),
                                 element(name("output"), webappContext.getOutput()),
-                                element(name("systemProperties"), sysProps.toArray(new Element[0])),
-                                element(name("dependencies"), deps.toArray(new Element[0])),
+                                element(name("systemProperties"), sysProps.toArray(new Element[sysProps.size()])),
+                                element(name("dependencies"), deps.toArray(new Element[deps.size()])),
                                 element(name("timeout"), String.valueOf(startupTimeout))
                         ),
                         element(name("configuration"), removeNullElements(
                                     element(name("home"), container.getConfigDirectory(getBuildDirectory(), productInstanceId)),
                                     element(name("type"), "standalone"),
-                                    element(name("properties"), props.toArray(new Element[0])),
+                                    element(name("properties"), props.toArray(new Element[props.size()])),
                                     xmlReplacementsElement(webappContext.getCargoXmlOverrides())) // This may be null
 
                         ),
@@ -1137,8 +1171,8 @@ public class MavenGoals
             log.debug("cargo.protocol = " + protocol);
             props.add(element(name("cargo.protocol"), protocol));
 
-            log.debug("cargo.tomcat.connector.clientAuth = " + webappContext.getHttpsClientAuth());
-            props.add(element(name("cargo.tomcat.connector.clientAuth"), webappContext.getHttpsClientAuth()));
+            log.debug("cargo.tomcat.connector.clientAuth = " + webappContext.getHttpsClientAuth().toString());
+            props.add(element(name("cargo.tomcat.connector.clientAuth"), webappContext.getHttpsClientAuth().toString()));
 
             log.debug("cargo.tomcat.connector.sslProtocol = " +  webappContext.getHttpsSSLProtocol());
             props.add(element(name("cargo.tomcat.connector.sslProtocol"), webappContext.getHttpsSSLProtocol()));
@@ -1209,12 +1243,12 @@ public class MavenGoals
      */
     private Element[] createShutdownPortsPropertiesConfiguration(final Product webappContext)
     {
-        final List<Element> properties = new ArrayList<>();
+        final List<Element> properties = new ArrayList<Element>();
         final String portUsedToDetermineIfShutdownSucceeded = String.valueOf(webappContext.getHttpPort());
         properties.add(element(name("cargo.servlet.port"), portUsedToDetermineIfShutdownSucceeded));
         properties.add(element(name("cargo.rmi.port"), portUsedToDetermineIfShutdownSucceeded));
         properties.add(element(name(AJP_PORT_PROPERTY), portUsedToDetermineIfShutdownSucceeded));
-        return properties.toArray(new Element[0]);
+        return properties.toArray(new Element[properties.size()]);
     }
 
     /**
@@ -1224,12 +1258,11 @@ public class MavenGoals
      */
     protected Plugin cargo(Product context)
     {
-        String cargoVersion = defaultArtifactIdToVersionMap.get("cargo-maven2-plugin");
-        log.info("using codehaus cargo v" + cargoVersion);
+        log.info("using codehaus cargo v" + pluginArtifactIdToVersionMap.get("org.codehaus.cargo:cargo-maven2-plugin"));
         return plugin(
                 groupId("org.codehaus.cargo"),
                 artifactId("cargo-maven2-plugin"),
-                version(cargoVersion));
+                version(pluginArtifactIdToVersionMap.get("org.codehaus.cargo:cargo-maven2-plugin")));
     }
 
     private Element waitElement(Plugin cargo)
@@ -1263,13 +1296,13 @@ public class MavenGoals
             final File targetDirectory, final String category, final boolean skipVerifyGoal)
     		throws MojoExecutionException
 	{
-        List<Element> includeElements = new ArrayList<>(includes.size());
+    	List<Element> includeElements = new ArrayList<Element>(includes.size());
     	for (String include : includes)
     	{
     		includeElements.add(element(name("include"), include));
     	}
 
-        List<Element> excludeElements = new ArrayList<>(excludes.size() + 2);
+        List<Element> excludeElements = new ArrayList<Element>(excludes.size() + 2);
         excludeElements.add(element(name("exclude"), "**/*$*"));
         excludeElements.add(element(name("exclude"), "**/Abstract*"));
         for (String exclude : excludes)
@@ -1284,10 +1317,10 @@ public class MavenGoals
         final Element systemProps = convertPropsToElements(systemProperties);
         final Xpp3Dom itconfig = configuration(
                 element(name("includes"),
-                        includeElements.toArray(new Element[0])
+                        includeElements.toArray(new Element[includeElements.size()])
                 ),
                 element(name("excludes"),
-                        excludeElements.toArray(new Element[0])
+                        excludeElements.toArray(new Element[excludeElements.size()])
                 ),
                 systemProps,
                 element(name(reportsDirectory), testOutputDir)
@@ -1403,7 +1436,24 @@ public class MavenGoals
      */
     private Element convertPropsToElements(Map<String, Object> systemProperties)
     {
-        ArrayList<Element> properties = new ArrayList<>();
+        ArrayList<Element> properties = new ArrayList<Element>();
+
+        /*
+        OLD surefire 2.4.3 style
+
+        // add extra system properties... overwriting any of the hard coded values above.
+        for (Map.Entry<String, Object> entry: systemProperties.entrySet())
+        {
+            properties.add(
+                    element(name("property"),
+                            element(name("name"), entry.getKey()),
+                            element(name("value"), entry.getValue().toString())));
+        }
+
+        return element(name("systemProperties"), properties.toArray(new Element[properties.size()]));
+        */
+
+        // NEW surefire 2.12 style
         for (Map.Entry<String, Object> entry: systemProperties.entrySet())
         {
             log.info("adding system property to configuration: " + entry.getKey() + "::" + entry.getValue());
@@ -1411,7 +1461,7 @@ public class MavenGoals
             properties.add(element(name(entry.getKey()),entry.getValue().toString()));
         }
 
-        return element(name("systemPropertyVariables"), properties.toArray(new Element[0]));
+        return element(name("systemPropertyVariables"), properties.toArray(new Element[properties.size()]));
     }
 
     private Container findContainer(final String containerId)
@@ -1432,7 +1482,7 @@ public class MavenGoals
                 plugin(
                         groupId("com.atlassian.maven.plugins"),
                         artifactId("atlassian-pdk"),
-                        version(defaultArtifactIdToVersionMap.get("atlassian-pdk"))
+                        version(pluginArtifactIdToVersionMap.get("atlassian-pdk"))
                 ),
                 goal("install"),
                 configuration(
@@ -1454,7 +1504,7 @@ public class MavenGoals
                 plugin(
                         groupId("com.atlassian.maven.plugins"),
                         artifactId("atlassian-pdk"),
-                        version(defaultArtifactIdToVersionMap.get("atlassian-pdk"))
+                        version(pluginArtifactIdToVersionMap.get("atlassian-pdk"))
                 ),
                 goal("uninstall"),
                 configuration(
@@ -1473,7 +1523,7 @@ public class MavenGoals
                 plugin(
                         groupId("org.twdata.maven"),
                         artifactId("maven-cli-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-cli-plugin"))
+                        version(pluginArtifactIdToVersionMap.get("maven-cli-plugin"))
                 ),
                 goal("idea"),
                 configuration(),
@@ -1518,7 +1568,7 @@ public class MavenGoals
 
     public void generateBundleManifest(final Map<String, String> instructions, final Map<String, String> basicAttributes) throws MojoExecutionException
     {
-        final List<Element> instlist = new ArrayList<>();
+        final List<Element> instlist = new ArrayList<Element>();
         for (final Map.Entry<String, String> entry : instructions.entrySet())
         {
             instlist.add(element(entry.getKey(), entry.getValue()));
@@ -1542,7 +1592,7 @@ public class MavenGoals
                                 element(name("supportedProjectType"), "bundle"),
                                 element(name("supportedProjectType"), "war"),
                                 element(name("supportedProjectType"), "atlassian-plugin")),
-                        element(name("instructions"), instlist.toArray(new Element[0]))
+                        element(name("instructions"), instlist.toArray(new Element[instlist.size()]))
                 ),
                 executionEnvironment()
         );
@@ -1550,7 +1600,7 @@ public class MavenGoals
 
     public void generateTestBundleManifest(final Map<String, String> instructions, final Map<String, String> basicAttributes) throws MojoExecutionException
     {
-        final List<Element> instlist = new ArrayList<>();
+        final List<Element> instlist = new ArrayList<Element>();
         for (final Map.Entry<String, String> entry : instructions.entrySet())
         {
             instlist.add(element(entry.getKey(), entry.getValue()));
@@ -1575,7 +1625,7 @@ public class MavenGoals
                                 element(name("supportedProjectType"), "bundle"),
                                 element(name("supportedProjectType"), "war"),
                                 element(name("supportedProjectType"), "atlassian-plugin")),
-                        element(name("instructions"), instlist.toArray(new Element[0]))
+                        element(name("instructions"), instlist.toArray(new Element[instlist.size()]))
                 ),
                 executionEnvironment()
         );
@@ -1595,14 +1645,19 @@ public class MavenGoals
         {
             m.getMainAttributes().putValue(entry.getKey(), entry.getValue());
         }
-
-        try (FileOutputStream fos = new FileOutputStream(mf))
+        FileOutputStream fos = null;
+        try
         {
+            fos = new FileOutputStream(mf);
             m.write(fos);
         }
         catch (IOException e)
         {
             throw new MojoExecutionException("Unable to create manifest", e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(fos);
         }
     }
 
@@ -1620,14 +1675,19 @@ public class MavenGoals
         {
             m.getMainAttributes().putValue(entry.getKey(), entry.getValue());
         }
-
-        try (FileOutputStream fos = new FileOutputStream(mf))
+        FileOutputStream fos = null;
+        try
         {
+            fos = new FileOutputStream(mf);
             m.write(fos);
         }
         catch (IOException e)
         {
             throw new MojoExecutionException("Unable to create manifest", e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(fos);
         }
     }
 
@@ -1710,6 +1770,7 @@ public class MavenGoals
      */
     public void attachArtifact(File file, String type) throws MojoExecutionException
     {
+
         executeMojo(
                 plugin(
                         groupId("org.codehaus.mojo"),
@@ -1790,7 +1851,7 @@ public class MavenGoals
 
         if(!restModules.isEmpty() && packagesPath.length() > 0)
         {
-            Set<String> docletPaths = new HashSet<>();
+            Set<String> docletPaths = new HashSet<String>();
             StringBuffer docletPath = new StringBuffer(File.pathSeparator + prj.getBuild().getOutputDirectory());
             String resourcedocPath = fixWindowsSlashes(prj.getBuild().getOutputDirectory() + File.separator + "resourcedoc.xml");
 
@@ -1818,12 +1879,11 @@ public class MavenGoals
             {
                 throw new MojoExecutionException("Dependencies must be resolved", e);
             }
-
-            Element outputOption = element(name("additionalOption"), "-output \"" + resourcedocPath + "\"");
-            Element[] additionalOptions = jacksonModules == null
-                    ? new Element[] {outputOption}
-                    : new Element[] {outputOption, element(name("additionalOption"), " -modules \"" + jacksonModules + "\"")};
-
+            String additionalParam =  "-output \"" + resourcedocPath + "\"";
+            if (jacksonModules != null)
+            {
+                additionalParam += " -modules \"" + jacksonModules + "\"";
+            }
             //AMPSDEV-127: 'generate-rest-docs' fails with JDK8 - invalid flag: -Xdoclint:all
             //Root cause: ResourceDocletJSON doclet does not support option doclint
             //Solution: Temporary remove global javadoc configuration(remove doclint)
@@ -1861,8 +1921,7 @@ public class MavenGoals
                                             element(name("version"), "2.6")
                                     )
                             ),
-                            element(name("outputDirectory")),
-                            element(name("additionalOptions"), additionalOptions),
+                            element(name("additionalparam"), additionalParam),
                             element(name("useStandardDocletOptions"),"false")
                     ),
                     executionEnvironment()

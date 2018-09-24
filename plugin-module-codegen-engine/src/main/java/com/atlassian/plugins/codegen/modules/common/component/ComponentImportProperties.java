@@ -2,7 +2,7 @@ package com.atlassian.plugins.codegen.modules.common.component;
 
 import com.atlassian.plugins.codegen.modules.ClassWithInterfaceProperties;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @since 3.6

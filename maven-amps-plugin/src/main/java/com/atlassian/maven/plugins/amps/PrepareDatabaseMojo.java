@@ -13,7 +13,7 @@ import java.util.List;
 
 import static com.atlassian.maven.plugins.amps.product.ImportMethod.SQL;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.getDatabaseType;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 /**
  * Run the pre integration tests prepare data.

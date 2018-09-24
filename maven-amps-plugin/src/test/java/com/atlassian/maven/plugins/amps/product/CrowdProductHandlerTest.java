@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -26,19 +26,27 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class CrowdProductHandlerTest
 {
+
     @Mock
     private Product ctx;
+
     @Mock
     private MavenContext mavenContext;
+
     @Mock
     private MavenGoals mavenGoals;
+
     @Mock
     private MavenProject project;
+
     @Mock
     private ArtifactFactory artifactFactory;
+
     @Mock
     private Build build;
+
     private CrowdProductHandler crowdProductHandler;
+
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     private File crowdHome;

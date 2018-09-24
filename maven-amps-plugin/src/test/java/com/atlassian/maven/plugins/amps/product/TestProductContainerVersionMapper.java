@@ -55,7 +55,7 @@ public class TestProductContainerVersionMapper
     @Test
     public void testBitbucketVersionMapping()
     {
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("bitbucket", "1"), is("tomcat8x"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("bitbucket", "1"), is("tomcat6x"));
         assertThat(ProductContainerVersionMapper.containerForProductVersion("bitbucket", "4.0.0"), is("tomcat8x"));
         assertThat(ProductContainerVersionMapper.containerForProductVersion("bitbucket", "5.11.0"), is("tomcat8x"));
     }
@@ -72,7 +72,7 @@ public class TestProductContainerVersionMapper
     @Test
     public void testMissingApp()
     {
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("elephant", "7.0.0-SNAPSHOT"), is("tomcat85x"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("elephant", "7.0.0-SNAPSHOT"), is("tomcat6x"));
     }
 
     @Test

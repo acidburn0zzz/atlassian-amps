@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import java.util.Properties;
 
 import static java.util.Arrays.stream;
-import static org.apache.commons.lang3.StringUtils.split;
+import static org.apache.commons.lang.StringUtils.split;
 
 /**
  * Utility methods relating to {@link Properties}.

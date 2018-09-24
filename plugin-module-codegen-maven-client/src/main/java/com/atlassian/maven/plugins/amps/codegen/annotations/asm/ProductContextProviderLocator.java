@@ -8,8 +8,8 @@ import com.atlassian.plugins.codegen.annotations.asm.AbstractAnnotationParser;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreatorRegistry;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;

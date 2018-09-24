@@ -3,7 +3,7 @@ package com.atlassian.plugins.codegen.modules.jira;
 import com.atlassian.plugins.codegen.ClassId;
 import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
 

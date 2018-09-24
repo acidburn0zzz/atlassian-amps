@@ -5,11 +5,11 @@ import com.atlassian.plugins.codegen.PluginProjectChangeset;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 
+import static com.atlassian.fugue.Option.option;
+import static com.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.modules.Dependencies.HTTPCLIENT_TEST;
 import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
 import static com.atlassian.plugins.codegen.modules.Dependencies.SLF4J;
-import static io.atlassian.fugue.Option.option;
-import static io.atlassian.fugue.Option.some;
 
 /**
  * @since 3.6

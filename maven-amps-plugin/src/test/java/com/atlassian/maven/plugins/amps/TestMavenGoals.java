@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.archetype.common.DefaultPomManager;
@@ -8,19 +9,22 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 import java.io.File;
@@ -46,14 +50,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironmentM3;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -62,38 +66,26 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
 
-@RunWith(MockitoJUnitRunner.class)
 public class TestMavenGoals
 {
-    @Mock
-    private Build build;
-    @Mock
-    private MavenContext ctx;
-    @Mock
-    private ExecutionEnvironment executionEnvironment;
+    @Mock private MavenContext ctx;
+    @Mock private MavenProject project;
+    @Mock private MavenSession session;
+    @Mock private Build build;
+    @Mock private Product product;
     private MavenGoals goals;
-    @Mock
-    private Product product;
-    @Mock
-    private MavenProject project;
-    @Mock
-    private RepositorySystemSession repositorySession;
-    @Mock
-    private MavenSession session;
+    @Mock private MojoExecutor.ExecutionEnvironment executionEnvironment;
+    @Mock private MavenProject mavenProject;
 
     @Before
     public void setUp()
     {
+        MockitoAnnotations.initMocks(this);
+        when(project.getBuild()).thenReturn(build);
         when(ctx.getProject()).thenReturn(project);
+        when(ctx.getSession()).thenReturn(session);
         when(ctx.getLog()).thenReturn(new SystemStreamLog());
         when(ctx.getVersionOverrides()).thenReturn(new Properties());
-
-        when(executionEnvironment.getMavenProject()).thenReturn(project);
-        when(executionEnvironment.getMavenSession()).thenReturn(session);
-
-        when(project.getBuild()).thenReturn(build);
-
-        when(session.getCurrentProject()).thenReturn(project);
 
         goals = new MavenGoals(ctx);
     }
@@ -122,23 +114,34 @@ public class TestMavenGoals
                 )
         );
         // Mock objects
+        final ExecutionEnvironmentM3 executionEnvironment = mock(ExecutionEnvironmentM3.class);
         final BuildPluginManager buildPluginManager = mock(BuildPluginManager.class);
         final PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
         final MojoDescriptor mojoDescriptor = mock(MojoDescriptor.class);
+        // Setup Cargo mojo descriptor parameters for merging child node configuration
+        final List<Parameter> params = ImmutableList.of(
+                createParamByName("container"),
+                createParamByName("deployables")
+        );
 
         globalCargo.setConfiguration(globalConfig);
         build.addPlugin(globalCargo);
         // Mock methods
         when(project.getBuild()).thenReturn(build);
+        when(project.getBuildPlugins()).thenReturn(build.getPlugins());
         when(project.getPlugin("org.codehaus.cargo:cargo-maven2-plugin")).thenReturn(globalCargo);
-        when(executionEnvironment.getPluginManager()).thenReturn(buildPluginManager);
-        when(buildPluginManager.loadPlugin(any(Plugin.class), any(), any(RepositorySystemSession.class)))
+        when(executionEnvironment.getMavenProject()).thenReturn(project);
+        when(executionEnvironment.getMavenSession()).thenReturn(session);
+        when(executionEnvironment.getBuildPluginManager()).thenReturn(buildPluginManager);
+        when(buildPluginManager.loadPlugin(any(Plugin.class), anyListOf(RemoteRepository.class), any(RepositorySystemSession.class)))
                 .thenReturn(pluginDescriptor);
         when(pluginDescriptor.getMojo(anyString())).thenReturn(mojoDescriptor);
         when(mojoDescriptor.getMojoConfiguration()).thenReturn(new DefaultPlexusConfiguration(""));
-        when(session.getRepositorySession()).thenReturn(repositorySession);
+        when(mojoDescriptor.getParameters()).thenReturn(params);
 
-        doAnswer(invocation -> {
+        Mockito.doCallRealMethod().when(executionEnvironment).executeMojo(any(Plugin.class), any(String.class), any(Xpp3Dom.class));
+        Mockito.doCallRealMethod().when(project).getGoalConfiguration(anyString(), anyString(), anyString(), anyString());
+        Mockito.doAnswer(invocation -> {
             final Object[] args = invocation.getArguments();
             if (null != args[1])
             {
@@ -180,7 +183,7 @@ public class TestMavenGoals
     }
 
     @Test
-    public void testConfigurationPropertiesShouldIncludeAjpPortIfSet()
+    public void configurationPropertiesShouldIncludeAjpPortIfSet()
     {
         // Set up
         final int ajpPort = 8010;
@@ -202,11 +205,11 @@ public class TestMavenGoals
     }
 
     @Test
-    public void testBndlibNotOverridden()
+    public void bndlibNotOverridden()
     {
-        final Map<String, String> pluginArtifactIdToVersionMap = goals.defaultArtifactIdToVersionMap;
-        assertThat("bndlib should not be overridden.", pluginArtifactIdToVersionMap.get("bndlib"), CoreMatchers.nullValue());
-        assertThat("bndlib should not be overridden.", pluginArtifactIdToVersionMap.get("biz.aQute.bndlib"), CoreMatchers.nullValue());
+        final Map<String, String> pluginArtifactIdToVersionMap = goals.pluginArtifactIdToVersionMap;
+        assertThat("Bndlib should not be overridden.", pluginArtifactIdToVersionMap.get("bndlib"), CoreMatchers.nullValue());
+        assertThat("Bndlib should not be overridden.", pluginArtifactIdToVersionMap.get("biz.aQute.bndlib"), CoreMatchers.nullValue());
     }
 
     private List<MojoExecutor.Element> getConfigurationProperties(final int ajpPort)
@@ -216,6 +219,7 @@ public class TestMavenGoals
         final int rmiPort = 666;
         final Map<String, String> systemProperties = Collections.emptyMap();
         final Product mockProduct = mock(Product.class);
+        when(mockProduct.getAjpPort()).thenReturn(ajpPort);
         final String protocol = "http";
 
         // Invoke
@@ -225,6 +229,13 @@ public class TestMavenGoals
         // Check
         assertNotNull(configurationProperties);
         return configurationProperties;
+    }
+
+    private Parameter createParamByName(final String name)
+    {
+        final Parameter p = new Parameter();
+        p.setName(name);
+        return p;
     }
 
     @Test
@@ -253,28 +264,19 @@ public class TestMavenGoals
     }
 
     @Test
-    public void testStartWebappUsesPortsConfiguredFromProduct() throws Exception
+    public void shouldUsePortsConfiguredFromProductWhenStartWebapp() throws MojoExecutionException
     {
-        final MojoDescriptor mojoDescriptor = mock(MojoDescriptor.class);
-        when(mojoDescriptor.getMojoConfiguration()).thenReturn(new DefaultPlexusConfiguration(""));
-
-        final PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
-        when(pluginDescriptor.getMojo(anyString())).thenReturn(mojoDescriptor);
-
-        final BuildPluginManager buildPluginManager = mock(BuildPluginManager.class);
-        when(buildPluginManager.loadPlugin(any(Plugin.class), any(), any()))
-                .thenReturn(pluginDescriptor);
-
-        final File war = mock(File.class);
-        when(war.getPath()).thenReturn("/");
-
+        final String productInstanceId = "";
+        final File war = Mockito.mock(File.class);
         when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
-        when(executionEnvironment.getPluginManager()).thenReturn(buildPluginManager);
+        when(executionEnvironment.getMavenProject()).thenReturn(mavenProject);
+        when(mavenProject.getBuild()).thenReturn(build);
         when(product.getContainerId()).thenReturn("tomcat8x");
         when(product.getServer()).thenReturn("server");
         when(product.getContextPath()).thenReturn("/context");
+        when(war.getPath()).thenReturn("/");
 
-        goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
+        goals.startWebapp(productInstanceId, war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
 
         verify(product).getRmiPort();
         verify(product).getAjpPort();

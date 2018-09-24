@@ -1,10 +1,10 @@
 package com.atlassian.plugins.codegen;
 
-import io.atlassian.fugue.Option;
+import com.atlassian.fugue.Option;
 
+import static com.atlassian.fugue.Option.none;
+import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.atlassian.fugue.Option.none;
-import static io.atlassian.fugue.Option.some;
 
 /**
  * Simple wrapper for a Maven artifact ID with optional group ID.

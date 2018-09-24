@@ -1,12 +1,12 @@
 package com.atlassian.plugins.codegen.modules.confluence.blueprint;
 
+import com.atlassian.fugue.Pair;
 import com.atlassian.plugins.codegen.modules.AbstractNameBasedModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.ContextProviderProperties;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.ResourcedProperties;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import io.atlassian.fugue.Pair;
 
 import java.util.List;
 

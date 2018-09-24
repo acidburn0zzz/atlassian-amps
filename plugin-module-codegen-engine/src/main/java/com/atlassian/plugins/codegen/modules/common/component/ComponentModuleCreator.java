@@ -12,11 +12,11 @@ import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.StashPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 
+import static com.atlassian.fugue.Option.option;
+import static com.atlassian.fugue.Option.some;
 import static com.atlassian.plugins.codegen.ComponentDeclaration.Visibility.PRIVATE;
 import static com.atlassian.plugins.codegen.ComponentDeclaration.Visibility.PUBLIC;
 import static com.atlassian.plugins.codegen.modules.Dependencies.MOCKITO_TEST;
-import static io.atlassian.fugue.Option.option;
-import static io.atlassian.fugue.Option.some;
 
 /**
  * @since 3.6

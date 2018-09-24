@@ -5,16 +5,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
+import com.atlassian.fugue.Option;
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
-import io.atlassian.fugue.Option;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import static io.atlassian.fugue.Option.none;
-import static io.atlassian.fugue.Option.some;
+import static com.atlassian.fugue.Option.none;
+import static com.atlassian.fugue.Option.some;
 
 /**
  * Provides useful read-only operations on atlassian-plugin.xml.

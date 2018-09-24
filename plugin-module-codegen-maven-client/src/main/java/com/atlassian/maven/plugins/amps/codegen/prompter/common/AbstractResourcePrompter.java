@@ -7,7 +7,7 @@ import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter;
 import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.Resource;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 

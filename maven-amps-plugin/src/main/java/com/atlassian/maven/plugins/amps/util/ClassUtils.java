@@ -6,7 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.objectweb.asm.ClassReader;
 
 import static com.atlassian.maven.plugins.amps.util.OSUtils.isWindows;
