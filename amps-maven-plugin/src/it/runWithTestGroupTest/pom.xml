@@ -17,7 +17,7 @@
                 <configuration>
                     <wait>false</wait>
                     <writePropertiesToFile>true</writePropertiesToFile>
-                    <container>tomcat6x</container>
+                    <container>tomcat85x</container>
                     <productInheritConfiguration>true</productInheritConfiguration>
                     <systemPropertyVariables>
                         <invoker.artifactId>${invoker.artifactId}</invoker.artifactId>

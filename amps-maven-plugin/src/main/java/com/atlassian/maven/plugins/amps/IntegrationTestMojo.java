@@ -288,7 +288,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
     }
 
     /**
-     * Returns the classifier of the test group. Unless specified, this is "tomcat6x", the default container.
+     * Returns the classifier of the test group. Unless specified, this is "tomcat85x", the default container.
      */
     private String getClassifier(String testGroupId)
     {

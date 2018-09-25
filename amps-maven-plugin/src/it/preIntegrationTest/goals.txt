@@ -1,6 +1,0 @@
--Dproduct.version=${product.version}
--Dproduct.data.version=${product.data.version}
--Dhttp.port.bak=${it.http.port}
--Dallow.google.tracking=false
--DskipAllPrompts=true
--Drmi.port.bak=${it.rmi.port}install ${invoker.product}:prepare-database -Pjira-${product.database.type}

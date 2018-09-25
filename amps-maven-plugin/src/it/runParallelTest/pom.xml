@@ -15,6 +15,7 @@
                 <version>${project.version}</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <containerId>tomcat85x</containerId>
                     <wait>false</wait>
                     <writePropertiesToFile>true</writePropertiesToFile>
                 </configuration>

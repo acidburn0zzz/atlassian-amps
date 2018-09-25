@@ -1,9 +1,9 @@
 def product = binding.product
 product = 'amps'.equals(product) ? 'refapp' : product
 
-def integrationSurefireReportsFoo = new File(basedir, "target/group-foo/tomcat6x/surefire-reports")
+def integrationSurefireReportsFoo = new File(basedir, "target/group-foo/tomcat85x/surefire-reports")
 assert integrationSurefireReportsFoo.exists(), "Integration tests should have run and created test reports in $integrationSurefireReportsFoo"
-def integrationSurefireReportsBar = new File(basedir, "target/group-bar/tomcat6x/surefire-reports")
+def integrationSurefireReportsBar = new File(basedir, "target/group-bar/tomcat85x/surefire-reports")
 assert integrationSurefireReportsBar.exists(), "Integration tests should have run and created test reports in $integrationSurefireReportsBar"
 
 assert new File(integrationSurefireReportsFoo, 'it.com.atlassian.amps.foo.FooIntegrationTest.txt').exists(), "FooIntegrationTest.txt file should exist"

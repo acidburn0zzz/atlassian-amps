@@ -698,9 +698,13 @@ public class MavenGoals
         final Xpp3Dom config = configuration(
                 systemProps,
                 element(name("excludes"),
-                        element(name("exclude"), "it/**"),
+                        // The exclude handling in Surefire has changed, and patterns that don't start with "**/"
+                        // are now prefixed with it automatically. That means "it/**" becomes "**/it/**", which
+                        // ignores any test in any "it" directory anywhere, not just at the root.
+                        // Regex matches are _not_ automatically prefixed, so using a regex pattern here allows
+                        // us to continue only excluding tests in a root "it" package.
+                        element(name("exclude"), "%regex[it/.*]"),
                         element(name("exclude"), "**/*$*")),
-
                 element(name("excludedGroups"), excludedGroups)
         );
 
@@ -1177,7 +1181,7 @@ public class MavenGoals
      *
      * The RMI port is randomly chosen (see startWebapp), thus we don't have any information close at hand. As a future optimisation, e.g. when we move away from cargo to let's say
      * Apache's Tomcat Maven Plugin we could retrieve the actual configuration from the server.xml on shutdown and thus know exactly for what which port to wait until it gets closed.
-     * We could do that already in cargo (e.g. container/tomcat6x/<productHome>/conf/server.xml) but that means that we have to support all the containers we are supporting with cargo.
+     * We could do that already in cargo (e.g. container/tomcat85x/<productHome>/conf/server.xml) but that means that we have to support all the containers we are supporting with cargo.
      *
      * Since the HTTP port is the only one that interests us, we set all three ports to this one when calling stop. But since that may be randomly chosen as well we might be waiting
      * for the wrong port to get closed. Since this is the minor use case, one has to either accept the timeout if the default port is open, or configure product.stop.timeout to 0 in
