@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>6.3.19-d41a51c</version>
+        <version>6.3.19-SNAPSHOT</version>
     </parent>
 
     <artifactId>test-codegen-jar-classes</artifactId>
