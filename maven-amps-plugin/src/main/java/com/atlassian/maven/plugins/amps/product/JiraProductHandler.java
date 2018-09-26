@@ -5,6 +5,7 @@ import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.XmlOverride;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
@@ -97,6 +98,14 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     public String getId()
     {
         return "jira";
+    }
+
+    @Override
+    protected void customiseInstance(Product ctx, File homeDir, File explodedWarDir) throws MojoExecutionException {
+        // Jira 7.12.x has new tomcat version which requires additional characters to be whitelisted
+        if (new ComparableVersion(ctx.getVersion()).compareTo(new ComparableVersion("7.12.0")) >= 0) {
+            ctx.setCargoXmlOverrides(serverXmlJiraOverride());
+        }
     }
 
     @Override
@@ -531,5 +540,12 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         super.cleanupProductHomeForZip(product, snapshotDir);
 
         FileUtils.deleteQuietly(new File(snapshotDir, "log/atlassian-jira.log"));
+    }
+
+    private Collection<XmlOverride> serverXmlJiraOverride() {
+        return Collections.unmodifiableList(Arrays.asList(
+                new XmlOverride("conf/server.xml", "//Connector", "relaxedPathChars", "[]|"),
+                new XmlOverride("conf/server.xml", "//Connector", "relaxedQueryChars", "[]|{}^&#x5c;&#x60;&quot;&lt;&gt;")
+        ));
     }
 }
