@@ -12,7 +12,6 @@ import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
 import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
-import com.atlassian.plugins.codegen.annotations.StashPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreatorRegistry;
 
@@ -44,7 +43,6 @@ public class ModuleCreatorAnnotationParser extends AbstractAnnotationParser
         productMap.put(BitbucketPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.BITBUCKET);
         productMap.put(CrowdPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.CROWD);
         productMap.put(FeCruPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.FECRU);
-        productMap.put(StashPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.STASH);
         productMap.put(RefAppPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.REFAPP);
 
         annotationProductMap = Collections.unmodifiableMap(productMap);

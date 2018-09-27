@@ -76,8 +76,6 @@
         <crowd.version>3.2.0</crowd.version>
         <crowd.data.version>${crowd.version}</crowd.data.version>
         <clover.version>3.1.7</clover.version>
-        <stash.version>3.11.6</stash.version>
-        <stash.data.version>${stash.version}</stash.data.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
         <maven.cli.version>1.0.11</maven.cli.version>
@@ -232,7 +230,6 @@
                             <artifact>com.atlassian.maven.plugins:bitbucket-maven-plugin:${project.version}</artifact>
                             <artifact>com.atlassian.maven.plugins:maven-fecru-plugin:${project.version}</artifact>
                             <artifact>com.atlassian.maven.plugins:maven-crowd-plugin:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.plugins:maven-stash-plugin:${project.version}</artifact>
 
                             <!-- the archetypes -->
                             <artifact>com.atlassian.maven.archetypes:refapp-plugin-archetype:${project.version}</artifact>
@@ -242,7 +239,6 @@
                             <artifact>com.atlassian.maven.archetypes:bitbucket-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:fecru-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:crowd-plugin-archetype:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.archetypes:stash-plugin-archetype:${project.version}</artifact>
 
                             <!-- restricted artifacts -->
                             <artifact>javax.servlet:servlet-api:2.3</artifact>

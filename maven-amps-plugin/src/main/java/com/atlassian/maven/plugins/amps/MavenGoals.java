@@ -2,7 +2,6 @@ package com.atlassian.maven.plugins.amps;
 
 import aQute.bnd.osgi.Constants;
 import com.atlassian.maven.plugins.amps.product.ImportMethod;
-import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabase;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory;
 import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
@@ -246,22 +245,16 @@ public class MavenGoals
         CreatePluginProperties props = null;
         Properties systemProps = System.getProperties();
 
-        if(systemProps.containsKey("groupId")
+        if (systemProps.containsKey("groupId")
                 && systemProps.containsKey("artifactId")
                 && systemProps.containsKey("version")
                 && systemProps.containsKey("package"))
         {
-            props = new CreatePluginProperties(systemProps.getProperty("groupId")
-                    ,systemProps.getProperty("artifactId")
-                    ,systemProps.getProperty("version")
-                    ,systemProps.getProperty("package")
-                    );
+            props = new CreatePluginProperties(systemProps.getProperty("groupId"),
+                    systemProps.getProperty("artifactId"), systemProps.getProperty("version"),
+                    systemProps.getProperty("package"));
         }
-        // Stash plugins are deprecated, we need to direct plugin devs to use create bitbucket plugins instead
-        if(productId.equals(ProductHandlerFactory.STASH)) {
-            printStashDeprecationWarning(this.log);
-        }
-        if(null == props)
+        if (null == props)
         {
             try
             {
@@ -273,7 +266,7 @@ public class MavenGoals
             }
         }
 
-        if(null != props)
+        if (null != props)
         {
             ExecutionEnvironment execEnv = executionEnvironment();
 
@@ -308,7 +301,7 @@ public class MavenGoals
 
             File pluginDir = new File(ctx.getProject().getBasedir(),props.getArtifactId());
 
-            if(pluginDir.exists())
+            if (pluginDir.exists())
             {
                 File src = new File(pluginDir,"src");
                 File test = new File(src,"test");
@@ -322,16 +315,16 @@ public class MavenGoals
                 File ut = new File(new File(java,"ut"),packagePath);
                 File it = new File(new File(java,"it"),packagePath);
 
-                if(packageFile.exists())
+                if (packageFile.exists())
                 {
                     try
                     {
-                        if(packageUT.exists())
+                        if (packageUT.exists())
                         {
                             FileUtils.copyDirectory(packageUT, ut);
                         }
 
-                        if(packageIT.exists())
+                        if (packageIT.exists())
                         {
                             FileUtils.copyDirectory(packageIT, it);
                         }
@@ -348,23 +341,6 @@ public class MavenGoals
                 }
             }
         }
-    }
-
-    static void printStashDeprecationWarning(Log log) {
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-
-        log.warn(">>> WARNING: Since version 4.0, Stash has been rebranded. Stash is <<<");
-        log.warn(">>> now known as Bitbucket Server. Running stash commands will re- <<<");
-        log.warn(">>> sult in a plugin for a version which is now EOL.               <<<");
-        log.warn(">>> For the latest version of Bitbucket server, please use the co- <<<");
-        log.warn(">>> rresponding bitbucket command.                                 <<<");
-        log.warn(">>> Eg.  atlas-create-bitbucket-plugin or mvn bitbucket:create     <<<");
-        log.warn(">>> Stash commands will be deprecated in the next major version.   <<<");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        log.warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
     }
 
     /**

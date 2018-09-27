@@ -30,7 +30,6 @@ public class PluginModuleCreatorRegistryImpl implements PluginModuleCreatorRegis
         registry.put(PluginModuleCreatorRegistry.CONFLUENCE, new TreeMap<Class, PluginModuleCreator>(comparator));
         registry.put(PluginModuleCreatorRegistry.CROWD, new TreeMap<Class, PluginModuleCreator>(comparator));
         registry.put(PluginModuleCreatorRegistry.FECRU, new TreeMap<Class, PluginModuleCreator>(comparator));
-        registry.put(PluginModuleCreatorRegistry.STASH, new TreeMap<Class, PluginModuleCreator>(comparator));
         registry.put(PluginModuleCreatorRegistry.REFAPP, new TreeMap<Class, PluginModuleCreator>(comparator));
 
         creatorRegistry = Collections.unmodifiableMap(registry);

@@ -58,7 +58,6 @@ public class MavenProjectRewriter implements ProjectRewriter
                         "maven-confluence-plugin",
                         "maven-crowd-plugin",
                         "maven-fecru-plugin",
-                        "maven-stash-plugin",
                         "maven-jira-plugin",
                         "maven-refapp-plugin");
     

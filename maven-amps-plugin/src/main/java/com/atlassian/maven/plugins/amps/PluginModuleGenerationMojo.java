@@ -67,10 +67,6 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
         }
 
         String productId = getProductId();
-        if (productId.equals(ProductHandlerFactory.STASH)) {
-            MavenGoals.printStashDeprecationWarning(log);
-        }
-
         MavenProject project = getMavenContext().getProject();
         File javaDir = getJavaSourceRoot(project);
         File testDir = getJavaTestRoot(project);

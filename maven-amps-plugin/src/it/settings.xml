@@ -111,8 +111,6 @@ under the License.
                 <fecru.data.version>${fecru.data.version}</fecru.data.version>
                 <crowd.version>${crowd.version}</crowd.version>
                 <crowd.data.version>${crowd.data.version}</crowd.data.version>
-                <stash.version>${stash.version}</stash.version>
-                <stash.data.version>${stash.data.version}</stash.data.version>
                 <skipAllPrompts>true</skipAllPrompts>
             </properties>
         </profile>

@@ -31,13 +31,6 @@
             <defaultValue>${bitbucket.data.version}</defaultValue>
         </requiredProperty>
 
-        <requiredProperty key="stashVersion">
-            <defaultValue>${stash.version}</defaultValue>
-        </requiredProperty>
-        <requiredProperty key="stashDataVersion">
-            <defaultValue>${stash.data.version}</defaultValue>
-        </requiredProperty>
-
         <requiredProperty key="crowdVersion">
             <defaultValue>${crowd.version}</defaultValue>
         </requiredProperty>

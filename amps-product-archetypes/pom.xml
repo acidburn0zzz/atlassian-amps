@@ -21,7 +21,6 @@
         <module>bitbucket-plugin-archetype</module>
         <module>fecru-plugin-archetype</module>
         <module>crowd-plugin-archetype</module>
-        <module>stash-plugin-archetype</module>
         <module>plugin-archetype</module>
     </modules>
 
