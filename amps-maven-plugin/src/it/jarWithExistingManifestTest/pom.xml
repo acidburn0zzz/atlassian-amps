@@ -1,0 +1,28 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.atlassian.amps.it</groupId>
+    <artifactId>amps-maven-plugin-jar-with-existing-manifest</artifactId>
+    <version>testing</version>
+    <name>TestJar</name>
+
+    <build>
+        <finalName>testjar</finalName>
+        <plugins>
+            <plugin>
+                <groupId>${invoker.groupId}</groupId>
+                <artifactId>${invoker.artifactId}</artifactId>
+                <version>${project.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

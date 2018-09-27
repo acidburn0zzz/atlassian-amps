@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.atlassian.amps</groupId>
+        <artifactId>atlassian-amps-product-plugins</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.atlassian.maven.plugins</groupId>
+    <artifactId>fecru-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+
+    <name>FishEye/Crucible Maven Plugin</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.atlassian.maven.archetypes</groupId>
+            <artifactId>fecru-plugin-archetype</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>invoker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-invoker-plugin</artifactId>
+                        <configuration>
+                            <scriptVariables>
+                                <artifactId>${invoker.artifactId}</artifactId>
+                                <product>${invoker.product}</product>
+                            </scriptVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+                <!-- pass environment properties into the SDK debug integration test -->
+                <testResources>
+                    <testResource>
+                        <targetPath>${project.build.directory}/it/debug</targetPath>
+                        <filtering>false</filtering>
+                        <directory>src/test/resources</directory>
+                        <includes>
+                            <include>env.properties</include>
+                        </includes>
+                    </testResource>
+                </testResources>
+            </build>
+            <properties>
+                <invoker.test>compressResourcesTest,copyBundledDependenciesTest,createTest,debugTest,!debugWithTestGroupTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateManifestWithNoInstructionsButIsAtlassianPluginTest,generateManifestWithNoInstructionsNorIsAtlassianPluginTest,generateObrTest,integrationTestTest,!integrationTestWithTestGroupTest,jarWithExistingManifestTest,nexusStagingTest,quickreloadTest,runTest,runParallelTest,!runWithTestGroupTest,unitTestTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest</invoker.test>
+                <invoker.product>fecru</invoker.product>
+                <product.version>${fecru.version}</product.version>
+                <product.data.version>${fecru.data.version}</product.data.version>
+                <project.version>${project.version}</project.version>
+            </properties>
+        </profile>
+    </profiles>
+</project>

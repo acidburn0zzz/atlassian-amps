@@ -15,18 +15,18 @@
 
     <modules>
         <module>bitbucket-maven-plugin</module>
-        <module>maven-bamboo-plugin</module>
-        <module>maven-confluence-plugin</module>
-        <module>maven-jira-plugin</module>
-        <module>maven-refapp-plugin</module>
-        <module>maven-fecru-plugin</module>
-        <module>maven-crowd-plugin</module>
+        <module>bamboo-maven-plugin</module>
+        <module>confluence-maven-plugin</module>
+        <module>jira-maven-plugin</module>
+        <module>refapp-maven-plugin</module>
+        <module>fecru-maven-plugin</module>
+        <module>crowd-maven-plugin</module>
     </modules>
 
     <dependencies>
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
-            <artifactId>maven-amps-plugin</artifactId>
+            <artifactId>amps-maven-plugin</artifactId>
             <version>${project.version}</version>
             <type>maven-plugin</type>
         </dependency>
@@ -44,7 +44,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.atlassian.maven.plugins</groupId>
-                    <artifactId>maven-amps-plugin</artifactId>
+                    <artifactId>amps-maven-plugin</artifactId>
                     <version>${project.version}</version>
                     <type>zip</type>
                     <classifier>integration-tests</classifier>

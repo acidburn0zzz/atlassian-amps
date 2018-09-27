@@ -1,0 +1,25 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.atlassian.amps.it</groupId>
+        <artifactId>maven-amps-pom-deploy</artifactId>
+        <version>testing</version>
+    </parent>
+
+    <artifactId>maven-amps-jar-deploy</artifactId>
+    <packaging>jar</packaging>
+    <name>TestUnitTest jar depending on plugin and pom</name>
+    <dependencies>
+        <dependency>
+            <groupId>com.atlassian.amps.it</groupId>
+            <artifactId>amps-maven-plugin-deploy</artifactId>
+            <version>testing</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

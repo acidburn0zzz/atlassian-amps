@@ -31,9 +31,9 @@
         <module>plugin-module-codegen-maven-client</module>
         <module>standalone</module>
         <module>amps-product-archetypes</module>
-        <module>maven-amps-plugin</module>
+        <module>amps-maven-plugin</module>
         <module>maven-3-tests</module>
-        <module>maven-amps-dispatcher-plugin</module>
+        <module>amps-dispatcher-maven-plugin</module>
         <module>amps-product-plugins</module>
     </modules>
 
@@ -221,24 +221,24 @@
                     <configuration>
                         <artifacts>
                             <!-- the plugins  -->
-                            <artifact>com.atlassian.maven.plugins:maven-amps-plugin:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.plugins:maven-amps-dispatcher-plugin:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.plugins:maven-refapp-plugin:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.plugins:maven-confluence-plugin:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.plugins:maven-jira-plugin:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.plugins:maven-bamboo-plugin:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.plugins:amps-maven-plugin:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.plugins:amps-dispatcher-maven-plugin:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.plugins:bamboo-maven-plugin:${project.version}</artifact>
                             <artifact>com.atlassian.maven.plugins:bitbucket-maven-plugin:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.plugins:maven-fecru-plugin:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.plugins:maven-crowd-plugin:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.plugins:confluence-maven-plugin:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.plugins:crowd-maven-plugin:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.plugins:fecru-maven-plugin:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.plugins:jira-maven-plugin:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.plugins:refapp-maven-plugin:${project.version}</artifact>
 
                             <!-- the archetypes -->
-                            <artifact>com.atlassian.maven.archetypes:refapp-plugin-archetype:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.archetypes:confluence-plugin-archetype:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.archetypes:jira-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:bamboo-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:bitbucket-plugin-archetype:${project.version}</artifact>
-                            <artifact>com.atlassian.maven.archetypes:fecru-plugin-archetype:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.archetypes:confluence-plugin-archetype:${project.version}</artifact>
                             <artifact>com.atlassian.maven.archetypes:crowd-plugin-archetype:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.archetypes:fecru-plugin-archetype:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.archetypes:jira-plugin-archetype:${project.version}</artifact>
+                            <artifact>com.atlassian.maven.archetypes:refapp-plugin-archetype:${project.version}</artifact>
 
                             <!-- restricted artifacts -->
                             <artifact>javax.servlet:servlet-api:2.3</artifact>
@@ -329,9 +329,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <!-- Versions newer than 3.3 enforce the maven-*-plugin prohibition, so all of the product plugins
-                     (exception bitbucket-maven-plugin) fail to build. Don't upgrade this -->
-                <version>3.3</version>
+                <version>3.5.2</version>
                 <configuration>
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                 </configuration>
