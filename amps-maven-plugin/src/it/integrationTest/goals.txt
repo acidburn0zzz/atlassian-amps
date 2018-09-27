@@ -1,8 +1,0 @@
--Dproduct.version=${product.version}
--Dproduct.data.version=${product.data.version}
--Dhttp.port.bak=${it.http.port}
--Drmi.port.bak=${it.rmi.port}
---no-snapshot-updates
--Dallow.google.tracking=false
--DskipAllPrompts=true
-integration-test

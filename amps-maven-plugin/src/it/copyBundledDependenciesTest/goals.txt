@@ -1,3 +1,0 @@
--Dproduct.version=${product.version}
--Dproduct.data.version=${product.data.version}
-${invoker.product}:copy-bundled-dependencies -DskipAllPrompts=true -DextractDependencies=false

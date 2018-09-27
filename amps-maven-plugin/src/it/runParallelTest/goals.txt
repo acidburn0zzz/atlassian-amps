@@ -1,8 +1,0 @@
--Dproduct.version=${product.version}
--Dproduct.data.version=${product.data.version}
--Dhttp.port.bak=${it.http.port}
--Drmi.port.bak=${it.rmi.port}
--Dallow.google.tracking=false
--DskipAllPrompts=true
-${invoker.product}:run org.codehaus.gmaven:gmaven-plugin::execute
-${invoker.product}:stop org.codehaus.gmaven:gmaven-plugin::execute

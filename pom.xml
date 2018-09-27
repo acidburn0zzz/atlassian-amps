@@ -58,12 +58,12 @@
         <maven.compiler.target>8</maven.compiler.target>
         <build.maven.version>3.5.4</build.maven.version>
         <bundled.maven.version>3.5.4</bundled.maven.version>
-        <refapp.version>5.0.0-m2</refapp.version>
+        <refapp.version>5.0.0-m3</refapp.version>
         <refapp.data.version>${refapp.version}</refapp.data.version>
         <platform.version>5.0.0-2450df2</platform.version>
         <confluence.version>6.10.0</confluence.version>
         <confluence.data.version>${confluence.version}</confluence.data.version>
-        <jira.version>6.4.7</jira.version>
+        <jira.version>8.0.0-QR-20180830142820</jira.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <fugue.version>4.7.2</fugue.version>
         <guava.osgi.version>11.0.1</guava.osgi.version>
@@ -87,7 +87,7 @@
         <release.profiles>release,installer-win,installer-linux,installer-osx</release.profiles>
         <release.arguments>-Pinstaller-win,installer-osx,installer-linux</release.arguments>
         <javadoc.additional.params>-Xdoclint:none</javadoc.additional.params>
-        <invoker.artifactId>maven-${invoker.product}-plugin</invoker.artifactId>
+        <invoker.artifactId>${invoker.product}-maven-plugin</invoker.artifactId>
         <invoker.groupId>com.atlassian.maven.plugins</invoker.groupId>
         <invoker.product>amps</invoker.product>
         <spring.version>5.0.7.RELEASE</spring.version>
@@ -328,20 +328,20 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-invoker-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.5.2</version>
                 <configuration>
+                    <extractors>
+                        <!-- Skip the Javadoc extractor, because there's nothing for it to match -->
+                        <extractor>java-annotations</extractor>
+                    </extractors>
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>mojo-descriptor</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>descriptor</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

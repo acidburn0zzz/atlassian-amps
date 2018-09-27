@@ -1,6 +1,5 @@
 import static groovyx.net.http.Method.GET
 import groovyx.net.http.HTTPBuilder
-import java.util.Properties
 import org.apache.http.conn.HttpHostConnectException
 
 final File ampsFile = new File("${project.build.directory}/amps.properties")
@@ -38,11 +37,14 @@ else if ("stop".equals(System.getProperty("step")))
         
         assert false, "An assertion should have already failed before reaching this point"
     }
+    catch (SocketException socketException)
+    {
+        // Do nothing, we expect this exception
+    }
     catch (HttpHostConnectException connectionException)
     {
         // Do nothing, we expect this exception
     }
-    
 }
 else
 {

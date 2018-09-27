@@ -55,9 +55,18 @@ under the License.
             </activation>
             <repositories>
                 <repository>
+                    <id>local.central</id>
+                    <url>@localRepositoryUrl@</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
                     <id>atlassian-public</id>
-                    <!--<url>http://172.18.1.52:8081/nexus/content/groups/public</url>-->
-                    <url>https://maven.atlassian.com/repository/public</url>
+                    <url>https://packages.atlassian.com/maven/repository/public</url>
                     <snapshots>
                         <enabled>true</enabled>
                         <updatePolicy>daily</updatePolicy>
@@ -83,9 +92,18 @@ under the License.
 
             <pluginRepositories>
                 <pluginRepository>
+                    <id>local.central</id>
+                    <url>@localRepositoryUrl@</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </pluginRepository>
+                <pluginRepository>
                     <id>atlassian-public</id>
-                    <!--<url>http://172.18.1.52:8081/nexus/content/groups/public</url>-->
-                    <url>https://maven.atlassian.com/repository/public</url>
+                    <url>https://packages.atlassian.com/maven/repository/public</url>
                     <releases>
                         <enabled>true</enabled>
                         <checksumPolicy>warn</checksumPolicy>

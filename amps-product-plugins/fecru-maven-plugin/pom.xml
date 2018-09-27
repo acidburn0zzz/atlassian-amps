@@ -60,7 +60,7 @@
                 </testResources>
             </build>
             <properties>
-                <invoker.test>compressResourcesTest,copyBundledDependenciesTest,createTest,debugTest,!debugWithTestGroupTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateManifestWithNoInstructionsButIsAtlassianPluginTest,generateManifestWithNoInstructionsNorIsAtlassianPluginTest,generateObrTest,integrationTestTest,!integrationTestWithTestGroupTest,jarWithExistingManifestTest,nexusStagingTest,quickreloadTest,runTest,runParallelTest,!runWithTestGroupTest,unitTestTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest</invoker.test>
+                <invoker.test>compressResourcesTest,copyBundledDependenciesTest,createTest,debugTest,!debugWithTestGroupTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateManifestWithNoInstructionsButIsAtlassianPluginTest,generateManifestWithNoInstructionsNorIsAtlassianPluginTest,generateObrTest,integrationTestTest,!integrationTestWithTestGroupTest,jarWithExistingManifestTest,nexusStagingTest,quickreloadTest,runTest,runParallelTest,!runWithTestGroupTest,unitTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest</invoker.test>
                 <invoker.product>fecru</invoker.product>
                 <product.version>${fecru.version}</product.version>
                 <product.data.version>${fecru.data.version}</product.data.version>
