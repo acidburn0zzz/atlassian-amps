@@ -58,12 +58,12 @@
         <maven.compiler.target>8</maven.compiler.target>
         <build.maven.version>3.5.4</build.maven.version>
         <bundled.maven.version>3.5.4</bundled.maven.version>
-        <refapp.version>5.0.0-m2</refapp.version>
+        <refapp.version>5.0.0-m3</refapp.version>
         <refapp.data.version>${refapp.version}</refapp.data.version>
         <platform.version>5.0.0-2450df2</platform.version>
         <confluence.version>6.10.0</confluence.version>
         <confluence.data.version>${confluence.version}</confluence.data.version>
-        <jira.version>6.4.7</jira.version>
+        <jira.version>8.0.0-QR-20180830142820</jira.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <fugue.version>4.7.2</fugue.version>
         <guava.osgi.version>11.0.1</guava.osgi.version>
