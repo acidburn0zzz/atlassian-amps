@@ -371,7 +371,7 @@ public class TestJiraProductHandler
 
         final XmlOverride second = valueIterator.next();
         Assert.assertThat(second.getAttributeName(), is("relaxedQueryChars"));
-        Assert.assertThat(second.getValue(), is("[]|{}^&#x5c;&#x60;&quot;&lt;&gt;"));
+        Assert.assertThat(second.getValue(), is("[]|{}^\\`\"<>"));
     }
 
     @Test
