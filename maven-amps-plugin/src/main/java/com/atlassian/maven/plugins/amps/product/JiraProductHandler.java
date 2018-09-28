@@ -545,7 +545,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     private Collection<XmlOverride> serverXmlJiraOverride() {
         return Collections.unmodifiableList(Arrays.asList(
                 new XmlOverride("conf/server.xml", "//Connector", "relaxedPathChars", "[]|"),
-                new XmlOverride("conf/server.xml", "//Connector", "relaxedQueryChars", "[]|{}^&#x5c;&#x60;&quot;&lt;&gt;")
+                new XmlOverride("conf/server.xml", "//Connector", "relaxedQueryChars", "[]|{}^\\`\"<>")
         ));
     }
 }
