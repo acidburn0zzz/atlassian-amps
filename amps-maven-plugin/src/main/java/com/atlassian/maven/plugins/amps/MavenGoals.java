@@ -91,7 +91,7 @@ public class MavenGoals
     private final Map<String, Container> idToContainerMap = ImmutableMap.<String, Container>builder()
             .put("tomcat5x", new Container("tomcat5x", "org.apache.tomcat", "apache-tomcat", "5.5.36"))
             .put("tomcat6x", new Container("tomcat6x", "org.apache.tomcat", "apache-tomcat", "6.0.41"))
-            .put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.73", "windows-x64"))
+            .put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.73-atlassian-hosted", "windows-x64"))
             .put("tomcat8x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.0.53-atlassian-hosted", "windows-x64"))
             .put("tomcat85x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.33-atlassian-hosted", "windows-x64"))
             .put("tomcat85_6", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.6-atlassian-hosted", "windows-x64"))
