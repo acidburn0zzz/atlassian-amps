@@ -2,9 +2,11 @@ package com.atlassian.maven.plugins.amps.product;
 
 import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.XmlOverride;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Build;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.dom4j.Node;
@@ -16,6 +18,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.w3c.dom.Document;
@@ -25,6 +29,9 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 import static com.atlassian.maven.plugins.amps.product.JiraProductHandler.BUNDLED_PLUGINS_FROM_4_1;
@@ -50,7 +57,11 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -67,6 +78,8 @@ public class TestJiraProductHandler
     private MavenProject mavenProject;
     @Mock
     private Build build;
+    @Captor
+    ArgumentCaptor<Collection<XmlOverride>> expectedOverridesCaptor;
 
     private JiraProductHandler productHandler;
 
@@ -268,10 +281,10 @@ public class TestJiraProductHandler
     public void dbconfigXmlNotCreatedWhenAlreadyExists() throws Exception
     {
         final File f = new File(TEMP_HOME, FILENAME_DBCONFIG);
-        FileUtils.writeStringToFile(f, "Original contents");
+        FileUtils.writeStringToFile(f, "Original contents", StandardCharsets.UTF_8);
         JiraProductHandler.createDbConfigXmlIfNecessary(TEMP_HOME);
 
-        final String after = FileUtils.readFileToString(f);
+        final String after = FileUtils.readFileToString(f, StandardCharsets.UTF_8);
         assertEquals("Original contents", after);
     }
 
@@ -334,6 +347,45 @@ public class TestJiraProductHandler
     {
         final File bundledPluginsZip = new File(TEMP_HOME, BUNDLED_PLUGINS_FROM_4_1);
         assertBundledPluginPath("not.a.version", TEMP_HOME, bundledPluginsZip);
+    }
+
+    @Test
+    public void testCustomiseInstanceForServerXmlOverridesForNewJiras() throws MojoExecutionException {
+        final Product ctx = mock(Product.class);
+        when(ctx.getVersion()).thenReturn("7.12.0");
+
+        final JiraProductHandler spied = spy(productHandler);
+
+        // Execute
+        spied.customiseInstance(ctx, new File("./"), new File("./"));
+
+        // Validate
+        verify(ctx, times(1)).setCargoXmlOverrides(expectedOverridesCaptor.capture());
+        Assert.assertThat(expectedOverridesCaptor.getValue().size(), is(2));
+        final Iterator<XmlOverride> valueIterator = expectedOverridesCaptor.getValue().iterator();
+
+        final XmlOverride first = valueIterator.next();
+        Assert.assertThat(first.getAttributeName(), is("relaxedPathChars"));
+        Assert.assertThat(first.getValue(), is("[]|"));
+
+        final XmlOverride second = valueIterator.next();
+        Assert.assertThat(second.getAttributeName(), is("relaxedQueryChars"));
+        Assert.assertThat(second.getValue(), is("[]|{}^&#x5c;&#x60;&quot;&lt;&gt;"));
+    }
+
+    @Test
+    public void testCustomiseInstanceForServerXmlOverridesForOlderJiras() throws MojoExecutionException {
+        final Product ctx = mock(Product.class);
+        when(ctx.getVersion()).thenReturn("7.11.0");
+
+        final JiraProductHandler spied = spy(productHandler);
+
+        // Execute
+        spied.customiseInstance(ctx, new File("./"), new File("./"));
+
+        // Validate we did not overide configuration
+        // reason - older Jiras run older tomcat version that are less resticted
+        verify(ctx, times(0)).setCargoXmlOverrides(any());
     }
 
     private Product newProduct(String version) {
