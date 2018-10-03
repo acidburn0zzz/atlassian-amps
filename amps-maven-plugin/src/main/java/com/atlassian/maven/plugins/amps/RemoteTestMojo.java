@@ -10,7 +10,6 @@ import java.util.jar.Manifest;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.UriBuilder;
 
-import com.atlassian.maven.plugins.amps.product.AmpsDefaults;
 import com.atlassian.maven.plugins.amps.util.ClassUtils;
 import com.atlassian.maven.plugins.amps.util.WiredTestInfo;
 
@@ -20,8 +19,6 @@ import com.google.common.collect.Collections2;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.archiver.MavenArchiveConfiguration;
-import org.apache.maven.archiver.MavenArchiver;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -31,9 +28,7 @@ import org.apache.wink.client.*;
 import org.apache.wink.client.handlers.BasicAuthSecurityHandler;
 import org.apache.wink.common.http.HttpStatus;
 import org.codehaus.plexus.archiver.Archiver;
-import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
-import org.codehaus.plexus.archiver.jar.ManifestException;
 
 import aQute.bnd.osgi.Constants;
 
@@ -41,7 +36,6 @@ import aQute.bnd.osgi.Constants;
 @Execute(phase = LifecyclePhase.PACKAGE)
 public class RemoteTestMojo extends AbstractProductHandlerMojo
 {
-
     /**
      * The Jar archiver.
      */
@@ -101,7 +95,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
     protected String pdkPassword;
 
     @Parameter
-    protected List<ProductArtifact> deployArtifacts = new ArrayList<ProductArtifact>();
+    protected List<ProductArtifact> deployArtifacts = new ArrayList<>();
 
     /**
      * Denotes test category as defined by surefire/failsafe notion of groups. In JUnit4, this affects tests annotated
@@ -160,7 +154,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
 
     private Map<String, Object> copy(Map<String, Object> systemPropertyVariables)
     {
-        return new HashMap<String, Object>(systemPropertyVariables);
+        return new HashMap<>(systemPropertyVariables);
     }
 
     private String getBaseUrl(String server, int actualHttpPort, String contextPath)
@@ -191,7 +185,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
                 return;
             }
             
-            List<String> includes = new ArrayList<String>(wiredTestClasses.size());
+            List<String> includes = new ArrayList<>(wiredTestClasses.size());
             for(String wiredClass : wiredTestClasses)
             {
                 String includePath = wiredClass.replaceAll("\\.", "/");
@@ -212,8 +206,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
 
             Map<ProductArtifact,File> frameworkFiles = getFrameworkFiles();
             File junitFile = null;
-            ProductArtifact junitArtifact = null;
-            
+
             //we MUST install junit first!
             for(Map.Entry<ProductArtifact,File> entry : frameworkFiles.entrySet())
             {
@@ -223,7 +216,6 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
                 if(artifactFile.getName().startsWith("org.apache.servicemix.bundles.junit"))
                 {
                     junitFile = artifactFile;
-                    junitArtifact = artifact;
                     frameworkFiles.remove(artifact);
                     break;
                 }
@@ -237,11 +229,11 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
                 throw new MojoExecutionException("couldn't find junit!!!!");
             }
 
-            installPluginFileIfNotInstalled(junitArtifact,junitFile);
+            installPluginFileIfNotInstalled(junitFile);
 
             for(Map.Entry<ProductArtifact,File> pluginEntry : frameworkFiles.entrySet())
             {
-                installPluginFileIfNotInstalled(pluginEntry.getKey(), pluginEntry.getValue());
+                installPluginFileIfNotInstalled(pluginEntry.getValue());
             }
 
 
@@ -258,7 +250,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
 
     }
 
-    private void installPluginFileIfNotInstalled(ProductArtifact pluginArtifact, File pluginFile) throws IOException, MojoExecutionException
+    private void installPluginFileIfNotInstalled(File pluginFile) throws IOException, MojoExecutionException
     {
         getLog().info("checking to see if we need to install " + pluginFile.getName());
         JarFile jar = new JarFile(pluginFile);
@@ -342,7 +334,6 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
             {
                 //TODO: check version and remove/install if we have an update
             }
-            
         }
     }
 
@@ -367,10 +358,10 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
                 .build());
     }
 
-    private List<String> getWiredTestClassnames(File testClassesDir) throws Exception
+    private List<String> getWiredTestClassnames(File testClassesDir)
     {
         MavenProject prj = getMavenContext().getProject();
-        List<String> wiredClasses = new ArrayList<String>();
+        List<String> wiredClasses = new ArrayList<>();
         
         if (testClassesDir.exists())
         {
@@ -393,12 +384,11 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
 
     private Map<ProductArtifact,File> getFrameworkFiles() throws MojoExecutionException
     {
-        List<ProductArtifact> pluginsToDeploy = new ArrayList<ProductArtifact>();
+        List<ProductArtifact> pluginsToDeploy = new ArrayList<>();
         pluginsToDeploy.addAll(getTestFrameworkPlugins());
-        pluginsToDeploy.add(new ProductArtifact("com.atlassian.labs","fastdev-plugin", AmpsDefaults.DEFAULT_FASTDEV_VERSION));
         pluginsToDeploy.addAll(deployArtifacts);
 
-        Map<ProductArtifact,File> artifactFileMap = new HashMap<ProductArtifact, File>(pluginsToDeploy.size());
+        Map<ProductArtifact,File> artifactFileMap = new HashMap<>(pluginsToDeploy.size());
         
         try
         {
@@ -412,7 +402,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
             {
                 final File artifactFile = file;
                 
-                Collection<ProductArtifact> filtered = Collections2.filter(pluginsToDeploy,new Predicate<ProductArtifact>() {
+                Collection<ProductArtifact> filtered = Collections2.filter(pluginsToDeploy, new Predicate<ProductArtifact>() {
                     @Override
                     public boolean apply(@Nullable ProductArtifact productArtifact)
                     {
@@ -433,86 +423,6 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
         {
             throw new MojoExecutionException("Error copying framework files", e);
         }
-    }
-
-    private File generateObrZip(File obrDir, File outputDirectory, String obrName) throws MojoExecutionException
-    {
-        MavenArchiver archiver = new MavenArchiver();
-        archiver.setArchiver(jarArchiver);
-        File outputFile = new File(outputDirectory, obrName + ".obr");
-        final MavenProject mavenProject = getMavenContext().getProject();
-        try
-        {
-            archiver.getArchiver().addDirectory(obrDir, "");
-            archiver.setOutputFile(outputFile);
-
-            archive.setAddMavenDescriptor(false);
-
-            // todo: be smarter about when this is updated
-            archive.setForced(true);
-
-            archiver.createArchive(mavenProject, archive);
-        }
-        catch (IOException e)
-        {
-            throw new MojoExecutionException("Error creating obr archive: " + e.getMessage(), e);
-        }
-        catch (ArchiverException e)
-        {
-            throw new MojoExecutionException("Error creating obr archive: " + e.getMessage(), e);
-        }
-        catch (DependencyResolutionRequiredException e)
-        {
-            throw new MojoExecutionException("Error creating obr archive: " + e.getMessage(), e);
-        }
-        catch (ManifestException e)
-        {
-            throw new MojoExecutionException("Error creating obr archive: " + e.getMessage(), e);
-        }
-
-        return outputFile;
-
-    }
-
-    /**
-     * Creates a directory containing the files that will be in the obr artifact.
-     *
-     * @param deps         The dependencies for this artifact
-     * @param mainArtifact The main artifact file
-     * @return The directory containing the future obr zip contents
-     * @throws IOException            If the files cannot be copied
-     * @throws MojoExecutionException If the dependencies cannot be retrieved
-     */
-    private File layoutObr(List<File> deps, File mainArtifact) throws MojoExecutionException, IOException
-    {
-        // create directories
-        File obrDir = new File(getMavenContext().getProject().getBuild().getDirectory(), "obr");
-        obrDir.mkdir();
-        File depDir = new File(obrDir, "dependencies");
-        depDir.mkdir();
-
-        // Copy in the dependency plugins for the obr generation
-        for (File dep : deps)
-        {
-            FileUtils.copyFileToDirectory(dep, depDir, true);
-        }
-
-        // Generate the obr xml
-        File obrXml = new File(obrDir, "obr.xml");
-        for (File dep : depDir.listFiles())
-        {
-            getMavenGoals().generateObrXml(dep, obrXml);
-        }
-
-        // Copy the main artifact over
-        File mainArtifactCopy = new File(obrDir, mainArtifact.getName());
-        FileUtils.copyFile(mainArtifact, mainArtifactCopy);
-
-        // Generate the obr xml for the main artifact
-        // The File must be the one copied into the obrDir (see AMPS-300)
-        getMavenGoals().generateObrXml(mainArtifactCopy, obrXml);
-
-        return obrDir;
     }
 
 }
