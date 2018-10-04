@@ -255,13 +255,41 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
             waitForProducts(productExecutions, true);
         }
 
-        // Actually run the tests
-        goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory, category, skipITVerification);
-
-        // Shut all products down
-        if (!noWebapp)
+        MojoExecutionException thrown = null;
+        try
         {
-            stopProducts(productExecutions);
+            // Actually run the tests.
+            goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory, category, skipITVerification);
+        }
+        catch (MojoExecutionException e)
+        {
+            // If any tests fail an exception will be thrown. We need to catch that and hold onto it, because
+            // even if tests fail any running products still need to be stopped
+            thrown = e;
+        }
+        finally
+        {
+            if (!noWebapp)
+            {
+                try
+                {
+                    // Shut all products down.
+                    stopProducts(productExecutions);
+                }
+                catch (MojoExecutionException e)
+                {
+                    if (thrown == null)
+                    {
+                        // If no exception was thrown during the tests, propagate the failure to stop
+                        thrown = e;
+                    }
+                    else
+                    {
+                        // Otherwise, suppress the stop failure and focus on the test failure
+                        thrown.addSuppressed(e);
+                    }
+                }
+            }
         }
     }
 
