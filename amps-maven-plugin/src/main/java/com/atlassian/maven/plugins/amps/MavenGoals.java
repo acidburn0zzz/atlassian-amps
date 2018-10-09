@@ -55,6 +55,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -969,19 +970,61 @@ public class MavenGoals
             }
         }
 
-        final int rmiPort = pickFreePort(webappContext.getRmiPort());
-        final int actualAjpPort = pickFreePort(webappContext.getAjpPort());
-        final int actualHttpPort;
-        String protocol = "http";
-
-        if(webappContext.getUseHttps())
+        final int httpPort;
+        final String protocol;
+        if (webappContext.isHttps())
         {
-            actualHttpPort = webappContext.getHttpsPort();
+            httpPort = webappContext.getHttpsPort();
             protocol = "https";
         }
         else
         {
-            actualHttpPort = pickFreePort(webappContext.getHttpPort());
+            httpPort = webappContext.getHttpPort();
+            protocol = "http";
+        }
+
+        final int actualHttpPort = pickFreePort(httpPort);
+        if (actualHttpPort != httpPort)
+        {
+            if (httpPort != 0) // No warning if a random port was expected
+            {
+                log.warn(productInstanceId + " will start " + protocol.toUpperCase(Locale.ROOT) + " on port " +
+                        actualHttpPort + " because the configured port, " + httpPort + ", is already in use");
+            }
+
+            // Update the Product to match the port that will actually be used
+            if (webappContext.isHttps())
+            {
+                webappContext.setHttpsPort(actualHttpPort);
+            }
+            else
+            {
+                webappContext.setHttpPort(actualHttpPort);
+            }
+        }
+
+        final int rmiPort = webappContext.getRmiPort();
+        final int actualRmiPort = pickFreePort(rmiPort);
+        if (actualRmiPort != rmiPort)
+        {
+            if (rmiPort != 0)
+            {
+                log.warn(productInstanceId + " will start RMI on port " + actualRmiPort +
+                        " because the configured port, " + rmiPort + ", is already in use");
+            }
+            webappContext.setRmiPort(actualRmiPort);
+        }
+
+        final int ajpPort = webappContext.getAjpPort();
+        final int actualAjpPort = pickFreePort(ajpPort);
+        if (actualAjpPort != ajpPort)
+        {
+            if (ajpPort != 0)
+            {
+                log.warn(productInstanceId + " will start AJP on port " + actualAjpPort +
+                        " because the configured port, " + ajpPort + ", is already in use");
+            }
+            webappContext.setAjpPort(actualAjpPort);
         }
 
         final List<Element> sysProps = new ArrayList<>();
@@ -991,7 +1034,7 @@ public class MavenGoals
             sysProps.add(element(name(entry.getKey()), entry.getValue()));
         }
         log.info("Starting " + productInstanceId + " on the " + container.getId() + " container on ports "
-                + actualHttpPort + " (" + protocol + "), " + rmiPort + " (rmi) and " + actualAjpPort + " (ajp)");
+                + actualHttpPort + " (" + protocol + "), " + actualRmiPort + " (rmi) and " + actualAjpPort + " (ajp)");
 
         final String baseUrl = getBaseUrl(webappContext, actualHttpPort);
         sysProps.add(element(name("baseurl"), baseUrl));
@@ -1019,8 +1062,8 @@ public class MavenGoals
             ));
         }
 
-        final List<Element> props =
-                getConfigurationProperties(systemProperties, webappContext, rmiPort, actualHttpPort, actualAjpPort, protocol);
+        final List<Element> props = getConfigurationProperties(systemProperties, webappContext,
+                actualRmiPort, actualHttpPort, actualAjpPort, protocol);
 
         int startupTimeout = webappContext.getStartupTimeout();
         if (Boolean.FALSE.equals(webappContext.getSynchronousStartup()))
@@ -1190,8 +1233,10 @@ public class MavenGoals
      */
     private Element[] createShutdownPortsPropertiesConfiguration(final Product webappContext)
     {
+        final String portUsedToDetermineIfShutdownSucceeded =
+                String.valueOf(webappContext.isHttps() ? webappContext.getHttpsPort() : webappContext.getHttpPort());
+
         final List<Element> properties = new ArrayList<>();
-        final String portUsedToDetermineIfShutdownSucceeded = String.valueOf(webappContext.getHttpPort());
         properties.add(element(name("cargo.servlet.port"), portUsedToDetermineIfShutdownSucceeded));
         properties.add(element(name("cargo.rmi.port"), portUsedToDetermineIfShutdownSucceeded));
         properties.add(element(name(AJP_PORT_PROPERTY), portUsedToDetermineIfShutdownSucceeded));
@@ -1226,7 +1271,7 @@ public class MavenGoals
 
     public static String getBaseUrl(Product product, int actualHttpPort)
     {
-        return getBaseUrl(product.getServer(), product.getHttpPort(), product.getContextPath());
+        return getBaseUrl(product.getServer(), actualHttpPort, product.getContextPath());
     }
 
     private static String getBaseUrl(String server, int actualHttpPort, String contextPath)

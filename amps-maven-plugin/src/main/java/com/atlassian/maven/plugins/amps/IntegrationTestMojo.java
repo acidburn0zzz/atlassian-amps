@@ -144,7 +144,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 
     private Map<String,Object> copy(Map<String,Object> systemPropertyVariables)
     {
-        return new HashMap<String,Object>(systemPropertyVariables);
+        return new HashMap<>(systemPropertyVariables);
     }
 
     /**
@@ -159,9 +159,9 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         return Collections.emptyMap();
     }
 
-    private Set<String> getTestGroupIds() throws MojoExecutionException
+    private Set<String> getTestGroupIds()
     {
-        Set<String> ids = new HashSet<String>();
+        Set<String> ids = new HashSet<>();
 
         for (TestGroup group : getTestGroups())
         {
@@ -290,6 +290,12 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                     }
                 }
             }
+        }
+
+        if (thrown != null)
+        {
+            // If tests failed, or if any products could not be stopped, propagate the exception
+            throw thrown;
         }
     }
 
