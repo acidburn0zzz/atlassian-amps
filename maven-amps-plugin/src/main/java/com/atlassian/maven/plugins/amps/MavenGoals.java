@@ -125,7 +125,7 @@ public class MavenGoals
         {{
                 //overrides.getProperty(JUNIT_ARTIFACT_ID,"
                 put("maven-cli-plugin", overrides.getProperty("maven-cli-plugin","1.0.11"));
-                put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.6.10"));
+                put("cargo-maven2-plugin", overrides.getProperty("cargo-maven2-plugin","1.6.10"));
                 put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.3"));
                 put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
                 put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","3.5.0"));
@@ -1259,11 +1259,11 @@ public class MavenGoals
      */
     protected Plugin cargo(Product context)
     {
-        log.info("using codehaus cargo v" + pluginArtifactIdToVersionMap.get("org.codehaus.cargo:cargo-maven2-plugin"));
+        log.info("using codehaus cargo v" + pluginArtifactIdToVersionMap.get("cargo-maven2-plugin"));
         return plugin(
                 groupId("org.codehaus.cargo"),
                 artifactId("cargo-maven2-plugin"),
-                version(pluginArtifactIdToVersionMap.get("org.codehaus.cargo:cargo-maven2-plugin")));
+                version(pluginArtifactIdToVersionMap.get("cargo-maven2-plugin")));
     }
 
     private Element waitElement(Plugin cargo)
