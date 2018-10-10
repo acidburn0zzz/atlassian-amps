@@ -291,6 +291,12 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                 }
             }
         }
+
+        if (thrown != null)
+        {
+            // If tests failed, or if any products could not be stopped, propagate the exception
+            throw thrown;
+        }
     }
 
     /**
