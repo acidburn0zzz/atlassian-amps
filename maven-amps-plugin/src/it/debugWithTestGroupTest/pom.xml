@@ -50,13 +50,20 @@
                             <id>${invoker.product}</id>
                             <instanceId>product-1</instanceId>
                         </product>
+                        <!-- The ports for product-2 and product-3 aren't especially important, but they
+                             should not try to use the default ports (which will be used by product-1) -->
                         <product>
                             <id>${invoker.product}</id>
                             <instanceId>product-2</instanceId>
+                            <ajpPort>10951</ajpPort>
+                            <httpPort>10950</httpPort>
+                            <jvmDebugPort>9988</jvmDebugPort>
                         </product>
                         <product>
                             <id>${invoker.product}</id>
                             <instanceId>product-3</instanceId>
+                            <ajpPort>10956</ajpPort>
+                            <httpPort>10955</httpPort>
                             <jvmDebugPort>9999</jvmDebugPort>
                         </product>
                     </products>
