@@ -125,7 +125,7 @@ public class MavenGoals
         {{
                 //overrides.getProperty(JUNIT_ARTIFACT_ID,"
                 put("maven-cli-plugin", overrides.getProperty("maven-cli-plugin","1.0.11"));
-                put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.6.10"));
+                put("cargo-maven2-plugin", overrides.getProperty("cargo-maven2-plugin","1.6.10"));
                 put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.3"));
                 put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
                 put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","3.5.0"));
@@ -1270,28 +1270,27 @@ public class MavenGoals
     }
 
     /**
-     * Cargo waits (org.codehaus.cargo.container.tomcat.internal.AbstractCatalinaInstalledLocalContainer#waitForCompletion(boolean waitForStarting)) for 3 ports, but the AJP and RMI ports may
-     * not be correct (see below), so we configure it to wait on the HTTP port only.
-     *
-     * Since we're not configuring the AJP port it defaults to 8009. This port might have been taken by a different application (the container will still come up though, see
-     * "INFO: Port busy 8009 java.net.BindException: Address already in use" in the log). Thus we don't want to wait for it because it might be still open also the container
-     * is shut down.
-     *
-     * The RMI port is randomly chosen (see startWebapp), thus we don't have any information close at hand. As a future optimisation, e.g. when we move away from cargo to let's say
-     * Apache's Tomcat Maven Plugin we could retrieve the actual configuration from the server.xml on shutdown and thus know exactly for what which port to wait until it gets closed.
-     * We could do that already in cargo (e.g. container/tomcat6x/<productHome>/conf/server.xml) but that means that we have to support all the containers we are supporting with cargo.
-     *
-     * Since the HTTP port is the only one that interests us, we set all three ports to this one when calling stop. But since that may be randomly chosen as well we might be waiting
-     * for the wrong port to get closed. Since this is the minor use case, one has to either accept the timeout if the default port is open, or configure product.stop.timeout to 0 in
-     * order to skip the wait.
+     * Cargo waits (AbstractCatalinaInstalledLocalContainer#waitForCompletion(boolean)) for the HTTP and AJP ports, to
+     * close before it decides the container is stopped.
+     * <p>
+     * Since {@link #startWebapp} can use random ports for HTTP or AJP, it's possible the container isn't using the
+     * ports defined on the {@link Product}. For the HTTP port we just accept that risk, on the assumption it's likely
+     * to be a minority case. For the AJP port, rather than waiting for {@link Product#getAjpPort}, we configure it to
+     * use the HTTP port as the AJP port.
+     * <p>
+     * Note that the RMI port <i>is intentionally not configured here</i>. Earlier versions of AMPS set the HTTP port
+     * as the RMI port as well, but <a href="https://codehaus-cargo.atlassian.net/browse/CARGO-1337">CARGO-1337</a>
+     * resulted in a change in Cargo that causes it to no longer wait for the RMI port to stop. That means if we set
+     * the AJP and HTTP ports to a value that matches the RMI port Cargo doesn't wait for <i>any</i> of the sockets
+     * to be closed and just immediately concludes the container has stopped.
      */
     private Element[] createShutdownPortsPropertiesConfiguration(final Product webappContext)
     {
-        final List<Element> properties = new ArrayList<Element>();
-        final String portUsedToDetermineIfShutdownSucceeded = String.valueOf(webappContext.isHttps() ? webappContext.getHttpsPort() : webappContext.getHttpPort());
-        properties.add(element(name("cargo.servlet.port"), portUsedToDetermineIfShutdownSucceeded));
-        properties.add(element(name("cargo.rmi.port"), portUsedToDetermineIfShutdownSucceeded));
-        properties.add(element(name(AJP_PORT_PROPERTY), portUsedToDetermineIfShutdownSucceeded));
+        final String httpPort = String.valueOf(webappContext.isHttps() ? webappContext.getHttpsPort() : webappContext.getHttpPort());
+
+        final List<Element> properties = new ArrayList<>();
+        properties.add(element(name("cargo.servlet.port"), httpPort));
+        properties.add(element(name(AJP_PORT_PROPERTY), httpPort));
         return properties.toArray(new Element[properties.size()]);
     }
 
@@ -1302,11 +1301,11 @@ public class MavenGoals
      */
     protected Plugin cargo(Product context)
     {
-        log.info("using codehaus cargo v" + pluginArtifactIdToVersionMap.get("org.codehaus.cargo:cargo-maven2-plugin"));
+        log.info("using codehaus cargo v" + pluginArtifactIdToVersionMap.get("cargo-maven2-plugin"));
         return plugin(
                 groupId("org.codehaus.cargo"),
                 artifactId("cargo-maven2-plugin"),
-                version(pluginArtifactIdToVersionMap.get("org.codehaus.cargo:cargo-maven2-plugin")));
+                version(pluginArtifactIdToVersionMap.get("cargo-maven2-plugin")));
     }
 
     private Element waitElement(Plugin cargo)
