@@ -1061,7 +1061,7 @@ public class MavenGoals
         final int rmiPort = webappContext.getRmiPort();
         final int actualRmiPort = pickFreePort(rmiPort);
         if(actualRmiPort != rmiPort){
-            if (rmiPort != 0 )
+            if(rmiPort != 0)
             {
                 log.warn(productInstanceId + " will start RMI on port " + actualRmiPort +
                     " because the configured port, " + rmiPort + ", is already in use");
@@ -1072,7 +1072,7 @@ public class MavenGoals
         final int ajpPort = webappContext.getAjpPort();
         final int actualAjpPort = pickFreePort(ajpPort);
         if(actualAjpPort != ajpPort){
-            if (ajpPort != 0 )
+            if(ajpPort != 0)
             {
                 log.warn(productInstanceId + " will start RMI on port " + actualRmiPort +
                         " because the configured port, " + rmiPort + ", is already in use");
