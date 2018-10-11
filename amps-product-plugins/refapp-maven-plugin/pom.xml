@@ -46,7 +46,7 @@
                 <product.database.type>no-database-type</product.database.type>
                 <tests>
                     amps1211, amps1454,
-                    cli, compressResources, compressResourcesWithClosureOptionLanguageIn, compressResourcesWithIncludeParam, copyBundledDependencies, create, debug, debugWithTestGroup,
+                    compressResources, compressResourcesWithClosureOptionLanguageIn, compressResourcesWithIncludeParam, copyBundledDependencies, create, debug, debugWithTestGroup,
                     filterPluginDescriptorWithoutPluginDescriptor, filterPluginDescriptorWithPluginDescriptor,
                     generateManifestWithInstructions, generateManifestWithNoInstructions,
                     generateObr, integrationTest,

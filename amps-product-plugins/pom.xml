@@ -179,7 +179,7 @@
                 </plugins>
             </build>
             <properties>
-                <invoker.test>!cliTest,*Test</invoker.test>
+                <invoker.test>*Test</invoker.test>
             </properties>
          </profile>
      </profiles>
