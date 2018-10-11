@@ -29,14 +29,15 @@ public class ProductContainerVersionMapper
         populateVersionMapForProduct(ProductHandlerFactory.BAMBOO, "0", "5.1", "5.10");
         populateVersionMapForProduct(ProductHandlerFactory.BITBUCKET, null, null, "1");
         populateVersionMapForProduct(ProductHandlerFactory.CONFLUENCE, "0", "5.5", "5.8", null, "6.10");
-        populateVersionMapForProduct(ProductHandlerFactory.CROWD, "0", "2.7", null, "3.1");
-        populateVersionMapForProduct(ProductHandlerFactory.JIRA, ImmutableMap.of(
-                "0", "tomcat6x",
-                "5.2", "tomcat7x",
-                "7.0.0", "tomcat8x",
-                "7.3.0", "tomcat85_6",
-                "7.12.0", "tomcat85x"
-                )
+        populateVersionMapForProduct(ProductHandlerFactory.CROWD, "0", "2.7.0", null, "3.1.0");
+        populateVersionMapForProduct(ProductHandlerFactory.JIRA, new ImmutableMap.Builder<String, String>()
+                .put("0", "tomcat6x")
+                .put("5.2", "tomcat7x")
+                .put("7.0.0", "tomcat8x")
+                .put("7.3.0", "tomcat85_6")
+                .put("7.6.0", "tomcat85_29")
+                .put("7.12.0", "tomcat85x")
+                .build()
         );
         populateVersionMapForProduct(ProductHandlerFactory.REFAPP, "0", "2.21.0", "3.0.0", "5.0.0");
     }

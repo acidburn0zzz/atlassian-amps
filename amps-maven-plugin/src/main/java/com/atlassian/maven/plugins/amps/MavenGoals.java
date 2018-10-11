@@ -95,6 +95,7 @@ public class MavenGoals
             .put("tomcat8x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.0.53-atlassian-hosted", "windows-x64"))
             .put("tomcat85x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.33-atlassian-hosted", "windows-x64"))
             .put("tomcat85_6", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.6-atlassian-hosted", "windows-x64"))
+            .put("tomcat85_29", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.29-atlassian-hosted", "windows-x64"))
             .put("tomcat9x", new Container("tomcat9x", "org.apache.tomcat", "apache-tomcat", "9.0.11-atlassian-hosted", "windows-x64"))
             .put("jetty6x", new Container("jetty6x"))
             .put("jetty7x", new Container("jetty7x"))
@@ -1173,29 +1174,28 @@ public class MavenGoals
     }
 
     /**
-     * Cargo waits (org.codehaus.cargo.container.tomcat.internal.AbstractCatalinaInstalledLocalContainer#waitForCompletion(boolean waitForStarting)) for 3 ports, but the AJP and RMI ports may
-     * not be correct (see below), so we configure it to wait on the HTTP port only.
-     *
-     * Since we're not configuring the AJP port it defaults to 8009. This port might have been taken by a different application (the container will still come up though, see
-     * "INFO: Port busy 8009 java.net.BindException: Address already in use" in the log). Thus we don't want to wait for it because it might be still open also the container
-     * is shut down.
-     *
-     * The RMI port is randomly chosen (see startWebapp), thus we don't have any information close at hand. As a future optimisation, e.g. when we move away from cargo to let's say
-     * Apache's Tomcat Maven Plugin we could retrieve the actual configuration from the server.xml on shutdown and thus know exactly for what which port to wait until it gets closed.
-     * We could do that already in cargo (e.g. container/tomcat85x/<productHome>/conf/server.xml) but that means that we have to support all the containers we are supporting with cargo.
-     *
-     * Since the HTTP port is the only one that interests us, we set all three ports to this one when calling stop. But since that may be randomly chosen as well we might be waiting
-     * for the wrong port to get closed. Since this is the minor use case, one has to either accept the timeout if the default port is open, or configure product.stop.timeout to 0 in
-     * order to skip the wait.
+     * Cargo waits (AbstractCatalinaInstalledLocalContainer#waitForCompletion(boolean)) for the HTTP and AJP ports, to
+     * close before it decides the container is stopped.
+     * <p>
+     * Since {@link #startWebapp} can use random ports for HTTP or AJP, it's possible the container isn't using the
+     * ports defined on the {@link Product}. For the HTTP port we just accept that risk, on the assumption it's likely
+     * to be a minority case. For the AJP port, rather than waiting for {@link Product#getAjpPort}, we configure it to
+     * use the HTTP port as the AJP port.
+     * <p>
+     * Note that the RMI port <i>is intentionally not configured here</i>. Earlier versions of AMPS set the HTTP port
+     * as the RMI port as well, but <a href="https://codehaus-cargo.atlassian.net/browse/CARGO-1337">CARGO-1337</a>
+     * resulted in a change in Cargo that causes it to no longer wait for the RMI port to stop. That means if we set
+     * the AJP and HTTP ports to a value that matches the RMI port Cargo doesn't wait for <i>any</i> of the sockets
+     * to be closed and just immediately concludes the container has stopped.
      */
     private Element[] createShutdownPortsPropertiesConfiguration(final Product webappContext)
     {
+        final String httpPort = String.valueOf(webappContext.isHttps() ? webappContext.getHttpsPort() : webappContext.getHttpPort());
+
         final List<Element> properties = new ArrayList<>();
-        final String portUsedToDetermineIfShutdownSucceeded = String.valueOf(webappContext.getHttpPort());
-        properties.add(element(name("cargo.servlet.port"), portUsedToDetermineIfShutdownSucceeded));
-        properties.add(element(name("cargo.rmi.port"), portUsedToDetermineIfShutdownSucceeded));
-        properties.add(element(name(AJP_PORT_PROPERTY), portUsedToDetermineIfShutdownSucceeded));
-        return properties.toArray(new Element[0]);
+        properties.add(element(name("cargo.servlet.port"), httpPort));
+        properties.add(element(name(AJP_PORT_PROPERTY), httpPort));
+        return properties.toArray(new Element[properties.size()]);
     }
 
     /**
