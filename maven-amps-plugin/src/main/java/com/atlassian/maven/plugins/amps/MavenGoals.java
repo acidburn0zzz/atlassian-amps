@@ -1244,11 +1244,12 @@ public class MavenGoals
      */
     private Element[] createShutdownPortsPropertiesConfiguration(final Product webappContext)
     {
+        final String httpPort = String.valueOf(webappContext.getHttpPort());
+
         final List<Element> properties = new ArrayList<Element>();
-        final String portUsedToDetermineIfShutdownSucceeded = String.valueOf(webappContext.getHttpPort());
-        properties.add(element(name("cargo.servlet.port"), portUsedToDetermineIfShutdownSucceeded));
-        properties.add(element(name("cargo.rmi.port"), portUsedToDetermineIfShutdownSucceeded));
-        properties.add(element(name(AJP_PORT_PROPERTY), portUsedToDetermineIfShutdownSucceeded));
+        properties.add(element(name("cargo.servlet.port"), httpPort));
+        properties.add(element(name("cargo.rmi.port"), httpPort));
+        properties.add(element(name(AJP_PORT_PROPERTY), String.valueOf(webappContext.getAjpPort())));
         return properties.toArray(new Element[properties.size()]);
     }
 
