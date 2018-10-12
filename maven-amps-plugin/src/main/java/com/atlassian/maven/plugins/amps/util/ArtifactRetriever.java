@@ -2,7 +2,7 @@ package com.atlassian.maven.plugins.amps.util;
 
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.metadata.*;

@@ -15,7 +15,7 @@ import com.atlassian.plugins.codegen.modules.common.Resource;
 import com.atlassian.plugins.codegen.modules.common.web.AbstractWebFragmentProperties;
 
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.junit.After;
 import org.junit.Before;

@@ -14,7 +14,7 @@ import com.atlassian.plugins.codegen.modules.jira.CustomFieldModuleCreator;
 import com.atlassian.plugins.codegen.modules.jira.CustomFieldProperties;
 import com.atlassian.plugins.codegen.util.ClassnameUtil;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 

@@ -2,7 +2,7 @@ package com.atlassian.maven.plugins.amps.codegen.prompter;
 
 import com.atlassian.maven.plugins.amps.codegen.annotations.asm.ModulePrompterAnnotationParser;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.components.interactivity.Prompter;
 
