@@ -1026,7 +1026,7 @@ public class MavenGoals
         final int httpPort;
         final String protocol;
 
-        if(webappContext.isHttps())
+        if (webappContext.isHttps())
         {
             httpPort = webappContext.getHttpsPort();
             protocol = "https";
@@ -1048,7 +1048,7 @@ public class MavenGoals
             }
 
             // Update the Product to match the port that will actually be used
-            if(webappContext.isHttps())
+            if (webappContext.isHttps())
             {
                 webappContext.setHttpsPort(actualHttpPort);
             }
@@ -1060,8 +1060,8 @@ public class MavenGoals
 
         final int rmiPort = webappContext.getRmiPort();
         final int actualRmiPort = pickFreePort(rmiPort);
-        if(actualRmiPort != rmiPort){
-            if(rmiPort != 0)
+        if (actualRmiPort != rmiPort){
+            if (rmiPort != 0)
             {
                 log.warn(productInstanceId + " will start RMI on port " + actualRmiPort +
                     " because the configured port, " + rmiPort + ", is already in use");
@@ -1071,8 +1071,8 @@ public class MavenGoals
 
         final int ajpPort = webappContext.getAjpPort();
         final int actualAjpPort = pickFreePort(ajpPort);
-        if(actualAjpPort != ajpPort){
-            if(ajpPort != 0)
+        if (actualAjpPort != ajpPort){
+            if (ajpPort != 0)
             {
                 log.warn(productInstanceId + " will start RMI on port " + actualRmiPort +
                         " because the configured port, " + rmiPort + ", is already in use");
