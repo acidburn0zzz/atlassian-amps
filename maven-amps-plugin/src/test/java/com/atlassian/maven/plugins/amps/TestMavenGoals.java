@@ -183,6 +183,20 @@ public class TestMavenGoals
     }
 
     @Test
+    public void httpPortShouldBeReflectedInBaseUrl()
+    {
+        // Set up
+        final int httpPort = 51935;
+
+        // Invoke
+        final String baseUrl = getBaseUrl(httpPort);
+
+        // Check
+        assertEquals("http://localhost:51935/confluence", baseUrl);
+
+    }
+
+    @Test
     public void configurationPropertiesShouldIncludeAjpPortIfSet()
     {
         // Set up
@@ -231,6 +245,25 @@ public class TestMavenGoals
         return configurationProperties;
     }
 
+    private String getBaseUrl(final int httpPort)
+    {
+        // Set up
+        final String server = "http://localhost";
+        final String contextPath = "confluence";
+        final int defaultHttp = 2990;
+        final Product mockProduct = mock(Product.class);
+        when(mockProduct.getServer()).thenReturn(server);
+        when(mockProduct.getContextPath()).thenReturn(contextPath);
+        when(mockProduct.getHttpPort()).thenReturn(defaultHttp);
+
+        // Invoke
+        final String baseUrl = goals.getBaseUrl(mockProduct, httpPort);
+
+        // Check
+        assertNotNull(baseUrl);
+        return baseUrl;
+    }
+
     private Parameter createParamByName(final String name)
     {
         final Parameter p = new Parameter();
@@ -264,7 +297,7 @@ public class TestMavenGoals
     }
 
     @Test
-    public void shouldUsePortsConfiguredFromProductWhenStartWebapp() throws MojoExecutionException
+    public void shouldUseHttpPortsConfiguredFromProductWhenStartWebapp() throws MojoExecutionException
     {
         final String productInstanceId = "";
         final File war = Mockito.mock(File.class);
@@ -275,11 +308,33 @@ public class TestMavenGoals
         when(product.getServer()).thenReturn("server");
         when(product.getContextPath()).thenReturn("/context");
         when(war.getPath()).thenReturn("/");
+        when(product.isHttps()).thenReturn(false);
 
         goals.startWebapp(productInstanceId, war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
 
         verify(product).getRmiPort();
         verify(product).getAjpPort();
         verify(product, atLeastOnce()).getHttpPort();
+    }
+
+    @Test
+    public void shouldUseHttpsPortsConfiguredFromProductWhenStartWebapp() throws MojoExecutionException
+    {
+        final String productInstanceId = "";
+        final File war = Mockito.mock(File.class);
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(executionEnvironment.getMavenProject()).thenReturn(mavenProject);
+        when(mavenProject.getBuild()).thenReturn(build);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+        when(product.getServer()).thenReturn("server");
+        when(product.getContextPath()).thenReturn("/context");
+        when(war.getPath()).thenReturn("/");
+        when(product.isHttps()).thenReturn(true);
+
+        goals.startWebapp(productInstanceId, war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
+
+        verify(product).getRmiPort();
+        verify(product).getAjpPort();
+        verify(product, atLeastOnce()).getHttpsPort();
     }
 }
