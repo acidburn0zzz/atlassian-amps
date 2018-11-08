@@ -2,6 +2,7 @@ package com.atlassian.maven.plugins.amps.product;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,8 +22,8 @@ import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
 import com.atlassian.maven.plugins.amps.util.FileUtils;
 import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
+import com.atlassian.maven.plugins.amps.util.ZipUtils;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 
@@ -51,7 +52,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public abstract class AbstractProductHandler extends AmpsProductHandler
 {
     private static final Map<String, Map<String, GroupArtifactPair>> APPLICATION_KEYS =
-            ImmutableMap.<String, Map<String, GroupArtifactPair>>of(
+            ImmutableMap.of(
                     JIRA, ImmutableMap.of(
                             "jira-software", new GroupArtifactPair("com.atlassian.jira", "jira-software-application"),
                             "jira-servicedesk", new GroupArtifactPair("com.atlassian.servicedesk", "jira-servicedesk-application")));
@@ -174,14 +175,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         File[] topLevelFiles = tmpDir.listFiles();
         if (topLevelFiles.length != 1)
         {
-            Iterable<String> filenames = Iterables.transform(Arrays.asList(topLevelFiles), new Function<File, String>()
-            {
-                @Override
-                public String apply(File from)
-                {
-                    return from.getName();
-                }
-            });
+            Iterable<String> filenames = Iterables.transform(Arrays.asList(topLevelFiles), File::getName);
             throw new MojoExecutionException("Expected a single top-level directory in test resources. Got: "
                     + Joiner.on(", ").join(filenames));
         }
@@ -228,7 +222,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
             if (app.isFile())
             {
                 final File warFile = new File(app.getParentFile(), getId() + ".war");
-                com.atlassian.core.util.FileUtils.createZipFile(appDir, warFile);
+                ZipUtils.zipChildren(warFile, appDir);
                 return warFile;
             }
             else
@@ -268,8 +262,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         ctx.setJvmArgs(jvmArgs);
     }
 
-    private void addArtifacts(final Product ctx, final File homeDir, final File appDir)
-            throws IOException, MojoExecutionException, Exception
+    private void addArtifacts(final Product ctx, final File homeDir, final File appDir) throws Exception
     {
         File pluginsDir = getUserInstalledPluginsDirectory(ctx, appDir, homeDir);
         File bundledPluginsDir = new File(getBaseDirectory(ctx), "bundled-plugins");
@@ -321,7 +314,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         }
 
         // add plugins1 plugins
-        List<ProductArtifact> artifacts = new ArrayList<ProductArtifact>();
+        List<ProductArtifact> artifacts = new ArrayList<>();
         artifacts.addAll(getDefaultLibPlugins());
         artifacts.addAll(ctx.getLibArtifacts());
         addArtifactsToDirectory(artifacts, new File(appDir, getLibArtifactTargetDir()));
@@ -330,7 +323,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         List<ProductArtifact> applications = applicationMapper.provideApplications(ctx);
         extractApplicationPlugins(applications, pluginsDir);
 
-        artifacts = new ArrayList<ProductArtifact>();
+        artifacts = new ArrayList<>();
         artifacts.addAll(getDefaultBundledPlugins());
         artifacts.addAll(ctx.getBundledArtifacts());
         artifacts.addAll(getAdditionalPlugins(ctx));
@@ -341,7 +334,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         {
             if (!bundledPluginsFile.isDirectory())
             {
-                com.atlassian.core.util.FileUtils.createZipFile(bundledPluginsDir, bundledPluginsFile);
+                ZipUtils.zipChildren(bundledPluginsFile, bundledPluginsDir);
             }
         }
 
@@ -381,7 +374,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         final File atlassianPluginXml = new File(project.getBasedir(), "src/main/resources/atlassian-plugin.xml");
         if (atlassianPluginXml.exists())
         {
-            String text = readFileToString(atlassianPluginXml);
+            String text = readFileToString(atlassianPluginXml, StandardCharsets.UTF_8);
             return !text.contains("pluginsVersion=\"2\"") && !text.contains("plugins-version=\"2\"");
         }
         else
@@ -462,7 +455,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     }
 
     private void extractApplicationPlugins(final List<ProductArtifact> products, final File bundledPluginsDir)
-            throws MojoExecutionException, RuntimeException, IOException
+            throws RuntimeException, IOException
     {
         for (final ProductArtifact product : products)
         {
@@ -483,15 +476,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
             final ArtifactResolver resolver = session.getContainer().lookup(ArtifactResolver.class);
             resolver.resolve(artifact, project.getRemoteArtifactRepositories(), session.getLocalRepository());
         }
-        catch (final ComponentLookupException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (final ArtifactNotFoundException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (final ArtifactResolutionException e)
+        catch (ArtifactNotFoundException | ArtifactResolutionException | ComponentLookupException e)
         {
             throw new RuntimeException(e);
         }
@@ -514,19 +499,16 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
      */
     protected final Map<String, String> mergeSystemProperties(Product ctx)
     {
-        final Map<String, String> properties = new HashMap<String, String>();
-        // Apply the base properties
-        properties.putAll(getSystemProperties(ctx));
-        for (Map.Entry<String, Object> entry : ctx.getSystemPropertyVariables().entrySet())
-        {
-            // Enter the System Property Variables from product context, overwriting duplicates
-            properties.put(entry.getKey(), (String) entry.getValue());
-        }
+        // Start from the base properties
+        final Map<String, String> properties = new HashMap<>(getSystemProperties(ctx));
+
+        // Enter the System Property Variables from product context, overwriting duplicates
+        ctx.getSystemPropertyVariables().forEach((key, value) -> properties.put(key, (String) value));
+
+        // Overwrite the default system properties with user input arguments
         Properties userProperties = context.getExecutionEnvironment().getMavenSession().getUserProperties();
-        for (String key : userProperties.stringPropertyNames()) {
-            // Overwrite the default system properties with user input arguments
-            properties.put(key, userProperties.getProperty(key));
-        }
+        userProperties.forEach((key, value) -> properties.put((String) key, (String) value));
+
         return properties;
     }
 
@@ -545,10 +527,9 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
      * Returns the directory where jars listed in  <libArtifacts> are
      * copied. Default is "WEB-INF/lib"
      * 
-     * @return
+     * @return the directory where lib artifacts should be written
      */
-    
-    protected String getLibArtifactTargetDir() 
+    protected String getLibArtifactTargetDir()
     {
     	return "WEB-INF/lib";
     }

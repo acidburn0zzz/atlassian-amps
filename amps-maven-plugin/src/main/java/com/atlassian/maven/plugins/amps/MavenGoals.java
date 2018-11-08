@@ -12,6 +12,7 @@ import com.atlassian.maven.plugins.amps.util.minifier.MinifierParameters;
 import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Resources;
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -20,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.archetype.common.DefaultPomManager;
 import org.apache.maven.archetype.common.MavenJDOMWriter;
 import org.apache.maven.archetype.common.util.Format;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
@@ -49,6 +49,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -573,9 +574,9 @@ public class MavenGoals
         {
             try
             {
-                String source = FileUtils.readFileToString(pluginXmlFile);
+                String source = FileUtils.readFileToString(pluginXmlFile, StandardCharsets.UTF_8);
                 String min = compressor.compress(source);
-                FileUtils.writeStringToFile(pluginXmlFile,min);
+                FileUtils.writeStringToFile(pluginXmlFile, min, StandardCharsets.UTF_8);
             }
             catch (IOException e)
             {
@@ -608,10 +609,6 @@ public class MavenGoals
                 executionEnvironment()
         );
 
-    }
-
-    public void runUnitTests(Map<String, Object> systemProperties) throws MojoExecutionException {
-        runUnitTests(systemProperties, null, null);
     }
 
     public void runUnitTests(Map<String, Object> systemProperties, String excludedGroups, final String category) throws MojoExecutionException
@@ -694,36 +691,12 @@ public class MavenGoals
                         //Overwrite needs to be enabled or unpack won't unpack multiple copies
                         //of the same dependency GAV, _even to different output directories_
                         element(name("overWriteReleases"), "true"),
-                        element(name("overWriteSnapshots"), "true")
+                        element(name("overWriteSnapshots"), "true"),
+                        //Use the JVM's chmod; it's faster than forking
+                        element(name("useJvmChmod"), "true")
                 ),
                 executionEnvironment()
         );
-    }
-
-    public File copyArtifact(final String targetFileName, final File targetDirectory,
-                             final ProductArtifact artifact, String type) throws MojoExecutionException
-    {
-        final File targetFile = new File(targetDirectory, targetFileName);
-        executeMojo(
-                plugin(
-                        groupId("org.apache.maven.plugins"),
-                        artifactId("maven-dependency-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
-                ),
-                goal("copy"),
-                configuration(
-                        element(name("artifactItems"),
-                                element(name("artifactItem"),
-                                        element(name("groupId"), artifact.getGroupId()),
-                                        element(name("artifactId"), artifact.getArtifactId()),
-                                        element(name("type"), type),
-                                        element(name("version"), artifact.getVersion()),
-                                        element(name("destFileName"), targetFile.getName()))),
-                        element(name("outputDirectory"), targetDirectory.getPath())
-                ),
-                executionEnvironment()
-        );
-        return targetFile;
     }
 
     /**
@@ -1347,27 +1320,6 @@ public class MavenGoals
         );
     }
 
-    public void uninstallPlugin(final String pluginKey, final String server, final int port, final String contextPath)
-            throws MojoExecutionException
-    {
-        final String baseUrl = getBaseUrl(server, port, contextPath);
-        executeMojo(
-                plugin(
-                        groupId("com.atlassian.maven.plugins"),
-                        artifactId("atlassian-pdk"),
-                        version(defaultArtifactIdToVersionMap.get("atlassian-pdk"))
-                ),
-                goal("uninstall"),
-                configuration(
-                        element(name("username"), "admin"),
-                        element(name("password"), "admin"),
-                        element(name("serverUrl"), baseUrl),
-                        element(name("pluginKey"), pluginKey)
-                ),
-                executionEnvironment()
-        );
-    }
-
     public void installIdeaPlugin() throws MojoExecutionException
     {
         executeMojo(
@@ -1555,11 +1507,6 @@ public class MavenGoals
 
     }
 
-    private String artifactToString(final Artifact artifact)
-    {
-        return String.format("GAV: %s:%s:%s Type: %s, Classifier: %s", artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier());
-    }
-
     public void jarTests(String finalName) throws MojoExecutionException
     {
         executeMojo(
@@ -1670,16 +1617,16 @@ public class MavenGoals
     public void generateRestDocs(String jacksonModules) throws MojoExecutionException
     {
         MavenProject prj = ctx.getProject();
-        StringBuffer packagesPath = new StringBuffer();
+        StringBuilder packagesPath = new StringBuilder();
         List<PluginXmlUtils.RESTModuleInfo> restModules = PluginXmlUtils.getRestModules(ctx);
 
-        for(PluginXmlUtils.RESTModuleInfo moduleInfo : restModules)
+        for (PluginXmlUtils.RESTModuleInfo moduleInfo : restModules)
         {
             List<String> packageList = moduleInfo.getPackagesToScan();
 
-            for(String packageToScan : packageList)
+            for (String packageToScan : packageList)
             {
-                if(packagesPath.length() > 0)
+                if (packagesPath.length() > 0)
                 {
                     packagesPath.append(File.pathSeparator);
                 }
@@ -1689,10 +1636,10 @@ public class MavenGoals
             }
         }
 
-        if(!restModules.isEmpty() && packagesPath.length() > 0)
+        if (!restModules.isEmpty() && packagesPath.length() > 0)
         {
             Set<String> docletPaths = new HashSet<>();
-            StringBuffer docletPath = new StringBuffer(File.pathSeparator + prj.getBuild().getOutputDirectory());
+            StringBuilder docletPath = new StringBuilder(File.pathSeparator + prj.getBuild().getOutputDirectory());
             String resourcedocPath = fixWindowsSlashes(prj.getBuild().getOutputDirectory() + File.separator + "resourcedoc.xml");
 
             PluginXmlUtils.PluginInfo pluginInfo = PluginXmlUtils.getPluginInfo(ctx);
@@ -1715,7 +1662,8 @@ public class MavenGoals
                     docletPath.append(path);
                 }
 
-            } catch (DependencyResolutionRequiredException e)
+            }
+            catch (DependencyResolutionRequiredException e)
             {
                 throw new MojoExecutionException("Dependencies must be resolved", e);
             }
@@ -1773,40 +1721,39 @@ public class MavenGoals
             {
                 executionEnvironment().getMavenProject().getBuild().addPlugin(globalJavadoc);
             }
-            try {
-
+            try
+            {
                 File userAppDocs = new File(prj.getBuild().getOutputDirectory(),"application-doc.xml");
-                if(!userAppDocs.exists())
+                if (!userAppDocs.exists())
                 {
-                    String appDocText = com.atlassian.core.util.FileUtils.getResourceContent("application-doc.xml");
+                    String appDocText = Resources.toString(Resources.getResource("application-doc.xml"), StandardCharsets.UTF_8);
                     appDocText = StringUtils.replace(appDocText, "${rest.doc.title}", pluginInfo.getName());
                     appDocText = StringUtils.replace(appDocText,"${rest.doc.description}",pluginInfo.getDescription());
                     File appDocFile = new File(prj.getBuild().getOutputDirectory(), "application-doc.xml");
 
-                    FileUtils.writeStringToFile(appDocFile,appDocText);
+                    FileUtils.writeStringToFile(appDocFile, appDocText, StandardCharsets.UTF_8);
                     log.info("Wrote " + appDocFile.getAbsolutePath());
                 }
 
                 File userGrammars = new File(prj.getBuild().getOutputDirectory(),"application-grammars.xml");
-                if(!userGrammars.exists())
+                if (!userGrammars.exists())
                 {
-                    String grammarText = com.atlassian.core.util.FileUtils.getResourceContent("application-grammars.xml");
+                    String grammarText = Resources.toString(Resources.getResource("application-grammars.xml"), StandardCharsets.UTF_8);
                     File grammarFile = new File(prj.getBuild().getOutputDirectory(), "application-grammars.xml");
 
-                    FileUtils.writeStringToFile(grammarFile,grammarText);
+                    FileUtils.writeStringToFile(grammarFile, grammarText, StandardCharsets.UTF_8);
 
                     log.info("Wrote " + grammarFile.getAbsolutePath());
                 }
-
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
-                throw new MojoExecutionException("Error writing REST application xml files",e);
+                throw new MojoExecutionException("Error writing REST application xml files", e);
             }
         }
     }
 
-    public void copyContainerToOutputDirectory(String containerVersion) throws
-            MojoExecutionException
+    public void copyContainerToOutputDirectory(String containerVersion) throws MojoExecutionException
     {
         executeMojo(
                 plugin(
@@ -1861,29 +1808,6 @@ public class MavenGoals
         );
     }
 
-    public void saveArtifactToCurrentDirectory(String groupId, String artifactId, String version, String type, String filename) throws MojoExecutionException
-    {
-        executeMojo(
-                plugin(
-                        groupId("org.apache.maven.plugins"),
-                        artifactId("maven-dependency-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
-                ),
-                goal("copy"),
-                configuration(
-                        element(name("artifactItems"),
-                                element(name("artifactItem"),
-                                        element(name("groupId"), groupId),
-                                        element(name("artifactId"), artifactId),
-                                        element(name("version"), version),
-                                        element(name("type"), type),
-                                        element(name("destFileName"), filename))),
-                        element(name("outputDirectory"), ".")
-                ),
-                executionEnvironment()
-        );
-    }
-
     private static class Container extends ProductArtifact
     {
         private final String id;
@@ -1898,7 +1822,7 @@ public class MavenGoals
          * @param artifactId artifactId of container.
          * @param version    version number of container.
          */
-        public Container(final String id, final String groupId, final String artifactId, final String version)
+        Container(final String id, final String groupId, final String artifactId, final String version)
         {
             super(groupId, artifactId, version);
             this.id = id;
@@ -1915,7 +1839,7 @@ public class MavenGoals
          * @param version    version number of container.
          * @param classifier classifier of the container.
          */
-        public Container(final String id, final String groupId, final String artifactId, final String version, final String classifier)
+        Container(final String id, final String groupId, final String artifactId, final String version, final String classifier)
         {
             super(groupId, artifactId, version);
             this.id = id;
@@ -1928,7 +1852,7 @@ public class MavenGoals
          *
          * @param id identifier of container, eg. "jetty6x".
          */
-        public Container(final String id)
+        Container(final String id)
         {
             this.id = id;
             this.type = "embedded";

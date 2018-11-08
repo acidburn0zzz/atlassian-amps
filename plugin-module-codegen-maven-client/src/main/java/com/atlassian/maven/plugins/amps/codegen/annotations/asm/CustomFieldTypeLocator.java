@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.atlassian.plugins.codegen.annotations.asm.AbstractAnnotationParser;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.objectweb.asm.AnnotationVisitor;
@@ -20,7 +19,7 @@ import org.objectweb.asm.Opcodes;
  */
 public class CustomFieldTypeLocator extends AbstractAnnotationParser
 {
-    public static final String JIRA_FIELDS_PACKAGE = "com.atlassian.jira.issue.customfields.impl";
+    private static final String JIRA_FIELDS_PACKAGE = "com.atlassian.jira.issue.customfields.impl";
 
     private Map<String, String> fieldTypeRegistry;
 
@@ -85,13 +84,10 @@ public class CustomFieldTypeLocator extends AbstractAnnotationParser
                     .getContextClassLoader();
             String path = superName.replace('.', '/');
 
-            InputStream is = null;
-            try
+            try (InputStream is = classLoader.getResourceAsStream(path + ".class"))
             {
-                is = classLoader.getResourceAsStream(path + ".class");
                 if (null != is)
                 {
-
                     ClassReader classReader = new ClassReader(is);
                     hasInterface = ArrayUtils.contains(classReader.getInterfaces(), interfaceName);
                     if (!hasInterface)
@@ -99,12 +95,10 @@ public class CustomFieldTypeLocator extends AbstractAnnotationParser
                         hasInterface = superHasInterface(classReader.getSuperName(), interfaceName);
                     }
                 }
-            } catch (Exception e)
+            }
+            catch (Exception ignored)
             {
                 //don't care
-            } finally
-            {
-                IOUtils.closeQuietly(is);
             }
 
             return hasInterface;

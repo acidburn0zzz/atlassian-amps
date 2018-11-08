@@ -1,24 +1,23 @@
 package com.atlassian.maven.plugins.amps.util;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.google.common.collect.Lists;
+import org.apache.commons.io.FileUtils;
+import org.junit.*;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
@@ -26,104 +25,104 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings("Duplicates")
 public class TestZipUtils
 {
-    public static final int NUM_FILES = 2;
-    public static final int NUM_FOLDERS = 4;
-    public static final int NUM_FOLDERS_NESTED_PREFIX = NUM_FOLDERS + 1;
+    private static final int NUM_FILES = 2;
+    private static final int NUM_FOLDERS = 4;
+    private static final int NUM_FOLDERS_NESTED_PREFIX = NUM_FOLDERS + 1;
 
-    public static final String ROOT_DIR = "test-zip-dir";
-    public static final String FIRST_PREFIX = "prefix1";
-    public static final String SECOND_PREFIX = "prefix2";
-    public static final String NESTED_PREFIX = FIRST_PREFIX + "/" + SECOND_PREFIX;
+    private static final String ROOT_DIR = "test-zip-dir";
+    private static final String FIRST_PREFIX = "prefix1";
+    private static final String SECOND_PREFIX = "prefix2";
+    private static final String NESTED_PREFIX = FIRST_PREFIX + "/" + SECOND_PREFIX;
 
-    private File tempDir;
+    @Rule
+    public final TemporaryFolder tempDir = new TemporaryFolder();
+
     private File sourceZipDir;
-    private ZipFile zip;
 
     @Before
     public void ensureDirsExist() throws IOException
     {
-
-        // Create the temp dir
-        final File sysTempDir = new File(System.getProperty("java.io.tmpdir"));
-        String dirName = UUID.randomUUID().toString();
-        tempDir = new File(sysTempDir, dirName);
-        tempDir.mkdirs();
-
         // Create our test source tree
-        sourceZipDir = new File(tempDir, ROOT_DIR);
-        File level2sub1 = new File(sourceZipDir, "level2sub1");
-        File level2sub2 = new File(sourceZipDir, "level2sub2");
-        File level3sub1 = new File(level2sub2, "level3sub1");
+        sourceZipDir = tempDir.newFolder(ROOT_DIR);
+        tempDir.newFolder(ROOT_DIR, "level2sub1");
 
+        File level2sub2 = tempDir.newFolder(ROOT_DIR, "level2sub2");
         File level2TextFile = new File(level2sub2, "level2sub2.txt");
+        FileUtils.writeStringToFile(level2TextFile, "level2sub2", StandardCharsets.UTF_8);
+
+        File level3sub1 = tempDir.newFolder(ROOT_DIR, "level2sub2", "level3sub1");
         File level3TextFile = new File(level3sub1, "level3sub1.txt");
-
-        level2sub1.mkdirs();
-        level3sub1.mkdirs();
-
-        FileUtils.writeStringToFile(level2TextFile, "level2sub2");
-        FileUtils.writeStringToFile(level3TextFile, "level3sub1");
+        FileUtils.writeStringToFile(level3TextFile, "level3sub1", StandardCharsets.UTF_8);
     }
 
-    @After
-    public void removeTempDir() throws IOException
+    @Test
+    public void zipChildrenHasNoPrefix() throws IOException
     {
-        // make sure zip is closed, else delete fails on windows
-        if (zip != null)
+        File zipFile = tempDir.newFile("zip-children.zip");
+        ZipUtils.zipChildren(zipFile, sourceZipDir);
+
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            try
-            {
-                zip.close();
-            }
-            catch (IOException e)
-            {
-                // ignore
-            }
-            zip = null;
+            List<String> entries = Collections.list(zip.entries()).stream()
+                    .map(ZipEntry::getName)
+                    .collect(toList());
+
+            // - Directories should have explicit entries
+            // - Entries should be relative to _without including_ sourceZipDir (test-zip-dir)
+            assertEquals(5, entries.size());
+            assertEquals("level2sub1/", entries.get(0));
+            assertEquals("level2sub2/", entries.get(1));
+            assertEquals("level2sub2/level3sub1/", entries.get(2));
+            assertEquals("level2sub2/level3sub1/level3sub1.txt", entries.get(3));
+            assertEquals("level2sub2/level2sub2.txt", entries.get(4));
         }
-        FileUtils.deleteDirectory(tempDir);
     }
 
     @Test
     public void zipContainsSinglePrefix() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-with-prefix.zip");
+        File zipFile = tempDir.newFile("zip-with-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, FIRST_PREFIX);
 
-        zip = new ZipFile(zipFile);
-        final Enumeration<? extends ZipEntry> entries = zip.entries();
-
-        while (entries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            final ZipEntry zipEntry = entries.nextElement();
-            String zipPath = zipEntry.getName();
-            String testPrefix = zipPath.substring(0, zipPath.indexOf("/"));
+            final Enumeration<? extends ZipEntry> entries = zip.entries();
 
-            assertEquals(FIRST_PREFIX, testPrefix);
+            while (entries.hasMoreElements())
+            {
+                final ZipEntry zipEntry = entries.nextElement();
+                String zipPath = zipEntry.getName();
+                String testPrefix = zipPath.substring(0, zipPath.indexOf("/"));
+
+                assertEquals(FIRST_PREFIX, testPrefix);
+            }
         }
     }
 
     @Test
     public void zipContainsNestedPrefix() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-nested-prefix.zip");
+        File zipFile = tempDir.newFile("zip-nested-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, NESTED_PREFIX);
 
-        zip = new ZipFile(zipFile);
-        final Enumeration<? extends ZipEntry> entries = zip.entries();
-
-        while (entries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            final ZipEntry zipEntry = entries.nextElement();
-            String zipPath = zipEntry.getName();
-            String[] segments = zipPath.split("/");
-            if (segments.length > 1)
-            {
-                String testPrefix = segments[0] + "/" + segments[1];
+            final Enumeration<? extends ZipEntry> entries = zip.entries();
 
-                assertEquals(NESTED_PREFIX, testPrefix);
+            while (entries.hasMoreElements())
+            {
+                final ZipEntry zipEntry = entries.nextElement();
+                String zipPath = zipEntry.getName();
+                String[] segments = zipPath.split("/");
+                if (segments.length > 1)
+                {
+                    String testPrefix = segments[0] + "/" + segments[1];
+
+                    assertEquals(NESTED_PREFIX, testPrefix);
+                }
             }
         }
     }
@@ -131,22 +130,24 @@ public class TestZipUtils
     @Test
     public void prefixedZipDoesNotContainRootDir() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-with-prefix-no-root.zip");
+        File zipFile = tempDir.newFile("zip-with-prefix-no-root.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, FIRST_PREFIX);
 
-        zip = new ZipFile(zipFile);
-        final Enumeration<? extends ZipEntry> entries = zip.entries();
-
-        while (entries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            final ZipEntry zipEntry = entries.nextElement();
-            String zipPath = zipEntry.getName();
-            String[] segments = zipPath.split("/");
-            if (segments.length > 1)
-            {
-                String rootPath = segments[1];
+            final Enumeration<? extends ZipEntry> entries = zip.entries();
 
-                assertThat(rootPath, not(equalTo(ROOT_DIR)));
+            while (entries.hasMoreElements())
+            {
+                final ZipEntry zipEntry = entries.nextElement();
+                String zipPath = zipEntry.getName();
+                String[] segments = zipPath.split("/");
+                if (segments.length > 1)
+                {
+                    String rootPath = segments[1];
+
+                    assertThat(rootPath, not(equalTo(ROOT_DIR)));
+                }
             }
         }
     }
@@ -154,22 +155,24 @@ public class TestZipUtils
     @Test
     public void nestedPrefixedZipDoesNotContainRootDir() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-nested-prefix-no-root.zip");
+        File zipFile = tempDir.newFile("zip-nested-prefix-no-root.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, NESTED_PREFIX);
 
-        zip = new ZipFile(zipFile);
-        final Enumeration<? extends ZipEntry> entries = zip.entries();
-
-        while (entries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            final ZipEntry zipEntry = entries.nextElement();
-            String zipPath = zipEntry.getName();
-            String[] segments = zipPath.split("/");
-            if (segments.length > 2)
-            {
-                String rootPath = segments[2];
+            final Enumeration<? extends ZipEntry> entries = zip.entries();
 
-                assertThat(rootPath, not(equalTo(ROOT_DIR)));
+            while (entries.hasMoreElements())
+            {
+                final ZipEntry zipEntry = entries.nextElement();
+                String zipPath = zipEntry.getName();
+                String[] segments = zipPath.split("/");
+                if (segments.length > 2)
+                {
+                    String rootPath = segments[2];
+
+                    assertThat(rootPath, not(equalTo(ROOT_DIR)));
+                }
             }
         }
     }
@@ -177,140 +180,148 @@ public class TestZipUtils
     @Test
     public void emptyPrefixedZipContainsRootDir() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-empty-prefix.zip");
+        File zipFile = tempDir.newFile("zip-empty-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, "");
 
-        zip = new ZipFile(zipFile);
-        final Enumeration<? extends ZipEntry> entries = zip.entries();
-
-        while (entries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            final ZipEntry zipEntry = entries.nextElement();
-            String zipPath = zipEntry.getName();
-            String rootPath = zipPath.substring(0, zipPath.indexOf("/"));
+            final Enumeration<? extends ZipEntry> entries = zip.entries();
 
-            assertEquals(ROOT_DIR, rootPath);
+            while (entries.hasMoreElements())
+            {
+                final ZipEntry zipEntry = entries.nextElement();
+                String zipPath = zipEntry.getName();
+                String rootPath = zipPath.substring(0, zipPath.indexOf("/"));
+
+                assertEquals(ROOT_DIR, rootPath);
+            }
         }
     }
 
     @Test
     public void nullPrefixedZipContainsRootDir() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-null-prefix.zip");
+        File zipFile = tempDir.newFile("zip-null-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, null);
 
-        zip = new ZipFile(zipFile);
-        final Enumeration<? extends ZipEntry> entries = zip.entries();
-
-        while (entries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            final ZipEntry zipEntry = entries.nextElement();
-            String zipPath = zipEntry.getName();
-            String rootPath = zipPath.substring(0, zipPath.indexOf("/"));
+            final Enumeration<? extends ZipEntry> entries = zip.entries();
 
-            assertEquals(ROOT_DIR, rootPath);
+            while (entries.hasMoreElements())
+            {
+                final ZipEntry zipEntry = entries.nextElement();
+                String zipPath = zipEntry.getName();
+                String rootPath = zipPath.substring(0, zipPath.indexOf("/"));
+
+                assertEquals(ROOT_DIR, rootPath);
+            }
         }
     }
 
     @Test
     public void emptyPrefixedZipFolderCountMatches() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-empty-prefix.zip");
+        File zipFile = tempDir.newFile("zip-empty-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, "");
 
-        zip = new ZipFile(zipFile);
-        final Enumeration<? extends ZipEntry> entries = zip.entries();
-
-        int numFolders = 0;
-
-        while (entries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            final ZipEntry zipEntry = entries.nextElement();
-            if (zipEntry.isDirectory())
-            {
-                numFolders++;
-            }
-        }
+            final Enumeration<? extends ZipEntry> entries = zip.entries();
 
-        assertEquals(NUM_FOLDERS, numFolders);
+            int numFolders = 0;
+            while (entries.hasMoreElements())
+            {
+                final ZipEntry zipEntry = entries.nextElement();
+                if (zipEntry.isDirectory())
+                {
+                    numFolders++;
+                }
+            }
+
+            assertEquals(NUM_FOLDERS, numFolders);
+        }
     }
 
     @Test
     public void singlePrefixedZipFolderCountMatches() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-single-prefix.zip");
+        File zipFile = tempDir.newFile("zip-single-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, FIRST_PREFIX);
 
-        zip = new ZipFile(zipFile);
-        final Enumeration<? extends ZipEntry> entries = zip.entries();
-
-        int numFolders = 0;
-
-        while (entries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            final ZipEntry zipEntry = entries.nextElement();
-            if (zipEntry.isDirectory())
-            {
-                numFolders++;
-            }
-        }
+            final Enumeration<? extends ZipEntry> entries = zip.entries();
 
-        assertEquals(NUM_FOLDERS, numFolders);
+            int numFolders = 0;
+            while (entries.hasMoreElements())
+            {
+                final ZipEntry zipEntry = entries.nextElement();
+                if (zipEntry.isDirectory())
+                {
+                    numFolders++;
+                }
+            }
+
+            assertEquals(NUM_FOLDERS, numFolders);
+        }
     }
 
     @Test
     public void nestedPrefixedZipFolderCountMatches() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-nested-prefix.zip");
+        File zipFile = tempDir.newFile("zip-nested-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, NESTED_PREFIX);
 
-        zip = new ZipFile(zipFile);
-        final Enumeration<? extends ZipEntry> entries = zip.entries();
-
-        int numFolders = 0;
-
-        while (entries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            final ZipEntry zipEntry = entries.nextElement();
-            if (zipEntry.isDirectory())
-            {
-                numFolders++;
-            }
-        }
+            final Enumeration<? extends ZipEntry> entries = zip.entries();
 
-        assertEquals(NUM_FOLDERS_NESTED_PREFIX, numFolders);
+            int numFolders = 0;
+            while (entries.hasMoreElements())
+            {
+                final ZipEntry zipEntry = entries.nextElement();
+                if (zipEntry.isDirectory())
+                {
+                    numFolders++;
+                }
+            }
+
+            assertEquals(NUM_FOLDERS_NESTED_PREFIX, numFolders);
+        }
     }
 
     @Test
     public void zipFileCountMatches() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-single-prefix.zip");
+        File zipFile = tempDir.newFile("zip-single-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, FIRST_PREFIX);
 
-        zip = new ZipFile(zipFile);
-        final Enumeration<? extends ZipEntry> entries = zip.entries();
-
-        int numFiles = 0;
-
-        while (entries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            final ZipEntry zipEntry = entries.nextElement();
-            if (!zipEntry.isDirectory())
-            {
-                numFiles++;
-            }
-        }
+            final Enumeration<? extends ZipEntry> entries = zip.entries();
 
-        assertEquals(NUM_FILES, numFiles);
+            int numFiles = 0;
+            while (entries.hasMoreElements())
+            {
+                final ZipEntry zipEntry = entries.nextElement();
+                if (!zipEntry.isDirectory())
+                {
+                    numFiles++;
+                }
+            }
+
+            assertEquals(NUM_FILES, numFiles);
+        }
     }
 
     @Test
     public void unzipNonPrefixed() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-empty-prefix.zip");
+        File zipFile = tempDir.newFile("zip-empty-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, "");
 
-        File unzipDir = new File(tempDir, "unzip-empty-prefix");
+        File unzipDir = tempDir.newFolder("unzip-empty-prefix");
         ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath());
 
         File rootUnzip = new File(unzipDir, ROOT_DIR);
@@ -321,10 +332,10 @@ public class TestZipUtils
     @Test
     public void unzipSinglePrefix() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-single-prefix.zip");
+        File zipFile = tempDir.newFile("zip-single-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, FIRST_PREFIX);
 
-        File unzipDir = new File(tempDir, "unzip-single-prefix");
+        File unzipDir = tempDir.newFolder("unzip-single-prefix");
         ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath());
 
         File rootUnzip = new File(unzipDir, FIRST_PREFIX);
@@ -335,10 +346,10 @@ public class TestZipUtils
     @Test
     public void unzipNestedPrefix() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-nested-prefix.zip");
+        File zipFile = tempDir.newFile("zip-nested-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, NESTED_PREFIX);
 
-        File unzipDir = new File(tempDir, "unzip-nested-prefix");
+        File unzipDir = tempDir.newFolder("unzip-nested-prefix");
         ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath());
 
         File rootUnzip = new File(unzipDir, FIRST_PREFIX);
@@ -350,7 +361,7 @@ public class TestZipUtils
     @Test
     public void detectPrefix() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-single-prefix.zip");
+        File zipFile = tempDir.newFile("zip-single-prefix.zip");
         // zipDir will use the foldername as a prefix
         ZipUtils.zipDir(zipFile, sourceZipDir, "");
 
@@ -362,7 +373,7 @@ public class TestZipUtils
     @Test
     public void detectDoublePrefix() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-double-prefix.zip");
+        File zipFile = tempDir.newFile("zip-double-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, NESTED_PREFIX);
 
         int nestedRoots = ZipUtils.countNestingLevel(zipFile);
@@ -387,10 +398,10 @@ public class TestZipUtils
     @Test
     public void unzipSinglePrefixTrimmed() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-single-prefix.zip");
+        File zipFile = tempDir.newFile("zip-single-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, FIRST_PREFIX);
 
-        File unzipDir = new File(tempDir, "unzip-single-prefix");
+        File unzipDir = tempDir.newFolder("unzip-single-prefix");
         ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath(), 1);
 
         File rootUnzip = new File(unzipDir, FIRST_PREFIX);
@@ -401,10 +412,10 @@ public class TestZipUtils
     @Test
     public void unzipNestedPrefixTrimmed() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-nested-prefix.zip");
+        File zipFile = tempDir.newFile("zip-nested-prefix.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, NESTED_PREFIX);
 
-        File unzipDir = new File(tempDir, "unzip-nested-prefix");
+        File unzipDir = tempDir.newFolder("unzip-nested-prefix");
         ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath(), 2);
 
         File nestedUnzip = new File(unzipDir, SECOND_PREFIX);
@@ -415,10 +426,10 @@ public class TestZipUtils
     @Test
     public void unzipAndFlatten() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-flatten.zip");
+        File zipFile = tempDir.newFile("zip-flatten.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, "");
 
-        File unzipDir = new File(tempDir, "unzip-flatten");
+        File unzipDir = tempDir.newFolder("unzip-flatten");
         ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath(), 0, true, null);
 
         File level2TextFile = new File(unzipDir, "level2sub2.txt");
@@ -431,10 +442,10 @@ public class TestZipUtils
     @Test
     public void unzipPatternShouldMatch() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-pattern.zip");
+        File zipFile = tempDir.newFile("zip-pattern.zip");
         ZipUtils.zipDir(zipFile, sourceZipDir, "");
 
-        File unzipDir = new File(tempDir, "unzip-pattern");
+        File unzipDir = tempDir.newFolder("unzip-pattern");
         ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath(), 0, false, null);
 
         File level2TextFile = new File(unzipDir, "test-zip-dir/level2sub2/level2sub2.txt");
@@ -443,7 +454,7 @@ public class TestZipUtils
         assertTrue(level2TextFile.exists());
         assertTrue(level3TextFile.exists());
 
-        unzipDir = new File(tempDir, "unzip-pattern-2");
+        unzipDir = tempDir.newFolder("unzip-pattern-2");
         ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath(), 0, false, Pattern.compile(".+level2sub2.txt"));
 
         level2TextFile = new File(unzipDir, "test-zip-dir/level2sub2/level2sub2.txt");
@@ -456,16 +467,16 @@ public class TestZipUtils
     @Test
     public void unzipExecutable() throws IOException
     {
-        File zipFile = new File(tempDir, "zip-executable.zip");
+        File zipFile = tempDir.newFile("zip-executable.zip");
         File executable = new File(sourceZipDir, "executable.sh");
         executable.createNewFile();
 
-        // This won't work under Windows - not much we can but ignore this test
+        // This won't work under Windows - not much we can do but ignore this test
         Assume.assumeTrue(executable.setExecutable(true));
 
         ZipUtils.zipDir(zipFile, sourceZipDir, "");
 
-        File unzipDir = new File(tempDir, "unzip-executable");
+        File unzipDir = tempDir.newFolder("unzip-executable");
         ZipUtils.unzip(zipFile, unzipDir.getAbsolutePath(), 1);
 
         File nestedUnzip = new File(unzipDir, "executable.sh");

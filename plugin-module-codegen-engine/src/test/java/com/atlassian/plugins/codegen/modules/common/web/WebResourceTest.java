@@ -6,7 +6,7 @@ import com.atlassian.plugins.codegen.modules.common.Resource;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -53,7 +53,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
     {
         createDependencies();
         
-        assertNotNull(getGeneratedModule().selectSingleNode("//dependency[text() = '" + DEPENDENCY1 + "'"));
+        assertNotNull(getGeneratedModule().selectSingleNode("//dependency[text() = '" + DEPENDENCY1 + "']"));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
     {
         createDependencies();
         
-        assertNotNull(getGeneratedModule().selectSingleNode("//dependency[text() = '" + DEPENDENCY2 + "'"));
+        assertNotNull(getGeneratedModule().selectSingleNode("//dependency[text() = '" + DEPENDENCY2 + "']"));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
     {
         createContexts();
         
-        assertNotNull(getGeneratedModule().selectSingleNode("//context[text() = '" + CONTEXT1 + "'"));
+        assertNotNull(getGeneratedModule().selectSingleNode("//context[text() = '" + CONTEXT1 + "']"));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
     {
         createContexts();
         
-        assertNotNull(getGeneratedModule().selectSingleNode("//context[text() = '" + CONTEXT2 + "'"));
+        assertNotNull(getGeneratedModule().selectSingleNode("//context[text() = '" + CONTEXT2 + "']"));
     }
 
     @Test
@@ -334,23 +334,30 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         assertEquals("false", getGeneratedModule().selectSingleNode("//resource/param[@name='batch']/@value").getText());
     }
 
-    protected void createDependencies()
+    private void addTransformerWithKey(WebResourceTransformation transformation, String transformerKey)
+    {
+        WebResourceTransformer transformer = new WebResourceTransformer();
+        transformer.setModuleKey(transformerKey);
+        transformation.addTransformer(transformer);
+    }
+
+    private void createDependencies()
     {
         props.getResources().add(cssResource);
 
         props.addDependency(DEPENDENCY1);
         props.addDependency(DEPENDENCY2);
     }
-    
-    protected void createContexts()
+
+    private void createContexts()
     {
         props.getResources().add(cssResource);
 
         props.addContext(CONTEXT1);
         props.addContext(CONTEXT2);
     }
-    
-    protected void createSingleTransformer()
+
+    private void createSingleTransformer()
     {
         props.getResources().add(cssResource);
 
@@ -360,7 +367,7 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
         props.addTransformation(transformation);
     }
 
-    protected void createMultipleTransformers()
+    private void createMultipleTransformers()
     {
         props.getResources().add(cssResource);
 
@@ -370,8 +377,8 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
 
         props.addTransformation(transformation);
     }
-    
-    protected void createMultipleTransformations()
+
+    private void createMultipleTransformations()
     {
         props.getResources().add(cssResource);
 
@@ -383,12 +390,5 @@ public class WebResourceTest extends AbstractConditionTest<WebResourceProperties
 
         props.addTransformation(txtTrans);
         props.addTransformation(cssTrans);
-    }
-
-    private void addTransformerWithKey(WebResourceTransformation transformation, String transformerKey)
-    {
-        WebResourceTransformer transformer = new WebResourceTransformer();
-        transformer.setModuleKey(transformerKey);
-        transformation.addTransformer(transformer);
     }
 }

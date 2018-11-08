@@ -17,6 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -81,7 +82,7 @@ public class CrowdProductHandlerTest
 
         crowdProductHandler.processHomeDirectory(ctx, crowdHome);
 
-        assertThat(FileUtils.readFileToString(new File(sharedHome, "crowd.cfg.xml")),
+        assertThat(FileUtils.readFileToString(new File(sharedHome, "crowd.cfg.xml"), StandardCharsets.UTF_8),
                 containsString(databasePathContains(crowdHome.getCanonicalPath())));
     }
 
@@ -92,7 +93,7 @@ public class CrowdProductHandlerTest
 
         crowdProductHandler.processHomeDirectory(ctx, crowdHome);
 
-        assertThat(FileUtils.readFileToString(new File(crowdHome, "crowd.cfg.xml")),
+        assertThat(FileUtils.readFileToString(new File(crowdHome, "crowd.cfg.xml"), StandardCharsets.UTF_8),
                 containsString(databasePathContains(crowdHome.getCanonicalPath())));
     }
 
@@ -105,9 +106,9 @@ public class CrowdProductHandlerTest
 
         crowdProductHandler.processHomeDirectory(ctx, crowdHome);
 
-        assertThat(FileUtils.readFileToString(new File(crowdHome, "crowd.cfg.xml")),
+        assertThat(FileUtils.readFileToString(new File(crowdHome, "crowd.cfg.xml"), StandardCharsets.UTF_8),
                 containsString(databasePathContains(crowdHome.getCanonicalPath())));
-        assertThat(FileUtils.readFileToString(new File(sharedHome, "crowd.cfg.xml")),
+        assertThat(FileUtils.readFileToString(new File(sharedHome, "crowd.cfg.xml"), StandardCharsets.UTF_8),
                 containsString(databasePathContains(crowdHome.getCanonicalPath())));
     }
 

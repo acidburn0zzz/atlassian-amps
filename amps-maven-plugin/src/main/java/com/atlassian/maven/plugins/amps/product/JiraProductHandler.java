@@ -10,7 +10,7 @@ import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -30,7 +30,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,7 +42,6 @@ import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.get
 import static com.atlassian.maven.plugins.amps.util.ConfigFileUtils.RegexReplacement;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static java.lang.String.format;
-import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class JiraProductHandler extends AbstractWebappProductHandler
@@ -101,7 +99,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     }
 
     @Override
-    protected void customiseInstance(Product ctx, File homeDir, File explodedWarDir) throws MojoExecutionException {
+    protected void customiseInstance(Product ctx, File homeDir, File explodedWarDir) {
         // Jira 7.12.x has new tomcat version which requires additional characters to be whitelisted
         if (new ComparableVersion(ctx.getVersion()).compareTo(new ComparableVersion("7.12.0")) >= 0) {
             ctx.setCargoXmlOverrides(serverXmlJiraOverride());
@@ -167,7 +165,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         properties.putAll(super.getSystemProperties(ctx));
         properties.put("jira.home", fixWindowsSlashes(getHomeDirectory(ctx).getPath()));
         properties.put("cargo.servlet.uriencoding", "UTF-8");
-        final boolean forceAwaitFullInit = Optional.fromNullable(ctx.isAwaitFullInitialization()).or(Boolean.TRUE);
+        final boolean forceAwaitFullInit = MoreObjects.firstNonNull(ctx.isAwaitFullInitialization(), Boolean.TRUE);
         if (forceAwaitFullInit) {
             properties.put("com.atlassian.jira.startup.LauncherContextListener.SYNCHRONOUS", "true");
         }
@@ -325,13 +323,13 @@ public class JiraProductHandler extends AbstractWebappProductHandler
      * </dataSource>
      * }
      * </pre>
-     * @param homeDir
-     * @param dbType
-     * @param schema
-     * @throws MojoExecutionException
+     * @param homeDir the application's home directory
+     * @param dbType  the database type in use
+     * @param schema  the schema to use
+     * @throws MojoExecutionException if {@code dbconfig.xml} can't be updated
      */
     @VisibleForTesting
-    protected void updateDbConfigXml(final File homeDir, final JiraDatabaseType dbType, final String schema)
+    void updateDbConfigXml(final File homeDir, final JiraDatabaseType dbType, final String schema)
             throws MojoExecutionException
     {
         final File dbConfigXml = new File(homeDir, FILENAME_DBCONFIG);
@@ -348,10 +346,6 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         catch (DocumentException de)
         {
             throw new MojoExecutionException("Cannot parse database configuration xml file", de);
-        }
-        catch (MalformedURLException me)
-        {
-            throw new MojoExecutionException(me.getMessage());
         }
         final Node dbTypeNode = dbConfigDoc.selectSingleNode("//jira-database-config/database-type");
         final Node schemaNode = dbConfigDoc.selectSingleNode("//jira-database-config/schema-name");
@@ -424,17 +418,11 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     private void writeDbConfigXml(final File dbConfigXml, final Document dbConfigDoc) throws IOException
     {
         // write dbconfig.xml
-        FileOutputStream fos = new FileOutputStream(dbConfigXml);
-        OutputFormat format = OutputFormat.createPrettyPrint();
-        XMLWriter writer = new XMLWriter(fos, format);
-        try
+        try (FileOutputStream fos = new FileOutputStream(dbConfigXml))
         {
+            XMLWriter writer = new XMLWriter(fos, OutputFormat.createPrettyPrint());
             writer.write(dbConfigDoc);
-        }
-        finally
-        {
             writer.close();
-            closeQuietly(fos);
         }
     }
 
@@ -527,8 +515,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         @Override
         protected Collection<ProductArtifact> getPdkInstallArtifacts(String pdkInstallVersion)
         {
-            List<ProductArtifact> plugins = new ArrayList<ProductArtifact>();
-            plugins.addAll(super.getPdkInstallArtifacts(pdkInstallVersion));
+            List<ProductArtifact> plugins = new ArrayList<>(super.getPdkInstallArtifacts(pdkInstallVersion));
             plugins.add(new ProductArtifact("commons-fileupload", "commons-fileupload", "1.2.1"));
             return plugins;
         }

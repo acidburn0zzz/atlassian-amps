@@ -2,10 +2,8 @@ package com.atlassian.maven.plugins.amps;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -21,15 +19,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Run the webapp
@@ -38,7 +32,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Execute(phase = LifecyclePhase.PACKAGE)
 public class RunMojo extends AbstractTestGroupsHandlerMojo
 {
-   
     @Parameter(property = "wait", defaultValue = "true")
     private boolean wait;
 
@@ -47,7 +40,6 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
      */
     @Parameter(property = "amps.properties", required = true, defaultValue = "false")
     protected boolean writePropertiesToFile;
-
 
     /**
      * When this property is set to {@literal true}, Mojo will be executed on the last project in the Reactor
@@ -63,19 +55,16 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
      * </ul>
      * </p>
      */
-    @Parameter(property = "runProject", required = false)
+    @Parameter(property = "runProject")
     protected String runProject;
 
     /**
      * The properties actually used by the mojo when running
      */
-    protected final Map<String, String> properties = new HashMap<String, String>();
-
-    
+    protected final Map<String, String> properties = new HashMap<>();
 
     protected void doExecute() throws MojoExecutionException, MojoFailureException
     {
-
         if (!shouldExecute())
         {
             getLog().info("Skipping execution");
@@ -97,22 +86,21 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
 
     protected void startProducts(List<ProductExecution> productExecutions) throws MojoExecutionException
     {
-        if (wait) {
+        if (wait)
+        {
             getLog().debug("=======> ADDING SHUTDOWN HOOK\n");
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    getLog().info("Running Shutdown Hook");
-                    try {
-                        stopProducts(productExecutions);
-                    } catch (MojoExecutionException e) {
-                        e.printStackTrace();
-                        throw new RuntimeException("Unable to shut down products in shutdown hook");
-                    }
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                getLog().info("Running Shutdown Hook");
+                try
+                {
+                    stopProducts(productExecutions);
+                }
+                catch (MojoExecutionException e)
+                {
+                    throw new RuntimeException("Unable to shut down products in shutdown hook", e);
                 }
             }));
         }
-
 
         long globalStartTime = System.nanoTime();
         setParallelMode(productExecutions);
@@ -127,7 +115,7 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
             }
 
             //add artifacts for test console
-            if(shouldBuildTestPlugin())
+            if (shouldBuildTestPlugin())
             {
                 List<ProductArtifact> plugins = product.getBundledArtifacts();
                 plugins.addAll(getTestFrameworkPlugins());
@@ -246,19 +234,13 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
         }
 
         final File ampsProperties = new File(getMavenContext().getProject().getBuild().getDirectory(), "amps.properties");
-        OutputStream out = null;
-        try
+        try (OutputStream out = new FileOutputStream(ampsProperties))
         {
-            out = new FileOutputStream(ampsProperties);
             props.store(out, "");
         }
         catch (IOException e)
         {
             throw new MojoExecutionException("Error writing " + ampsProperties.getAbsolutePath(), e);
-        }
-        finally
-        {
-            IOUtils.closeQuietly(out);
         }
     }
 
@@ -272,7 +254,7 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
         private String event;
         private Product product;
 
-        public StartupInformation(final Product product, final String event, final int actualHttpPort, final long durationSeconds)
+        StartupInformation(final Product product, final String event, final int actualHttpPort, final long durationSeconds)
         {
             this.actualHttpPort = actualHttpPort;
             this.product = product;
@@ -300,7 +282,6 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
         {
             return product.getOutput();
         }
-
     }
 
     /**
@@ -333,5 +314,4 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
         final List<MavenProject> reactor = mavenContext.getReactor();
         return reactor == null || Iterables.getLast(reactor, currentProject).equals(currentProject);
     }
-
 }

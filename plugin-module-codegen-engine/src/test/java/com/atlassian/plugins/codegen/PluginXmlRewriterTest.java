@@ -1,13 +1,15 @@
 package com.atlassian.plugins.codegen;
 
+import java.nio.charset.StandardCharsets;
+
 import com.atlassian.plugins.codegen.ComponentDeclaration.Visibility;
 import com.atlassian.plugins.codegen.XmlMatchers.XmlWrapper;
 
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
@@ -28,36 +30,25 @@ import static org.hamcrest.Matchers.nullValue;
 
 public class PluginXmlRewriterTest
 {
-    protected static final String CLASS = "com.atlassian.test.MyClass";
-    protected static final String INTERFACE = "com.atlassian.test.MyInterface";
-    protected static final String INTERFACE2 = "com.atlassian.test.MyInterface2";
-    protected static final ComponentImport IMPORT = ComponentImport.componentImport(fullyQualified(INTERFACE));
-    protected static final ComponentImport IMPORT2 = ComponentImport.componentImport(fullyQualified(INTERFACE2));
-    
-    protected ComponentDeclaration.Builder componentBuilder = ComponentDeclaration.builder(fullyQualified(CLASS), "my-key");
+    private static final String CLASS = "com.atlassian.test.MyClass";
+    private static final String INTERFACE = "com.atlassian.test.MyInterface";
+    private static final String INTERFACE2 = "com.atlassian.test.MyInterface2";
+    private static final ComponentImport IMPORT = ComponentImport.componentImport(fullyQualified(INTERFACE));
+    private static final ComponentImport IMPORT2 = ComponentImport.componentImport(fullyQualified(INTERFACE2));
 
-    protected ProjectHelper helper;
-    protected PluginXmlRewriter rewriter;
+    @Rule
+    public final ProjectHelper helper = new ProjectHelper();
+
+    private ComponentDeclaration.Builder componentBuilder;
+    private PluginXmlRewriter rewriter;
     
     @Before
     public void setup() throws Exception
     {
-        helper = new ProjectHelper();
+        componentBuilder = ComponentDeclaration.builder(fullyQualified(CLASS), "my-key");
         usePluginXml("empty-plugin.xml");
     }
-    
-    private void usePluginXml(String path) throws Exception
-    {
-        helper.usePluginXml(path);
-        rewriter = new PluginXmlRewriter(helper.location);
-    }
-    
-    @After
-    public void deleteTempDir() throws Exception
-    {
-        helper.destroy();
-    }
-    
+
     @Test
     public void i18nResourceIsNotAddedByDefault() throws Exception
     {
@@ -481,19 +472,25 @@ public class PluginXmlRewriterTest
                    node("//my-module", nodeTextEquals("good")));
     }
     
-    protected PluginProjectChangeset addPluginParam()
+    private PluginProjectChangeset addPluginParam()
     {
         return new PluginProjectChangeset().with(pluginParameter("foo", "bar"));
     }
     
-    protected PluginProjectChangeset addI18nProperty()
+    private PluginProjectChangeset addI18nProperty()
     {
         return new PluginProjectChangeset().with(i18nString("foo", "bar"));
     }
     
-    protected XmlWrapper applyChanges(PluginProjectChangeset changes) throws Exception
+    private XmlWrapper applyChanges(PluginProjectChangeset changes) throws Exception
     {
         rewriter.applyChanges(changes);
-        return XmlMatchers.xml(FileUtils.readFileToString(helper.pluginXml));
+        return XmlMatchers.xml(FileUtils.readFileToString(helper.pluginXml, StandardCharsets.UTF_8));
+    }
+
+    private void usePluginXml(String path) throws Exception
+    {
+        helper.usePluginXml(path);
+        rewriter = new PluginXmlRewriter(helper.location);
     }
 }

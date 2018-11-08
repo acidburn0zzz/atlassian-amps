@@ -7,7 +7,7 @@ import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @since 3.6

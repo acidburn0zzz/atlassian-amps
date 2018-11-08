@@ -2,6 +2,7 @@ package com.atlassian.plugins.codegen.modules;
 
 import java.io.File;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -228,7 +229,7 @@ public abstract class AbstractPluginModuleCreator<T extends PluginModuleProperti
      */
     protected String fromFile(String filePath) throws Exception
     {
-        return IOUtils.toString(getClass().getClassLoader().getResourceAsStream(filePath));
+        return IOUtils.toString(getClass().getClassLoader().getResourceAsStream(filePath), StandardCharsets.UTF_8);
     }
     
     /**

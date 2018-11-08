@@ -3,6 +3,7 @@ package com.atlassian.plugins.codegen;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
@@ -14,7 +15,6 @@ import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
  * Applies the changes from a {@link PluginProjectChangeset} that involve creating
@@ -41,7 +41,7 @@ public class ProjectFilesRewriter implements ProjectRewriter
                 location.getTestDirectory() : location.getSourceDirectory();
             File newFile = FileUtil.dotDelimitedFilePath(baseDir, sourceFile.getClassId().getFullName(), ".java");
             Files.createParentDirs(newFile);
-            FileUtils.writeStringToFile(newFile, sourceFile.getContent());
+            FileUtils.writeStringToFile(newFile, sourceFile.getContent(), StandardCharsets.UTF_8);
         }
         for (ResourceFile resourceFile : changes.getItems(ResourceFile.class))
         {
@@ -64,7 +64,7 @@ public class ProjectFilesRewriter implements ProjectRewriter
     private void addI18nStrings(File file, Iterable<I18nString> items) throws IOException
     {
         Files.createParentDirs(file);
-        String oldContent = file.exists() ? FileUtils.readFileToString(file) : "";
+        String oldContent = file.exists() ? FileUtils.readFileToString(file, StandardCharsets.UTF_8) : "";
         Properties oldProps = new Properties();
         oldProps.load(new StringReader(oldContent));
         StringBuilder newContent = new StringBuilder(oldContent);
@@ -84,7 +84,7 @@ public class ProjectFilesRewriter implements ProjectRewriter
         }
         if (modified)
         {
-            FileUtils.writeStringToFile(file, newContent.toString());
+            FileUtils.writeStringToFile(file, newContent.toString(), StandardCharsets.UTF_8);
         }
     }
 }

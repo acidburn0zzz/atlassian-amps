@@ -12,6 +12,7 @@
         <invoker.product>${invoker.product}</invoker.product>
         <jira.version>6.3</jira.version>
     </properties>
+
     <profiles>
         <profile>
             <id>jira-no-database-type</id>
@@ -51,7 +52,7 @@
                             <importMethod>SQL</importMethod>
                             <libArtifacts>
                                 <libArtifact>
-                                    <groupId>postgresql</groupId>
+                                    <groupId>org.postgresql</groupId>
                                     <artifactId>postgresql</artifactId>
                                     <version>${postgres.version}</version>
                                 </libArtifact>
@@ -220,8 +221,8 @@
                             <importMethod>IMPDP</importMethod>
                             <libArtifacts>
                                 <libArtifact>
-                                    <groupId>com.oracle</groupId>
-                                    <artifactId>ojdbc6</artifactId>
+                                    <groupId>com.oracle.jdbc</groupId>
+                                    <artifactId>ojdbc8</artifactId>
                                     <version>${oracle.version}</version>
                                 </libArtifact>
                             </libArtifacts>
@@ -249,6 +250,5 @@
                 </plugins>
             </build>
         </profile>
-
     </profiles>
 </project>

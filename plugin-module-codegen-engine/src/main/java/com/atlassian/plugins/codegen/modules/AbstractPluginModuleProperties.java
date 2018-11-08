@@ -13,11 +13,11 @@ import com.google.common.collect.Maps;
 public abstract class AbstractPluginModuleProperties extends Properties implements PluginModuleProperties
 {
     protected boolean includeExamples;
-    protected Map<String, String> i18nProperties;
+
+    private Map<String, String> i18nProperties;
 
     protected AbstractPluginModuleProperties()
     {
-        super();
         i18nProperties = Maps.newHashMap();
         includeExamples = false;
         setProductId("RefApp");
@@ -25,9 +25,8 @@ public abstract class AbstractPluginModuleProperties extends Properties implemen
 
     protected AbstractPluginModuleProperties(AbstractPluginModuleProperties from)
     {
-        super();
         putAll(from);
-        i18nProperties = new HashMap(from.i18nProperties);
+        i18nProperties = new HashMap<>(from.i18nProperties);
         includeExamples = from.includeExamples;
     }
 
@@ -66,5 +65,4 @@ public abstract class AbstractPluginModuleProperties extends Properties implemen
     {
         return ImmutableMap.copyOf(i18nProperties);
     }
-
 }

@@ -9,7 +9,6 @@ import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompter;
 import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompterRegistry;
 import com.atlassian.plugins.codegen.annotations.asm.AbstractAnnotationParser;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.components.interactivity.Prompter;
@@ -20,7 +19,7 @@ import org.objectweb.asm.*;
  */
 public class ModulePrompterAnnotationParser extends AbstractAnnotationParser
 {
-    public static final String PROMPTER_PACKAGE = "com.atlassian.maven.plugins.amps.codegen.prompter";
+    private static final String PROMPTER_PACKAGE = "com.atlassian.maven.plugins.amps.codegen.prompter";
     private Log log;
 
     private PluginModulePrompterRegistry pluginModulePrompterRegistry;
@@ -37,7 +36,7 @@ public class ModulePrompterAnnotationParser extends AbstractAnnotationParser
                 .getContextClassLoader();
         Thread.currentThread()
                 .setContextClassLoader(getClass().getClassLoader());
-        parse(PROMPTER_PACKAGE, new PropmpterClassVisitor());
+        parse(PROMPTER_PACKAGE, new PrompterClassVisitor());
         Thread.currentThread()
                 .setContextClassLoader(oldLoader);
     }
@@ -48,18 +47,17 @@ public class ModulePrompterAnnotationParser extends AbstractAnnotationParser
                 .getContextClassLoader();
         Thread.currentThread()
                 .setContextClassLoader(getClass().getClassLoader());
-        parse(basePackage, new PropmpterClassVisitor());
+        parse(basePackage, new PrompterClassVisitor());
         Thread.currentThread()
                 .setContextClassLoader(oldLoader);
     }
 
-    public class PropmpterClassVisitor extends ClassVisitor
+    public class PrompterClassVisitor extends ClassVisitor
     {
-
         private String visitedClassname;
         private boolean isModulePrompter;
 
-        public PropmpterClassVisitor()
+        PrompterClassVisitor()
         {
             super(Opcodes.ASM5);
         }
@@ -76,13 +74,14 @@ public class ModulePrompterAnnotationParser extends AbstractAnnotationParser
                 this.isModulePrompter = superHasInterface(superName, iface);
             }
 
-            Class modulePrompterClass = null;
+            Class modulePrompterClass;
             try
             {
                 modulePrompterClass = Class.forName(visitedClassname);
-            } catch (ClassNotFoundException e)
+            }
+            catch (ClassNotFoundException e)
             {
-                //dumb. we're visiting this class so it has to exist!
+                throw new IllegalStateException(visitedClassname + " could not be loaded", e);
             }
 
             if (isModulePrompter && !AbstractModulePrompter.class.isAssignableFrom(modulePrompterClass))
@@ -108,13 +107,10 @@ public class ModulePrompterAnnotationParser extends AbstractAnnotationParser
                     .getContextClassLoader();
             String path = superName.replace('.', '/');
 
-            InputStream is = null;
-            try
+            try (InputStream is = classLoader.getResourceAsStream(path + ".class"))
             {
-                is = classLoader.getResourceAsStream(path + ".class");
                 if (null != is)
                 {
-
                     ClassReader classReader = new ClassReader(is);
                     hasInterface = ArrayUtils.contains(classReader.getInterfaces(), interfaceName);
                     if (!hasInterface)
@@ -122,12 +118,10 @@ public class ModulePrompterAnnotationParser extends AbstractAnnotationParser
                         hasInterface = superHasInterface(classReader.getSuperName(), interfaceName);
                     }
                 }
-            } catch (Exception e)
+            }
+            catch (Exception ignored)
             {
                 //don't care
-            } finally
-            {
-                IOUtils.closeQuietly(is);
             }
 
             return hasInterface;
@@ -177,9 +171,9 @@ public class ModulePrompterAnnotationParser extends AbstractAnnotationParser
 
                 try
                 {
-                    Class creatorClass = Class.forName(normalizedCreatorName);
-                    Class modulePrompterClass = Class.forName(visitedClassname);
-                    Class[] argTypes = new Class[]{Prompter.class};
+                    Class<?> creatorClass = Class.forName(normalizedCreatorName);
+                    Class<?> modulePrompterClass = Class.forName(visitedClassname);
+                    Class<?>[] argTypes = new Class<?>[]{Prompter.class};
                     Object[] args = new Object[]{mavenPrompter};
 
                     Constructor prompterConstructor = modulePrompterClass.getConstructor(argTypes);

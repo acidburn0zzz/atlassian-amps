@@ -12,7 +12,6 @@ import com.atlassian.plugins.codegen.util.PluginXmlHelper;
 
 import com.google.common.collect.ImmutableList;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -83,19 +82,12 @@ public class PluginXmlRewriter implements ProjectRewriter
 
         if (modified)
         {
-            OutputFormat format = OutputFormat.createPrettyPrint();
-            FileOutputStream fos = new FileOutputStream(xmlHelper.getXmlFile());
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            XMLWriter writer = new XMLWriter(osw, format);
-            try
+            try (FileOutputStream fos = new FileOutputStream(xmlHelper.getXmlFile());
+                 OutputStreamWriter osw = new OutputStreamWriter(fos))
             {
+                XMLWriter writer = new XMLWriter(osw, OutputFormat.createPrettyPrint());
                 writer.write(document);
-            }
-            finally
-            {
                 writer.close();
-                IOUtils.closeQuietly(osw);
-                IOUtils.closeQuietly(fos);
             }
         }
     }
