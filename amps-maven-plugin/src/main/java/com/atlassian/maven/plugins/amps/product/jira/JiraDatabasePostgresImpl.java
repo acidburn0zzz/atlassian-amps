@@ -12,8 +12,6 @@ import com.atlassian.maven.plugins.amps.product.ImportMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -153,9 +151,8 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
      * @param url JDBC URL to parse
      * @param defaults Default properties
      * @return Properties with elements added from the url
-     * @exception SQLException
      */
-    public Properties parseURL(String url, Properties defaults) throws SQLException
+    public Properties parseURL(String url, Properties defaults)
     {
         Properties urlProps = new Properties(defaults);
         String l_urlServer = url;
@@ -178,11 +175,9 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
             }
             urlProps.setProperty("PGDBNAME", l_urlServer.substring(slash + 1));
             String[] addresses = l_urlServer.substring(0, slash).split(",");
-            StringBuffer hosts = new StringBuffer();
-            StringBuffer ports = new StringBuffer();
-            for (int addr = 0; addr < addresses.length; ++addr) {
-                String address = addresses[addr];
-
+            StringBuilder hosts = new StringBuilder();
+            StringBuilder ports = new StringBuilder();
+            for (String address : addresses) {
                 int portIdx = address.lastIndexOf(':');
                 if (portIdx != -1 && address.lastIndexOf(']') < portIdx) {
                     String portStr = address.substring(portIdx + 1);
@@ -211,10 +206,10 @@ public class JiraDatabasePostgresImpl extends AbstractJiraDatabase
         }
         //parse the args part of the url
         String[] args = l_urlArgs.split("&");
-        for (int i = 0; i < args.length; ++i)
+        for (String token : args)
         {
-            String token = args[i];
-            if (token.length() ==  0) {
+            if (token.length() == 0)
+            {
                 continue;
             }
             int l_pos = token.indexOf('=');

@@ -8,15 +8,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-
-import jline.ANSIBuffer;
+import org.jline.utils.AttributedStringBuilder;
+import org.jline.utils.AttributedStyle;
 
 /**
  *
  */
 public class DefaultPluginModuleSelectionQueryer extends AbstractLogEnabled implements PluginModuleSelectionQueryer
 {
-    public static final List<String> YN_ANSWERS = new ArrayList<String>(Arrays.asList("Y", "y", "N", "n"));
+    public static final List<String> YN_ANSWERS = new ArrayList<>(Arrays.asList("Y", "y", "N", "n"));
     private Prompter prompter;
     private boolean useAnsiColor;
 
@@ -26,7 +26,8 @@ public class DefaultPluginModuleSelectionQueryer extends AbstractLogEnabled impl
         if (mavencolor != null && !mavencolor.equals(""))
         {
             useAnsiColor = Boolean.parseBoolean(mavencolor);
-        } else
+        }
+        else
         {
             useAnsiColor = false;
         }
@@ -35,11 +36,11 @@ public class DefaultPluginModuleSelectionQueryer extends AbstractLogEnabled impl
     @Override
     public PluginModuleCreator selectModule(Map<Class, PluginModuleCreator> map) throws PrompterException
     {
-
         if (useAnsiColor)
         {
             return getAnsiModule(map);
-        } else
+        }
+        else
         {
             return getPlainModule(map);
         }
@@ -47,11 +48,11 @@ public class DefaultPluginModuleSelectionQueryer extends AbstractLogEnabled impl
 
     private PluginModuleCreator getAnsiModule(Map<Class, PluginModuleCreator> map) throws PrompterException
     {
-        ANSIBuffer query = new ANSIBuffer();
-        query.bold("Choose Plugin Module:\n");
+        AttributedStringBuilder builder = new AttributedStringBuilder()
+                .styled(AttributedStyle.BOLD, "Choose Plugin Module:\n");
 
-        List<String> answers = new ArrayList<String>();
-        Map<String, PluginModuleCreator> moduleAnswerMap = new HashMap<String, PluginModuleCreator>();
+        List<String> answers = new ArrayList<>();
+        Map<String, PluginModuleCreator> moduleAnswerMap = new HashMap<>();
 
         int counter = 1;
 
@@ -60,16 +61,17 @@ public class DefaultPluginModuleSelectionQueryer extends AbstractLogEnabled impl
             PluginModuleCreator moduleCreator = entry.getValue();
 
             String answer = String.valueOf(counter);
-            query.bold(answer);
+            builder.styled(AttributedStyle.BOLD, answer);
             if (counter < 10)
             {
-                query.append(":  ");
-            } else
-            {
-                query.append(": ");
+                builder.append(":  ");
             }
-            query.append(entry.getValue()
-                    .getModuleName() + "\n");
+            else
+            {
+                builder.append(": ");
+            }
+            builder.append(entry.getValue().getModuleName())
+                    .append("\n");
 
             answers.add(answer);
 
@@ -78,21 +80,19 @@ public class DefaultPluginModuleSelectionQueryer extends AbstractLogEnabled impl
             counter++;
         }
 
-        query.bold("Choose a number");
+        builder.styled(AttributedStyle.BOLD, "Choose a number");
 
-        String answer = prompter.prompt(query.toString(), answers);
+        String answer = prompter.prompt(builder.toAnsi(), answers);
 
-        PluginModuleCreator selection = moduleAnswerMap.get(answer);
-
-        return selection;
+        return moduleAnswerMap.get(answer);
     }
 
     private PluginModuleCreator getPlainModule(Map<Class, PluginModuleCreator> map) throws PrompterException
     {
         StringBuilder query = new StringBuilder("Choose Plugin Module:\n");
 
-        List<String> answers = new ArrayList<String>();
-        Map<String, PluginModuleCreator> moduleAnswerMap = new HashMap<String, PluginModuleCreator>();
+        List<String> answers = new ArrayList<>();
+        Map<String, PluginModuleCreator> moduleAnswerMap = new HashMap<>();
 
         int counter = 1;
 
@@ -103,13 +103,12 @@ public class DefaultPluginModuleSelectionQueryer extends AbstractLogEnabled impl
             String answer = String.valueOf(counter);
             if (counter < 10)
             {
-                query.append(answer + ":  ");
+                query.append(answer).append(":  ");
             } else
             {
-                query.append(answer + ": ");
+                query.append(answer).append(": ");
             }
-            query.append(entry.getValue()
-                    .getModuleName() + "\n");
+            query.append(entry.getValue().getModuleName()).append("\n");
 
             answers.add(answer);
 
@@ -122,9 +121,7 @@ public class DefaultPluginModuleSelectionQueryer extends AbstractLogEnabled impl
 
         String answer = prompter.prompt(query.toString(), answers);
 
-        PluginModuleCreator selection = moduleAnswerMap.get(answer);
-
-        return selection;
+        return moduleAnswerMap.get(answer);
     }
 
     @Override
@@ -141,23 +138,15 @@ public class DefaultPluginModuleSelectionQueryer extends AbstractLogEnabled impl
     protected boolean promptForBoolean(String message, String defaultValue) throws PrompterException
     {
         String answer;
-        boolean bool;
         if (StringUtils.isBlank(defaultValue))
         {
             answer = prompter.prompt(message, YN_ANSWERS);
-        } else
+        }
+        else
         {
             answer = prompter.prompt(message, YN_ANSWERS, defaultValue);
         }
 
-        if ("y".equals(answer.toLowerCase()))
-        {
-            bool = true;
-        } else
-        {
-            bool = false;
-        }
-
-        return bool;
+        return "y".equalsIgnoreCase(answer);
     }
 }

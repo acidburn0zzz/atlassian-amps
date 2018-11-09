@@ -13,15 +13,12 @@
     <packaging>maven-plugin</packaging>
 
     <name>AMPS Dispatcher Maven Plugin</name>
-    <description>
-        Detects which version of AMPS is being used and dispatches all goals to it
-    </description>
+    <description>Detects which version of AMPS is being used and dispatches all goals to it</description>
 
     <dependencies>
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>amps-maven-plugin</artifactId>
-            <version>${project.version}</version>
             <type>maven-plugin</type>
         </dependency>
     </dependencies>

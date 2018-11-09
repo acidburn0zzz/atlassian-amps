@@ -17,7 +17,6 @@
         <dependency>
             <groupId>com.atlassian.amps</groupId>
             <artifactId>plugin-module-codegen-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

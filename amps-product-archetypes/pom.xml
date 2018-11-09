@@ -24,9 +24,6 @@
         <module>plugin-archetype</module>
     </modules>
 
-    <dependencies>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
