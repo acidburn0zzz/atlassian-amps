@@ -34,34 +34,14 @@ import org.codehaus.plexus.components.interactivity.OutputHandler;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.StringUtils;
-
-import jline.ANSIBuffer;
+import org.jline.utils.AttributedStringBuilder;
+import org.jline.utils.AttributedStyle;
 
 /**
  * @since 3.6
  */
 public class PrettyPrompter implements Prompter
 {
-
-    //maven-cli-plugin uses an old version jline that has ansi codes in package scope.
-    //re-defining them in public here
-    public static final int OFF = 0;
-    public static final int BOLD = 1;
-    public static final int UNDERSCORE = 4;
-    public static final int BLINK = 5;
-    public static final int REVERSE = 7;
-    public static final int CONCEALED = 8;
-    public static final int FG_BLACK = 30;
-    public static final int FG_RED = 31;
-    public static final int FG_GREEN = 32;
-    public static final int FG_YELLOW = 33;
-    public static final int FG_BLUE = 34;
-    public static final int FG_MAGENTA = 35;
-    public static final int FG_CYAN = 36;
-    public static final int FG_WHITE = 37;
-    public static final char ESC = 27;
-
-
     /**
      * @requirement
      */
@@ -80,7 +60,8 @@ public class PrettyPrompter implements Prompter
         if (mavencolor != null && !mavencolor.equals(""))
         {
             useAnsiColor = Boolean.parseBoolean(mavencolor);
-        } else
+        }
+        else
         {
             useAnsiColor = false;
         }
@@ -170,15 +151,11 @@ public class PrettyPrompter implements Prompter
                     String invalid = "Invalid selection.";
                     if (useAnsiColor)
                     {
-                        ANSIBuffer ansiBuffer = new ANSIBuffer();
-                        ansiBuffer.append(ANSIBuffer.ANSICodes
-                                .attrib(FG_RED))
-                                .append(ANSIBuffer.ANSICodes
-                                        .attrib(BOLD))
-                                .append("Invalid selection.")
-                                .append(ANSIBuffer.ANSICodes
-                                        .attrib(OFF));
-                        invalid = ansiBuffer.toString();
+                        invalid = new AttributedStringBuilder()
+                                .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.RED))
+                                .append(invalid)
+                                .style(AttributedStyle.DEFAULT)
+                                .toAnsi();
                     }
                     outputHandler.writeLine(invalid);
                 } catch (IOException e)
@@ -231,48 +208,42 @@ public class PrettyPrompter implements Prompter
 
     private String formatAnsiMessage(String message, List possibleValues, String defaultReply)
     {
-        ANSIBuffer formatted = new ANSIBuffer();
-
-        formatted.append(message);
+        AttributedStringBuilder builder = new AttributedStringBuilder()
+                .append(message);
 
         if (possibleValues != null && !possibleValues.isEmpty())
         {
-            formatted.append(" (");
+            builder.append(" (");
 
             for (Iterator it = possibleValues.iterator(); it.hasNext(); )
             {
                 String possibleValue = (String) it.next();
 
-                formatted.attrib(possibleValue, BOLD);
-
+                builder.styled(AttributedStyle.BOLD, possibleValue);
                 if (it.hasNext())
                 {
-                    formatted.append("/");
+                    builder.append("/");
                 }
             }
 
-            formatted.append(")");
+            builder.append(")");
         }
 
         if (defaultReply != null)
         {
-            formatted.append(ANSIBuffer.ANSICodes
-                    .attrib(FG_GREEN))
-                    .append(ANSIBuffer.ANSICodes
-                            .attrib(BOLD))
+            builder.style(AttributedStyle.BOLD.foreground(AttributedStyle.GREEN))
                     .append(" [")
                     .append(defaultReply)
                     .append("]")
-                    .append(ANSIBuffer.ANSICodes
-                            .attrib(OFF));
+                    .style(AttributedStyle.DEFAULT);
         }
 
-        return formatted.toString();
+        return builder.toAnsi();
     }
 
     private String formatPlainMessage(String message, List possibleValues, String defaultReply)
     {
-        StringBuffer formatted = new StringBuffer(message.length() * 2);
+        StringBuilder formatted = new StringBuilder(message.length() * 2);
 
         formatted.append(message);
 
@@ -323,6 +294,4 @@ public class PrettyPrompter implements Prompter
         }
 
     }
-
-
 }

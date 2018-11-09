@@ -7,6 +7,23 @@
     <name>TestUnitTest</name>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <!-- The default binding for Maven 3.5.4 is maven-compiler-plugin 3.1.0, which still defaults
+                         to a Java 5 target. Java 11 does not support that target. 3.8.0 defaults to Java 6, but,
+                         in addition to specifying that, we explicitly target Java 8 instead.
+                         See https://maven.apache.org/ref/3.5.4/maven-core/default-bindings.html -->
+                    <version>3.8.0</version>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>${invoker.groupId}</groupId>

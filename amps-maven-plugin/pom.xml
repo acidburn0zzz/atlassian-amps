@@ -38,95 +38,77 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.6</version>
         </dependency>
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
             <artifactId>biz.aQute.bndlib</artifactId>
-            <version>3.5.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.9.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
-            <version>${bundled.maven.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
-            <version>${bundled.maven.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-compat</artifactId>
-            <version>${bundled.maven.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <!-- Version required by mojo-executor -->
-            <version>3.0.15</version>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
-            <version>1.2.0-atlassian-2</version>
         </dependency>
 
         <!-- Depend on libraries used, rather than on plugins -->
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-archiver</artifactId>
-            <version>1.0-alpha-9</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-archiver</artifactId>
-            <version>2.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.18</version>
         </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-            <version>1.6</version>
         </dependency>
 
         <!-- needed for plugin module generation -->
         <dependency>
-            <groupId>jdom</groupId>
+            <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
-            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>com.atlassian.amps</groupId>
             <artifactId>plugin-module-codegen-maven-client</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- refapp archetype for integration testing -->
         <dependency>
             <groupId>com.atlassian.maven.archetypes</groupId>
             <artifactId>refapp-plugin-archetype</artifactId>
-            <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -134,19 +116,16 @@
         <dependency>
           <groupId>com.dmurph</groupId>
           <artifactId>JGoogleAnalyticsTracker</artifactId>
-          <version>1.2.1-atlassian</version>
         </dependency>
 
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.13</version>
         </dependency>
 
         <dependency>
           <groupId>com.atlassian.amps</groupId>
           <artifactId>standalone</artifactId>
-          <version>${project.version}</version>
           <type>pom</type>
           <scope>runtime</scope>
         </dependency>
@@ -155,47 +134,37 @@
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-osgi-testrunner</artifactId>
-            <version>${plugin.testrunner.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
-            <version>1.1.1</version>
         </dependency>
 
         <!-- minification -->
         <dependency>
             <groupId>com.google.javascript</groupId>
             <artifactId>closure-compiler</artifactId>
-            <version>rr2079.1</version>
         </dependency>
-        <!-- Version 2.4.8 fails for empty files, where 2.4.7 emits an empty minified file without error.
-             Be careful when updating! (Note that compressResourcesTest minifies an empty JS file) -->
         <dependency>
             <groupId>com.yahoo.platform.yui</groupId>
             <artifactId>yuicompressor</artifactId>
-            <version>2.4.7</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.10</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.htmlcompressor</groupId>
             <artifactId>htmlcompressor</artifactId>
-            <version>1.5.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.wink</groupId>
             <artifactId>wink-client-apache-httpclient</artifactId>
-            <version>1.4</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.maven.archetype</groupId>
             <artifactId>archetype-common</artifactId>
-            <version>2.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

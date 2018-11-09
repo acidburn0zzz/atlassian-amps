@@ -27,13 +27,11 @@
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>amps-maven-plugin</artifactId>
-            <version>${project.version}</version>
             <type>maven-plugin</type>
         </dependency>
         <dependency>
             <groupId>net.lingala.zip4j</groupId>
             <artifactId>zip4j</artifactId>
-            <version>1.3.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

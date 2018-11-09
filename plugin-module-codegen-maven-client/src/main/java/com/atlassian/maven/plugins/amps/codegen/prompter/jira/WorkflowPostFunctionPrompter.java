@@ -20,11 +20,9 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 @ModuleCreatorClass(WorkflowPostFunctionModuleCreator.class)
 public class WorkflowPostFunctionPrompter extends AbstractModulePrompter<WorkflowPostFunctionProperties>
 {
-
     public WorkflowPostFunctionPrompter(Prompter prompter)
     {
         super(prompter);
-
     }
 
     @Override
@@ -56,12 +54,12 @@ public class WorkflowPostFunctionPrompter extends AbstractModulePrompter<Workflo
 
     private String promptForAddables() throws PrompterException
     {
-        List<String> addables = new ArrayList<String>();
-        List<String> mutableValues = new ArrayList<String>(ActionTypeFactory.getAvailableActionTypes());
+        List<String> addables = new ArrayList<>();
+        List<String> mutableValues = new ArrayList<>(ActionTypeFactory.getAvailableActionTypes());
 
         promptForAddable(addables, mutableValues);
 
-        StringBuffer addableBuffer = new StringBuffer();
+        StringBuilder addableBuffer = new StringBuilder();
         for (String addable : addables)
         {
             if (addableBuffer.length() > 0)
@@ -90,12 +88,12 @@ public class WorkflowPostFunctionPrompter extends AbstractModulePrompter<Workflo
         if (addAddable)
         {
             StringBuilder addableQuery = new StringBuilder("Choose A Type\n");
-            List<String> indexChoices = new ArrayList<String>(allowedAddables.size());
+            List<String> indexChoices = new ArrayList<>(allowedAddables.size());
             int index = 1;
             for (String addable : allowedAddables)
             {
                 String strIndex = Integer.toString(index);
-                addableQuery.append(strIndex + ": " + addable + "\n");
+                addableQuery.append(strIndex).append(": ").append(addable).append("\n");
                 indexChoices.add(strIndex);
                 index++;
             }

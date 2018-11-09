@@ -18,7 +18,6 @@
         <dependency>
             <groupId>com.atlassian.maven.archetypes</groupId>
             <artifactId>crowd-plugin-archetype</artifactId>
-            <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>

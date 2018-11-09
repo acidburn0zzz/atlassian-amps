@@ -21,11 +21,9 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 @ModuleCreatorClass(ServletFilterModuleCreator.class)
 public class ServletFilterModulePrompter extends AbstractModulePrompter<ServletFilterProperties>
 {
-
     public ServletFilterModulePrompter(Prompter prompter)
     {
         super(prompter);
-
     }
 
     @Override
@@ -59,20 +57,18 @@ public class ServletFilterModulePrompter extends AbstractModulePrompter<ServletF
 
     private String getUrlPatternFromUser() throws PrompterException
     {
-        String pattern = promptNotBlank("URL Pattern", "/*");
-
-        return pattern;
+        return promptNotBlank("URL Pattern", "/*");
     }
 
     private String getLocationFromUser(List<String> allowedLocations) throws PrompterException
     {
         StringBuilder locationQuery = new StringBuilder("Choose Filter Chain Location\n");
-        List<String> indexChoices = new ArrayList<String>(allowedLocations.size());
+        List<String> indexChoices = new ArrayList<>(allowedLocations.size());
         int index = 1;
         for (String location : allowedLocations)
         {
             String strIndex = Integer.toString(index);
-            locationQuery.append(strIndex + ": " + location + "\n");
+            locationQuery.append(strIndex).append(": ").append(location).append("\n");
             indexChoices.add(strIndex);
             index++;
         }
@@ -85,8 +81,8 @@ public class ServletFilterModulePrompter extends AbstractModulePrompter<ServletF
 
     private List<String> promptForDispatchers(List<String> allowedDispatchers) throws PrompterException
     {
-        List<String> dispatchers = new ArrayList<String>();
-        List<String> mutableValues = new ArrayList<String>(allowedDispatchers);
+        List<String> dispatchers = new ArrayList<>();
+        List<String> mutableValues = new ArrayList<>(allowedDispatchers);
 
         promptForDispatcher(dispatchers, mutableValues);
 
@@ -100,12 +96,12 @@ public class ServletFilterModulePrompter extends AbstractModulePrompter<ServletF
         if (addDispatcher)
         {
             StringBuilder dispatcherQuery = new StringBuilder("Choose A Dispatcher\n");
-            List<String> indexChoices = new ArrayList<String>(allowedDispatchers.size());
+            List<String> indexChoices = new ArrayList<>(allowedDispatchers.size());
             int index = 1;
             for (String dispatcher : allowedDispatchers)
             {
                 String strIndex = Integer.toString(index);
-                dispatcherQuery.append(strIndex + ": " + dispatcher + "\n");
+                dispatcherQuery.append(strIndex).append(": ").append(dispatcher).append("\n");
                 indexChoices.add(strIndex);
                 index++;
             }
@@ -125,7 +121,7 @@ public class ServletFilterModulePrompter extends AbstractModulePrompter<ServletF
 
     private Map<String, String> promptForInitParams() throws PrompterException
     {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         promptForInitParam(params);
 
         return params;
@@ -133,7 +129,7 @@ public class ServletFilterModulePrompter extends AbstractModulePrompter<ServletF
 
     private void promptForInitParam(Map<String, String> params) throws PrompterException
     {
-        StringBuffer addBuffer = new StringBuffer();
+        StringBuilder addBuffer = new StringBuilder();
         if (params.size() > 0)
         {
             addBuffer.append("init-params:\n");
