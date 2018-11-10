@@ -192,11 +192,11 @@ public class MavenGoals
         {
             ExecutionEnvironment execEnv = executionEnvironment();
 
-            Properties sysProps = execEnv.getMavenSession().getExecutionProperties();
-            sysProps.setProperty("groupId",props.getGroupId());
-            sysProps.setProperty("artifactId",props.getArtifactId());
-            sysProps.setProperty("version",props.getVersion());
-            sysProps.setProperty("package",props.getThePackage());
+            Properties userProperties = execEnv.getMavenSession().getUserProperties();
+            userProperties.setProperty("groupId", props.getGroupId());
+            userProperties.setProperty("artifactId", props.getArtifactId());
+            userProperties.setProperty("version", props.getVersion());
+            userProperties.setProperty("package", props.getThePackage());
 
             executeMojo(
                     plugin(
@@ -635,11 +635,15 @@ public class MavenGoals
             appendJunitCategoryToConfiguration(category, config);
         }
 
+        String version = defaultArtifactIdToVersionMap.get("maven-surefire-plugin");
+        log.info("Surefire " + version + " test configuration:");
+        log.info(config.toString());
+
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-surefire-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-surefire-plugin"))
+                        version(version)
                 ),
                 goal("test"),
                 config,
@@ -1183,7 +1187,7 @@ public class MavenGoals
         systemProperties.put(reportsDirectory, testOutputDir);
 
         final Element systemProps = convertPropsToElements(systemProperties);
-        final Xpp3Dom itconfig = configuration(
+        final Xpp3Dom config = configuration(
                 element(name("includes"),
                         includeElements.toArray(new Element[0])
                 ),
@@ -1196,23 +1200,21 @@ public class MavenGoals
 
         if (isRelevantCategory(category))
         {
-            appendJunitCategoryToConfiguration(category, itconfig);
+            appendJunitCategoryToConfiguration(category, config);
         }
 
-        final Xpp3Dom verifyconfig = configuration(element(name(reportsDirectory), testOutputDir));
-
-
-        log.info("Failsafe integration-test configuration:");
-        log.info(itconfig.toString());
+        String version = defaultArtifactIdToVersionMap.get("maven-failsafe-plugin");
+        log.info("Failsafe " + version + " integration-test configuration:");
+        log.info(config.toString());
 
         executeMojo(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-failsafe-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-failsafe-plugin"))
+                        version(version)
                 ),
                 goal("integration-test"),
-                itconfig,
+                config,
                 executionEnvironment()
         );
         if (!skipVerifyGoal) {
@@ -1220,10 +1222,10 @@ public class MavenGoals
                     plugin(
                             groupId("org.apache.maven.plugins"),
                             artifactId("maven-failsafe-plugin"),
-                            version(defaultArtifactIdToVersionMap.get("maven-failsafe-plugin"))
+                            version(version)
                     ),
                     goal("verify"),
-                    verifyconfig,
+                    configuration(element(name(reportsDirectory), testOutputDir)),
                     executionEnvironment()
             );
         } else {
