@@ -65,7 +65,7 @@
         <fugue.version>4.7.2</fugue.version>
         <bamboo.version>6.5.0</bamboo.version>
         <bamboo.data.version>${bamboo.version}</bamboo.data.version>
-        <bitbucket.version>6.0.0-platform5-2</bitbucket.version>
+        <bitbucket.version>5.14.0</bitbucket.version>
         <bitbucket.data.version>${bitbucket.version}</bitbucket.data.version>
         <fecru.version>4.5.0-20170908094439</fecru.version>
         <fecru.data.version>${fecru.version}</fecru.data.version>
