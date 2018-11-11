@@ -295,14 +295,6 @@
 
     <profiles>
         <profile>
-            <!-- Skip unit tests when running maven-invoker-plugin integration tests -->
-            <id>invoker</id>
-            <properties>
-                <skipAllPrompts>true</skipAllPrompts>
-                <skipTests>true</skipTests>
-            </properties>
-        </profile>
-        <profile>
             <id>nosdk</id>
             <properties>
                 <release.profiles>release</release.profiles>
