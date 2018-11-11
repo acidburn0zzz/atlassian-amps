@@ -51,6 +51,7 @@ import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
@@ -180,6 +181,19 @@ public class TestMavenGoals
     }
 
     @Test
+    public void testHttpPortShouldBeReflectedInBaseUrl()
+    {
+        // Set up
+        final int httpPort = 51935;
+
+        // Invoke
+        final String baseUrl = getBaseUrl(httpPort);
+
+        // Check
+        assertEquals("http://localhost:51935/confluence", baseUrl);
+    }
+
+    @Test
     public void testConfigurationPropertiesShouldIncludeAjpPortIfSet()
     {
         // Set up
@@ -227,6 +241,23 @@ public class TestMavenGoals
         return configurationProperties;
     }
 
+    private String getBaseUrl(final int httpPort)
+    {
+        // Set up
+        final Product mockProduct = mock(Product.class);
+        when(mockProduct.getServer()).thenReturn("http://localhost");
+        when(mockProduct.getContextPath()).thenReturn("/confluence");
+
+        // Invoke
+        final String baseUrl = MavenGoals.getBaseUrl(mockProduct, httpPort);
+
+        // Check
+        assertNotNull(baseUrl);
+        verify(mockProduct, never()).getHttpPort();
+        verify(mockProduct, never()).getHttpsPort();
+        return baseUrl;
+    }
+
     @Test
     public void testProcessCorrectCrlf() throws Exception
     {
@@ -253,7 +284,48 @@ public class TestMavenGoals
     }
 
     @Test
-    public void testStartWebappUsesPortsConfiguredFromProduct() throws Exception
+    public void testShouldUseHttpPortsConfiguredFromProductWhenStartWebapp() throws Exception
+    {
+        mockBuildPluginManager();
+
+        final File war = mock(File.class);
+        when(war.getPath()).thenReturn("/");
+
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+        when(product.getServer()).thenReturn("server");
+        when(product.getContextPath()).thenReturn("/context");
+        when(product.isHttps()).thenReturn(false);
+
+        goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
+
+        verify(product).getRmiPort();
+        verify(product).getAjpPort();
+        verify(product, atLeastOnce()).getHttpPort();
+    }
+
+    @Test
+    public void testShouldUseHttpsPortsConfiguredFromProductWhenStartWebapp() throws Exception
+    {
+        mockBuildPluginManager();
+
+        final File war = mock(File.class);
+        when(war.getPath()).thenReturn("/");
+
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+        when(product.getServer()).thenReturn("server");
+        when(product.getContextPath()).thenReturn("/context");
+        when(product.isHttps()).thenReturn(true);
+
+        goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
+
+        verify(product).getRmiPort();
+        verify(product).getAjpPort();
+        verify(product, atLeastOnce()).getHttpsPort();
+    }
+
+    private void mockBuildPluginManager() throws Exception
     {
         final MojoDescriptor mojoDescriptor = mock(MojoDescriptor.class);
         when(mojoDescriptor.getMojoConfiguration()).thenReturn(new DefaultPlexusConfiguration(""));
@@ -265,19 +337,6 @@ public class TestMavenGoals
         when(buildPluginManager.loadPlugin(any(Plugin.class), any(), any()))
                 .thenReturn(pluginDescriptor);
 
-        final File war = mock(File.class);
-        when(war.getPath()).thenReturn("/");
-
-        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
         when(executionEnvironment.getPluginManager()).thenReturn(buildPluginManager);
-        when(product.getContainerId()).thenReturn("tomcat8x");
-        when(product.getServer()).thenReturn("server");
-        when(product.getContextPath()).thenReturn("/context");
-
-        goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
-
-        verify(product).getRmiPort();
-        verify(product).getAjpPort();
-        verify(product, atLeastOnce()).getHttpPort();
     }
 }
