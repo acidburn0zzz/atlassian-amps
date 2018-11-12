@@ -4,7 +4,7 @@
 *.ipr
 *.iws
 
-# People still use Eclipse??
+# Eclipse spam
 .project
 .classpath
 .settings/

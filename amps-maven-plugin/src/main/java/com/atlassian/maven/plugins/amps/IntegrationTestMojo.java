@@ -25,7 +25,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
      * Pattern for to use to find integration tests.  Only used if no test groups are defined.
      */
     @Parameter(property = "functional.test.pattern")
-    private String functionalTestPattern = "%regex[it/.*]";
+    private String functionalTestPattern = "%regex[it[/\\\\].*]";
 
     /**
      * The directory containing generated test classes of the project being tested.

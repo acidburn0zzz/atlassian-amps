@@ -625,7 +625,7 @@ public class MavenGoals
                         // ignores any test in any "it" directory anywhere, not just at the root.
                         // Regex matches are _not_ automatically prefixed, so using a regex pattern here allows
                         // us to continue only excluding tests in a root "it" package.
-                        element(name("exclude"), "%regex[it/.*]"),
+                        element(name("exclude"), "%regex[it[/\\\\].*]"),
                         element(name("exclude"), "**/*$*")),
                 element(name("excludedGroups"), excludedGroups)
         );
