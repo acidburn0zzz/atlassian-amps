@@ -83,6 +83,22 @@ public class MavenGoals
 {
     @VisibleForTesting
     static final String AJP_PORT_PROPERTY = "cargo.tomcat.ajp.port";
+    /**
+     * Defines a Failsafe/Surefire {@code %regex} pattern which can be used to exclude/include integration tests.
+     * <p>
+     * Pattern handling for excludes and includes changed in Surefire 2.22, and patterns that don't start with
+     * "**&#47;" are now prefixed with it automatically. That means "it/**" becomes "**&#47;it/**", which matches
+     * any test with an "it" package anywhere, not just at the root. Regexes are <i>not</i> automatically prefixed,
+     * so using a regex pattern here allows us to continue only matching tests with an "it" package at the root.
+     * <p>
+     * <b>Warning</b>: Surefire's documentation states that all slashes are forward, even on Windows. However,
+     * <a href="https://github.com/bturner/surefire-slashes">a simple test</a> proves that that's not the case.
+     * <a href="https://issues.apache.org/jira/browse/SUREFIRE-1599">SUREFIRE-1599</a> has been created to track
+     * this mismatch between the documentation and the implementation.
+     *
+     * @since 8.0
+     */
+    static final String REGEX_INTEGRATION_TESTS = "%regex[it[/\\\\].*]";
 
     @VisibleForTesting
     final Map<String, String> defaultArtifactIdToVersionMap;
@@ -620,12 +636,7 @@ public class MavenGoals
         final Xpp3Dom config = configuration(
                 systemProps,
                 element(name("excludes"),
-                        // The exclude handling in Surefire has changed, and patterns that don't start with "**/"
-                        // are now prefixed with it automatically. That means "it/**" becomes "**/it/**", which
-                        // ignores any test in any "it" directory anywhere, not just at the root.
-                        // Regex matches are _not_ automatically prefixed, so using a regex pattern here allows
-                        // us to continue only excluding tests in a root "it" package.
-                        element(name("exclude"), "%regex[it[/\\\\].*]"),
+                        element(name("exclude"), REGEX_INTEGRATION_TESTS),
                         element(name("exclude"), "**/*$*")),
                 element(name("excludedGroups"), excludedGroups)
         );
