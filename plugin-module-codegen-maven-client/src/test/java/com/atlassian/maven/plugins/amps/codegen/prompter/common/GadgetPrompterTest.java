@@ -35,7 +35,7 @@ public class GadgetPrompterTest extends AbstractPrompterTest
 
     public static final String LOCATION = "gadgets/awesome/gadget.xml";
 
-    Prompter prompter;
+    private Prompter prompter;
 
     @Before
     public void setup()
@@ -52,7 +52,6 @@ public class GadgetPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         GadgetPrompter modulePrompter = new GadgetPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         GadgetProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
@@ -79,7 +78,6 @@ public class GadgetPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         GadgetPrompter modulePrompter = new GadgetPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         GadgetProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv module name", ADV_MODULE_NAME, props.getModuleName());

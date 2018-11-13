@@ -16,13 +16,11 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.dom4j.DocumentException;
-
-import org.jline.utils.AttributedStringBuilder;
-import org.jline.utils.AttributedStyle;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,22 +34,13 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
     public static final List<String> YN_ANSWERS = new ArrayList<>(Arrays.asList("Y", "y", "N", "n"));
     public static final String NO_VERSION_DEFINED = "no-version-defined";
     public static final String POM_UPDATE_PREF_PREFIX = "sdk-pom-update-check";
-    private boolean useAnsiColor;
+
     private Prompter prompter;
     private boolean skipCheck;
 
     public AmpsPluginVersionCheckerImpl()
     {
         this.skipCheck = false;
-
-        String mavencolor = System.getenv("MAVEN_COLOR");
-        if (mavencolor != null && !mavencolor.equals(""))
-        {
-            useAnsiColor = Boolean.parseBoolean(mavencolor);
-        } else
-        {
-            useAnsiColor = false;
-        }
     }
 
     @Override
@@ -234,43 +223,16 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
 
     private boolean promptToUpdatePom(DefaultArtifactVersion ampsVersionInPom, DefaultArtifactVersion runningVersion) throws PrompterException
     {
-        if (useAnsiColor)
-        {
-            return promptForUpdateAnsi(ampsVersionInPom, runningVersion);
-        } else
-        {
-            return promptForUpdatePlain(ampsVersionInPom, runningVersion);
-        }
-    }
-
-    private boolean promptForUpdateAnsi(DefaultArtifactVersion ampsVersionInPom, DefaultArtifactVersion runningVersion) throws PrompterException
-    {
-        String prompt = new AttributedStringBuilder()
-                .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.YELLOW))
-                .append("You are running AMPS plugin version ")
-                .append(runningVersion.toString())
-                .append(" but your pom is using version ")
-                .append(ampsVersionInPom.toString())
-                .append("\n")
-                .style(AttributedStyle.BOLD)
-                .append("Would you like to have your pom updated?")
-                .style(AttributedStyle.DEFAULT)
-                .toAnsi();
+        String prompt = MessageUtils.buffer()
+                .warning("You are running AMPS plugin version ")
+                .warning(runningVersion)
+                .warning(" but your pom is using version ")
+                .warning(ampsVersionInPom)
+                .newline()
+                .strong("Would you like to have your pom updated?")
+                .toString();
 
         return promptForBoolean(prompt,"Y");
-    }
-
-    private boolean promptForUpdatePlain(DefaultArtifactVersion ampsVersionInPom, DefaultArtifactVersion runningVersion) throws PrompterException
-    {
-        StringBuilder builder = new StringBuilder();
-        builder.append("You are running AMPS plugin version ")
-                  .append(runningVersion.toString())
-                  .append(" but your pom is using version ")
-                  .append(ampsVersionInPom.toString())
-                  .append("\n")
-                  .append("Would you like to have your pom updated?");
-
-        return promptForBoolean(builder.toString(), "Y");
     }
 
     private DefaultArtifactVersion getPomVersion(String ampsVersionOrProperty, MavenProject project)

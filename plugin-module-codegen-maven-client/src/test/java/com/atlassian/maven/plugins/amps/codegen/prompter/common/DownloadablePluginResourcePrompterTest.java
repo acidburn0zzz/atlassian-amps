@@ -27,7 +27,6 @@ public class DownloadablePluginResourcePrompterTest extends AbstractPrompterTest
     public static final String PARAM_KEY = "paramKey";
     public static final String PARAM_VAL = "paramVal";
 
-
     @Test
     public void resourceWithNameIsValid() throws PrompterException
     {
@@ -41,8 +40,7 @@ public class DownloadablePluginResourcePrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         DownloadablePluginResourcePrompter modulePrompter = new DownloadablePluginResourcePrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
-        DownloadablePluginResourceProperties props = (DownloadablePluginResourceProperties) modulePrompter.getModulePropertiesFromInput(moduleLocation);
+        DownloadablePluginResourceProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         Resource cssResource = props.getResource();
 
@@ -69,8 +67,7 @@ public class DownloadablePluginResourcePrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         DownloadablePluginResourcePrompter modulePrompter = new DownloadablePluginResourcePrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
-        DownloadablePluginResourceProperties props = (DownloadablePluginResourceProperties) modulePrompter.getModulePropertiesFromInput(moduleLocation);
+        DownloadablePluginResourceProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         Resource vmResource = props.getResource();
 

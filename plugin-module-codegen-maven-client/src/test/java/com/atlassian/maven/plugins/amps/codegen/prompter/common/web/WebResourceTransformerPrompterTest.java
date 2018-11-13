@@ -35,7 +35,7 @@ public class WebResourceTransformerPrompterTest extends AbstractPrompterTest
     public static final String ADV_I18N_NAME_KEY = "awesome-plugin.name";
     public static final String ADV_I18N_DESCRIPTION_KEY = "pluginus-awesomeous.description";
 
-    Prompter prompter;
+    private Prompter prompter;
 
     @Before
     public void setup()
@@ -51,7 +51,6 @@ public class WebResourceTransformerPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebResourceTransformerPrompter modulePrompter = new WebResourceTransformerPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         WebResourceTransformer props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong class", CLASSNAME, props.getClassId().getName());
@@ -78,7 +77,6 @@ public class WebResourceTransformerPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebResourceTransformerPrompter modulePrompter = new WebResourceTransformerPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         WebResourceTransformer props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv class", CLASSNAME, props.getClassId().getName());

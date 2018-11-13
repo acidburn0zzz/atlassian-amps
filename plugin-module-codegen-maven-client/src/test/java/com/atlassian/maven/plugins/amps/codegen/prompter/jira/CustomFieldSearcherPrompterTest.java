@@ -47,8 +47,8 @@ public class CustomFieldSearcherPrompterTest extends AbstractPrompterTest
     public static final String RESOURCE_NAME = "view";
     public static final String RESOURCE_VM_PATH = "templates/resource.vm";
 
-    Prompter prompter;
-    TestingCustomFieldSearcherFactory searcherFactory;
+    private Prompter prompter;
+    private TestingCustomFieldSearcherFactory searcherFactory;
 
     @Before
     public void setup()
@@ -72,7 +72,6 @@ public class CustomFieldSearcherPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         CustomFieldSearcherPrompter modulePrompter = new CustomFieldSearcherPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         CustomFieldSearcherProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong class", "TextSearcher", props.getClassId().getName());
@@ -108,7 +107,6 @@ public class CustomFieldSearcherPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         CustomFieldSearcherPrompter modulePrompter = new CustomFieldSearcherPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         CustomFieldSearcherProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong class", "TextSearcher", props.getClassId().getName());
@@ -136,7 +134,7 @@ public class CustomFieldSearcherPrompterTest extends AbstractPrompterTest
 
     protected class TestingCustomFieldSearcherFactory extends CustomFieldSearcherFactory
     {
-        public void setSearchers(Map<String, String> searcherMap)
+        void setSearchers(Map<String, String> searcherMap)
         {
             searchers = searcherMap;
         }

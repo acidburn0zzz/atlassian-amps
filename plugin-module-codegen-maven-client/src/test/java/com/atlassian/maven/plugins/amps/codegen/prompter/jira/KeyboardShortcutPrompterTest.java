@@ -33,7 +33,7 @@ public class KeyboardShortcutPrompterTest extends AbstractPrompterTest
     public static final String ADV_I18N_NAME_KEY = "awesome-plugin.name";
     public static final String ADV_I18N_DESCRIPTION_KEY = "pluginus-awesomeous.description";
 
-    Prompter prompter;
+    private Prompter prompter;
 
     @Before
     public void setup()
@@ -54,7 +54,6 @@ public class KeyboardShortcutPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         JiraKeyboardShortcutPrompter modulePrompter = new JiraKeyboardShortcutPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         JiraKeyboardShortcutProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
@@ -92,7 +91,6 @@ public class KeyboardShortcutPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         JiraKeyboardShortcutPrompter modulePrompter = new JiraKeyboardShortcutPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         JiraKeyboardShortcutProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv module name", MODULE_NAME, props.getModuleName());

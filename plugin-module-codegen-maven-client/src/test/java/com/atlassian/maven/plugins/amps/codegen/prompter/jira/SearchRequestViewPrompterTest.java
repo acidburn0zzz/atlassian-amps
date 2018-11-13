@@ -47,7 +47,7 @@ public class SearchRequestViewPrompterTest extends AbstractPrompterTest
     public static final String RESOURCE_NAME = "view";
     public static final String RESOURCE_VM_PATH = "templates/resource.vm";
 
-    Prompter prompter;
+    private Prompter prompter;
 
     @Before
     public void setup()
@@ -67,7 +67,6 @@ public class SearchRequestViewPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         SearchRequestViewPrompter modulePrompter = new SearchRequestViewPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         SearchRequestViewProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong class", CLASSNAME, props.getClassId().getName());
@@ -107,7 +106,6 @@ public class SearchRequestViewPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         SearchRequestViewPrompter modulePrompter = new SearchRequestViewPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         SearchRequestViewProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv class", CLASSNAME, props.getClassId().getName());

@@ -23,10 +23,6 @@
             <artifactId>plugin-module-codegen-engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jline</groupId>
-            <artifactId>jline</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-interactivity-api</artifactId>
         </dependency>

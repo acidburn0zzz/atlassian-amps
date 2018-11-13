@@ -45,8 +45,8 @@ public class WorkflowPostFunctionPrompterTest extends AbstractPrompterTest
     public static final String ADV_I18N_NAME_KEY = "awesome-plugin.name";
     public static final String ADV_I18N_DESCRIPTION_KEY = "pluginus-awesomeous.description";
 
-    Prompter prompter;
-    TestingActionTypeFactory actionTypeFactory;
+    private Prompter prompter;
+    private TestingActionTypeFactory actionTypeFactory;
 
     @Before
     public void setup()
@@ -59,7 +59,7 @@ public class WorkflowPostFunctionPrompterTest extends AbstractPrompterTest
     @After
     public void resetActionTypes()
     {
-        actionTypeFactory.setActionTypes(Collections.<String>emptyList());
+        actionTypeFactory.setActionTypes(Collections.emptyList());
     }
 
     @Test
@@ -71,7 +71,6 @@ public class WorkflowPostFunctionPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WorkflowPostFunctionPrompter modulePrompter = new WorkflowPostFunctionPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         WorkflowPostFunctionProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong function class", CLASSNAME, props.getClassId().getName());
@@ -114,7 +113,6 @@ public class WorkflowPostFunctionPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WorkflowPostFunctionPrompter modulePrompter = new WorkflowPostFunctionPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         WorkflowPostFunctionProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong function class", CLASSNAME, props.getClassId().getName());
@@ -133,7 +131,7 @@ public class WorkflowPostFunctionPrompterTest extends AbstractPrompterTest
 
     protected class TestingActionTypeFactory extends ActionTypeFactory
     {
-        public void setActionTypes(List<String> types)
+        void setActionTypes(List<String> types)
         {
             availableActionTypes = types;
         }

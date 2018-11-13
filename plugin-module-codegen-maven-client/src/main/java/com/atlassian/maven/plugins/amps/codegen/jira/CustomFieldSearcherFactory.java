@@ -12,11 +12,11 @@ import com.atlassian.maven.plugins.amps.codegen.annotations.asm.CustomFieldSearc
  */
 public class CustomFieldSearcherFactory
 {
-    protected static Map<String, String> searchers = new TreeMap<String, String>();
+    protected static Map<String, String> searchers = new TreeMap<>();
 
     public static void locateAvailableCustomFieldSearchers(List<String> classpathElements) throws Exception
     {
-        List<URL> fieldURLs = new ArrayList<URL>();
+        List<URL> fieldURLs = new ArrayList<>();
         for (String path : classpathElements)
         {
             File aFile = new File(path);

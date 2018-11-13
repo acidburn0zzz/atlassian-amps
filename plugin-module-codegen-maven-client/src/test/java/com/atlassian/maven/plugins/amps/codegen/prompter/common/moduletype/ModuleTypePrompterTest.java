@@ -45,7 +45,6 @@ public class ModuleTypePrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         ModuleTypePrompter modulePrompter = new ModuleTypePrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         ModuleTypeProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong interface", INTERFACE_CLASS, props.getInterfaceId().getName());
@@ -77,7 +76,6 @@ public class ModuleTypePrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         ModuleTypePrompter modulePrompter = new ModuleTypePrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         ModuleTypeProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv interface", INTERFACE_CLASS, props.getInterfaceId().getName());

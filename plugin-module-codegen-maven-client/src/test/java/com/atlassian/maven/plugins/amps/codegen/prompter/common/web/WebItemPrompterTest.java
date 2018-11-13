@@ -56,8 +56,7 @@ public class WebItemPrompterTest extends AbstractWebFragmentPrompterTest<WebItem
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebItemPrompter modulePrompter = new WebItemPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
-        setProps((WebItemProperties) modulePrompter.getModulePropertiesFromInput(moduleLocation));
+        setProps(modulePrompter.getModulePropertiesFromInput(moduleLocation));
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
         assertEquals("wrong module key", MODULE_KEY, props.getModuleKey());
@@ -107,8 +106,7 @@ public class WebItemPrompterTest extends AbstractWebFragmentPrompterTest<WebItem
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebItemPrompter modulePrompter = new WebItemPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
-        setProps((WebItemProperties) modulePrompter.getModulePropertiesFromInput(moduleLocation));
+        setProps(modulePrompter.getModulePropertiesFromInput(moduleLocation));
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
         assertEquals("wrong module key", ADV_MODULE_KEY, props.getModuleKey());
@@ -135,7 +133,7 @@ public class WebItemPrompterTest extends AbstractWebFragmentPrompterTest<WebItem
     @Test
     public void providerContextFromListIsValid() throws PrompterException
     {
-        SortedMap<String, String> providersMap = new TreeMap<String, String>();
+        SortedMap<String, String> providersMap = new TreeMap<>();
         providersMap.put("HeightContextProvider", "com.atlassian.test.HeightContextPRovider");
         providersMap.put("WidthContextProvider", "com.atlassian.test.WidthContextProvider");
 
@@ -177,8 +175,7 @@ public class WebItemPrompterTest extends AbstractWebFragmentPrompterTest<WebItem
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebItemPrompter modulePrompter = new WebItemPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
-        setProps((WebItemProperties) modulePrompter.getModulePropertiesFromInput(moduleLocation));
+        setProps(modulePrompter.getModulePropertiesFromInput(moduleLocation));
 
         assertEquals("wrong context provider", "com.atlassian.test.WidthContextProvider", props.getContextProvider());
     }
@@ -186,7 +183,7 @@ public class WebItemPrompterTest extends AbstractWebFragmentPrompterTest<WebItem
     @Test
     public void conditionFromListIsValid() throws PrompterException
     {
-        SortedMap<String, String> conditionMap = new TreeMap<String, String>();
+        SortedMap<String, String> conditionMap = new TreeMap<>();
         conditionMap.put("NoFacialHairCondition", "com.atlassian.test.NoFacialHairCondition");
         conditionMap.put("HasGlobalAdminPermissionCondition", "com.atlassian.test.HasGlobalAdminPermissionCondition");
 
@@ -228,8 +225,7 @@ public class WebItemPrompterTest extends AbstractWebFragmentPrompterTest<WebItem
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebItemPrompter modulePrompter = new WebItemPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
-        setProps((WebItemProperties) modulePrompter.getModulePropertiesFromInput(moduleLocation));
+        setProps(modulePrompter.getModulePropertiesFromInput(moduleLocation));
 
         Condition condition = (Condition) ((Conditions) props.getConditions()
                 .get(0)).getConditions()

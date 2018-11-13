@@ -11,10 +11,9 @@ import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
 import com.atlassian.plugins.codegen.util.ClassnameUtil;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
-import org.jline.utils.AttributedStringBuilder;
-import org.jline.utils.AttributedStyle;
 
 /**
  * @since 3.6
@@ -33,7 +32,6 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
     protected boolean showAdvancedNamePrompt;
     protected String defaultBasePackage;
     protected String pluginKey;
-    protected boolean useAnsiColor;
 
     public AbstractModulePrompter(Prompter prompter)
     {
@@ -41,15 +39,6 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
         this.showExamplesPrompt = true;
         this.showAdvancedPrompt = true;
         this.showAdvancedNamePrompt = true;
-
-        String mavencolor = System.getenv("MAVEN_COLOR");
-        if (StringUtils.isNotBlank(mavencolor))
-        {
-            useAnsiColor = Boolean.parseBoolean(mavencolor);
-        } else
-        {
-            useAnsiColor = false;
-        }
     }
 
     @Override
@@ -383,28 +372,11 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
         this.showAdvancedNamePrompt = false;
     }
 
-    public boolean isUseAnsiColor()
-    {
-        return useAnsiColor;
-    }
-
-    public void setUseAnsiColor(boolean useAnsiColor)
-    {
-        this.useAnsiColor = useAnsiColor;
-    }
-
     protected String requiredMessage(String message)
     {
-        if (useAnsiColor)
-        {
-            return new AttributedStringBuilder()
-                    .style(AttributedStyle.BOLD.foreground(AttributedStyle.RED))
-                    .append(message)
-                    .style(AttributedStyle.DEFAULT)
-                    .toAnsi();
-        }
-
-        return message;
+        return MessageUtils.buffer()
+                .failure(message)
+                .toString();
     }
 
     @Override

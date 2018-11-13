@@ -5,10 +5,9 @@ import com.atlassian.maven.plugins.updater.SdkPackageType;
 import com.atlassian.maven.plugins.updater.SdkResource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.jline.utils.AttributedStringBuilder;
-import org.jline.utils.AttributedStyle;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,17 +31,8 @@ public class UpdateCheckerImpl extends AbstractLogEnabled implements UpdateCheck
     private String currentVersion;
     private boolean forceCheck;
     private boolean skipCheck;
-    private boolean useAnsiColor;
-    
+
     public UpdateCheckerImpl() {
-        String mavencolor = System.getenv("MAVEN_COLOR");
-        if (mavencolor != null && !mavencolor.equals(""))
-        {
-            useAnsiColor = Boolean.parseBoolean(mavencolor);
-        } else
-        {
-            useAnsiColor = false;
-        }
         this.currentVersion = "";
         this.forceCheck = false;
         this.skipCheck = false;
@@ -54,14 +44,14 @@ public class UpdateCheckerImpl extends AbstractLogEnabled implements UpdateCheck
             SdkPackageType packageType = localSdk.sdkPackageType();
             String latestVersion = sdkResource.getLatestSdkVersion(packageType);
             if (canUpdate(currentVersion, latestVersion)) {
-                if(useAnsiColor)
-                {
-                    promptAnsi(latestVersion);
-                }
-                else
-                {
-                    promptPlain(latestVersion);
-                }
+                String warning = MessageUtils.buffer()
+                        .warning("************************************************************\n")
+                        .warning("Version ").warning(latestVersion).warning(" of the Atlassian Plugin SDK is now available.\n")
+                        .warning("Run the atlas-update command to update.\n")
+                        .warning("************************************************************")
+                        .toString();
+
+                getLogger().warn(warning);
             } else {
                 StringBuilder sb = new StringBuilder();
                 if(StringUtils.isEmpty(latestVersion)) {
@@ -76,30 +66,6 @@ public class UpdateCheckerImpl extends AbstractLogEnabled implements UpdateCheck
                 getLogger().warn(sb.toString());
             }
         }
-    }
-
-    private void promptPlain(String latestVersion)
-    {
-        String warning = "************************************************************\n" +
-                "Version " + latestVersion + " of the Atlassian Plugin SDK is now available.\n" +
-                "Run the atlas-update command to update.\n" +
-                "************************************************************";
-
-        getLogger().warn(warning);
-    }
-
-    private void promptAnsi(String latestVersion)
-    {
-        String warning = new AttributedStringBuilder()
-                .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.YELLOW))
-                .append("************************************************************\n")
-                .append("Version ").append(latestVersion).append(" of the Atlassian Plugin SDK is now available.\n")
-                .append("Run the atlas-update command to update.\n")
-                .append("************************************************************")
-                .style(AttributedStyle.DEFAULT)
-                .toAnsi();
-
-        getLogger().warn(warning);
     }
 
     private boolean canUpdate(String currentVersion, String latestVersion) {

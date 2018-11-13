@@ -47,7 +47,7 @@ public class RPCPrompterTest extends AbstractPrompterTest
     public static final String ADV_I18N_NAME_KEY = "awesome-plugin.name";
     public static final String ADV_I18N_DESCRIPTION_KEY = "pluginus-awesomeous.description";
 
-    Prompter prompter;
+    private Prompter prompter;
 
     @Before
     public void setup()
@@ -68,7 +68,6 @@ public class RPCPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         RPCPrompter modulePrompter = new RPCPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         RPCProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong interface", SOAP_INTERFACE, props.getInterfaceId().getName());
@@ -104,7 +103,6 @@ public class RPCPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         RPCPrompter modulePrompter = new RPCPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         RPCProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv interface", SOAP_INTERFACE, props.getInterfaceId().getName());
@@ -133,7 +131,6 @@ public class RPCPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         RPCPrompter modulePrompter = new RPCPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         RPCProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong interface", XML_INTERFACE, props.getInterfaceId().getName());
@@ -169,7 +166,6 @@ public class RPCPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         RPCPrompter modulePrompter = new RPCPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         RPCProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv interface", XML_INTERFACE, props.getInterfaceId().getName());

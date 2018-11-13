@@ -37,7 +37,7 @@ public class WorkflowConditionPrompterTest extends AbstractPrompterTest
     public static final String ADV_I18N_NAME_KEY = "awesome-plugin.name";
     public static final String ADV_I18N_DESCRIPTION_KEY = "pluginus-awesomeous.description";
 
-    Prompter prompter;
+    private Prompter prompter;
 
     @Before
     public void setup()
@@ -54,7 +54,6 @@ public class WorkflowConditionPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WorkflowConditionPrompter modulePrompter = new WorkflowConditionPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         WorkflowElementProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong condition class", CLASSNAME, props.getClassId().getName());
@@ -83,7 +82,6 @@ public class WorkflowConditionPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WorkflowConditionPrompter modulePrompter = new WorkflowConditionPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         WorkflowElementProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong condition class", CLASSNAME, props.getClassId().getName());

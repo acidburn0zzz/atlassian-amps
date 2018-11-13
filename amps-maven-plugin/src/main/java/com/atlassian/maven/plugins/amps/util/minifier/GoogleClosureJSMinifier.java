@@ -2,9 +2,9 @@ package com.atlassian.maven.plugins.amps.util.minifier;
 
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.Result;
+import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.SourceMap;
 import org.apache.maven.plugin.logging.Log;
 
@@ -63,11 +63,11 @@ public class GoogleClosureJSMinifier
         options.setSourceMapFormat(SourceMap.Format.V3);
         options.setSourceMapOutputPath("/dummy-file-path");
 
-        JSSourceFile extern = JSSourceFile.fromCode("externs.js","function alert(x) {}");
+        SourceFile extern = SourceFile.fromCode("externs.js","function alert(x) {}");
 
         // The dummy input name "input.js" is used here so that any warnings or
         // errors will cite line numbers in terms of input.js.
-        JSSourceFile input = JSSourceFile.fromCode("input.js", code);
+        SourceFile input = SourceFile.fromCode("input.js", code);
 
         // compile() returns a Result, but it is not needed here.
         Result result = compiler.compile(extern, input, options);

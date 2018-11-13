@@ -47,8 +47,8 @@ public class CustomFieldPrompterTest extends AbstractPrompterTest
     public static final String RESOURCE_NAME = "view";
     public static final String RESOURCE_VM_PATH = "templates/resource.vm";
 
-    Prompter prompter;
-    TestingCustomFieldTypeFactory fieldTypeFactory;
+    private Prompter prompter;
+    private TestingCustomFieldTypeFactory fieldTypeFactory;
 
     @Before
     public void setup()
@@ -69,7 +69,6 @@ public class CustomFieldPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         CustomFieldPrompter modulePrompter = new CustomFieldPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         CustomFieldProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong class", CLASSNAME, props.getClassId().getName());
@@ -105,7 +104,6 @@ public class CustomFieldPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         CustomFieldPrompter modulePrompter = new CustomFieldPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         CustomFieldProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv class", CLASSNAME, props.getClassId().getName());
@@ -133,7 +131,7 @@ public class CustomFieldPrompterTest extends AbstractPrompterTest
 
     protected class TestingCustomFieldTypeFactory extends CustomFieldTypeFactory
     {
-        public void setFieldTypes(Map<String, String> types)
+        void setFieldTypes(Map<String, String> types)
         {
             fields = types;
         }

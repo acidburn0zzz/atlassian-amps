@@ -29,13 +29,13 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.maven.shared.utils.logging.MessageBuilder;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.components.interactivity.InputHandler;
 import org.codehaus.plexus.components.interactivity.OutputHandler;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.StringUtils;
-import org.jline.utils.AttributedStringBuilder;
-import org.jline.utils.AttributedStyle;
 
 /**
  * @since 3.6
@@ -52,19 +52,8 @@ public class PrettyPrompter implements Prompter
      */
     private InputHandler inputHandler;
 
-    private boolean useAnsiColor;
-
     public PrettyPrompter()
     {
-        String mavencolor = System.getenv("MAVEN_COLOR");
-        if (mavencolor != null && !mavencolor.equals(""))
-        {
-            useAnsiColor = Boolean.parseBoolean(mavencolor);
-        }
-        else
-        {
-            useAnsiColor = false;
-        }
     }
 
     public String prompt(String message)
@@ -148,15 +137,9 @@ public class PrettyPrompter implements Prompter
             {
                 try
                 {
-                    String invalid = "Invalid selection.";
-                    if (useAnsiColor)
-                    {
-                        invalid = new AttributedStringBuilder()
-                                .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.RED))
-                                .append(invalid)
-                                .style(AttributedStyle.DEFAULT)
-                                .toAnsi();
-                    }
+                    String invalid = MessageUtils.buffer()
+                            .failure("Invalid selection.")
+                            .toString();
                     outputHandler.writeLine(invalid);
                 } catch (IOException e)
                 {
@@ -197,83 +180,34 @@ public class PrettyPrompter implements Prompter
 
     protected String formatMessage(String message, List possibleValues, String defaultReply)
     {
-        if (useAnsiColor)
-        {
-            return formatAnsiMessage(message, possibleValues, defaultReply);
-        } else
-        {
-            return formatPlainMessage(message, possibleValues, defaultReply);
-        }
-    }
-
-    private String formatAnsiMessage(String message, List possibleValues, String defaultReply)
-    {
-        AttributedStringBuilder builder = new AttributedStringBuilder()
-                .append(message);
+        MessageBuilder builder = MessageUtils.buffer().a(message);
 
         if (possibleValues != null && !possibleValues.isEmpty())
         {
-            builder.append(" (");
+            builder.a(" (");
 
             for (Iterator it = possibleValues.iterator(); it.hasNext(); )
             {
                 String possibleValue = (String) it.next();
 
-                builder.styled(AttributedStyle.BOLD, possibleValue);
+                builder.strong(possibleValue);
                 if (it.hasNext())
                 {
-                    builder.append("/");
+                    builder.a("/");
                 }
             }
 
-            builder.append(")");
+            builder.a(")");
         }
 
         if (defaultReply != null)
         {
-            builder.style(AttributedStyle.BOLD.foreground(AttributedStyle.GREEN))
-                    .append(" [")
-                    .append(defaultReply)
-                    .append("]")
-                    .style(AttributedStyle.DEFAULT);
+            builder.success(" [")
+                    .success(defaultReply)
+                    .success("]");
         }
 
-        return builder.toAnsi();
-    }
-
-    private String formatPlainMessage(String message, List possibleValues, String defaultReply)
-    {
-        StringBuilder formatted = new StringBuilder(message.length() * 2);
-
-        formatted.append(message);
-
-        if (possibleValues != null && !possibleValues.isEmpty())
-        {
-            formatted.append(" (");
-
-            for (Iterator it = possibleValues.iterator(); it.hasNext(); )
-            {
-                String possibleValue = (String) it.next();
-
-                formatted.append(possibleValue);
-
-                if (it.hasNext())
-                {
-                    formatted.append('/');
-                }
-            }
-
-            formatted.append(')');
-        }
-
-        if (defaultReply != null)
-        {
-            formatted.append(" [")
-                    .append(defaultReply)
-                    .append("]");
-        }
-
-        return formatted.toString();
+        return builder.toString();
     }
 
     private void writePrompt(String message)
