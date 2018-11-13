@@ -26,6 +26,7 @@ import org.twdata.maven.mojoexecutor.MojoExecutor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -269,14 +270,14 @@ public class TestMavenGoals
         File temp = new File(sysTempDir, "tempOriginalPom.xml");
 
         FileUtils.copyFile(originalPomFile, temp);
-        String originalPomXml = FileUtils.readFileToString(temp);
+        String originalPomXml = FileUtils.readFileToString(temp, StandardCharsets.UTF_8);
 
         assertThat("Not expected file!", originalPomXml, startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
         assertThat("File contains \r\n before process correct CRLF", originalPomXml, containsString("\r\n"));
 
         goals.processCorrectCrlf(pomManager, temp);
 
-        String processedPomXml = FileUtils.readFileToString(temp);
+        String processedPomXml = FileUtils.readFileToString(temp, StandardCharsets.UTF_8);
         assertThat("Not expected file after process correct CRLF!", processedPomXml, startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
         assertThat("File contains \n after process correct CRLF", processedPomXml, containsString("\n"));
         assertThat("File not contains \r\n after process correct CRLF", processedPomXml, not(containsString("\r\n")));

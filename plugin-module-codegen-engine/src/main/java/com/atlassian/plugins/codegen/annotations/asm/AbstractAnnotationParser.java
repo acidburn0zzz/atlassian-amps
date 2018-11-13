@@ -5,14 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 
@@ -30,7 +27,6 @@ public abstract class AbstractAnnotationParser
         String path = basePackage.replace('.', '/');
 
         Enumeration<URL> resources = classLoader.getResources(path);
-        List<File> dirs = new ArrayList<File>();
         while (resources.hasMoreElements())
         {
             URL resource = resources.nextElement();
@@ -62,13 +58,9 @@ public abstract class AbstractAnnotationParser
             String name = entry.getName();
             if (name.startsWith(basePath) && !entry.isDirectory() && name.endsWith(".class"))
             {
-                InputStream is = jarFile.getInputStream(entry);
-                try
+                try (InputStream is = jarFile.getInputStream(entry))
                 {
                     processClassFile(is, classVisitor);
-                } finally
-                {
-                    IOUtils.closeQuietly(is);
                 }
             }
         }
@@ -91,14 +83,9 @@ public abstract class AbstractAnnotationParser
             } else if (file.getName()
                     .endsWith(".class"))
             {
-                InputStream is = FileUtils.openInputStream(file);
-
-                try
+                try (InputStream is = FileUtils.openInputStream(file))
                 {
                     processClassFile(is, classVisitor);
-                } finally
-                {
-                    IOUtils.closeQuietly(is);
                 }
 
             }

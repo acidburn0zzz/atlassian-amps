@@ -1,13 +1,11 @@
 package com.atlassian.plugins.codegen.modules.common.moduletype;
 
-import com.atlassian.plugins.codegen.AbstractCodegenTestCase;
 import com.atlassian.plugins.codegen.AbstractModuleCreatorTestCase;
-import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @since 3.6
@@ -15,10 +13,10 @@ import static junit.framework.Assert.assertEquals;
 public class ModuleTypeTest extends AbstractModuleCreatorTestCase<ModuleTypeProperties>
 {
     public static final String MODULE_TYPE = "module-type";
-    
+
     public ModuleTypeTest()
     {
-        super("module-type", new ModuleTypeModuleCreator());
+        super(MODULE_TYPE, new ModuleTypeModuleCreator());
     }
     
     @Before

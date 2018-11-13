@@ -2,8 +2,8 @@ package com.atlassian.maven.plugins.amps;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,10 +26,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.dom4j.DocumentException;
-import org.junit.Test;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
-
 
 /**
  * Jars the tests into an OSGi bundle.  Only builds the jar if the {@link #buildTestPlugin} flag is set or it detects
@@ -43,7 +41,6 @@ import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 @Mojo(name = "test-jar",requiresDependencyResolution = ResolutionScope.TEST)
 public class TestJarMojo extends AbstractAmpsMojo
 {
-
     /**
      * The final name for the test plugin, without the "-tests" suffix.
      */
@@ -64,12 +61,13 @@ public class TestJarMojo extends AbstractAmpsMojo
                 {
                     String symbolicName = prj.getGroupId() + "." + prj.getArtifactId() + "-tests";
                     FileUtils.writeStringToFile(mf,
-                           "Manifest-Version: 1.0\n" +
-                           "Bundle-SymbolicName: " + symbolicName + "\n" +
-                           "Bundle-Version: 1.0\n" +
-                           "Bundle-Name: " + finalName + "-tests\n" +
-                           "DynamicImport-Package: *\n" + 
-                           "Atlassian-Plugin-Key: " + symbolicName + "\n"
+                            "Manifest-Version: 1.0\n" +
+                            "Bundle-SymbolicName: " + symbolicName + "\n" +
+                            "Bundle-Version: 1.0\n" +
+                            "Bundle-Name: " + finalName + "-tests\n" +
+                            "DynamicImport-Package: *\n" +
+                            "Atlassian-Plugin-Key: " + symbolicName + "\n",
+                            StandardCharsets.UTF_8
                     );
                 }
                 catch (IOException e)
@@ -81,22 +79,22 @@ public class TestJarMojo extends AbstractAmpsMojo
             File pluginXml = file(testClassesDir,"atlassian-plugin.xml");
             File itPackageDir = file(testClassesDir,"it");
             
-            if(pluginXml.exists() && itPackageDir.exists())
+            if (pluginXml.exists() && itPackageDir.exists())
             {
                 PluginProjectChangeset changes = new PluginProjectChangeset();
                 
                 Collection<File> classFiles = FileUtils.listFiles(itPackageDir, new String[]{"class"}, true);
                 try
                 {
-                    for(File classFile : classFiles)
+                    for (File classFile : classFiles)
                     {
                         String className = ClassUtils.getClassnameFromFile(classFile, prj.getBuild().getTestOutputDirectory());
                         WiredTestInfo wiredInfo = ClassUtils.getWiredTestInfo(classFile);
-                        if(wiredInfo.isWiredTest())
+                        if (wiredInfo.isWiredTest())
                         {
                             getLog().info("found Test: " + className + ", adding to plugin.xml...");
 
-                            Map<String,String> serviceProps = new HashMap<String, String>();
+                            Map<String,String> serviceProps = new HashMap<>();
                             serviceProps.put("inProductTest","true");
                             
                             String simpleClassname = StringUtils.substringAfterLast(className,".");
@@ -118,11 +116,7 @@ public class TestJarMojo extends AbstractAmpsMojo
                 {
                     throw new MojoExecutionException("unable to convert test classes folder to URL",e);
                 }
-                catch (DocumentException e)
-                {
-                    throw new MojoExecutionException("unable to modify plugin.xml",e);
-                }
-                catch (IOException e)
+                catch (DocumentException | IOException e)
                 {
                     throw new MojoExecutionException("unable to modify plugin.xml",e);
                 }
@@ -131,24 +125,5 @@ public class TestJarMojo extends AbstractAmpsMojo
             getMavenGoals().jarTests(finalName);
         }
     }
-
-    private boolean hasTestMethod(Class<?> testClass)
-    {
-        boolean hasTestAnno = false;
-        
-        Method[] methods = testClass.getMethods();
-        for(Method m : methods)
-        {
-            if(m.isAnnotationPresent(Test.class))
-            {
-                hasTestAnno = true;
-                break;
-            }
-        }
-
-        return hasTestAnno;
-    }
-
-    
 }
 

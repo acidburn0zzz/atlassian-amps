@@ -1,8 +1,6 @@
 package com.atlassian.plugins.codegen.annotations.asm;
 
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
@@ -15,7 +13,7 @@ import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreatorRegistry;
 
-import org.apache.commons.io.IOUtils;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.objectweb.asm.AnnotationVisitor;
@@ -30,23 +28,17 @@ import org.objectweb.asm.Opcodes;
  */
 public class ModuleCreatorAnnotationParser extends AbstractAnnotationParser
 {
-
     public static final String MODULE_PACKAGE = "com.atlassian.plugins.codegen.modules";
-    protected static final Map<String, String> annotationProductMap;
 
-    static
-    {
-        Map<String, String> productMap = new HashMap<String, String>();
-        productMap.put(JiraPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.JIRA);
-        productMap.put(ConfluencePluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.CONFLUENCE);
-        productMap.put(BambooPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.BAMBOO);
-        productMap.put(BitbucketPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.BITBUCKET);
-        productMap.put(CrowdPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.CROWD);
-        productMap.put(FeCruPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.FECRU);
-        productMap.put(RefAppPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.REFAPP);
-
-        annotationProductMap = Collections.unmodifiableMap(productMap);
-    }
+    private static final Map<String, String> annotationProductMap = ImmutableMap.<String, String>builder()
+            .put(BambooPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.BAMBOO)
+            .put(BitbucketPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.BITBUCKET)
+            .put(ConfluencePluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.CONFLUENCE)
+            .put(CrowdPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.CROWD)
+            .put(FeCruPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.FECRU)
+            .put(JiraPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.JIRA)
+            .put(RefAppPluginModuleCreator.class.getName(), PluginModuleCreatorRegistry.REFAPP)
+            .build();
 
     private final PluginModuleCreatorRegistry pluginModuleCreatorRegistry;
 
@@ -113,13 +105,10 @@ public class ModuleCreatorAnnotationParser extends AbstractAnnotationParser
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             String path = superName.replace('.', '/');
 
-            InputStream is = null;
-            try
+            try (InputStream is = classLoader.getResourceAsStream(path + ".class"))
             {
-                is = classLoader.getResourceAsStream(path + ".class");
-                if (null != is)
+                if (is != null)
                 {
-
                     ClassReader classReader = new ClassReader(is);
                     hasInterface = ArrayUtils.contains(classReader.getInterfaces(), interfaceName);
                     if (!hasInterface)
@@ -127,12 +116,10 @@ public class ModuleCreatorAnnotationParser extends AbstractAnnotationParser
                         hasInterface = superHasInterface(classReader.getSuperName(), interfaceName);
                     }
                 }
-            } catch (Exception e)
+            }
+            catch (Exception ignored)
             {
                 //don't care
-            } finally
-            {
-                IOUtils.closeQuietly(is);
             }
 
             return hasInterface;

@@ -2,9 +2,9 @@ package com.atlassian.plugins.codegen;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import com.atlassian.plugins.codegen.ArtifactDependency.Scope;
 import com.atlassian.plugins.codegen.XmlMatchers.XmlWrapper;
@@ -14,9 +14,10 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static com.atlassian.plugins.codegen.AmpsSystemPropertyVariable.ampsSystemPropertyVariable;
 import static com.atlassian.plugins.codegen.ArtifactDependency.dependency;
@@ -35,7 +36,6 @@ import static com.atlassian.plugins.codegen.XmlMatchers.nodeCount;
 import static com.atlassian.plugins.codegen.XmlMatchers.nodeText;
 import static com.atlassian.plugins.codegen.XmlMatchers.nodeTextEquals;
 import static com.atlassian.plugins.codegen.XmlMatchers.nodes;
-import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.equalTo;
@@ -97,28 +97,18 @@ public class MavenProjectRewriterTest
         privatePackage("com.atlassian.random");
     
     private static final PluginProjectChangeset changeset = new PluginProjectChangeset();
+
+    @Rule
+    public final TemporaryFolder tempDir = new TemporaryFolder();
     
-    private File tempDir;
     private File pom;
-    private MavenProjectRewriter rewriter;
-    
+
     @Before
     public void setup() throws Exception
     {
-        final File sysTempDir = new File("target");
-        String dirName = UUID.randomUUID().toString();
-        tempDir = new File(sysTempDir, dirName);
-        tempDir.mkdirs();
-        
-        pom = new File(tempDir, "pom.xml");
+        pom = tempDir.newFile("pom.xml");
     }
     
-    @After
-    public void deleteTempDir() throws Exception
-    {
-        FileUtils.deleteDirectory(tempDir);
-    }
-
     @Test
     public void dependencyIsAdded() throws Exception
     {
@@ -337,7 +327,7 @@ public class MavenProjectRewriterTest
     {
         assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(NEW_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
-                        nodeText(delimitedList(",", Matchers.<String>iterableWithSize(4)))));
+                        nodeText(delimitedList(Matchers.iterableWithSize(4)))));
     }
 
     @SuppressWarnings("unchecked")
@@ -346,10 +336,10 @@ public class MavenProjectRewriterTest
     {
         assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(NEW_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
-                        nodeText(delimitedList(",",
-                                               Matchers.<String>hasItems(any(String.class), 
-                                                   equalTo("com.atlassian.random;version=\"2.0.1\""),
-                                                   any(String.class), any(String.class))))));
+                        nodeText(delimitedList(
+                                Matchers.hasItems(any(String.class),
+                                        equalTo("com.atlassian.random;version=\"2.0.1\""),
+                                        any(String.class), any(String.class))))));
     }
 
     @SuppressWarnings("unchecked")
@@ -358,9 +348,9 @@ public class MavenProjectRewriterTest
     {
         assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(NEW_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
-                        nodeText(delimitedList(",",
-                                               Matchers.<String>hasItems(equalTo("com.atlassian.plugin.*;version=\"${atlassian.plugins.version}\""),
-                                                   any(String.class), any(String.class), any(String.class))))));
+                        nodeText(delimitedList(
+                                Matchers.hasItems(equalTo("com.atlassian.plugin.*;version=\"${atlassian.plugins.version}\""),
+                                        any(String.class), any(String.class), any(String.class))))));
     }
 
     @Test
@@ -368,8 +358,7 @@ public class MavenProjectRewriterTest
     {
         assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(DUPLICATE_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
-                        nodeText(delimitedList(",",
-                                               Matchers.<String>iterableWithSize(3)))));
+                        nodeText(delimitedList(Matchers.iterableWithSize(3)))));
     }
 
     @SuppressWarnings("unchecked")
@@ -378,8 +367,8 @@ public class MavenProjectRewriterTest
     {
         assertThat(applyChanges(TEST_POM_WITH_INSTRUCTIONS, changeset.with(DUPLICATE_IMPORT_PACKAGE)),
                    node("//build/plugins/plugin[1]/configuration/instructions/Import-Package",
-                        nodeText(delimitedList(",",
-                                               Matchers.<String>hasItems(equalTo("com.atlassian.plugins.rest.common*;version=\"1.0.5\";resolution:=optional"))))));
+                        nodeText(delimitedList(
+                                Matchers.hasItems(equalTo("com.atlassian.plugins.rest.common*;version=\"1.0.5\";resolution:=optional"))))));
     }
 
     @Test
@@ -500,27 +489,27 @@ public class MavenProjectRewriterTest
                    node("//build/plugins/plugin[1]/configuration/systemPropertyVariables/existingVariable", nodeTextEquals("foo")));
     }
     
-    protected XmlWrapper applyChanges(String pomTemplateName, PluginProjectChangeset changes) throws Exception
+    private XmlWrapper applyChanges(String pomTemplateName, PluginProjectChangeset changes) throws Exception
     {
-        InputStream is = getClass().getClassLoader().getResourceAsStream(pomTemplateName);
-        FileUtils.copyInputStreamToFile(is, pom);
-        closeQuietly(is);
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(pomTemplateName))
+        {
+            FileUtils.copyInputStreamToFile(is, pom);
+        }
 
-        rewriter = new MavenProjectRewriter(pom);
+        MavenProjectRewriter rewriter = new MavenProjectRewriter(pom);
         rewriter.applyChanges(changes);
         
-        return XmlMatchers.xml(FileUtils.readFileToString(pom), "project");
+        return XmlMatchers.xml(FileUtils.readFileToString(pom, StandardCharsets.UTF_8), "project");
     }
-    
 
-    public static Matcher<String> delimitedList(final String delimiter, final Matcher<Iterable<String>> listMatcher)
+    private static Matcher<String> delimitedList(final Matcher<Iterable<String>> listMatcher)
     {
         return new TypeSafeDiagnosingMatcher<String>()
         {
             protected boolean matchesSafely(String s, Description mismatchDescription)
             {
-                String[] parts = s.split(delimiter);
-                List<String> trimmed = new ArrayList<String>(parts.length);
+                String[] parts = s.split(",");
+                List<String> trimmed = new ArrayList<>(parts.length);
                 for (String p : parts)
                 {
                     trimmed.add(p.trim());
@@ -535,7 +524,7 @@ public class MavenProjectRewriterTest
 
             public void describeTo(Description description)
             {
-                description.appendText("list delimited by '" + delimiter + "' ");
+                description.appendText("list delimited by '" + "," + "' ");
                 listMatcher.describeTo(description);
             }
         };

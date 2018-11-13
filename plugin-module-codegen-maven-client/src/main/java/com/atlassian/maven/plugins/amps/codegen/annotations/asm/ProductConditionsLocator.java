@@ -7,7 +7,6 @@ import java.util.Map;
 import com.atlassian.plugins.codegen.annotations.asm.AbstractAnnotationParser;
 import com.atlassian.plugins.codegen.modules.PluginModuleCreatorRegistry;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.objectweb.asm.ClassReader;
@@ -19,7 +18,7 @@ import org.objectweb.asm.Opcodes;
  */
 public class ProductConditionsLocator extends AbstractAnnotationParser
 {
-    protected static final Map<String, String> productConditionsPackages = new HashMap<String, String>();
+    private static final Map<String, String> productConditionsPackages = new HashMap<>();
 
     static
     {
@@ -61,7 +60,7 @@ public class ProductConditionsLocator extends AbstractAnnotationParser
         private String visitedClassname;
         private boolean isWebCondition;
 
-        public ConditionClassVisitor()
+        ConditionClassVisitor()
         {
             super(Opcodes.ASM5);
         }
@@ -105,13 +104,10 @@ public class ProductConditionsLocator extends AbstractAnnotationParser
                     .getContextClassLoader();
             String path = superName.replace('.', '/');
 
-            InputStream is = null;
-            try
+            try (InputStream is = classLoader.getResourceAsStream(path + ".class"))
             {
-                is = classLoader.getResourceAsStream(path + ".class");
                 if (null != is)
                 {
-
                     ClassReader classReader = new ClassReader(is);
                     hasInterface = ArrayUtils.contains(classReader.getInterfaces(), interfaceName);
                     if (!hasInterface)
@@ -119,16 +115,13 @@ public class ProductConditionsLocator extends AbstractAnnotationParser
                         hasInterface = superHasInterface(classReader.getSuperName(), interfaceName);
                     }
                 }
-            } catch (Exception e)
+            }
+            catch (Exception ignored)
             {
                 //don't care
-            } finally
-            {
-                IOUtils.closeQuietly(is);
             }
 
             return hasInterface;
         }
-
     }
 }

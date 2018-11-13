@@ -1,7 +1,5 @@
 package com.atlassian.maven.plugins.amps.util.minifier;
 
-import com.google.common.collect.ImmutableList;
-import com.google.debugging.sourcemap.SourceMapFormat;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.JSSourceFile;
@@ -10,7 +8,6 @@ import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceMap;
 import org.apache.maven.plugin.logging.Log;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
@@ -22,29 +19,29 @@ public class GoogleClosureJSMinifier
     /**
      * Needed as a tuple to return two things from the method - compiled code and source map.
      */
-    public static class CompiledSourceWithSourceMap
+    static class CompiledSourceWithSourceMap
     {
         private final String compiled;
         private final String sourceMap;
 
-        public CompiledSourceWithSourceMap(final String compiled, final String sourceMap)
+        CompiledSourceWithSourceMap(final String compiled, final String sourceMap)
         {
             this.compiled = compiled;
             this.sourceMap = sourceMap;
         }
 
-        public String getCompiled()
+        String getCompiled()
         {
             return compiled;
         }
 
-        public String getSourceMap()
+        String getSourceMap()
         {
             return sourceMap;
         }
     }
 
-    public static CompilerOptions getOptions(Map<String, String> closureOptions, Log log)
+    private static CompilerOptions getOptions(Map<String, String> closureOptions, Log log)
     {
         GoogleClosureOptionsHandler googleClosureOptionsHandler = new GoogleClosureOptionsHandler(log);
         if(closureOptions != null && !closureOptions.isEmpty()) {

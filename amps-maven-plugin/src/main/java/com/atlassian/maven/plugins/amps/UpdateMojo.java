@@ -4,7 +4,6 @@ import com.atlassian.maven.plugins.amps.util.ZipUtils;
 import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkPackageType;
 import com.atlassian.maven.plugins.updater.SdkResource;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -12,7 +11,10 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -97,26 +99,26 @@ public class UpdateMojo extends AbstractAmpsMojo {
             throws MojoExecutionException {
         sdkInstaller.setExecutable(true);
 
-        List<String> commands = new ArrayList<String>();
+        List<String> commands = new ArrayList<>();
         Collections.addAll(commands, packageType.installCommands());
         commands.add(sdkInstaller.getAbsolutePath());
+
         ProcessBuilder installer = new ProcessBuilder(commands);
-        BufferedReader in = null, err = null;
         try {
             Process p = installer.start();
-            in  = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                 BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()))) {
+                String line;
+                getLog().info("Output from installer process follow:");
+                while ((line = in.readLine()) != null) {
+                    getLog().info(line);
+                }
 
-            String line;
-            getLog().debug("Returned input from installer process follows:");
-            while ((line = in.readLine()) != null) {
-                getLog().info(line);
-            }
-
-            if (err.ready()) {
-                getLog().info("Errors returned by subprocess installer:");
-                while ((line = err.readLine()) != null) {
-                    getLog().error(line);
+                if (err.ready()) {
+                    getLog().error("Errors from installer process follow:");
+                    while ((line = err.readLine()) != null) {
+                        getLog().error(line);
+                    }
                 }
             }
 
@@ -129,9 +131,6 @@ public class UpdateMojo extends AbstractAmpsMojo {
             }
         } catch (IOException e) {
             throw new MojoExecutionException("error from installer subprocess", e);
-        } finally {
-            IOUtils.closeQuietly(in);
-            IOUtils.closeQuietly(err);
         }
     }
 

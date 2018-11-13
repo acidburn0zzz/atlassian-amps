@@ -12,13 +12,11 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.DirectoryScanner;
-
 
 /**
  * @since version
@@ -33,40 +31,39 @@ public class ResourcesMinifier
 
     public static void minify(List<Resource> resources, String outputDir, MinifierParameters minifierParameters) throws MojoExecutionException
     {
-        if(null == INSTANCE)
+        if (null == INSTANCE)
         {
             INSTANCE = new ResourcesMinifier();
         }
 
-        for(Resource resource : resources)
+        for (Resource resource : resources)
         {
             INSTANCE.processResource(resource, new File(outputDir), minifierParameters);
         }
     }
-    
+
     public void processResource(Resource resource, File outputDir, MinifierParameters minifierParameters) throws MojoExecutionException
     {
         File destDir = outputDir;
-        if(StringUtils.isNotBlank(resource.getTargetPath()))
+        if (StringUtils.isNotBlank(resource.getTargetPath()))
         {
-            destDir = new File(outputDir,resource.getTargetPath());
+            destDir = new File(outputDir, resource.getTargetPath());
         }
-        
+
         File resourceDir = new File(resource.getDirectory());
-        
-        if(null == resourceDir || !resourceDir.exists())
+        if (!resourceDir.exists())
         {
             return;
         }
 
-        if(minifierParameters.isCompressJs())
+        if (minifierParameters.isCompressJs())
         {
-            processJs(resourceDir,destDir,resource.getIncludes(),resource.getExcludes(), minifierParameters);
+            processJs(resourceDir, destDir, resource.getIncludes(), resource.getExcludes(), minifierParameters);
         }
-        
-        if(minifierParameters.isCompressCss())
+
+        if (minifierParameters.isCompressCss())
         {
-            processCss(resourceDir,destDir,resource.getIncludes(),resource.getExcludes(), minifierParameters);
+            processCss(resourceDir, destDir, resource.getIncludes(), resource.getExcludes(), minifierParameters);
         }
 
         processXml(resourceDir, destDir, resource.getIncludes(), resource.getExcludes(), minifierParameters);
@@ -81,13 +78,13 @@ public class ResourcesMinifier
 
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(resourceDir);
-        if(null == includes || includes.isEmpty())
+        if (null == includes || includes.isEmpty())
         {
             includes = Collections.singletonList("**/*.xml");
         }
-        scanner.setIncludes(includes.toArray(new String[includes.size()]));
+        scanner.setIncludes(includes.toArray(new String[0]));
 
-        if(null != excludes && !excludes.isEmpty())
+        if (null != excludes && !excludes.isEmpty())
         {
             scanner.setExcludes(excludes.toArray(new String[0]));
         }
@@ -99,17 +96,17 @@ public class ResourcesMinifier
         int numberOfMinifiedFile = 0;
         for (String name : scanner.getIncludedFiles())
         {
-            File sourceFile = new File(resourceDir,name);
+            File sourceFile = new File(resourceDir, name);
             // double check xml file
-            if(!sourceFile.getName().endsWith(".xml"))
+            if (!sourceFile.getName().endsWith(".xml"))
             {
                 continue;
             }
-            File destFile = new File(destDir,name);
+            File destFile = new File(destDir, name);
 
-            if(sourceFile.exists() && sourceFile.canRead())
+            if (sourceFile.exists() && sourceFile.canRead())
             {
-                if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
+                if (destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
                 {
                     log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
                     continue;
@@ -131,7 +128,7 @@ public class ResourcesMinifier
                 }
             }
         }
-        log.info(numberOfMinifiedFile +" XML file(s) were minified into target directory " + destDir.getAbsolutePath());
+        log.info(numberOfMinifiedFile + " XML file(s) were minified into target directory " + destDir.getAbsolutePath());
     }
 
     public void processJs(File resourceDir, File destDir, List<String> includes, List<String> excludes, MinifierParameters minifierParameters) throws MojoExecutionException
@@ -139,7 +136,7 @@ public class ResourcesMinifier
         Log log = minifierParameters.getLog();
         boolean useClosure = minifierParameters.isUseClosureForJs();
         Charset cs = minifierParameters.getCs();
-        if(useClosure)
+        if (useClosure)
         {
             log.info("Compiling javascript using Closure");
         }
@@ -147,16 +144,16 @@ public class ResourcesMinifier
         {
             log.info("Compiling javascript using YUI");
         }
-        
+
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(resourceDir);
         if (null == includes || includes.isEmpty())
         {
             includes = Collections.singletonList("**/*.js");
         }
-        scanner.setIncludes(includes.toArray(new String[includes.size()]));
+        scanner.setIncludes(includes.toArray(new String[0]));
 
-        if(null != excludes && !excludes.isEmpty())
+        if (null != excludes && !excludes.isEmpty())
         {
             scanner.setExcludes(excludes.toArray(new String[0]));
         }
@@ -164,34 +161,33 @@ public class ResourcesMinifier
         scanner.addDefaultExcludes();
         scanner.scan();
         int numberOfMinifiedFile = 0;
-        for(String name : scanner.getIncludedFiles())
+        for (String name : scanner.getIncludedFiles())
         {
-            File sourceFile = new File(resourceDir,name);
+            File sourceFile = new File(resourceDir, name);
             // double check javascript file
-            if (!sourceFile.getName().endsWith(".js")) {
+            if (!sourceFile.getName().endsWith(".js"))
+            {
                 continue;
             }
             String baseName = FilenameUtils.removeExtension(name);
-            File destFile = new File(destDir,baseName + "-min.js");
+            File destFile = new File(destDir, baseName + "-min.js");
             File sourceMapFile = new File(destDir, baseName + "-min.js.map");
-            if(sourceFile.exists() && sourceFile.canRead())
+            if (sourceFile.exists() && sourceFile.canRead())
             {
-                if(
-                    (destFile.exists() && destFile.lastModified() > sourceFile.lastModified()) &&
-                    (!useClosure || (sourceMapFile.exists() && sourceMapFile.lastModified() > sourceFile.lastModified()))
-                )
+                if ((destFile.exists() && destFile.lastModified() > sourceFile.lastModified()) &&
+                        (!useClosure || (sourceMapFile.exists() && sourceMapFile.lastModified() > sourceFile.lastModified())))
                 {
                     log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
                     continue;
                 }
 
-                if(maybeCopyPreminifiedFileToDest(sourceFile, destFile, minifierParameters))
+                if (maybeCopyPreminifiedFileToDest(sourceFile, destFile, minifierParameters))
                 {
                     continue;
                 }
 
                 log.debug("compressing to " + destFile.getAbsolutePath());
-                if(useClosure)
+                if (useClosure)
                 {
                     log.debug("generating source map to " + sourceMapFile.getAbsolutePath());
                     closureJsCompile(sourceFile, destFile, sourceMapFile, minifierParameters);
@@ -209,12 +205,13 @@ public class ResourcesMinifier
     /**
      * If the file is determined to be already minified (by .min.js or -min.js extension), then it will
      * just copy the file to the destination.
-     * @param sourceFile            Source file
-     * @param destFile              Target file
-     * @param minifierParameters    Minifier parameters are constructed higher in the call-chain
+     *
+     * @param sourceFile         Source file
+     * @param destFile           Target file
+     * @param minifierParameters Minifier parameters are constructed higher in the call-chain
      * @return true if and only if the file name ends with .min.js or -min.js
      * @throws MojoExecutionException If an IOException is encountered reading or writing the source
-     *                                  or destination file.
+     *                                or destination file.
      */
     private boolean maybeCopyPreminifiedFileToDest(final File sourceFile,
                                                    final File destFile,
@@ -248,13 +245,13 @@ public class ResourcesMinifier
         Charset cs = minifierParameters.getCs();
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(resourceDir);
-        if(null == includes || includes.isEmpty())
+        if (null == includes || includes.isEmpty())
         {
             includes = Collections.singletonList("**/*.css");
         }
-        scanner.setIncludes(includes.toArray(new String[includes.size()]));
+        scanner.setIncludes(includes.toArray(new String[0]));
 
-        if(null != excludes && !excludes.isEmpty())
+        if (null != excludes && !excludes.isEmpty())
         {
             scanner.setExcludes(excludes.toArray(new String[0]));
         }
@@ -262,20 +259,20 @@ public class ResourcesMinifier
         scanner.addDefaultExcludes();
         scanner.scan();
         int numberOfMinifiedFile = 0;
-        for(String name : scanner.getIncludedFiles())
+        for (String name : scanner.getIncludedFiles())
         {
-            File sourceFile = new File(resourceDir,name);
+            File sourceFile = new File(resourceDir, name);
             // double check css file
-            if(!sourceFile.getName().endsWith(".css"))
+            if (!sourceFile.getName().endsWith(".css"))
             {
                 continue;
             }
             String baseName = FilenameUtils.removeExtension(name);
-            File destFile = new File(destDir,baseName + "-min.css");
+            File destFile = new File(destDir, baseName + "-min.css");
 
-            if(sourceFile.exists() && sourceFile.canRead())
+            if (sourceFile.exists() && sourceFile.canRead())
             {
-                if(destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
+                if (destFile.exists() && destFile.lastModified() > sourceFile.lastModified())
                 {
                     log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
                     continue;
@@ -306,52 +303,40 @@ public class ResourcesMinifier
             throw new MojoExecutionException("IOException when compiling JS", e);
         }
     }
-    
+
     private void yuiJsCompile(File sourceFile, File destFile, Log log, Charset cs) throws MojoExecutionException
     {
-        InputStreamReader in = null;
-        OutputStreamWriter out = null;
         try
         {
             FileUtils.forceMkdir(destFile.getParentFile());
-            in = new InputStreamReader(new FileInputStream(sourceFile), cs);
-            out = new OutputStreamWriter(new FileOutputStream(destFile), cs);
-            
-            JavaScriptCompressor yui = new JavaScriptCompressor(in,new YUIErrorReporter(log));
-            yui.compress(out,-1,true,false,false,false);
+            try (InputStreamReader in = new InputStreamReader(new FileInputStream(sourceFile), cs);
+                 OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(destFile), cs))
+            {
+                JavaScriptCompressor yui = new JavaScriptCompressor(in, new YUIErrorReporter(log));
+                yui.compress(out, -1, true, false, false, false);
+            }
         }
         catch (IOException e)
         {
             throw new MojoExecutionException("IOException when compiling JS", e);
-        }
-        finally {
-            IOUtils.closeQuietly(in);
-            IOUtils.closeQuietly(out);
         }
     }
 
     private void yuiCssCompile(File sourceFile, File destFile, Charset cs) throws MojoExecutionException
     {
-        InputStreamReader in = null;
-        OutputStreamWriter out = null;
         try
         {
             FileUtils.forceMkdir(destFile.getParentFile());
-            in = new InputStreamReader(new FileInputStream(sourceFile), cs);
-            out = new OutputStreamWriter(new FileOutputStream(destFile), cs);
-
-            CssCompressor yui = new CssCompressor(in);
-            yui.compress(out,-1);
+            try (InputStreamReader in = new InputStreamReader(new FileInputStream(sourceFile), cs);
+                 OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(destFile), cs))
+            {
+                CssCompressor yui = new CssCompressor(in);
+                yui.compress(out, -1);
+            }
         }
         catch (IOException e)
         {
             throw new MojoExecutionException("IOException when compiling JS", e);
         }
-        finally {
-            IOUtils.closeQuietly(in);
-            IOUtils.closeQuietly(out);
-        }
     }
-
-    
 }

@@ -30,7 +30,6 @@ import org.dom4j.io.XMLWriter;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Predicates.and;
 import static com.google.common.collect.Iterables.any;
-import static org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
  * Applies any changes from a {@link PluginProjectChangeset} that affect the POM of a Maven project.
@@ -523,17 +522,13 @@ public class MavenProjectRewriter implements ProjectRewriter
     
     private void writePom(Document doc, File f) throws IOException
     {
-        FileOutputStream fos = new FileOutputStream(f);
         OutputFormat format = OutputFormat.createPrettyPrint();
         format.setIndentSize(POM_INDENTATION);
-        XMLWriter writer = new XMLWriter(fos, format);
-        try
+
+        try (FileOutputStream fos = new FileOutputStream(f))
         {
+            XMLWriter writer = new XMLWriter(fos, format);
             writer.write(doc);
-        }
-        finally
-        {
-            closeQuietly(fos);
         }
     }
 

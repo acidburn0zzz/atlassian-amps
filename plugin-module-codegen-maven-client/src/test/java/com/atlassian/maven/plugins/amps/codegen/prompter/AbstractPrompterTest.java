@@ -1,17 +1,17 @@
 package com.atlassian.maven.plugins.amps.codegen.prompter;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.UUID;
 
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
 import static org.mockito.Mockito.mock;
 
@@ -20,37 +20,26 @@ import static org.mockito.Mockito.mock;
  */
 public abstract class AbstractPrompterTest
 {
-    protected File tempDir;
-    protected File srcDir;
-    protected File testDir;
-    protected File resourcesDir;
-    protected File templateDir;
-    protected File pluginXml;
+    @Rule
+    public final TemporaryFolder tempDir = new TemporaryFolder();
+
     protected PluginModuleLocation moduleLocation;
     protected Prompter prompter;
 
     @Before
     public void setupDirs() throws Exception
     {
+        File srcDir = tempDir.newFolder("src");
+        File testDir = tempDir.newFolder("test-src");
+        File resourcesDir = tempDir.newFolder("resources");
+        File templateDir = tempDir.newFolder("resources", "templates");
+        File pluginXml = tempDir.newFile("resources" + File.separator + "atlassian-plugin.xml");
 
-        final File sysTempDir = new File("target");
-        String dirName = UUID.randomUUID()
-                .toString();
-        tempDir = new File(sysTempDir, dirName);
-        srcDir = new File(tempDir, "src");
-        testDir = new File(tempDir, "test-src");
-        resourcesDir = new File(tempDir, "resources");
-        templateDir = new File(resourcesDir, "templates");
-        pluginXml = new File(resourcesDir, "atlassian-plugin.xml");
-
-        tempDir.mkdirs();
-        srcDir.mkdirs();
-        resourcesDir.mkdirs();
-        templateDir.mkdirs();
-
-        InputStream is = this.getClass()
-                .getResourceAsStream("/empty-plugin.xml");
-        IOUtils.copy(is, FileUtils.openOutputStream(pluginXml));
+        InputStream is = this.getClass().getResourceAsStream("/empty-plugin.xml");
+        try (FileOutputStream pluginXmlStream = FileUtils.openOutputStream(pluginXml))
+        {
+            IOUtils.copy(is, pluginXmlStream);
+        }
 
         moduleLocation = new PluginModuleLocation.Builder(srcDir)
                 .resourcesDirectory(resourcesDir)
@@ -58,11 +47,5 @@ public abstract class AbstractPrompterTest
                 .templateDirectory(templateDir)
                 .build();
         prompter = mock(Prompter.class);
-    }
-
-    @After
-    public void removeTempDir() throws IOException
-    {
-        FileUtils.deleteQuietly(tempDir);
     }
 }

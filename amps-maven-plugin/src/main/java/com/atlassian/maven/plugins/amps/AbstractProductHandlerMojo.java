@@ -4,8 +4,7 @@ import com.atlassian.maven.plugins.amps.product.ProductHandler;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -20,6 +19,7 @@ import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,6 @@ import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_SERV
 import static com.atlassian.maven.plugins.amps.product.AmpsDefaults.DEFAULT_WEB_CONSOLE_VERSION;
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pingRepeatedly;
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.toArtifacts;
-
 
 /**
  * Base class for webapp mojos
@@ -738,7 +737,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
         if (product.getDataSources() == null)
         {
-            product.setDataSources(Lists.<DataSource>newArrayList());
+            product.setDataSources(new ArrayList<>());
         }
     }
 
@@ -757,7 +756,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
     public List<ProductArtifact> getTestFrameworkPlugins()
     {
-        if(null == testFrameworkPlugins)
+        if (null == testFrameworkPlugins)
         {
             String testRunnerVersion;
             Artifact testRunnerArtifact = ProjectUtils.getReactorArtifact(getMavenContext(), TESTRUNNER_GROUP_ID, TESTRUNNER_ARTIFACT_ID);
@@ -772,7 +771,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
             Properties overrides = getMavenContext().getVersionOverrides();
 
-            this.testFrameworkPlugins = Lists.newArrayList(
+            testFrameworkPlugins = ImmutableList.of(
                     new ProductArtifact(JUNIT_GROUP_ID, JUNIT_ARTIFACT_ID, overrides.getProperty(JUNIT_ARTIFACT_ID, JUNIT_VERSION)),
                     new ProductArtifact(TESTRUNNER_GROUP_ID, TESTRUNNER_BUNDLE_ARTIFACT_ID, overrides.getProperty(TESTRUNNER_BUNDLE_ARTIFACT_ID, testRunnerVersion))
             );
@@ -803,14 +802,14 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      */
     Map<String, Product> createProductContexts() throws MojoExecutionException
     {
-        Map<String, Product> productMap = Maps.newHashMap();
+        Map<String, Product> productMap = new HashMap<>();
         MavenContext mavenContext = getMavenContext();
         MavenGoals goals = getMavenGoals();
 
         // Products in the <products> tag inherit from the upper settings, e.g. when there's a <httpPort> tag for all products
         makeProductsInheritDefaultConfiguration(products, productMap);
 
-        for (Product ctx : Lists.newArrayList(productMap.values()))
+        for (Product ctx : new ArrayList<>(productMap.values()))
         {
             ProductHandler handler = ProductHandlerFactory.create(ctx.getId(), mavenContext, goals,artifactFactory);
             setDefaultValues(ctx, handler);
@@ -868,7 +867,10 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         try
         {
             long before = System.nanoTime();
-            for (final ProductExecution execution : Lists.reverse(productExecutions))
+
+            List<ProductExecution> reversed = new ArrayList<>(productExecutions);
+            Collections.reverse(reversed);
+            for (final ProductExecution execution : reversed)
             {
                 final Product product = execution.getProduct();
                 final ProductHandler productHandler = execution.getProductHandler();

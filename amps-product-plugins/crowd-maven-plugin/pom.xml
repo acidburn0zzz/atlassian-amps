@@ -49,7 +49,7 @@
                 </plugins>
             </build>
             <properties>
-                <invoker.test>copyBundledDependenciesTest,createTest,debugTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateObrTest,integrationTestTest,jarWithExistingManifestTest,runTest,runParallelTest,stopTest,nexusStagingTest,unitTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest,quickreloadTest</invoker.test>
+                <invoker.test>copyBundledDependenciesTest,createTest,debugTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateObrTest,integrationTestTest,jarWithExistingManifestTest,runTest,runParallelTest,stopTest,unitTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest,quickreloadTest</invoker.test>
                 <invoker.product>crowd</invoker.product>
                 <product.version>${crowd.version}</product.version>
                 <product.data.version>${crowd.data.version}</product.data.version>

@@ -3,19 +3,28 @@ package com.atlassian.maven.plugins.amps.util;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.copyDirectory;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.doesFileNameMatchArtifact;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
-import static com.atlassian.maven.plugins.amps.util.OSUtils.isWindows;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import junit.framework.TestCase;
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
-public class TestFileUtils extends TestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class TestFileUtils
 {
+    @Rule
+    public final TemporaryFolder tempDir = new TemporaryFolder();
+
+    @Test
     public void testFile()
     {
         File parent = new File("bob");
@@ -25,21 +34,23 @@ public class TestFileUtils extends TestCase
                 file(parent, "jim", "sarah").getAbsolutePath());
     }
 
-    public void testDoesFileNameMatcheArtifact()
+    @Test
+    public void testDoesFileNameMatchArtifact()
     {
         assertTrue(doesFileNameMatchArtifact("sal-crowd-plugin-2.0.7.jar", "sal-crowd-plugin"));
         assertFalse(doesFileNameMatchArtifact("sal-crowd-plugin-2.0.7.jar", "crowd-plugin"));
     }
 
+    @Test
     public void testCopyDirectory() throws IOException
     {
-        File src = tempDirectory();
-        File dest = tempDirectory();
+        File src = tempDir.newFolder("src");
+        File dest = tempDir.newFolder("dst");
         try
         {
-            src.mkdirs();
             File file = new File(src, "something");
             file.createNewFile();
+
             // Ignore the executable assert on Windows
             boolean executable = file.setExecutable(true);
             new File(src, "a/b").mkdirs();
@@ -48,7 +59,7 @@ public class TestFileUtils extends TestCase
             copyDirectory(src, dest, true);
             assertTrue(new File(dest, "a/b/c").exists());
             assertTrue(new File(dest, "a/d").exists());
-            if (isWindows())
+            if (SystemUtils.IS_OS_WINDOWS)
             {
                 assertEquals(executable, new File(dest, "a/d").canExecute());
             }
@@ -65,11 +76,7 @@ public class TestFileUtils extends TestCase
         }
     }
 
-    private static File tempDirectory()
-    {
-        return new File(new File(System.getProperty("java.io.tmpdir")), UUID.randomUUID().toString());
-    }
-
+    @Test
     public void testReadFileToString()
     {
         // Invoke

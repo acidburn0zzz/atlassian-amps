@@ -2,11 +2,12 @@ package com.atlassian.plugins.codegen;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static com.atlassian.plugins.codegen.ClassId.fullyQualified;
@@ -22,30 +23,18 @@ public class ProjectFilesRewriterTest
     private static final String CONTENT = "this is some amazing content";
     private static final String I18N_FILE_NAME = ProjectHelper.GROUP_ID + File.separator + ProjectHelper.ARTIFACT_ID + ".properties";
 
-    private ProjectHelper helper;
+    @Rule
+    public final ProjectHelper helper = new ProjectHelper();
+
     private ProjectFilesRewriter rewriter;
     private File i18nFile;
 
     @Before
     public void setup() throws Exception
     {
-        helper = new ProjectHelper();        
         usePluginXml("empty-plugin.xml");
     }
-    
-    private void usePluginXml(String path) throws Exception
-    {
-        helper.usePluginXml(path);
-        rewriter = new ProjectFilesRewriter(helper.location);
-        i18nFile = new File(helper.location.getResourcesDir(), I18N_FILE_NAME);
-    }
 
-    @After
-    public void deleteTempDir() throws Exception
-    {
-        helper.destroy();
-    }
-    
     @Test
     public void sourceFileIsCreated() throws Exception
     {
@@ -63,7 +52,8 @@ public class ProjectFilesRewriterTest
             .with(sourceFile(CLASS, SourceFile.SourceGroup.MAIN, CONTENT));
         rewriter.applyChanges(changes);
         
-        assertEquals(CONTENT, FileUtils.readFileToString(new File(helper.srcDir, "com/atlassian/test/MyClass.java")));
+        assertEquals(CONTENT,
+                FileUtils.readFileToString(new File(helper.srcDir, "com/atlassian/test/MyClass.java"), StandardCharsets.UTF_8));
     }
     
     @Test
@@ -83,7 +73,8 @@ public class ProjectFilesRewriterTest
             .with(sourceFile(CLASS, SourceFile.SourceGroup.TESTS, CONTENT));
         rewriter.applyChanges(changes);
         
-        assertEquals(CONTENT, FileUtils.readFileToString(new File(helper.testDir, "com/atlassian/test/MyClass.java")));
+        assertEquals(CONTENT,
+                FileUtils.readFileToString(new File(helper.testDir, "com/atlassian/test/MyClass.java"), StandardCharsets.UTF_8));
     }
     
     @Test
@@ -103,7 +94,8 @@ public class ProjectFilesRewriterTest
             .with(ResourceFile.resourceFile("templates/test", "template.vm", CONTENT));
         rewriter.applyChanges(changes);
         
-        assertEquals(CONTENT, FileUtils.readFileToString(new File(helper.resourcesDir, "templates/test/template.vm")));
+        assertEquals(CONTENT,
+                FileUtils.readFileToString(new File(helper.resourcesDir, "templates/test/template.vm"), StandardCharsets.UTF_8));
     }
     
     @Test
@@ -120,14 +112,9 @@ public class ProjectFilesRewriterTest
         rewriter.applyChanges(changeset().with(i18nString("foo", "bar")));
 
         Properties props = new Properties();
-        FileInputStream in = new FileInputStream(i18nFile);
-        try
+        try (FileInputStream in = new FileInputStream(i18nFile))
         {
             props.load(in);
-        }
-        finally
-        {
-            in.close();
         }
         assertEquals("bar", props.getProperty("foo"));
     }
@@ -135,19 +122,19 @@ public class ProjectFilesRewriterTest
     @Test
     public void duplicateI18nPropertyNameIsNotAdded() throws Exception
     {
-        FileUtils.writeStringToFile(i18nFile, "foo=goo\n");
+        FileUtils.writeStringToFile(i18nFile, "foo=goo\n", StandardCharsets.UTF_8);
         rewriter.applyChanges(changeset().with(i18nString("foo", "bar")));
         
-        assertEquals("foo=goo\n", FileUtils.readFileToString(i18nFile));
+        assertEquals("foo=goo\n", FileUtils.readFileToString(i18nFile, StandardCharsets.UTF_8));
     }
 
     @Test
     public void propertiesAreNotReordered() throws Exception
     {
-        FileUtils.writeStringToFile(i18nFile, "foo=goo\nall=lol");
+        FileUtils.writeStringToFile(i18nFile, "foo=goo\nall=lol", StandardCharsets.UTF_8);
         rewriter.applyChanges(changeset().with(i18nString("gal", "pal"), i18nString("bar", "car")));
         
-        assertEquals("foo=goo\nall=lol\ngal=pal\nbar=car\n", FileUtils.readFileToString(i18nFile));
+        assertEquals("foo=goo\nall=lol\ngal=pal\nbar=car\n", FileUtils.readFileToString(i18nFile, StandardCharsets.UTF_8));
     }
 
     @Test
@@ -158,5 +145,12 @@ public class ProjectFilesRewriterTest
         rewriter.applyChanges(changeset().with(i18nString("foo", "bar")));
     
         assertTrue(new File(helper.resourcesDir, "nonstandard-location.properties").exists());
+    }
+
+    private void usePluginXml(String path) throws Exception
+    {
+        helper.usePluginXml(path);
+        rewriter = new ProjectFilesRewriter(helper.location);
+        i18nFile = new File(helper.location.getResourcesDir(), I18N_FILE_NAME);
     }
 }

@@ -384,8 +384,7 @@ public class RemoteTestMojo extends AbstractProductHandlerMojo
 
     private Map<ProductArtifact,File> getFrameworkFiles() throws MojoExecutionException
     {
-        List<ProductArtifact> pluginsToDeploy = new ArrayList<>();
-        pluginsToDeploy.addAll(getTestFrameworkPlugins());
+        List<ProductArtifact> pluginsToDeploy = new ArrayList<>(getTestFrameworkPlugins());
         pluginsToDeploy.addAll(deployArtifacts);
 
         Map<ProductArtifact,File> artifactFileMap = new HashMap<>(pluginsToDeploy.size());

@@ -1,8 +1,10 @@
 package com.atlassian.maven.plugins.updater;
 
-import org.apache.commons.io.IOUtils;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * Default LocalSdk implementation for SDK installed on filesystem.
@@ -40,9 +42,7 @@ public class FileSystemLocalSdk implements LocalSdk {
     }
 
     private String getInstallType(File file) {
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new FileReader(file));
+        try (BufferedReader in = new BufferedReader(new FileReader(file))) {
             return in.readLine().trim();
         } catch (FileNotFoundException e) {
             // shouldn't happen, as we did the check above
@@ -51,9 +51,6 @@ public class FileSystemLocalSdk implements LocalSdk {
         } catch (IOException e) {
             throw new RuntimeException("couldn't read from file " + file.getAbsolutePath()
                     + " even though we checked it for readability");
-        } finally {
-            IOUtils.closeQuietly(in);
         }
     }
-
 }

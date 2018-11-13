@@ -16,13 +16,13 @@
     <dependencies>
         <dependency>
             <groupId>com.atlassian.amps</groupId>
-            <artifactId>plugin-module-codegen-engine</artifactId>
+            <artifactId>plugin-module-codegen-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.atlassian.core</groupId>
-            <artifactId>atlassian-core</artifactId>
-            <version>4.0</version>
+            <groupId>com.atlassian.amps</groupId>
+            <artifactId>plugin-module-codegen-engine</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>jline</groupId>

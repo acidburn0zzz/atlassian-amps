@@ -6,12 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import com.google.common.base.Preconditions;
@@ -41,7 +41,7 @@ public class ConfigFileUtils
         }
         try
         {
-            String config = FileUtils.readFileToString(cfgFile);
+            String config = FileUtils.readFileToString(cfgFile, StandardCharsets.UTF_8);
             if (!inverted)
             {
                 for (Replacement replacement : replacements)
@@ -59,7 +59,7 @@ public class ConfigFileUtils
                     config = replacement.reverse(config);
                 }
             }
-            FileUtils.writeStringToFile(cfgFile, config);
+            FileUtils.writeStringToFile(cfgFile, config, StandardCharsets.UTF_8);
         }
         catch (IOException ex)
         {
@@ -75,9 +75,9 @@ public class ConfigFileUtils
         }
         try
         {
-            String config = FileUtils.readFileToString(cfgFile);
+            String config = FileUtils.readFileToString(cfgFile, StandardCharsets.UTF_8);
             config = config.replaceAll(pattern, replacement); // obeys regex
-            FileUtils.writeStringToFile(cfgFile, config);
+            FileUtils.writeStringToFile(cfgFile, config, StandardCharsets.UTF_8);
         }
         catch (IOException ex)
         {
@@ -85,34 +85,24 @@ public class ConfigFileUtils
         }
     }
 
-    public static void setProperties(File propertiesFile, Map<String, String> newProperties) throws MojoExecutionException
+    public static void setProperties(File propertiesFile, Map<String, String> newProperties)
     {
-        InputStream in = null;
-        OutputStream out = null;
-
-        try
+        try (InputStream in = new FileInputStream(propertiesFile))
         {
-            in = new FileInputStream(propertiesFile);
-
             Properties props = new Properties();
             props.load(in);
             in.close();
-            in = null;
 
-            for (Map.Entry<String, String> e : newProperties.entrySet())
+            newProperties.forEach(props::setProperty);
+
+            try (OutputStream out = new FileOutputStream(propertiesFile))
             {
-                props.setProperty(e.getKey(), e.getValue());
+                props.store(out, "Processed by AMPS");
             }
-
-            out = new FileOutputStream(propertiesFile);
-            props.store(out, "Processed by AMPS");
-            out.close();
-            out = null;
         }
-        catch (IOException ioe)
+        catch (IOException ignored)
         {
-            IOUtils.closeQuietly(in);
-            IOUtils.closeQuietly(out);
+
         }
     }
 

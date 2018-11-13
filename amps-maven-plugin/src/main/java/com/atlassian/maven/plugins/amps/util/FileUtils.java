@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.io.FileUtils.copyFile;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 
 public final class FileUtils
 {
@@ -43,7 +44,7 @@ public final class FileUtils
     {
         if (dir.exists())
         {
-            com.atlassian.core.util.FileUtils.deleteDir(dir);
+            deleteQuietly(dir);
         }
     }
 

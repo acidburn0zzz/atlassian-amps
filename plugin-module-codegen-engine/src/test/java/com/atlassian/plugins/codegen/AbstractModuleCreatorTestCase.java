@@ -12,7 +12,7 @@ import org.dom4j.Element;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractModuleCreatorTestCase<T extends NameBasedModuleProperties> extends AbstractCodegenTestCase<T>
 {

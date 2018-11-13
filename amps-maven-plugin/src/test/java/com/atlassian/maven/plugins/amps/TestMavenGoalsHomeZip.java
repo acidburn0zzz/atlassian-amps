@@ -7,60 +7,65 @@ import org.apache.maven.model.Build;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.project.MavenProject;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+@SuppressWarnings("Duplicates")
 public class TestMavenGoalsHomeZip
 {
-    public static final String PRODUCT_ID = "noplacelike";
-    public static final String INSTANCE_ID = "noplacelike1";
-    public static final String TMP_RESOURCES = "tmp-resources";
-    public static final String GENERATED_HOME = "generated-home";
-    public static final String PLUGINS = "plugins";
-    public static final String BUNDLED_PLUGINS = "bundled-plugins";
-    public static final String ZIP_PREFIX = "generated-resources/" + PRODUCT_ID + "-home";
-    public static final String SERVER = "server";
+    private static final String PRODUCT_ID = "noplacelike";
+    private static final String INSTANCE_ID = "noplacelike1";
+    private static final String TMP_RESOURCES = "tmp-resources";
+    private static final String GENERATED_HOME = "generated-home";
+    private static final String PLUGINS = "plugins";
+    private static final String BUNDLED_PLUGINS = "bundled-plugins";
+    private static final String ZIP_PREFIX = "generated-resources/" + PRODUCT_ID + "-home";
+    private static final String SERVER = "server";
+
+    @Rule
+    public final TemporaryFolder tempDir = new TemporaryFolder();
 
     private ProductHandler productHandler;
-    private MavenContext ctx;
-    private File tempDir;
-    private File productDir;
-    private File tempResourcesDir;
     private File generatedHomeDir;
     private File pluginsDir;
     private File bundledPluginsDir;
-    private ZipFile zip;
     private Product product;
 
     @Before
-    public void setup()
+    public void setup() throws IOException
     {
-        // Create the temp dir
-        final File sysTempDir = new File("target");
-        String dirName = UUID.randomUUID().toString();
-        tempDir = new File(sysTempDir, dirName);
-        productDir = new File(tempDir, INSTANCE_ID);
-        tempResourcesDir = new File(productDir, TMP_RESOURCES);
-        generatedHomeDir = new File(tempResourcesDir, GENERATED_HOME);
+        generatedHomeDir = tempDir.newFolder(INSTANCE_ID, TMP_RESOURCES, GENERATED_HOME);
         pluginsDir = new File(generatedHomeDir, PLUGINS);
         bundledPluginsDir = new File(generatedHomeDir, BUNDLED_PLUGINS);
 
         // setup maven mocks
-        MavenProject project = mock(MavenProject.class);
         Build build = mock(Build.class);
+        when(build.getDirectory()).thenReturn(tempDir.getRoot().getAbsolutePath());
+
+        MavenProject project = mock(MavenProject.class);
+        when(project.getBuild()).thenReturn(build);
+
+        MavenContext ctx = mock(MavenContext.class);
+        when(ctx.getProject()).thenReturn(project);
+        when(ctx.getLog()).thenReturn(new SystemStreamLog());
+        when(ctx.getReactor()).thenReturn(Collections.emptyList());
+        when(ctx.getSession()).thenReturn(null);
 
         // Mock the product
         product = mock(Product.class);
@@ -72,43 +77,13 @@ public class TestMavenGoalsHomeZip
         // when mocking the session
         // MavenSession session = mock(MavenSession.class);
 
-        SystemStreamLog log = new SystemStreamLog();
-        List<MavenProject> reactor = Collections.<MavenProject> emptyList();
-        ctx = mock(MavenContext.class);
-
-        when(build.getDirectory()).thenReturn(tempDir.getAbsolutePath());
-        when(project.getBuild()).thenReturn(build);
-        when(ctx.getProject()).thenReturn(project);
-        when(ctx.getLog()).thenReturn(log);
-        when(ctx.getReactor()).thenReturn(reactor);
-        when(ctx.getSession()).thenReturn(null);
-
         productHandler = new RefappProductHandler(ctx, null,null);
     }
 
-    @After
-    public void removeTempDir() throws IOException
-    {
-        // make sure zip is closed, else delete fails on windows
-        if (zip != null)
-        {
-            try
-            {
-                zip.close();
-            }
-            catch (IOException e)
-            {
-                // ignore
-            }
-            zip = null;
-        }
-        FileUtils.deleteDirectory(tempDir);
-    }
-
     @Test
-    public void skipNullHomeDir() throws MojoExecutionException
+    public void skipNullHomeDir() throws Exception
     {
-        File zip = new File(tempDir, "nullHomeZip.zip");
+        File zip = new File(tempDir.getRoot(), "nullHomeZip.zip");
 
         productHandler.createHomeZip(null, zip, product);
 
@@ -116,10 +91,10 @@ public class TestMavenGoalsHomeZip
     }
 
     @Test
-    public void skipNonExistentHomeDir() throws MojoExecutionException
+    public void skipNonExistentHomeDir() throws Exception
     {
-        File zip = new File(tempDir, "noExistHomeZip.zip");
-        File fakeHomeDir = new File(tempDir, "this-folder-does-not-exist");
+        File zip = new File(tempDir.getRoot(), "noExistHomeZip.zip");
+        File fakeHomeDir = new File(tempDir.getRoot(), "this-folder-does-not-exist");
 
         productHandler.createHomeZip(fakeHomeDir, zip, product);
 
@@ -130,12 +105,12 @@ public class TestMavenGoalsHomeZip
     public void existingGeneratedDirGetsDeleted() throws IOException, MojoExecutionException
     {
         generatedHomeDir.mkdirs();
-        File deletedFile = new File(generatedHomeDir, "should-be-deleted.txt");
-        FileUtils.writeStringToFile(deletedFile, "This file should have been deleted!");
 
-        File zip = new File(tempDir, "deleteGenHomeZip.zip");
-        File homeDir = new File(tempDir, "deleteGenHomeDir");
-        homeDir.mkdirs();
+        File deletedFile = new File(generatedHomeDir, "should-be-deleted.txt");
+        FileUtils.writeStringToFile(deletedFile, "This file should have been deleted!", StandardCharsets.UTF_8);
+
+        File zip = tempDir.newFile("deleteGenHomeZip.zip");
+        File homeDir = tempDir.newFolder("deleteGenHomeDir");
 
         productHandler.createHomeZip(homeDir, zip, product);
 
@@ -148,11 +123,10 @@ public class TestMavenGoalsHomeZip
         pluginsDir.mkdirs();
 
         File pluginFile = new File(pluginsDir, "plugin.txt");
-        FileUtils.writeStringToFile(pluginFile, "This file should have been deleted!");
+        FileUtils.writeStringToFile(pluginFile, "This file should have been deleted!", StandardCharsets.UTF_8);
 
-        File zip = new File(tempDir, "deletePluginsHomeZip.zip");
-        File homeDir = new File(tempDir, "deletePluginsHomeDir");
-        homeDir.mkdirs();
+        File zip = tempDir.newFile("deletePluginsHomeZip.zip");
+        File homeDir = tempDir.newFolder("deletePluginsHomeDir");
 
         productHandler.createHomeZip(homeDir, zip, product);
 
@@ -165,11 +139,10 @@ public class TestMavenGoalsHomeZip
         bundledPluginsDir.mkdirs();
 
         File pluginFile = new File(bundledPluginsDir, "bundled-plugin.txt");
-        FileUtils.writeStringToFile(pluginFile, "This file should have been deleted!");
+        FileUtils.writeStringToFile(pluginFile, "This file should have been deleted!", StandardCharsets.UTF_8);
 
-        File zip = new File(tempDir, "deleteBundledPluginsHomeZip.zip");
-        File homeDir = new File(tempDir, "deleteBundledPluginsHomeDir");
-        homeDir.mkdirs();
+        File zip = tempDir.newFile("deleteBundledPluginsHomeZip.zip");
+        File homeDir = tempDir.newFolder("deleteBundledPluginsHomeDir");
 
         productHandler.createHomeZip(homeDir, zip, product);
 
@@ -179,57 +152,57 @@ public class TestMavenGoalsHomeZip
     @Test
     public void zipContainsProperPrefix() throws IOException, MojoExecutionException
     {
-        File zipFile = new File(tempDir, "prefixedHomeZip.zip");
-        File homeDir = new File(tempDir, "prefixedHomeDir");
-        File dataDir = new File(homeDir, "data");
-
-        dataDir.mkdirs();
+        File zipFile = tempDir.newFile("prefixedHomeZip.zip");
+        File homeDir = tempDir.newFolder("prefixedHomeDir");
+        tempDir.newFolder("prefixedHomeDir", "data");
 
         productHandler.createHomeZip(homeDir, zipFile, product);
 
-        zip = new ZipFile(zipFile);
-        final Enumeration<? extends ZipEntry> entries = zip.entries();
-
-        while (entries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            final ZipEntry zipEntry = entries.nextElement();
-            String zipPath = zipEntry.getName();
-            String[] segments = zipPath.split("/");
-            if (segments.length > 1)
-            {
-                String testPrefix = segments[0] + "/" + segments[1];
-                assertEquals(ZIP_PREFIX, testPrefix);
-            }
+            final Enumeration<? extends ZipEntry> entries = zip.entries();
 
+            while (entries.hasMoreElements())
+            {
+                final ZipEntry zipEntry = entries.nextElement();
+                String zipPath = zipEntry.getName();
+                String[] segments = zipPath.split("/");
+                if (segments.length > 1)
+                {
+                    String testPrefix = segments[0] + "/" + segments[1];
+                    assertEquals(ZIP_PREFIX, testPrefix);
+                }
+            }
         }
     }
 
     @Test
     public void zipContainsTestFile() throws IOException, MojoExecutionException
     {
-        File zipFile = new File(tempDir, "fileHomeZip.zip");
-        File homeDir = new File(tempDir, "fileHomeDir");
-        File dataDir = new File(homeDir, "data");
-        File dataFile = new File(dataDir, "data.txt");
+        File zipFile = tempDir.newFile("fileHomeZip.zip");
+        File homeDir = tempDir.newFolder("fileHomeDir");
+        File dataDir = tempDir.newFolder("fileHomeDir", "data");
 
-        dataDir.mkdirs();
-        FileUtils.writeStringToFile(dataFile, "This is some data.");
+        File dataFile = new File(dataDir, "data.txt");
+        FileUtils.writeStringToFile(dataFile, "This is some data.", StandardCharsets.UTF_8);
 
         productHandler.createHomeZip(homeDir, zipFile, product);
 
         boolean dataFileFound = false;
-        zip = new ZipFile(zipFile);
-        final Enumeration<? extends ZipEntry> entries = zip.entries();
-
-        while (entries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(zipFile))
         {
-            final ZipEntry zipEntry = entries.nextElement();
-            String zipPath = zipEntry.getName();
-            String fileName = zipPath.substring(zipPath.lastIndexOf("/") + 1);
-            if (fileName.equals(dataFile.getName()))
+            final Enumeration<? extends ZipEntry> entries = zip.entries();
+
+            while (entries.hasMoreElements())
             {
-                dataFileFound = true;
-                break;
+                final ZipEntry zipEntry = entries.nextElement();
+                String zipPath = zipEntry.getName();
+                String fileName = zipPath.substring(zipPath.lastIndexOf("/") + 1);
+                if (fileName.equals(dataFile.getName()))
+                {
+                    dataFileFound = true;
+                    break;
+                }
             }
         }
 

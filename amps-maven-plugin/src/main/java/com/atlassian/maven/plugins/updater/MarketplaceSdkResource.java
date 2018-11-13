@@ -8,7 +8,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +16,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,8 +27,6 @@ public class MarketplaceSdkResource extends AbstractLogEnabled implements SdkRes
 
     private static final String SDK_DOWNLOAD_URL_ROOT =
             "https://marketplace.atlassian.com/rest/1.0/plugins/atlassian-plugin-sdk-";
-    private static final int CONNECT_TIMEOUT = 15 * 1000;
-    private static final int READ_TIMEOUT = 15 * 1000;
 
     private final ObjectMapper mapper;
 
@@ -47,10 +45,10 @@ public class MarketplaceSdkResource extends AbstractLogEnabled implements SdkRes
 
         String versionDownloadPath = null;
         Map<?, ?> versionsElement = (Map<?, ?>) rootAsMap.get("versions");
-        ArrayList<Map<?, ?>> versions = (ArrayList<Map<?, ?>>) versionsElement.get("versions");
+        List<Map<?, ?>> versions = (List<Map<?, ?>>) versionsElement.get("versions");
         for (Map<?, ?> versionData: versions) {
             if (versionData.get("version").equals(version)) {
-                ArrayList<Map<?, ?>> links = (ArrayList<Map<?, ?>>) versionData.get("links");
+                List<Map<?, ?>> links = (List<Map<?, ?>>) versionData.get("links");
                 for (Map<?, ?> link: links) {
                     if (link.get("rel").equals("binary")) {
                         versionDownloadPath = (String) link.get("href");
@@ -89,8 +87,10 @@ public class MarketplaceSdkResource extends AbstractLogEnabled implements SdkRes
                 throw new RuntimeException(e);
             }
             conn = (HttpURLConnection) url.openConnection();
-            copyResponseStreamToFile(conn.getInputStream(), sdkDownloadTempFile);
 
+            try (InputStream inputStream = conn.getInputStream()) {
+                copyResponseStreamToFile(inputStream, sdkDownloadTempFile);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
@@ -113,21 +113,11 @@ public class MarketplaceSdkResource extends AbstractLogEnabled implements SdkRes
     }
 
     private void copyResponseStreamToFile(InputStream stream, File file) {
-        FileOutputStream fos;
-        try {
-            fos = new FileOutputStream(file);
-        } catch (FileNotFoundException fnfe) {
-            throw new RuntimeException(fnfe);
-        }
-        try {
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             IOUtils.copy(stream, fos);
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
-        } finally {
-            IOUtils.closeQuietly(stream);
-            IOUtils.closeQuietly(fos);
         }
-
     }
 
     private Map<?, ?> getPluginJsonAsMap(SdkPackageType packageType) {
@@ -139,11 +129,11 @@ public class MarketplaceSdkResource extends AbstractLogEnabled implements SdkRes
         }
         String json;
         HttpURLConnection conn = null;
-        InputStream jsonStream = null;
         try {
             conn = (HttpURLConnection) url.openConnection();
-            jsonStream = new BufferedInputStream(conn.getInputStream());
-            json = IOUtils.toString(jsonStream);
+            try (InputStream jsonStream = new BufferedInputStream(conn.getInputStream())) {
+                json = IOUtils.toString(jsonStream, StandardCharsets.UTF_8);
+            }
         } catch (UnknownHostException e) {
             this.getLogger().info("Unknown host " + url.getHost());
             json = "";
@@ -153,7 +143,6 @@ public class MarketplaceSdkResource extends AbstractLogEnabled implements SdkRes
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            IOUtils.closeQuietly(jsonStream);
             if (conn != null) {
                 conn.disconnect();
             }
@@ -161,7 +150,7 @@ public class MarketplaceSdkResource extends AbstractLogEnabled implements SdkRes
 
         Map<?, ?> rootAsMap;
         try {
-            if(StringUtils.isNotEmpty(json)) {
+            if (StringUtils.isNotEmpty(json)) {
                 rootAsMap = mapper.readValue(json, Map.class);
             } else {
                 rootAsMap = ImmutableMap.of();
@@ -171,6 +160,4 @@ public class MarketplaceSdkResource extends AbstractLogEnabled implements SdkRes
             throw new RuntimeException(e);
         }
     }
-
-
 }

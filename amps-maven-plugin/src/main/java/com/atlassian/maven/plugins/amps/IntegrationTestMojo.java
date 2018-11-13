@@ -190,7 +190,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                 product.setInstallPlugin(installPlugin);
             }
             
-            if(shouldBuildTestPlugin())
+            if (shouldBuildTestPlugin())
             {
                 List<ProductArtifact> plugins = product.getBundledArtifacts();
                 plugins.addAll(getTestFrameworkPlugins());

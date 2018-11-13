@@ -2,14 +2,11 @@ package com.atlassian.maven.plugins.amps.util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.objectweb.asm.ClassReader;
-
-import static com.atlassian.maven.plugins.amps.util.OSUtils.isWindows;
 
 public class ClassUtils
 {
@@ -17,7 +14,7 @@ public class ClassUtils
     {
         String regex = "/";
 
-        if(isWindows())
+        if(SystemUtils.IS_OS_WINDOWS)
         {
             regex = "\\\\";
         }
@@ -32,35 +29,24 @@ public class ClassUtils
     
     public static WiredTestInfo getWiredTestInfo(File classFile)
     {
-        FileInputStream fis = null;
-        boolean isWiredClass = false;
-        String applicationFilter = "";
-        
-        try
+        boolean isWiredClass;
+        String applicationFilter;
+
+        try (FileInputStream fis = new FileInputStream(classFile))
         {
             TestClassVisitor visitor = new TestClassVisitor();
-            fis = new FileInputStream(classFile);
             ClassReader reader = new ClassReader(fis);
             
             reader.accept(visitor, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
             isWiredClass = visitor.isWiredTest();
             applicationFilter = visitor.getApplicationFilter();
         }
-        catch (FileNotFoundException e)
-        {
-            isWiredClass = false;
-            applicationFilter = "";
-        }
         catch (IOException e)
         {
             isWiredClass = false;
             applicationFilter = "";
         }
-        finally
-        {
-            IOUtils.closeQuietly(fis);
-        }
-        
-        return new WiredTestInfo(isWiredClass,applicationFilter);
+
+        return new WiredTestInfo(isWiredClass, applicationFilter);
     }
 }

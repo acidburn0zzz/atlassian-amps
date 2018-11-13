@@ -1,8 +1,6 @@
 package com.atlassian.maven.plugins.amps.osgi;
 
-import aQute.bnd.osgi.Constants;
 import com.atlassian.maven.plugins.amps.AbstractAmpsMojo;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -14,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.Manifest;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 
@@ -32,7 +29,7 @@ public class ValidateManifestMojo extends AbstractAmpsMojo
      * explicit Import-Package list, not if we auto-generated the imports.
      */
     @Parameter
-    private Map<String, String> instructions = new HashMap<String, String>();
+    private Map<String, String> instructions = new HashMap<>();
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -68,10 +65,8 @@ public class ValidateManifestMojo extends AbstractAmpsMojo
     private void checkManifestEndsWithNewLine(final File mfile)
             throws IOException, MojoExecutionException, MojoFailureException
     {
-        InputStream is = null;
-        try
+        try (InputStream is = new FileInputStream(mfile))
         {
-            is = new FileInputStream(mfile);
             final long bytesToSkip = mfile.length() - 1;
             long bytesSkipped = is.skip(bytesToSkip);
             if (bytesSkipped != bytesToSkip)
@@ -82,10 +77,6 @@ public class ValidateManifestMojo extends AbstractAmpsMojo
             {
                 throw new MojoFailureException("Manifests must end with a new line. " + mfile.getAbsolutePath() + " doesn't.");
             }
-        }
-        finally
-        {
-            IOUtils.closeQuietly(is);
         }
     }
 }
