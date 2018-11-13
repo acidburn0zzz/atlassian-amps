@@ -41,6 +41,11 @@
     <profiles>
         <profile>
             <id>invoker</id>
+
+            <properties>
+                <invoker.test>*Test</invoker.test>
+            </properties>
+
             <dependencies>
                 <dependency>
                     <groupId>com.atlassian.maven.plugins</groupId>
@@ -51,6 +56,7 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
+
             <build>
                 <pluginManagement>
                     <plugins>
@@ -89,9 +95,7 @@
                                                 <filtering>true</filtering>
                                                 <includes>
                                                     <include>**/pom.xml</include>
-                                                    <include>**/goals.txt</include>
-                                                    <include>**/flags.txt</include>
-                                                    <include>invoker.properties</include>
+                                                    <include>**/invoker.properties</include>
                                                     <include>settings.xml</include>
                                                 </includes>
                                             </resource>
@@ -112,9 +116,7 @@
                                                 <filtering>false</filtering>
                                                 <excludes>
                                                     <exclude>**/pom.xml</exclude>
-                                                    <exclude>**/goals.txt</exclude>
-                                                    <exclude>**/flags.txt</exclude>
-                                                    <exclude>invoker.properties</exclude>
+                                                    <exclude>**/invoker.properties</exclude>
                                                     <exclude>settings.xml</exclude>
                                                 </excludes>
                                             </resource>
@@ -126,12 +128,14 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-invoker-plugin</artifactId>
-                            <version>3.1.0</version>
                             <configuration>
                                 <projectsDirectory>${project.build.directory}/it</projectsDirectory>
                                 <settingsFile>${project.build.directory}/it/settings.xml</settingsFile>
-                                <!-- Do not need to resolve all dependencies each time run IT in DEV MODE-->
-                                <localRepositoryPath>${user.home}/local-repo</localRepositoryPath>
+                                <!-- Cache artifacts between integration test runs. This is primarily intended
+                                     to help AMPS developers, rather than Bamboo/CI.
+                                     The cache is created in the AMPS project root, providing a single location
+                                     that is shared by all product plugins. -->
+                                <localRepositoryPath>${root.dir}/invoker-repo</localRepositoryPath>
                                 <postBuildHookScript>validate</postBuildHookScript>
                                 <preBuildHookScript>setup</preBuildHookScript>
                                 <addTestClassPath>true</addTestClassPath>
@@ -149,38 +153,26 @@
                     </plugins>
                 </pluginManagement>
                 <plugins>
+                    <!-- Set a root.dir property for the project's root (as opposed to ${project.basedir}, which
+                         is the _current module's_ root). This will be where the amps-parent-pom is. -->
                     <plugin>
-                        <groupId>com.atlassian.maven.plugins</groupId>
-                        <artifactId>maven-repository-bundle-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>3.0.0</version>
                         <executions>
                             <execution>
-                                <phase>package</phase>
+                                <id>set-root-dir</id>
                                 <goals>
-                                    <goal>bundle</goal>
+                                    <goal>rootlocation</goal>
                                 </goals>
+                                <configuration>
+                                    <rootLocationProperty>root.dir</rootLocationProperty>
+                                </configuration>
                             </execution>
                         </executions>
-                    <configuration>
-                        <artifacts>
-                            <!-- restricted artifacts -->
-                            <artifact>javax.servlet:servlet-api:2.3</artifact>
-                            <artifact>javax.mail:mail:1.4</artifact>
-                            <artifact>javax.mail:mail:1.3.3</artifact>
-                            <artifact>javax.transaction:jta:1.1</artifact>
-                            <artifact>javax.transaction:jta:1.0.1b</artifact>
-                            <artifact>javax.transaction:jta:1.0.1B</artifact>
-                            <artifact>jndi:jndi:1.2.1</artifact>
-                            <artifact>jta:jta:1.0.1B</artifact>
-                            <artifact>jta:jta:1.0.1</artifact>
-                            <artifact>javax.jms:jms:1.1</artifact>
-                        </artifacts>
-                    </configuration>
                     </plugin>
                 </plugins>
             </build>
-            <properties>
-                <invoker.test>*Test</invoker.test>
-            </properties>
          </profile>
      </profiles>
 </project>

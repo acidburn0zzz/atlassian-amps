@@ -64,8 +64,8 @@
                         <artifactId>maven-invoker-plugin</artifactId>
                         <configuration>
                             <mavenHome>${project.build.directory}/apache-maven-${bundled.maven.version}</mavenHome>
-                            <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-                            <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
+                            <cloneProjectsTo>${project.build.directory}/its</cloneProjectsTo>
+                            <localRepositoryPath>${root.dir}/invoker-repo</localRepositoryPath>
                             <settingsFile>src/it/settings.xml</settingsFile>
                             <pomIncludes>
                                 <pomInclude>*</pomInclude>
@@ -77,6 +77,22 @@
                                     <goal>install</goal>
                                     <goal>run</goal>
                                 </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>set-root-dir</id>
+                                <goals>
+                                    <goal>rootlocation</goal>
+                                </goals>
+                                <configuration>
+                                    <rootLocationProperty>root.dir</rootLocationProperty>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

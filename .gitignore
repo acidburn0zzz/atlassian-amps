@@ -1,13 +1,21 @@
-target/
+# IDEA spam
+.idea
 *.iml
 *.ipr
 *.iws
-*~
-*.log
-.idea
-*.backup
-*.versionsBackup
+
+# Eclipse spam
 .project
 .classpath
 .settings/
+
+# Maven drippings
+invoker-repo/
+target/
 dependency-reduced-pom.xml
+*.backup
+*.versionsBackup
+
+# These were here when I got here, honest
+*~
+*.log
