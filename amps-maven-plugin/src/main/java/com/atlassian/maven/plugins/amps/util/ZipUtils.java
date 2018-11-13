@@ -280,9 +280,9 @@ public class ZipUtils
         Path root = rootDir.toPath();
 
         try (ZipArchiveOutputStream out = new ZipArchiveOutputStream(zipFile);
-             Stream<Path> children = Files.walk(rootDir.toPath()).skip(1L)) // Drop the root directory
+             Stream<Path> children = Files.walk(root).skip(1L)) // Drop the root directory
         {
-            byte[] buffer = new byte[16384];
+            byte[] buffer = new byte[8192]; //ZipArchiveOutputStream internally supports blocks up to 8K
 
             for (Path child : (Iterable<Path>) children::iterator)
             {
@@ -359,7 +359,7 @@ public class ZipUtils
             return;
         }
 
-        byte[] tmpBuf = new byte[16384];
+        byte[] tmpBuf = new byte[8192]; //ZipArchiveOutputStream internally supports blocks up to 8K
         String entryPrefix = ensurePrefixWithSlash(dirObj, prefix);
 
         for (File currentFile : files)

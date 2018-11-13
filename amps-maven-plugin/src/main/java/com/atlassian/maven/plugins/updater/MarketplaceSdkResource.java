@@ -87,8 +87,10 @@ public class MarketplaceSdkResource extends AbstractLogEnabled implements SdkRes
                 throw new RuntimeException(e);
             }
             conn = (HttpURLConnection) url.openConnection();
-            copyResponseStreamToFile(conn.getInputStream(), sdkDownloadTempFile);
 
+            try (InputStream inputStream = conn.getInputStream()) {
+                copyResponseStreamToFile(inputStream, sdkDownloadTempFile);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
