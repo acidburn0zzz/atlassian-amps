@@ -167,7 +167,7 @@
         <dependency>
             <groupId>com.google.javascript</groupId>
             <artifactId>closure-compiler</artifactId>
-            <version>rr2079.1</version>
+            <version>v20180910</version>
         </dependency>
         <!-- Version 2.4.8 fails for empty files, where 2.4.7 emits an empty minified file without error.
              Be careful when updating! (Note that compressResourcesTest minifies an empty JS file) -->
