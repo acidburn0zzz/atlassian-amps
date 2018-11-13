@@ -55,7 +55,7 @@
     <properties>
         <build.maven.version>3.5.4</build.maven.version>
         <bundled.maven.version>3.5.4</bundled.maven.version>
-        <refapp.version>5.0.0-m6</refapp.version>
+        <refapp.version>5.0.0-m7</refapp.version>
         <refapp.data.version>${refapp.version}</refapp.data.version>
         <platform.version>5.0.0-0aea465</platform.version>
         <confluence.version>6.10.0</confluence.version>
@@ -65,7 +65,7 @@
         <fugue.version>4.7.2</fugue.version>
         <bamboo.version>6.5.0</bamboo.version>
         <bamboo.data.version>${bamboo.version}</bamboo.data.version>
-        <bitbucket.version>6.0.0-platform5-2</bitbucket.version>
+        <bitbucket.version>6.0.0-platform5-3</bitbucket.version>
         <bitbucket.data.version>${bitbucket.version}</bitbucket.data.version>
         <fecru.version>4.5.0-20170908094439</fecru.version>
         <fecru.data.version>${fecru.version}</fecru.data.version>
