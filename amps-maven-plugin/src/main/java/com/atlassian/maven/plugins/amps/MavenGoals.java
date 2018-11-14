@@ -6,6 +6,7 @@ import com.atlassian.maven.plugins.amps.product.jira.JiraDatabase;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory;
 import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
 import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
+import com.atlassian.maven.plugins.amps.util.MojoUtils;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
 import com.atlassian.maven.plugins.amps.util.minifier.MinifierParameters;
@@ -34,7 +35,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
-import org.twdata.maven.mojoexecutor.MojoExecutor;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
@@ -70,7 +70,6 @@ import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreeP
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.goal;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
@@ -168,7 +167,7 @@ public class MavenGoals
 
     public void executeAmpsRecursively(final String ampsVersion, final String ampsGoal, Xpp3Dom cfg) throws MojoExecutionException
     {
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
             plugin(
                 groupId("com.atlassian.maven.plugins"),
                 artifactId("amps-maven-plugin"),
@@ -215,7 +214,7 @@ public class MavenGoals
             userProperties.setProperty("version", props.getVersion());
             userProperties.setProperty("package", props.getThePackage());
 
-            executeMojo(
+            MojoUtils.executeWithMergedConfig(
                     plugin(
                             groupId("org.apache.maven.plugins"),
                             artifactId("maven-archetype-plugin"),
@@ -339,7 +338,7 @@ public class MavenGoals
 
     public void copyBundledDependencies() throws MojoExecutionException
     {
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-dependency-plugin"),
@@ -369,7 +368,7 @@ public class MavenGoals
 
         String customExcludes = sb.toString();
 
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-dependency-plugin"),
@@ -424,7 +423,7 @@ public class MavenGoals
 
         String customExcludes = sb.toString();
 
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-dependency-plugin"),
@@ -445,7 +444,7 @@ public class MavenGoals
 
     public void extractBundledDependencies() throws MojoExecutionException
     {
-         executeMojo(
+         MojoUtils.executeWithMergedConfig(
                  plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-dependency-plugin"),
@@ -475,7 +474,7 @@ public class MavenGoals
 
         String customExcludes = sb.toString();
 
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-dependency-plugin"),
@@ -506,7 +505,7 @@ public class MavenGoals
 
         String customExcludes = sb.toString();
 
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-dependency-plugin"),
@@ -560,7 +559,7 @@ public class MavenGoals
 
     public void filterPluginDescriptor() throws MojoExecutionException
     {
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-resources-plugin"),
@@ -603,7 +602,7 @@ public class MavenGoals
 
     public void filterTestPluginDescriptor() throws MojoExecutionException
     {
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-resources-plugin"),
@@ -647,7 +646,7 @@ public class MavenGoals
         log.info("Surefire " + version + " test configuration:");
         log.info(config.toString());
 
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-surefire-plugin"),
@@ -663,7 +662,7 @@ public class MavenGoals
             throws MojoExecutionException
     {
         final File webappWarFile = new File(targetDirectory, productId + "-original.war");
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-dependency-plugin"),
@@ -688,7 +687,7 @@ public class MavenGoals
     public void unpackWebappWar(final File targetDirectory, final ProductArtifact artifact)
             throws MojoExecutionException
     {
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-dependency-plugin"),
@@ -754,7 +753,7 @@ public class MavenGoals
             }
             else
             {
-                executeMojo(
+                MojoUtils.executeWithMergedConfig(
                         plugin(
                                 groupId("org.apache.maven.plugins"),
                                 artifactId("maven-dependency-plugin"),
@@ -790,7 +789,7 @@ public class MavenGoals
 
     private void unpackContainer(final Container container) throws MojoExecutionException
     {
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-dependency-plugin"),
@@ -835,25 +834,6 @@ public class MavenGoals
                 groupId("org.apache.felix"),
                 artifactId("maven-bundle-plugin"),
                 version(bundleVersion));
-    }
-
-    /**
-     * Wrap execute Mojo function for temporary removing global Cargo configuration
-     * before starting AMPS internal Cargo
-     */
-    @VisibleForTesting
-    protected void executeMojoExcludeProductCargoConfig(Plugin internalCargo, String goal, Xpp3Dom configuration, ExecutionEnvironment env)
-            throws MojoExecutionException
-    {
-        // remove application cargo plugin for avoiding amps standalone cargo merges configuration
-        Plugin globalCargo = env.getMavenProject().getPlugin("org.codehaus.cargo:cargo-maven2-plugin");
-        env.getMavenProject().getBuild().removePlugin(globalCargo);
-        MojoExecutor.executeMojo(internalCargo, goal, configuration, env);
-        // restore application cargo plugin for maven next tasks
-        if (null != globalCargo)
-        {
-            env.getMavenProject().getBuild().addPlugin(globalCargo);
-        }
     }
 
     public int startWebapp(final String productInstanceId, final File war, final Map<String, String> systemProperties,
@@ -975,7 +955,7 @@ public class MavenGoals
         }
 
         Plugin cargo = cargo(webappContext);
-        executeMojoExcludeProductCargoConfig(
+        MojoUtils.execute(
                 cargo,
                 goal("start"),
                 configurationWithoutNullElements(
@@ -1095,26 +1075,26 @@ public class MavenGoals
 
         String actualShutdownTimeout = webappContext.getSynchronousStartup() ? "0" : String.valueOf(webappContext.getShutdownTimeout());
 
-        executeMojoExcludeProductCargoConfig(
-        cargo(webappContext),
-        goal("stop"),
-        configuration(
-                element(name("container"),
-                        element(name("containerId"), container.getId()),
-                        element(name("type"), container.getType()),
-                        element(name("timeout"), actualShutdownTimeout),
-                        // org.codehaus.cargo
-                        element(name("home"), container.getInstallDirectory(getBuildDirectory()))
+        MojoUtils.execute(
+                cargo(webappContext),
+                goal("stop"),
+                configuration(
+                        element(name("container"),
+                                element(name("containerId"), container.getId()),
+                                element(name("type"), container.getType()),
+                                element(name("timeout"), actualShutdownTimeout),
+                                // org.codehaus.cargo
+                                element(name("home"), container.getInstallDirectory(getBuildDirectory()))
+                        ),
+                        element(name("configuration"),
+                                // org.twdata.maven
+                                element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId)),
+                                //we don't need that atm. since timeout is 0 for org.codehaus.cargo
+                                //hoping this will fix AMPS-987
+                                element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext))
+                        )
                 ),
-                element(name("configuration"),
-                        // org.twdata.maven
-                        element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId)),
-                        //we don't need that atm. since timeout is 0 for org.codehaus.cargo
-                        //hoping this will fix AMPS-987
-                        element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext))
-                )
-        ),
-        executionEnvironment()
+                executionEnvironment()
         );
     }
 
@@ -1228,7 +1208,7 @@ public class MavenGoals
         log.info("Failsafe " + version + " integration-test configuration:");
         log.info(config.toString());
 
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-failsafe-plugin"),
@@ -1239,7 +1219,7 @@ public class MavenGoals
                 executionEnvironment()
         );
         if (!skipVerifyGoal) {
-            executeMojo(
+            MojoUtils.executeWithMergedConfig(
                     plugin(
                             groupId("org.apache.maven.plugins"),
                             artifactId("maven-failsafe-plugin"),
@@ -1267,7 +1247,7 @@ public class MavenGoals
                 version(defaultArtifactIdToVersionMap.get("sql-maven-plugin"))
         );
         sqlMaven.getDependencies().addAll(libs);
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 sqlMaven,
                 goal("execute"),
                 sqlMavenPluginConfiguration,
@@ -1284,7 +1264,7 @@ public class MavenGoals
             if(ImportMethod.SQL.equals(ImportMethod.getValueOf(dataSource.getImportMethod())))
             {
                 // Use JDBC to import sql standard dump file
-                executeMojo(
+                MojoUtils.executeWithMergedConfig(
                         sqlMaven,
                         goal("execute"),
                         jiraDatabase.getConfigImportFile(),
@@ -1300,7 +1280,7 @@ public class MavenGoals
                         version(defaultArtifactIdToVersionMap.get("maven-exec-plugin"))
                 );
                 // Use database specific tool to import dump file
-                executeMojo(
+                MojoUtils.executeWithMergedConfig(
                         execMaven,
                         goal("exec"),
                         configDatabaseTool,
@@ -1352,7 +1332,7 @@ public class MavenGoals
             throws MojoExecutionException
     {
         final String baseUrl = getBaseUrl(pdkParams.getServer(), pdkParams.getPort(), pdkParams.getContextPath());
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("com.atlassian.maven.plugins"),
                         artifactId("atlassian-pdk"),
@@ -1372,7 +1352,7 @@ public class MavenGoals
 
     public void installIdeaPlugin() throws MojoExecutionException
     {
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.twdata.maven"),
                         artifactId("maven-cli-plugin"),
@@ -1397,7 +1377,7 @@ public class MavenGoals
     public File copyZip(final File targetDirectory, final ProductArtifact artifact, final String localName) throws MojoExecutionException
     {
         final File artifactZip = new File(targetDirectory, localName);
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-dependency-plugin"),
@@ -1436,7 +1416,7 @@ public class MavenGoals
         {
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 bndPlugin(),
                 goal("manifest"),
                 configuration(
@@ -1468,7 +1448,7 @@ public class MavenGoals
         {
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 bndPlugin(),
                 goal("manifest"),
                 configuration(
@@ -1542,7 +1522,7 @@ public class MavenGoals
             archive = new Element[]{element(name("manifestFile"), "${project.build.outputDirectory}/META-INF/MANIFEST.MF")};
         }
 
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-jar-plugin"),
@@ -1559,7 +1539,7 @@ public class MavenGoals
 
     public void jarTests(String finalName) throws MojoExecutionException
     {
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-jar-plugin"),
@@ -1577,7 +1557,7 @@ public class MavenGoals
 
     public void generateObrXml(File dep, File obrXml) throws MojoExecutionException
     {
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 bndPlugin(),
                 goal("install-file"),
                 configuration(
@@ -1608,7 +1588,7 @@ public class MavenGoals
      */
     public void attachArtifact(File file, String type) throws MojoExecutionException
     {
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.codehaus.mojo"),
                         artifactId("build-helper-maven-plugin"),
@@ -1635,7 +1615,7 @@ public class MavenGoals
             args = mavenArgs;
         }
 
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-release-plugin"),
@@ -1649,7 +1629,7 @@ public class MavenGoals
                 executionEnvironment()
         );
 
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-release-plugin"),
@@ -1731,7 +1711,7 @@ public class MavenGoals
             {
                 executionEnvironment().getMavenProject().getBuild().removePlugin(globalJavadoc);
             }
-            executeMojo(
+            MojoUtils.executeWithMergedConfig(
                     plugin(
                             groupId("org.apache.maven.plugins"),
                             artifactId("maven-javadoc-plugin"),
@@ -1805,7 +1785,7 @@ public class MavenGoals
 
     public void copyContainerToOutputDirectory(String containerVersion) throws MojoExecutionException
     {
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-dependency-plugin"),
@@ -1836,7 +1816,7 @@ public class MavenGoals
             }
         }
 
-        executeMojo(
+        MojoUtils.executeWithMergedConfig(
                 plugin(
                         groupId("org.codehaus.mojo"),
                         artifactId("exec-maven-plugin"),
