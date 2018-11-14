@@ -28,6 +28,25 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>com.atlassian.maven.plugins</groupId>
+                        <artifactId>maven-repository-bundle-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>bundle</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <artifacts>
+                                <!-- Artifacts from atlassian-restricted are not available when maven-invoker-plugin
+                                     runs Maven, so they need to be copied over. Jira uses jta:jta -->
+                                <artifact>jta:jta:1.0.1</artifact>
+                            </artifacts>
+                        </configuration>
+                    </plugin>
+                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
                     </plugin>

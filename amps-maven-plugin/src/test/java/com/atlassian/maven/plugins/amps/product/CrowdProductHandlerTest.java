@@ -4,6 +4,7 @@ import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
@@ -125,6 +126,11 @@ public class CrowdProductHandlerTest
 
     private String databasePathContains(String path)
     {
+        if (SystemUtils.IS_OS_WINDOWS)
+        {
+            path = path.replace('\\', '/');
+        }
+
         return "<property name=\"hibernate.connection.url\">" +
                 "jdbc:hsqldb:" +
                 path +
