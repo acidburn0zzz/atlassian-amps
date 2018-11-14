@@ -9,9 +9,11 @@ import org.apache.maven.project.MavenProject;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 
 public class TestAbstractAmpsDispatcherMojo
@@ -66,14 +68,7 @@ public class TestAbstractAmpsDispatcherMojo
 
         project.setBuild(build);
 
-        Plugin found = mojo.findProductPlugin();
-        if (expected)
-        {
-            assertSame(plugin, found);
-        }
-        else
-        {
-            assertNull(found);
-        }
+        Optional<Plugin> found = mojo.findProductPlugin();
+        assertEquals(expected ? of(plugin) : empty(), found);
     }
 }

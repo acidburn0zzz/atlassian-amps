@@ -114,6 +114,7 @@ public class MojoUtils {
             pluginDescriptor = MavenCompatibilityHelper.loadPluginDescriptor(plugin,
                     executionEnvironment, executionEnvironment.getMavenSession());
         } catch (MojoExecutionException e) {
+            // Don't wrap MojoExecutionExceptions; they're already compatible with our throws clause
             throw e;
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to load descriptor for " +
