@@ -1,36 +1,32 @@
 package com.atlassian.maven.plugins.ampsdispatcher;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
-import com.atlassian.maven.plugins.amps.util.VersionUtils;
+import com.atlassian.maven.plugins.amps.util.MojoUtils;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.*;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.twdata.maven.mojoexecutor.MojoExecutor;
 
-import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
+import static java.util.Optional.empty;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.executionEnvironment;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.goal;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
 
 /**
  * Dispatches to the appropriate amps product-specific plugin by detecting the plugin in the project.
  *
  * @since 3.0-beta2
  */
-public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
-{
+public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo {
 
     /**
      * The Maven Project Object
@@ -47,70 +43,39 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo
     @Component
     BuildPluginManager buildPluginManager;
 
-    public final void execute() throws MojoExecutionException, MojoFailureException
-    {
-        String targetArtifactId = detectAmpsProduct();
+    public final void execute() throws MojoExecutionException, MojoFailureException {
+        String goal = session.getGoals().stream()
+                // We only pass in the first goal since we know the shell scripts only pass in one goal
+                .findFirst()
+                .map(AbstractAmpsDispatcherMojo::determineGoal)
+                .orElseThrow(() -> new MojoFailureException("No goals were specified to dispatch"));
 
-        if (targetArtifactId != null && session.getGoals().size() > 0)
-        {
-            // We only pass in the first goal since we know the shell scripts only pass in one goal
-            String goal = determineGoal();
+        Plugin plugin = findProductPlugin()
+                .orElseThrow(() -> new MojoFailureException("Couldn't detect an AMPS plugin to dispatch to"));
 
-            executeMojo(
-                plugin(
-                        groupId("com.atlassian.maven.plugins"),
-                        artifactId(targetArtifactId),
-                        version(VersionUtils.getVersion())  //ignored anyway
-                ),
-                goal(goal),
-                configuration(),
-                getExecutionEnvironment());
-        }
-        else
-        {
-            throw new MojoFailureException("Couldn't detect an AMPS product to dispatch to");
-        }
+        MojoUtils.executeWithMergedConfig(plugin, goal, configuration(),
+                executionEnvironment(project, session, buildPluginManager));
     }
 
-    final String determineGoal()
-    {
-        String goal = session.getGoals().get(0);
-        goal = goal.substring(goal.lastIndexOf(":") + 1);
-        return goal;
+    static String determineGoal(String goal) {
+        return goal.substring(goal.lastIndexOf(":") + 1);
     }
 
-    final String detectAmpsProduct()
-    {
-        List buildPlugins = project.getBuildPlugins();
-
-        Set<String> possiblePluginTypes = new HashSet<String>(ProductHandlerFactory.getIds());
-        possiblePluginTypes.add("amps");
-
-        if (buildPlugins != null)
-        {
-            for (Object buildPlugin : buildPlugins)
-            {
-                Plugin pomPlugin = (Plugin) buildPlugin;
-
-                if ("com.atlassian.maven.plugins".equals(pomPlugin.getGroupId()))
-                {
-                    for (String type : possiblePluginTypes)
-                    {
-                        if (("maven-" + type + "-plugin").equals(pomPlugin.getArtifactId()) ||
-                                (type + "-maven-plugin").equals(pomPlugin.getArtifactId()))
-                        {
-                            return pomPlugin.getArtifactId();
-                        }
-                    }
-                }
-            }
+    Optional<Plugin> findProductPlugin() {
+        List<Plugin> plugins = project.getBuildPlugins();
+        if (plugins == null) {
+            return empty();
         }
-        return null;
 
-    }
+        List<String> possiblePluginTypes = ImmutableList.<String>builder()
+                .addAll(ProductHandlerFactory.getIds())
+                .add("amps")
+                .build();
 
-    protected MojoExecutor.ExecutionEnvironment getExecutionEnvironment()
-    {
-        return executionEnvironment(project, session, buildPluginManager);
+        return plugins.stream()
+                .filter(pomPlugin -> "com.atlassian.maven.plugins".equals(pomPlugin.getGroupId()) &&
+                        possiblePluginTypes.stream()
+                                .anyMatch(type -> (type + "-maven-plugin").equals(pomPlugin.getArtifactId())))
+                .findFirst();
     }
 }

@@ -7,7 +7,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -38,7 +37,6 @@ import java.util.jar.Manifest;
 import static com.atlassian.maven.plugins.amps.MavenGoals.AJP_PORT_PROPERTY;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
@@ -50,19 +48,11 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestMavenGoals
@@ -78,8 +68,6 @@ public class TestMavenGoals
     private Product product;
     @Mock
     private MavenProject project;
-    @Mock
-    private RepositorySystemSession repositorySession;
     @Mock
     private MavenSession session;
 
@@ -98,64 +86,6 @@ public class TestMavenGoals
         when(session.getCurrentProject()).thenReturn(project);
 
         goals = new MavenGoals(ctx);
-    }
-
-    @Test
-    public void testCargoExecution() throws Exception
-    {
-        // Setup
-        final Plugin globalCargo = plugin(groupId("org.codehaus.cargo"), artifactId("cargo-maven2-plugin"), version("1.2.4"));
-        final Plugin internalCargo = goals.cargo(null);
-        // Maven build object for storing global cargo plugin
-        final Build build = new Build();
-        final Xpp3Dom internalConfig = configuration(
-                element(name("container"),
-                        element(name("containerId"), "tomcat8x"),
-                        element(name("timeout"), String.valueOf(120000))
-                )
-        );
-        final Xpp3Dom globalConfig = configuration(
-                element(name("deployables"),
-                        element(name("deployable"),
-                                element(name("groupId"), "foo"),
-                                element(name("artifactId"), "bar"),
-                                element(name("type"), "war")
-                        )
-                )
-        );
-        // Mock objects
-        final BuildPluginManager buildPluginManager = mock(BuildPluginManager.class);
-        final PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
-        final MojoDescriptor mojoDescriptor = mock(MojoDescriptor.class);
-
-        globalCargo.setConfiguration(globalConfig);
-        build.addPlugin(globalCargo);
-        // Mock methods
-        when(project.getBuild()).thenReturn(build);
-        when(project.getPlugin("org.codehaus.cargo:cargo-maven2-plugin")).thenReturn(globalCargo);
-        when(executionEnvironment.getPluginManager()).thenReturn(buildPluginManager);
-        when(buildPluginManager.loadPlugin(any(Plugin.class), any(), any(RepositorySystemSession.class)))
-                .thenReturn(pluginDescriptor);
-        when(pluginDescriptor.getMojo(anyString())).thenReturn(mojoDescriptor);
-        when(mojoDescriptor.getMojoConfiguration()).thenReturn(new DefaultPlexusConfiguration(""));
-        when(session.getRepositorySession()).thenReturn(repositorySession);
-
-        doAnswer(invocation -> {
-            final Object[] args = invocation.getArguments();
-            if (null != args[1])
-            {
-                final Xpp3Dom finalConfig = ((MojoExecution) args[1]).getConfiguration();
-                if (null != finalConfig && finalConfig != internalConfig)
-                {
-                    throw new RuntimeException("Global Cargo is still there");
-                }
-            }
-            return "ok";
-        }).when(buildPluginManager).executeMojo(any(MavenSession.class), any(MojoExecution.class));
-        // Invoke
-        goals.executeMojoExcludeProductCargoConfig(internalCargo, "start", internalConfig, executionEnvironment);
-        // Check
-        assertThat(build.getPlugins(), hasItem(globalCargo));
     }
 
     @Test

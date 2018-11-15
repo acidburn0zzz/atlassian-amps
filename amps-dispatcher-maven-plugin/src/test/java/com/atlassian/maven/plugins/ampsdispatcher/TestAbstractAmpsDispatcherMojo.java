@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.ampsdispatcher;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
@@ -8,19 +9,16 @@ import org.apache.maven.project.MavenProject;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class TestAbstractAmpsDispatcherMojo
 {
     private MavenProject project;
-    private MavenSession session;
     private AbstractAmpsDispatcherMojo mojo;
 
     @Before
@@ -29,12 +27,11 @@ public class TestAbstractAmpsDispatcherMojo
         BuildPluginManager buildPluginManager = mock(BuildPluginManager.class);
 
         project = new MavenProject();
-        session = mock(MavenSession.class);
 
         mojo = new AbstractAmpsDispatcherMojo(){};
         mojo.buildPluginManager = buildPluginManager;
         mojo.project = project;
-        mojo.session = session;
+        mojo.session = mock(MavenSession.class);
     }
 
     @Test
@@ -55,29 +52,23 @@ public class TestAbstractAmpsDispatcherMojo
     @Test
     public void testDetermineGoal()
     {
-        when(session.getGoals()).thenReturn(Collections.singletonList("foo"));
-        assertEquals("foo", mojo.determineGoal());
-
-        when(session.getGoals()).thenReturn(Collections.singletonList("foo:bar"));
-        assertEquals("bar", mojo.determineGoal());
-
-        when(session.getGoals()).thenReturn(Collections.singletonList("foo:bar:baz"));
-        assertEquals("baz", mojo.determineGoal());
-
-        when(session.getGoals()).thenReturn(Arrays.asList("foo", "bar"));
-        assertEquals("foo", mojo.determineGoal());
+        assertEquals("foo", AbstractAmpsDispatcherMojo.determineGoal("foo"));
+        assertEquals("bar", AbstractAmpsDispatcherMojo.determineGoal("foo:bar"));
+        assertEquals("baz", AbstractAmpsDispatcherMojo.determineGoal("foo:bar:baz"));
     }
 
     private void assertPlugin(boolean expected, String artifactId)
     {
-        List<Plugin> buildPlugins = new ArrayList<>();
         Plugin plugin = new Plugin();
         plugin.setGroupId("com.atlassian.maven.plugins");
         plugin.setArtifactId(artifactId);
-        buildPlugins.add(plugin);
+
         Build build = new Build();
-        build.setPlugins(buildPlugins);
+        build.setPlugins(ImmutableList.of(plugin));
+
         project.setBuild(build);
-        assertEquals(expected, artifactId.equals(mojo.detectAmpsProduct()));
+
+        Optional<Plugin> found = mojo.findProductPlugin();
+        assertEquals(expected ? of(plugin) : empty(), found);
     }
 }
