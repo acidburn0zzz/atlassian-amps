@@ -19,7 +19,6 @@
         <dependency>
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>amps-maven-plugin</artifactId>
-            <version>${project.version}</version>
             <type>maven-plugin</type>
         </dependency>
     </dependencies>

@@ -22,11 +22,9 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 @ModuleCreatorClass(ComponentModuleCreator.class)
 public class ComponentModulePrompter extends AbstractModulePrompter<ComponentProperties>
 {
-
     public ComponentModulePrompter(Prompter prompter)
     {
         super(prompter);
-
     }
 
     @Override
@@ -83,12 +81,11 @@ public class ComponentModulePrompter extends AbstractModulePrompter<ComponentPro
         }
 
         props.setIncludeExamples(false);
-
     }
 
     private Map<String, String> promptForServiceProps() throws PrompterException
     {
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new HashMap<>();
         promptForServiceProp(props);
 
         return props;
@@ -96,7 +93,7 @@ public class ComponentModulePrompter extends AbstractModulePrompter<ComponentPro
 
     private void promptForServiceProp(Map<String, String> props) throws PrompterException
     {
-        StringBuffer addBuffer = new StringBuffer();
+        StringBuilder addBuffer = new StringBuilder();
         if (props.size() > 0)
         {
             addBuffer.append("service-properties:\n");

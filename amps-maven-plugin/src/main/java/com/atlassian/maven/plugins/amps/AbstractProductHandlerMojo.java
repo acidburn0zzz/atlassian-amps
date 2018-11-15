@@ -50,8 +50,8 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
 
     // ------ start inline product context
 
-    protected static final String JUNIT_VERSION = "4.10_1";
-    protected static final String ATLASSIAN_TEST_RUNNER_VERSION = "1.2.0";
+    protected static final String JUNIT_VERSION = "4.12_1";
+    protected static final String ATLASSIAN_TEST_RUNNER_VERSION = "2.0.1";
     protected static final String NO_TEST_GROUP = "__no_test_group__";
     public static final String JUNIT_GROUP_ID = "org.apache.servicemix.bundles";
     public static final String JUNIT_ARTIFACT_ID = "org.apache.servicemix.bundles.junit";

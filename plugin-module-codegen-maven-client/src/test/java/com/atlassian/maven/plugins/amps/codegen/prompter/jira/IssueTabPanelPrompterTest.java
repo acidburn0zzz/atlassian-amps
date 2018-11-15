@@ -40,7 +40,7 @@ public class IssueTabPanelPrompterTest extends AbstractPrompterTest
     public static final String LABEL_KEY = "item.label";
     public static final String LABEL_VALUE = "this is my label";
 
-    Prompter prompter;
+    private Prompter prompter;
 
     @Before
     public void setup()
@@ -57,7 +57,6 @@ public class IssueTabPanelPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         IssueTabPanelPrompter modulePrompter = new IssueTabPanelPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         TabPanelProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong class", CLASSNAME, props.getClassId().getName());
@@ -94,7 +93,6 @@ public class IssueTabPanelPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         IssueTabPanelPrompter modulePrompter = new IssueTabPanelPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         TabPanelProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv class", CLASSNAME, props.getClassId().getName());

@@ -1,13 +1,11 @@
 package com.atlassian.maven.plugins.amps.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import com.atlassian.maven.plugins.amps.codegen.prompter.PrettyPrompter;
 import com.atlassian.plugins.codegen.AmpsVersionUpdate;
 import com.atlassian.plugins.codegen.MavenProjectRewriter;
 import com.atlassian.plugins.codegen.PluginProjectChangeset;
@@ -18,13 +16,11 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
 import org.dom4j.DocumentException;
-
-import jline.ANSIBuffer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -35,28 +31,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements AmpsPluginVersionChecker
 {
-    
-    public static final List<String> YN_ANSWERS = new ArrayList<String>(Arrays.asList("Y", "y", "N", "n"));
+    public static final List<String> YN_ANSWERS = new ArrayList<>(Arrays.asList("Y", "y", "N", "n"));
     public static final String NO_VERSION_DEFINED = "no-version-defined";
     public static final String POM_UPDATE_PREF_PREFIX = "sdk-pom-update-check";
-    private boolean useAnsiColor;
+
     private Prompter prompter;
     private boolean skipCheck;
 
     public AmpsPluginVersionCheckerImpl()
     {
         this.skipCheck = false;
-        
-        String mavencolor = System.getenv("MAVEN_COLOR");
-        if (mavencolor != null && !mavencolor.equals(""))
-        {
-            useAnsiColor = Boolean.parseBoolean(mavencolor);
-        } else
-        {
-            useAnsiColor = false;
-        }
     }
-    
+
     @Override
     public void checkAmpsVersionInPom(String currentVersion, MavenProject project)
     {
@@ -85,13 +71,13 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
             PomVersionElement pomElement = versionInfo.left().right();
             String pomElementType = pomElement.getType();
             String versionProp = pomElement.getVersionProperty();
-            
+
             ProjectRewriter rewriter = versionInfo.right();
-            
+
             boolean managementNeedsUpdate = false;
             boolean pluginNeedsUpdate = false;
 
-            
+
             if(pomElementType.equals(PomVersionElement.MANAGEMENT))
             {
 
@@ -100,36 +86,36 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
                     managementNeedsUpdate = true;
                 }
             }
-            
+
             if(pomElementType.equals(PomVersionElement.PLUGIN) && (NO_VERSION_DEFINED.equalsIgnoreCase(versionInPom.toString()) || runningVersion.compareTo(versionInPom) > 0))
             {
                     pluginNeedsUpdate = true;
             }
-            
+
             if(pluginNeedsUpdate || managementNeedsUpdate)
             {
                 boolean doUpdate = promptToUpdatePom(versionInPom,runningVersion);
                 if(doUpdate)
                 {
                     PluginProjectChangeset changes = new PluginProjectChangeset();
-                    
+
                     if(pluginNeedsUpdate)
                     {
                         changes = changes.with(AmpsVersionUpdate.ampsVersionUpdate(currentVersion,AmpsVersionUpdate.PLUGIN,true,false));
                     }
-                    
+
                     if(managementNeedsUpdate)
                     {
                         changes = changes.with(AmpsVersionUpdate.ampsVersionUpdate(currentVersion,AmpsVersionUpdate.MANAGEMENT,true,false));
                     }
                     rewriter.applyChanges(changes);
-                    
-                    
+
+
                     //update the property in the correct pom
                     PluginProjectChangeset propChanges = new PluginProjectChangeset();
                     propChanges = propChanges.with(AmpsVersionUpdate.ampsVersionUpdate(currentVersion,AmpsVersionUpdate.PLUGIN,false,true));
                     ProjectRewriter propRewriter;
-                    
+
                     if(StringUtils.isNotBlank(versionProp))
                     {
                         propRewriter = getRewriterForVersionProp(versionProp,project);
@@ -138,24 +124,24 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
                     {
                         propRewriter = rewriter;
                     }
-                    
+
                     propRewriter.applyChanges(propChanges);
-                    
+
                     getLogger().info("AMPS version in pom updated to " + currentVersion);
                 }
             }
-            
+
         }
         catch (Throwable t)
         {
             getLogger().error("unable to check amps version in pom...", t);
         }
     }
-    
+
     private Pair<Pair<DefaultArtifactVersion,PomVersionElement>,ProjectRewriter> getVersionAndRewriter(MavenProject project) throws IOException, DocumentException
     {
         ProjectRewriter rewriter;
-        
+
         if(null == project.getFile() || !project.getFile().exists())
         {
             rewriter = new NOOPProjectRewriter();
@@ -164,10 +150,10 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
 
         rewriter = new MavenProjectRewriter(project.getFile());
         MavenProjectRewriter mavenRewriter = (MavenProjectRewriter) rewriter;
-        
+
         String managementVersionInPom = mavenRewriter.getAmpsPluginManagementVersionInPom();
         String pluginVersionInPom = "";
-        
+
         DefaultArtifactVersion ampsManagementVersionInPom = getPomVersion(managementVersionInPom,project);
         DefaultArtifactVersion ampsVersionInPom;
         try
@@ -190,7 +176,7 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
             versionProp = pluginVersionInPom;
         }
 
-        
+
         if(project.hasParent() && NO_VERSION_DEFINED.equalsIgnoreCase(ampsManagementVersionInPom.toString()) && NO_VERSION_DEFINED.equalsIgnoreCase(ampsVersionInPom.toString()))
         {
             return getVersionAndRewriter(project.getParent());
@@ -211,10 +197,10 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
         {
             return null;
         }
-        
+
         MavenProjectRewriter rewriter = new MavenProjectRewriter(project.getFile());
         String propName = StringUtils.substringBetween(versionProp,"${","}");
-        
+
         if(StringUtils.isNotBlank(propName) && rewriter.definesProperty(propName))
         {
             return rewriter;
@@ -237,49 +223,22 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
 
     private boolean promptToUpdatePom(DefaultArtifactVersion ampsVersionInPom, DefaultArtifactVersion runningVersion) throws PrompterException
     {
-        if (useAnsiColor)
-        {
-            return promptForUpdateAnsi(ampsVersionInPom, runningVersion);
-        } else
-        {
-            return promptForUpdatePlain(ampsVersionInPom, runningVersion);
-        }
+        String prompt = MessageUtils.buffer()
+                .warning("You are running AMPS plugin version ")
+                .warning(runningVersion)
+                .warning(" but your pom is using version ")
+                .warning(ampsVersionInPom)
+                .newline()
+                .strong("Would you like to have your pom updated?")
+                .toString();
+
+        return promptForBoolean(prompt,"Y");
     }
 
-    private boolean promptForUpdateAnsi(DefaultArtifactVersion ampsVersionInPom, DefaultArtifactVersion runningVersion) throws PrompterException
-    {
-        ANSIBuffer ansiBuffer = new ANSIBuffer();
-        ansiBuffer.append(ANSIBuffer.ANSICodes.attrib(PrettyPrompter.FG_YELLOW))
-                .append("You are running AMPS plugin version ")
-                .append(runningVersion.toString())
-                .append(" but your pom is using version ")
-                .append(ampsVersionInPom.toString())
-                .append("\n")
-                .append(ANSIBuffer.ANSICodes.attrib(PrettyPrompter.OFF))
-                .append(ANSIBuffer.ANSICodes.attrib(PrettyPrompter.BOLD))
-                .append("Would you like to have your pom updated?")
-                .append(ANSIBuffer.ANSICodes.attrib(PrettyPrompter.OFF));
-        
-        return promptForBoolean(ansiBuffer.toString(),"Y");
-    }
-
-    private boolean promptForUpdatePlain(DefaultArtifactVersion ampsVersionInPom, DefaultArtifactVersion runningVersion) throws PrompterException
-    {
-        StringBuilder builder = new StringBuilder();
-        builder.append("You are running AMPS plugin version ")
-                  .append(runningVersion.toString())
-                  .append(" but your pom is using version ")
-                  .append(ampsVersionInPom.toString())
-                  .append("\n")
-                  .append("Would you like to have your pom updated?");
-
-        return promptForBoolean(builder.toString(), "Y");
-    }
-    
     private DefaultArtifactVersion getPomVersion(String ampsVersionOrProperty, MavenProject project)
     {
         DefaultArtifactVersion ampsVersionInPom = null;
-        
+
         if(StringUtils.isNotBlank(ampsVersionOrProperty) && ampsVersionOrProperty.startsWith("$"))
         {
             String propName = StringUtils.substringBetween(ampsVersionOrProperty,"${","}");
@@ -296,14 +255,13 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
         {
             ampsVersionInPom = new DefaultArtifactVersion(NO_VERSION_DEFINED);
         }
-        
+
         return ampsVersionInPom;
     }
 
     private boolean promptForBoolean(String message, String defaultValue) throws PrompterException
     {
         String answer;
-        boolean bool;
         if (StringUtils.isBlank(defaultValue))
         {
             answer = prompter.prompt(message, YN_ANSWERS);
@@ -312,22 +270,14 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
             answer = prompter.prompt(message, YN_ANSWERS, defaultValue);
         }
 
-        if ("y".equals(answer.toLowerCase()))
-        {
-            bool = true;
-        } else
-        {
-            bool = false;
-        }
-
-        return bool;
+        return "y".equals(answer.toLowerCase());
     }
 
     public class PomVersionElement
     {
         public static final String PLUGIN = "plugin";
         public static final String MANAGEMENT = "management";
-        
+
         private final String type;
         private final String versionProperty;
 
@@ -346,5 +296,5 @@ public class AmpsPluginVersionCheckerImpl extends AbstractLogEnabled implements 
         {
             return versionProperty;
         }
-    };
+    }
 }

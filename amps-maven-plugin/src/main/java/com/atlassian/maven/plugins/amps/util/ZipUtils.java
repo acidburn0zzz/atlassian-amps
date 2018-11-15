@@ -9,6 +9,7 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -295,6 +296,11 @@ public class ZipUtils
                 }
 
                 String path = root.relativize(child).toString();
+                if (SystemUtils.IS_OS_WINDOWS)
+                {
+                    // Always use forward slashes for the zip's entries, even on Windows
+                    path = path.replace('\\', '/');
+                }
                 if (attributes.isDirectory())
                 {
                     path += "/";

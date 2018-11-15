@@ -28,7 +28,7 @@ public class TemplateContextItemPrompterTest extends AbstractPrompterTest
     public static final String CONTEXT_KEY = "i18n";
     public static final String COMPONENT_REF = "i18nResolver";
 
-    Prompter prompter;
+    private Prompter prompter;
 
     @Before
     public void setup()
@@ -47,7 +47,6 @@ public class TemplateContextItemPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         TemplateContextItemPrompter modulePrompter = new TemplateContextItemPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         TemplateContextItemProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
@@ -72,7 +71,6 @@ public class TemplateContextItemPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         TemplateContextItemPrompter modulePrompter = new TemplateContextItemPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         TemplateContextItemProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
@@ -98,7 +96,6 @@ public class TemplateContextItemPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         TemplateContextItemPrompter modulePrompter = new TemplateContextItemPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         TemplateContextItemProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
@@ -124,7 +121,6 @@ public class TemplateContextItemPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         TemplateContextItemPrompter modulePrompter = new TemplateContextItemPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         TemplateContextItemProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());

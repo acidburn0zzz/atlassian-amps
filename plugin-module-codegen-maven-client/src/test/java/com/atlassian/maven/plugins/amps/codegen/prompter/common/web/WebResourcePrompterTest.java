@@ -61,7 +61,7 @@ public class WebResourcePrompterTest extends AbstractPrompterTest
     public static final String CONDITIONS_TYPE = "AND";
     public static final String CUSTOM_CONDITION = "com.atlassian.plugins.web.CustomCondition";
 
-    Prompter prompter;
+    private Prompter prompter;
 
     @Before
     public void setup()
@@ -93,7 +93,6 @@ public class WebResourcePrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebResourcePrompter modulePrompter = new WebResourcePrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         WebResourceProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
@@ -160,7 +159,6 @@ public class WebResourcePrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebResourcePrompter modulePrompter = new WebResourcePrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         WebResourceProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv module name", MODULE_NAME, props.getModuleName());

@@ -11,10 +11,9 @@ import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
 import com.atlassian.plugins.codegen.util.ClassnameUtil;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
-
-import jline.ANSIBuffer;
 
 /**
  * @since 3.6
@@ -33,7 +32,6 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
     protected boolean showAdvancedNamePrompt;
     protected String defaultBasePackage;
     protected String pluginKey;
-    protected boolean useAnsiColor;
 
     public AbstractModulePrompter(Prompter prompter)
     {
@@ -41,15 +39,6 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
         this.showExamplesPrompt = true;
         this.showAdvancedPrompt = true;
         this.showAdvancedNamePrompt = true;
-
-        String mavencolor = System.getenv("MAVEN_COLOR");
-        if (StringUtils.isNotBlank(mavencolor))
-        {
-            useAnsiColor = Boolean.parseBoolean(mavencolor);
-        } else
-        {
-            useAnsiColor = false;
-        }
     }
 
     @Override
@@ -58,7 +47,7 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
         //!!! REMOVE THIS WHEN WE SUPPORT EXAMPLE CODE
         suppressExamplesPrompt();
 
-        T props = (T) promptForBasicProperties(moduleLocation);
+        T props = promptForBasicProperties(moduleLocation);
 
         if (showAdvancedPrompt)
         {
@@ -276,7 +265,7 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
 
     protected Map<String, String> promptForParams(String message) throws PrompterException
     {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         promptForParam(message, params);
 
         return params;
@@ -284,7 +273,7 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
 
     protected void promptForParam(String message, Map<String, String> params) throws PrompterException
     {
-        StringBuffer addBuffer = new StringBuffer();
+        StringBuilder addBuffer = new StringBuilder();
         if (params.size() > 0)
         {
             addBuffer.append("params:\n");
@@ -310,7 +299,7 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
 
     protected List<String> promptForList(String addMessage, String enterMessage) throws PrompterException
     {
-        List<String> vals = new ArrayList<String>();
+        List<String> vals = new ArrayList<>();
         promptForListValue(addMessage, enterMessage, vals);
 
         return vals;
@@ -318,7 +307,7 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
 
     protected void promptForListValue(String addMessage, String enterMessage, List<String> vals) throws PrompterException
     {
-        StringBuffer addBuffer = new StringBuffer();
+        StringBuilder addBuffer = new StringBuilder();
         if (vals.size() > 0)
         {
             addBuffer.append("values:\n");
@@ -383,33 +372,11 @@ public abstract class AbstractModulePrompter<T extends PluginModuleProperties> i
         this.showAdvancedNamePrompt = false;
     }
 
-    public boolean isUseAnsiColor()
-    {
-        return useAnsiColor;
-    }
-
-    public void setUseAnsiColor(boolean useAnsiColor)
-    {
-        this.useAnsiColor = useAnsiColor;
-    }
-
     protected String requiredMessage(String message)
     {
-        String formattedMessage = message;
-        if (useAnsiColor)
-        {
-            ANSIBuffer ansiBuffer = new ANSIBuffer();
-            ansiBuffer.append(ANSIBuffer.ANSICodes
-                    .attrib(PrettyPrompter.BOLD))
-                    .append(ANSIBuffer.ANSICodes
-                            .attrib(PrettyPrompter.FG_RED))
-                    .append(message)
-                    .append(ANSIBuffer.ANSICodes
-                            .attrib(PrettyPrompter.OFF));
-            formattedMessage = ansiBuffer.toString();
-        }
-
-        return formattedMessage;
+        return MessageUtils.buffer()
+                .failure(message)
+                .toString();
     }
 
     @Override

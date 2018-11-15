@@ -38,7 +38,6 @@ public class BlueprintPrompterTest extends AbstractPrompterTest
     public void setup() throws PrompterException
     {
         modulePrompter = new BlueprintPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
 
         BlueprintStringer stringer = new BlueprintStringer(blueprintIndexKey, "com.foo.plugin");
 

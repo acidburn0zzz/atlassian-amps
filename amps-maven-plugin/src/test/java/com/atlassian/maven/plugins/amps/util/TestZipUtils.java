@@ -2,7 +2,6 @@ package com.atlassian.maven.plugins.amps.util;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,12 +20,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 @SuppressWarnings("Duplicates")
 public class TestZipUtils
@@ -75,12 +78,11 @@ public class TestZipUtils
 
             // - Directories should have explicit entries
             // - Entries should be relative to _without including_ sourceZipDir (test-zip-dir)
-            assertEquals(5, entries.size());
-            assertEquals("level2sub1/", entries.get(0));
-            assertEquals("level2sub2/", entries.get(1));
-            assertEquals("level2sub2/level3sub1/", entries.get(2));
-            assertEquals("level2sub2/level3sub1/level3sub1.txt", entries.get(3));
-            assertEquals("level2sub2/level2sub2.txt", entries.get(4));
+            assertThat(entries, allOf(
+                    iterableWithSize(5),
+                    hasItems("level2sub1/", "level2sub2/", "level2sub2/level2sub2.txt",
+                            "level2sub2/level3sub1/", "level2sub2/level3sub1/level3sub1.txt")
+            ));
         }
     }
 
@@ -472,10 +474,10 @@ public class TestZipUtils
     {
         File zipFile = tempDir.newFile("zip-executable.zip");
         File executable = new File(sourceZipDir, "executable.sh");
-        executable.createNewFile();
+        assertTrue(executable.createNewFile());
 
         // This won't work under Windows - not much we can do but ignore this test
-        Assume.assumeTrue(executable.setExecutable(true));
+        assumeTrue(executable.setExecutable(true));
 
         ZipUtils.zipDir(zipFile, sourceZipDir, "");
 

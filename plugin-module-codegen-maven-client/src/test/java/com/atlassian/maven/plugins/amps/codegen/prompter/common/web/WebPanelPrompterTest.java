@@ -45,8 +45,7 @@ public class WebPanelPrompterTest extends AbstractWebFragmentPrompterTest<WebPan
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebPanelPrompter modulePrompter = new WebPanelPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
-        setProps((WebPanelProperties) modulePrompter.getModulePropertiesFromInput(moduleLocation));
+        setProps(modulePrompter.getModulePropertiesFromInput(moduleLocation));
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
         assertEquals("wrong module key", MODULE_KEY, props.getModuleKey());
@@ -72,8 +71,7 @@ public class WebPanelPrompterTest extends AbstractWebFragmentPrompterTest<WebPan
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebPanelPrompter modulePrompter = new WebPanelPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
-        setProps((WebPanelProperties) modulePrompter.getModulePropertiesFromInput(moduleLocation));
+        setProps(modulePrompter.getModulePropertiesFromInput(moduleLocation));
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
         assertEquals("wrong module key", ADV_MODULE_KEY, props.getModuleKey());
@@ -98,7 +96,7 @@ public class WebPanelPrompterTest extends AbstractWebFragmentPrompterTest<WebPan
     @Test
     public void providerContextFromListIsValid() throws PrompterException
     {
-        SortedMap<String, String> providersMap = new TreeMap<String, String>();
+        SortedMap<String, String> providersMap = new TreeMap<>();
         providersMap.put("HeightContextProvider", "com.atlassian.test.HeightContextProvider");
         providersMap.put("WidthContextProvider", "com.atlassian.test.WidthContextProvider");
 
@@ -119,8 +117,7 @@ public class WebPanelPrompterTest extends AbstractWebFragmentPrompterTest<WebPan
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebPanelPrompter modulePrompter = new WebPanelPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
-        setProps((WebPanelProperties) modulePrompter.getModulePropertiesFromInput(moduleLocation));
+        setProps(modulePrompter.getModulePropertiesFromInput(moduleLocation));
 
         assertEquals("wrong context provider", "com.atlassian.test.WidthContextProvider", props.getContextProvider());
 
@@ -129,7 +126,7 @@ public class WebPanelPrompterTest extends AbstractWebFragmentPrompterTest<WebPan
     @Test
     public void conditionFromListIsValid() throws PrompterException
     {
-        SortedMap<String, String> conditionMap = new TreeMap<String, String>();
+        SortedMap<String, String> conditionMap = new TreeMap<>();
         conditionMap.put("NoFacialHairCondition", "com.atlassian.test.NoFacialHairCondition");
         conditionMap.put("HasGlobalAdminPermissionCondition", "com.atlassian.test.HasGlobalAdminPermissionCondition");
 
@@ -150,8 +147,7 @@ public class WebPanelPrompterTest extends AbstractWebFragmentPrompterTest<WebPan
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebPanelPrompter modulePrompter = new WebPanelPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
-        setProps((WebPanelProperties) modulePrompter.getModulePropertiesFromInput(moduleLocation));
+        setProps(modulePrompter.getModulePropertiesFromInput(moduleLocation));
 
         Condition condition = (Condition) ((Conditions) props.getConditions()
                 .get(0)).getConditions()

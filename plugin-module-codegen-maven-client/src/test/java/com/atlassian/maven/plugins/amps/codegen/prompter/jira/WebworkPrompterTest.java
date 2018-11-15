@@ -57,8 +57,7 @@ public class WebworkPrompterTest extends AbstractPrompterTest
     public static final String CUSTOM_VIEW_NAME = "custom";
     public static final String CUSTOM_VIEW_PATH = "/templates/actiontwo/custom.vm";
 
-    Prompter prompter;
-
+    private Prompter prompter;
 
     @Before
     public void setup()
@@ -74,7 +73,6 @@ public class WebworkPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebworkPrompter modulePrompter = new WebworkPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         WebworkProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong module name", MODULE_NAME, props.getModuleName());
@@ -146,7 +144,6 @@ public class WebworkPrompterTest extends AbstractPrompterTest
         when(prompter.prompt("Include Example Code?", PluginModulePrompter.YN_ANSWERS, "N")).thenReturn("N");
 
         WebworkPrompter modulePrompter = new WebworkPrompter(prompter);
-        modulePrompter.setUseAnsiColor(false);
         WebworkProperties props = modulePrompter.getModulePropertiesFromInput(moduleLocation);
 
         assertEquals("wrong adv module name", MODULE_NAME, props.getModuleName());

@@ -1,14 +1,12 @@
 package com.atlassian.maven.plugins.amps.util;
 
-import com.atlassian.maven.plugins.amps.codegen.prompter.PrettyPrompter;
 import com.atlassian.maven.plugins.updater.LocalSdk;
 import com.atlassian.maven.plugins.updater.SdkPackageType;
 import com.atlassian.maven.plugins.updater.SdkResource;
-import jline.ANSIBuffer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
-import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.text.ParseException;
@@ -33,17 +31,8 @@ public class UpdateCheckerImpl extends AbstractLogEnabled implements UpdateCheck
     private String currentVersion;
     private boolean forceCheck;
     private boolean skipCheck;
-    private boolean useAnsiColor;
-    
+
     public UpdateCheckerImpl() {
-        String mavencolor = System.getenv("MAVEN_COLOR");
-        if (mavencolor != null && !mavencolor.equals(""))
-        {
-            useAnsiColor = Boolean.parseBoolean(mavencolor);
-        } else
-        {
-            useAnsiColor = false;
-        }
         this.currentVersion = "";
         this.forceCheck = false;
         this.skipCheck = false;
@@ -55,21 +44,14 @@ public class UpdateCheckerImpl extends AbstractLogEnabled implements UpdateCheck
             SdkPackageType packageType = localSdk.sdkPackageType();
             String latestVersion = sdkResource.getLatestSdkVersion(packageType);
             if (canUpdate(currentVersion, latestVersion)) {
-                try
-                {
-                    if(useAnsiColor)
-                    {
-                        promptAnsi(latestVersion);
-                    }
-                    else
-                    {
-                        promptPlain(latestVersion);
-                    }
-                }
-                catch (PrompterException e)
-                {
-                    getLogger().error("error prompting for update: " + e.getMessage());
-                }
+                String warning = MessageUtils.buffer()
+                        .warning("************************************************************\n")
+                        .warning("Version ").warning(latestVersion).warning(" of the Atlassian Plugin SDK is now available.\n")
+                        .warning("Run the atlas-update command to update.\n")
+                        .warning("************************************************************")
+                        .toString();
+
+                getLogger().warn(warning);
             } else {
                 StringBuilder sb = new StringBuilder();
                 if(StringUtils.isEmpty(latestVersion)) {
@@ -84,31 +66,6 @@ public class UpdateCheckerImpl extends AbstractLogEnabled implements UpdateCheck
                 getLogger().warn(sb.toString());
             }
         }
-    }
-
-    private void promptPlain(String latestVersion) throws PrompterException
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append("************************************************************")
-          .append("Version " + latestVersion + " of the Atlassian Plugin SDK is now available.\n")
-          .append("Run the atlas-update command to update.\n")
-          .append("************************************************************");
-
-        getLogger().warn(sb.toString());
-        // prompter.prompt(sb.toString());
-    }
-
-    private void promptAnsi(String latestVersion) throws PrompterException
-    {
-        ANSIBuffer ansiBuffer = new ANSIBuffer();
-        ansiBuffer.append(ANSIBuffer.ANSICodes.attrib(PrettyPrompter.FG_YELLOW))
-                  .append("************************************************************")
-                  .append("\nVersion " + latestVersion + " of the Atlassian Plugin SDK is now available.\n")
-                  .append("Run the atlas-update command to update.\n")
-                  .append("************************************************************")
-                  .append(ANSIBuffer.ANSICodes.attrib(PrettyPrompter.OFF));
-        getLogger().warn(ansiBuffer.toString());
-        // prompter.prompt(ansiBuffer.toString());
     }
 
     private boolean canUpdate(String currentVersion, String latestVersion) {
