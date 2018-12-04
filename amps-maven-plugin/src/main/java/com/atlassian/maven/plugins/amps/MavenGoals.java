@@ -876,18 +876,8 @@ public class MavenGoals
         {
             if (httpPort != 0)
             {
-                log.warn(productInstanceId + " will start " + protocol + " on port " +
-                    actualHttpPort + " because the configured port, " + httpPort + ", is already in use");
-            }
-
-            // Update the Product to match the port that will actually be used
-            if (webappContext.isHttps())
-            {
-                webappContext.setHttpsPort(actualHttpPort);
-            }
-            else
-            {
-                webappContext.setHttpPort(actualHttpPort);
+                log.error(String.format("The port %s is not available and the application cannot start!", httpPort));
+                throw new MojoExecutionException("Requested http port is already in use!");
             }
         }
 
@@ -896,10 +886,9 @@ public class MavenGoals
         if (actualRmiPort != rmiPort){
             if (rmiPort != 0)
             {
-                log.warn(productInstanceId + " will start RMI on port " + actualRmiPort +
-                    " because the configured port, " + rmiPort + ", is already in use");
+                log.error(String.format("The port %s is not available and the application cannot start!", rmiPort));
+                throw new MojoExecutionException("Requested rmi port is already in use!");
             }
-            webappContext.setRmiPort(actualRmiPort);
         }
 
         final int ajpPort = webappContext.getAjpPort();
@@ -907,10 +896,9 @@ public class MavenGoals
         if (actualAjpPort != ajpPort){
             if (ajpPort != 0)
             {
-                log.warn(productInstanceId + " will start RMI on port " + actualRmiPort +
-                        " because the configured port, " + rmiPort + ", is already in use");
+                log.error(String.format("The port %s is not available and the application cannot start!", ajpPort));
+                throw new MojoExecutionException("Requested ajp port is already in use!");
             }
-            webappContext.setAjpPort(actualAjpPort);
         }
 
         final List<Element> sysProps = new ArrayList<>();
