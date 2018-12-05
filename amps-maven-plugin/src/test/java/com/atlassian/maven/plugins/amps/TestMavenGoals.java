@@ -7,6 +7,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -24,6 +25,7 @@ import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -212,6 +214,86 @@ public class TestMavenGoals
         assertThat("File contains \n after process correct CRLF", processedPomXml, containsString("\n"));
         assertThat("File not contains \r\n after process correct CRLF", processedPomXml, not(containsString("\r\n")));
         temp.deleteOnExit();
+    }
+
+    /**
+     * Tests that the application fails to start when the default port for jira is taken.
+     * @throws Exception
+     */
+    @Test
+    public void testShouldFailWhenDefaultHttpPortTakenWhenStartWebapp() throws Exception
+    {
+        mockBuildPluginManager();
+        final File war = mock(File.class);
+
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+        when(product.isHttps()).thenReturn(false);
+        //Not sure how to get default port here. Seems like its 0
+        when(product.getHttpPort()).thenReturn(2990);
+
+        ServerSocket serverSocket = new ServerSocket(2990);
+
+        try {
+            goals.startWebapp("jira", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
+            fail("Should throw a MojoExecutionException");
+        } catch (MojoExecutionException e){
+            //If startWebApp() has not thrown a MojoExecutionException then it has likely that it has started on another port
+        } finally {
+            serverSocket.close();
+        }
+    }
+
+    /**
+     * Tests that the application fails to start when a specified port is taken.
+     * @throws Exception
+     */
+    @Test
+    public void testShouldFailWhenHttpPortTakenWhenStartWebapp() throws Exception
+    {
+        mockBuildPluginManager();
+        final File war = mock(File.class);
+
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+        when(product.isHttps()).thenReturn(false);
+        when(product.getHttpPort()).thenReturn(5446);
+
+        ServerSocket serverSocket = new ServerSocket(5446);
+
+        try {
+            goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
+            fail("Should throw a MojoExecutionException");
+        } catch (MojoExecutionException e){
+            //If startWebApp() has not thrown a MojoExecutionException then it has likely that it has started on another port
+        } finally {
+            serverSocket.close();
+        }
+    }
+
+    /**
+     * Tests that the application starts when the specified port is available.
+     * @throws Exception
+     */
+    @Test
+    public void testShouldStartWhenHttpPortNotTakenWhenStartWebapp() throws Exception
+    {
+        mockBuildPluginManager();
+        final File war = mock(File.class);
+        when(war.getPath()).thenReturn("/");
+
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+        when(product.getServer()).thenReturn("server");
+        when(product.getContextPath()).thenReturn("/context");
+        when(product.isHttps()).thenReturn(false);
+        when(product.getHttpPort()).thenReturn(3050);
+
+        ServerSocket serverSocket = new ServerSocket(5446);
+        int httpPort = goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
+        assertEquals(httpPort, 3050);
+
+        serverSocket.close();
     }
 
     @Test
