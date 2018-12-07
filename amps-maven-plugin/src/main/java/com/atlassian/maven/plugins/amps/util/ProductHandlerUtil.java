@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.amps.util;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.google.common.collect.Lists;
+import com.mysql.fabric.Server;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -57,6 +58,34 @@ public final class ProductHandlerUtil
             final String version = (items.length == 3 ? items[2].trim() : "LATEST");
             return new ProductArtifact(groupId, artifactId, version);
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * Tests to check if a port is available. If a {@code bindAddress} is provided, the
+     * selected port will be verified against that interface.
+     *
+     * @param requestedPort the port to check
+     * @param bindAddress the local address to bind to, which may be {@code null} to bind to any interface
+     * @return A boolean indicating if the port is free
+     */
+    public static boolean isPortFree(final int requestedPort, @Nullable final InetAddress bindAddress)
+    {
+        try(final ServerSocket socket = new ServerSocket(requestedPort, 1, bindAddress)){
+            return true;
+        } catch(final IOException e){
+            return false;
+        }
+    }
+
+    /**
+     * Tests to check if a port is available.
+     *
+     * @param requestedPort the port to check
+     * @return A boolean indicating if the port is free
+     */
+    public static boolean isPortFree(final int requestedPort)
+    {
+        return isPortFree(requestedPort, null);
     }
 
     /**

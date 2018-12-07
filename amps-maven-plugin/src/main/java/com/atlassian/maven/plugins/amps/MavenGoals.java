@@ -67,6 +67,7 @@ import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
+import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.isPortFree;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -871,10 +872,15 @@ public class MavenGoals
             protocol = "http";
         }
 
-        final int actualHttpPort = pickFreePort(httpPort);
-        if (actualHttpPort != httpPort)
+        final int actualHttpPort;
+        if (httpPort == 0)
         {
-            if (httpPort != 0)
+            actualHttpPort = pickFreePort(httpPort);
+        }
+        else
+            {
+            actualHttpPort = httpPort;
+            if (!isPortFree(actualHttpPort))
             {
                 log.error(String.format("The http port '%s' is not available and the application cannot start! Product Instance ID: %s", httpPort, productInstanceId));
                 throw new MojoExecutionException(String.format("Requested http port '%s' is already in use! Product Instance ID: %s", httpPort, productInstanceId));
@@ -882,19 +888,28 @@ public class MavenGoals
         }
 
         final int rmiPort = webappContext.getRmiPort();
-        final int actualRmiPort = pickFreePort(rmiPort);
-        if (actualRmiPort != rmiPort){
-            if (rmiPort != 0)
-            {
+        final int actualRmiPort;
+        if (rmiPort == 0)
+        {
+            actualRmiPort = pickFreePort(rmiPort);
+        }
+        else {
+            actualRmiPort = rmiPort;
+            if (!isPortFree(actualRmiPort)){
                 log.error(String.format("The rmi port '%s' is not available and the application cannot start! Product Instance ID: %s", rmiPort, productInstanceId));
                 throw new MojoExecutionException(String.format("Requested rmi port '%s' is already in use! Product Instance ID: %s", rmiPort, productInstanceId));
             }
         }
 
         final int ajpPort = webappContext.getAjpPort();
-        final int actualAjpPort = pickFreePort(ajpPort);
-        if (actualAjpPort != ajpPort){
-            if (ajpPort != 0)
+        final int actualAjpPort;
+        if (ajpPort == 0)
+        {
+            actualAjpPort = pickFreePort(ajpPort);
+        }
+        else {
+            actualAjpPort = ajpPort;
+            if (!isPortFree(actualAjpPort)) ;
             {
                 log.error(String.format("The ajp port '%s' is not available and the application cannot start! Product Instance ID: %s", ajpPort, productInstanceId));
                 throw new MojoExecutionException(String.format("Requested ajp port '%s' is already in use! Product Instance ID: %s", ajpPort, productInstanceId));
