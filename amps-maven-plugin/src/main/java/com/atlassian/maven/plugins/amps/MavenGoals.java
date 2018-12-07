@@ -876,8 +876,8 @@ public class MavenGoals
         {
             if (httpPort != 0)
             {
-                log.error(String.format("The port %s is not available and the application cannot start!", httpPort));
-                throw new MojoExecutionException("Requested http port is already in use!");
+                log.error(String.format("The http port '%s' is not available and the application cannot start! Product Instance ID: %s", httpPort, productInstanceId));
+                throw new MojoExecutionException(String.format("Requested http port '%s' is already in use! Product Instance ID: %s", httpPort, productInstanceId));
             }
         }
 
@@ -886,8 +886,8 @@ public class MavenGoals
         if (actualRmiPort != rmiPort){
             if (rmiPort != 0)
             {
-                log.error(String.format("The port %s is not available and the application cannot start!", rmiPort));
-                throw new MojoExecutionException("Requested rmi port is already in use!");
+                log.error(String.format("The rmi port '%s' is not available and the application cannot start! Product Instance ID: %s", rmiPort, productInstanceId));
+                throw new MojoExecutionException(String.format("Requested rmi port '%s' is already in use! Product Instance ID: %s", rmiPort, productInstanceId));
             }
         }
 
@@ -896,8 +896,8 @@ public class MavenGoals
         if (actualAjpPort != ajpPort){
             if (ajpPort != 0)
             {
-                log.error(String.format("The port %s is not available and the application cannot start!", ajpPort));
-                throw new MojoExecutionException("Requested ajp port is already in use!");
+                log.error(String.format("The ajp port '%s' is not available and the application cannot start! Product Instance ID: %s", ajpPort, productInstanceId));
+                throw new MojoExecutionException(String.format("Requested ajp port '%s' is already in use! Product Instance ID: %s", ajpPort, productInstanceId));
             }
         }
 
