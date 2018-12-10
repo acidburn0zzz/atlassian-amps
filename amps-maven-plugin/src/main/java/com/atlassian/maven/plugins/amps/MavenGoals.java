@@ -882,8 +882,9 @@ public class MavenGoals
             actualHttpPort = httpPort;
             if (!isPortFree(actualHttpPort))
             {
-                log.error(String.format("The http port '%s' is not available and the application cannot start! Product Instance ID: %s", httpPort, productInstanceId));
-                throw new MojoExecutionException(String.format("Requested http port '%s' is already in use! Product Instance ID: %s", httpPort, productInstanceId));
+                final String httpErrorMessage = String.format("%s: The configured HTTP port, %d, is in use", productInstanceId, httpPort);
+                log.error(httpErrorMessage);
+                throw new MojoExecutionException(httpErrorMessage);
             }
         }
 
@@ -896,8 +897,9 @@ public class MavenGoals
         else {
             actualRmiPort = rmiPort;
             if (!isPortFree(actualRmiPort)){
-                log.error(String.format("The rmi port '%s' is not available and the application cannot start! Product Instance ID: %s", rmiPort, productInstanceId));
-                throw new MojoExecutionException(String.format("Requested rmi port '%s' is already in use! Product Instance ID: %s", rmiPort, productInstanceId));
+                final String rmiErrorMessage = String.format("%s: The configured RMI port, %d, is in use", productInstanceId, rmiPort);
+                log.error(rmiErrorMessage);
+                throw new MojoExecutionException(rmiErrorMessage);
             }
         }
 
@@ -911,8 +913,9 @@ public class MavenGoals
             actualAjpPort = ajpPort;
             if (!isPortFree(actualAjpPort)) ;
             {
-                log.error(String.format("The ajp port '%s' is not available and the application cannot start! Product Instance ID: %s", ajpPort, productInstanceId));
-                throw new MojoExecutionException(String.format("Requested ajp port '%s' is already in use! Product Instance ID: %s", ajpPort, productInstanceId));
+                final String ajpErrorMessage = String.format("%s: The configured AJP port, %d, is in use", productInstanceId, ajpPort);
+                log.error(ajpErrorMessage);
+                throw new MojoExecutionException(ajpErrorMessage);
             }
         }
 

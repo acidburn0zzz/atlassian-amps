@@ -1,7 +1,6 @@
 package com.atlassian.maven.plugins.amps.util;
 
 import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.mysql.fabric.Server;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -16,7 +15,9 @@ import java.util.List;
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.toArtifacts;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
 
 public class ProductHandlerUtilTest
