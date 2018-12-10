@@ -911,7 +911,7 @@ public class MavenGoals
         }
         else {
             actualAjpPort = ajpPort;
-            if (!isPortFree(actualAjpPort)) ;
+            if (!isPortFree(actualAjpPort))
             {
                 final String ajpErrorMessage = String.format("%s: The configured AJP port, %d, is in use", productInstanceId, ajpPort);
                 log.error(ajpErrorMessage);
