@@ -220,7 +220,7 @@ public class TestMavenGoals
      * Tests that the application fails to start when the default port for jira is taken.
      * @throws Exception
      */
-    @Test
+    @Test(expected = MojoExecutionException.class)
     public void testShouldFailWhenDefaultHttpPortTakenWhenStartWebapp() throws Exception
     {
         mockBuildPluginManager();
@@ -232,15 +232,9 @@ public class TestMavenGoals
         //Not sure how to get default port here. Seems like its 0
         when(product.getHttpPort()).thenReturn(2990);
 
-        ServerSocket serverSocket = new ServerSocket(2990);
-
-        try {
+        try (final ServerSocket serverSocket = new ServerSocket(2990))
+        {
             goals.startWebapp("jira", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
-            fail("Should throw a MojoExecutionException");
-        } catch (MojoExecutionException e){
-            //If startWebApp() has not thrown a MojoExecutionException then it has likely that it has started on another port
-        } finally {
-            serverSocket.close();
         }
     }
 
@@ -248,7 +242,7 @@ public class TestMavenGoals
      * Tests that the application fails to start when a specified port is taken.
      * @throws Exception
      */
-    @Test
+    @Test(expected = MojoExecutionException.class)
     public void testShouldFailWhenHttpPortTakenWhenStartWebapp() throws Exception
     {
         mockBuildPluginManager();
@@ -259,15 +253,9 @@ public class TestMavenGoals
         when(product.isHttps()).thenReturn(false);
         when(product.getHttpPort()).thenReturn(5446);
 
-        ServerSocket serverSocket = new ServerSocket(5446);
-
-        try {
+        try (final ServerSocket serverSocket = new ServerSocket(5446))
+        {
             goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
-            fail("Should throw a MojoExecutionException");
-        } catch (MojoExecutionException e){
-            //If startWebApp() has not thrown a MojoExecutionException then it has likely that it has started on another port
-        } finally {
-            serverSocket.close();
         }
     }
 

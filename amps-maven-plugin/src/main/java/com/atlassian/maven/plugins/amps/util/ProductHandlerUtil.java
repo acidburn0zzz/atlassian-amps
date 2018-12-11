@@ -70,9 +70,12 @@ public final class ProductHandlerUtil
      */
     public static boolean isPortFree(final int requestedPort, @Nullable final InetAddress bindAddress)
     {
-        try(final ServerSocket socket = new ServerSocket(requestedPort, 1, bindAddress)){
+        try (final ServerSocket socket = new ServerSocket(requestedPort, 1, bindAddress))
+        {
             return true;
-        } catch(final IOException e){
+        }
+        catch (final IOException e)
+        {
             return false;
         }
     }

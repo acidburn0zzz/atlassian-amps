@@ -26,7 +26,8 @@ public class ProductHandlerUtilTest
     @Test
     public void testIsPortFree() throws IOException
     {
-        try (final ServerSocket ignored = new ServerSocket(16829)){
+        try (final ServerSocket ignored = new ServerSocket(16829))
+        {
             //Ensure not free
             assertFalse(ProductHandlerUtil.isPortFree(16829));
 

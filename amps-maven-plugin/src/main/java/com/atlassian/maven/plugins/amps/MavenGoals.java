@@ -878,7 +878,7 @@ public class MavenGoals
             actualHttpPort = pickFreePort(httpPort);
         }
         else
-            {
+        {
             actualHttpPort = httpPort;
             if (!isPortFree(actualHttpPort))
             {
@@ -894,9 +894,11 @@ public class MavenGoals
         {
             actualRmiPort = pickFreePort(rmiPort);
         }
-        else {
+        else
+        {
             actualRmiPort = rmiPort;
-            if (!isPortFree(actualRmiPort)){
+            if (!isPortFree(actualRmiPort))
+            {
                 final String rmiErrorMessage = String.format("%s: The configured RMI port, %d, is in use", productInstanceId, rmiPort);
                 log.error(rmiErrorMessage);
                 throw new MojoExecutionException(rmiErrorMessage);
@@ -909,7 +911,8 @@ public class MavenGoals
         {
             actualAjpPort = pickFreePort(ajpPort);
         }
-        else {
+        else
+        {
             actualAjpPort = ajpPort;
             if (!isPortFree(actualAjpPort))
             {
