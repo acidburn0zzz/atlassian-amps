@@ -38,6 +38,7 @@ import java.util.jar.Manifest;
 
 import static com.atlassian.maven.plugins.amps.MavenGoals.AJP_PORT_PROPERTY;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
+import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
@@ -270,7 +271,6 @@ public class TestMavenGoals
 
         when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
         when(product.getContainerId()).thenReturn("tomcat8x");
-        when(product.isHttps()).thenReturn(false);
 
         try (final ServerSocket serverSocket = new ServerSocket(0))
         {
@@ -291,7 +291,6 @@ public class TestMavenGoals
 
         when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
         when(product.getContainerId()).thenReturn("tomcat8x");
-        when(product.isHttps()).thenReturn(false);
 
         try (final ServerSocket serverSocket = new ServerSocket(0))
         {
@@ -315,13 +314,8 @@ public class TestMavenGoals
         when(product.getContainerId()).thenReturn("tomcat8x");
         when(product.getServer()).thenReturn("server");
         when(product.getContextPath()).thenReturn("/context");
-        when(product.isHttps()).thenReturn(false);
 
-        final int freeHttpPort;
-        try (final ServerSocket serverSocket = new ServerSocket(0))
-        {
-            freeHttpPort = serverSocket.getLocalPort();
-        }
+        final int freeHttpPort = pickFreePort(0);
         when(product.getHttpPort()).thenReturn(freeHttpPort);
 
         int httpPort = goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
@@ -340,7 +334,6 @@ public class TestMavenGoals
         when(product.getContainerId()).thenReturn("tomcat8x");
         when(product.getServer()).thenReturn("server");
         when(product.getContextPath()).thenReturn("/context");
-        when(product.isHttps()).thenReturn(false);
 
         goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
 
