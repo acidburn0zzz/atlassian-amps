@@ -11,6 +11,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,6 +52,7 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
@@ -417,5 +419,16 @@ public class TestJiraProductHandler
         // Check
         assertNotNull(bundledPluginPath);
         assertEquals(expectedPath, bundledPluginPath);
+    }
+
+    @Test
+    public void getExtraJarsToSkipWhenScanningForTldsAndWebFragments_whenCalled_shouldSkipJotmAndXapool() {
+        // Set up
+
+        // Invoke
+        final Collection<String> extraJarsToSkip = productHandler.getExtraJarsToSkipWhenScanningForTldsAndWebFragments();
+
+        // Check
+        Assert.assertThat(extraJarsToSkip, contains("jotm*.jar", "xapool*.jar"));
     }
 }

@@ -25,6 +25,7 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -156,6 +157,13 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     public String getDefaultContainerId()
     {
         return "tomcat7x";
+    }
+
+    @Nonnull
+    @Override
+    protected Collection<String> getExtraJarsToSkipWhenScanningForTldsAndWebFragments() {
+        // Fixes AMPS-1429 by skipping these JARs
+        return Arrays.asList("jotm*.jar", "xapool*.jar");
     }
 
     @Override
