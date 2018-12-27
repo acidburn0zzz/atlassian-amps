@@ -153,7 +153,7 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
     protected void validatePortConfiguration(List<Product> products) throws MojoExecutionException
     {
         HashSet<String> compared = new HashSet<>();
-        List<String> errorList = new ArrayList<>();
+        HashSet<String> errorList = new HashSet<>();
         for (Product product : products)
         {
             for (Product product1 : products)
@@ -162,14 +162,14 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
                 {
                     if (product.isHttps() && product.getHttpsPort() != 0)
                     {
-                        checkPortConflicts(product.getHttpsPort(), product.getInstanceId(), "HTTPS", product1, errorList);
+                        checkPortConflicts(product.getHttpsPort(), "HTTPS", product, product1, errorList);
                     }
                     else
                     {
-                        checkPortConflicts(product.getHttpPort(), product.getInstanceId(), "HTTP", product1, errorList);
+                        checkPortConflicts(product.getHttpPort(), "HTTP", product, product1, errorList);
                     }
-                    checkPortConflicts(product.getAjpPort(), product.getInstanceId(), "AJP", product1, errorList);
-                    checkPortConflicts(product.getRmiPort(), product.getInstanceId(), "RMI", product1, errorList);
+                    checkPortConflicts(product.getAjpPort(), "AJP", product, product1, errorList);
+                    checkPortConflicts(product.getRmiPort(), "RMI", product, product1, errorList);
                 }
             }
             compared.add(product.getInstanceId());
@@ -184,25 +184,63 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
         }
     }
 
-    private void checkPortConflicts(int port, String instanceId, String portType, Product product1, List<String> errorList)
+    /**
+     * Does the actual comparisons between two provided products and adds error messages to provided errorSet. This
+     * method also ensures that duplicates are not reported.
+     * @param port The port number being compared to other portTypes
+     * @param portType The port type of the provided port. E.g. HTTP or AJP.
+     * @param product The first product
+     * @param product1 The second product
+     * @param errorSet The set to add error messages to.
+     */
+    private void checkPortConflicts(int port, String portType, Product product, Product product1, Set<String> errorSet)
     {
         if (port != 0)
         {
             if (port == product1.getHttpsPort())
             {
-                errorList.add(String.format("Conflict between %s port of %s and HTTPS port of %s on %d", portType, instanceId, product1.getInstanceId(), port));
+                errorSet.add(String.format("Conflict between %s port of %s and HTTPS port of %s on %d", portType, product.getInstanceId(), product1.getInstanceId(), port));
             }
             if (port == product1.getHttpPort())
             {
-                errorList.add(String.format("Conflict between %s port of %s and HTTP port of %s on %d", portType, instanceId, product1.getInstanceId(), port));
+                errorSet.add(String.format("Conflict between %s port of %s and HTTP port of %s on %d", portType, product.getInstanceId(), product1.getInstanceId(), port));
             }
             if (port == product1.getAjpPort())
             {
-                errorList.add(String.format("Conflict between %s port of %s and AJP port of %s on %d", portType, instanceId, product1.getInstanceId(), port));
+                errorSet.add(String.format("Conflict between %s port of %s and AJP port of %s on %d", portType, product.getInstanceId(), product1.getInstanceId(), port));
             }
             if (port == product1.getRmiPort())
             {
-                errorList.add(String.format("Conflict between %s port of %s and RMI port of %s on %d", portType, instanceId, product1.getInstanceId(), port));
+                errorSet.add(String.format("Conflict between %s port of %s and RMI port of %s on %d", portType, product.getInstanceId(), product1.getInstanceId(), port));
+            }
+            if (!portType.equalsIgnoreCase("HTTP") && !portType.equalsIgnoreCase("HTTPS"))
+            {
+                if (port == product.getHttpsPort()) {
+                    if (!errorSet.contains(String.format("Conflict between HTTPS port of %s and %s port of %s on %d", product.getInstanceId(), portType, product.getInstanceId(), port))) {
+                        errorSet.add(String.format("Conflict between %s port of %s and HTTPS port of %s on %d", portType, product.getInstanceId(), product.getInstanceId(), port));
+                    }
+                }
+                if (port == product.getHttpPort())
+                {
+                    if (!errorSet.contains(String.format("Conflict between HTTP port of %s and %s port of %s on %d", product.getInstanceId(), portType, product.getInstanceId(), port)))
+                    {
+                        errorSet.add(String.format("Conflict between %s port of %s and HTTP port of %s on %d", portType, product.getInstanceId(), product.getInstanceId(), port));
+                    }
+                }
+            }
+            if (!portType.equalsIgnoreCase("AJP") && port == product.getAjpPort())
+            {
+                if (!errorSet.contains(String.format("Conflict between AJP port of %s and %s port of %s on %d", product.getInstanceId(), portType, product.getInstanceId(), port)))
+                {
+                    errorSet.add(String.format("Conflict between %s port of %s and AJP port of %s on %d", portType, product.getInstanceId(), product.getInstanceId(), port));
+                }
+            }
+            if (!portType.equalsIgnoreCase("RMI") && port == product.getRmiPort())
+            {
+                if (!errorSet.contains(String.format("Conflict between RMI port of %s and %s port of %s on %d", product.getInstanceId(), portType, product.getInstanceId(), port)))
+                {
+                    errorSet.add(String.format("Conflict between %s port of %s and RMI port of %s on %d", portType, product.getInstanceId(), product.getInstanceId(), port));
+                }
             }
         }
     }

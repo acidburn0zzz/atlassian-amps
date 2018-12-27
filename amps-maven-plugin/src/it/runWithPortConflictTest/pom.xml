@@ -49,7 +49,9 @@
                         <product>
                             <id>${invoker.product}</id>
                             <instanceId>product-1</instanceId>
-                            <httpPort>10901</httpPort>
+                            <httpPort>10903</httpPort>
+                            <ajpPort>10903</ajpPort>
+                            <httpsPort>10903</httpsPort>
                         </product>
                         <product>
                             <id>${invoker.product}</id>
