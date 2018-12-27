@@ -51,7 +51,7 @@
                     generateManifestWithInstructions, generateManifestWithNoInstructions,
                     generateObr, integrationTest,
                     integrationTestWithTestGroup, jarWithExistingManifest, preIntegrationTest, quickreload,
-                    run, runParallel, runWithTestGroup, unitTest, validateManifestSkipValidation,
+                    run, runParallel, runWithTestGroup, runWithPortConflict, unitTest, validateManifestSkipValidation,
                     validateManifestWithInvalidManifest, validateManifestWithValidManifest
                 </tests>
             </properties>
