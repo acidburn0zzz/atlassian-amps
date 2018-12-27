@@ -176,6 +176,10 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         List<String> includes = getIncludesForTestGroup(testGroupId);
         List<String> excludes = getExcludesForTestGroup(testGroupId);
 
+        if (products.size() > 1)
+        {
+            validatePortConfiguration(products);
+        }
         List<ProductExecution> productExecutions = getTestGroupProductExecutions(testGroupId);
         setParallelMode(productExecutions);
 

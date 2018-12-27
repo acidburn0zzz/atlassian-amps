@@ -119,6 +119,10 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
         final List<ProductExecution> productExecutions;
         if (!isBlank(testGroup))
         {
+            if (products.size() > 1)
+            {
+                validatePortConfiguration(products);
+            }
             productExecutions = getTestGroupProductExecutions(testGroup);
         }
         else if (!isBlank(instanceId))
@@ -138,5 +142,68 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
             productExecutions = Collections.singletonList(new ProductExecution(ctx, product));
         }
         return productExecutions;
+    }
+
+    /**
+     * Ensures that there are no port conflicts between products and raises an exception if there
+     * are conflicts
+     * @param products
+     * @throws MojoExecutionException
+     */
+    protected void validatePortConfiguration(List<Product> products) throws MojoExecutionException
+    {
+        HashSet<String> compared = new HashSet<>();
+        List<String> errorList = new ArrayList<>();
+        for (Product product : products)
+        {
+            for (Product product1 : products)
+            {
+                if (!product.getInstanceId().equals(product1.getInstanceId()) && !compared.contains(product1.getInstanceId()))
+                {
+                    if (product.isHttps() && product.getHttpsPort() != 0)
+                    {
+                        checkPortConflicts(product.getHttpsPort(), product.getInstanceId(), "HTTPS", product1, errorList);
+                    }
+                    else
+                    {
+                        checkPortConflicts(product.getHttpPort(), product.getInstanceId(), "HTTP", product1, errorList);
+                    }
+                    checkPortConflicts(product.getAjpPort(), product.getInstanceId(), "AJP", product1, errorList);
+                    checkPortConflicts(product.getRmiPort(), product.getInstanceId(), "RMI", product1, errorList);
+                }
+            }
+            compared.add(product.getInstanceId());
+        }
+        if (errorList.size() > 0)
+        {
+            for (String error : errorList)
+            {
+                getLog().error(error);
+            }
+            throw new MojoExecutionException("Port conflicts detected. Please see error log for details");
+        }
+    }
+
+    private void checkPortConflicts(int port, String instanceId, String portType, Product product1, List<String> errorList)
+    {
+        if (port != 0)
+        {
+            if (port == product1.getHttpsPort())
+            {
+                errorList.add(String.format("Conflict between %s port of %s and HTTPS port of %s on %d", portType, instanceId, product1.getInstanceId(), port));
+            }
+            if (port == product1.getHttpPort())
+            {
+                errorList.add(String.format("Conflict between %s port of %s and HTTP port of %s on %d", portType, instanceId, product1.getInstanceId(), port));
+            }
+            if (port == product1.getAjpPort())
+            {
+                errorList.add(String.format("Conflict between %s port of %s and AJP port of %s on %d", portType, instanceId, product1.getInstanceId(), port));
+            }
+            if (port == product1.getRmiPort())
+            {
+                errorList.add(String.format("Conflict between %s port of %s and RMI port of %s on %d", portType, instanceId, product1.getInstanceId(), port));
+            }
+        }
     }
 }
