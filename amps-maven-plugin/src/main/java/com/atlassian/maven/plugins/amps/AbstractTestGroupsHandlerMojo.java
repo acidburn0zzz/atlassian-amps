@@ -148,6 +148,7 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
      * Ensures that there are no port conflicts between products and raises an exception if there
      * are conflicts
      * @throws MojoExecutionException
+     * @since 8.0
      */
     protected void validatePortConfiguration() throws MojoExecutionException
     {
@@ -190,7 +191,8 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
      * @param portType The port type of the provided port. E.g. HTTP or AJP.
      * @param product The first product
      * @param product1 The second product
-     * @param errorSet The set to add error messages to.
+     * @param errorSet The set to add error messages to
+     * @since 8.0
      */
     private void checkPortConflicts(int port, String portType, Product product, Product product1, Set<String> errorSet)
     {
