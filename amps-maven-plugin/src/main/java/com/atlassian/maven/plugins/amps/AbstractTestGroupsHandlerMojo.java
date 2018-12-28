@@ -121,7 +121,7 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
         {
             if (products.size() > 1)
             {
-                validatePortConfiguration(products);
+                validatePortConfiguration();
             }
             productExecutions = getTestGroupProductExecutions(testGroup);
         }
@@ -147,10 +147,9 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
     /**
      * Ensures that there are no port conflicts between products and raises an exception if there
      * are conflicts
-     * @param products
      * @throws MojoExecutionException
      */
-    protected void validatePortConfiguration(List<Product> products) throws MojoExecutionException
+    protected void validatePortConfiguration() throws MojoExecutionException
     {
         HashSet<String> compared = new HashSet<>();
         HashSet<String> errorSet = new HashSet<>();

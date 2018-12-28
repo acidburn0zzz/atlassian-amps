@@ -178,7 +178,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 
         if (products.size() > 1)
         {
-            validatePortConfiguration(products);
+            validatePortConfiguration();
         }
         List<ProductExecution> productExecutions = getTestGroupProductExecutions(testGroupId);
         setParallelMode(productExecutions);

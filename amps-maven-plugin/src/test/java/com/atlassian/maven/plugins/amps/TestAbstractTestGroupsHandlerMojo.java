@@ -1,7 +1,6 @@
 package com.atlassian.maven.plugins.amps;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -36,8 +35,9 @@ public class TestAbstractTestGroupsHandlerMojo
 
         AbstractTestGroupsHandlerMojo testGroupsHandlerMojo = Mockito.spy(AbstractTestGroupsHandlerMojo.class);
         List<Product> products = Arrays.asList(product, product1, product2);
+        testGroupsHandlerMojo.products = products;
         //No conflicts should be detected
-        testGroupsHandlerMojo.validatePortConfiguration(products);
+        testGroupsHandlerMojo.validatePortConfiguration();
     }
 
     @Test
@@ -56,8 +56,9 @@ public class TestAbstractTestGroupsHandlerMojo
 
         AbstractTestGroupsHandlerMojo testGroupsHandlerMojo = Mockito.spy(AbstractTestGroupsHandlerMojo.class);
         List<Product> products = Arrays.asList(product, product1);
+        testGroupsHandlerMojo.products = products;
         //Should not detect a conflict as http port of testProduct1 is not used
-        testGroupsHandlerMojo.validatePortConfiguration(products);
+        testGroupsHandlerMojo.validatePortConfiguration();
     }
 
 
@@ -87,7 +88,8 @@ public class TestAbstractTestGroupsHandlerMojo
 
         AbstractTestGroupsHandlerMojo testGroupsHandlerMojo = Mockito.spy(AbstractTestGroupsHandlerMojo.class);
         List<Product> products = Arrays.asList(product, product1, product2);
+        testGroupsHandlerMojo.products = products;
         //Should detect and print errors for all conflicts before throwing an exception
-        testGroupsHandlerMojo.validatePortConfiguration(products);
+        testGroupsHandlerMojo.validatePortConfiguration();
     }
 }
