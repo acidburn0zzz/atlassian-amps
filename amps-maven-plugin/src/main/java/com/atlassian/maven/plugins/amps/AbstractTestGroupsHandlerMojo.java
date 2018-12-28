@@ -153,7 +153,7 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
     protected void validatePortConfiguration(List<Product> products) throws MojoExecutionException
     {
         HashSet<String> compared = new HashSet<>();
-        HashSet<String> errorList = new HashSet<>();
+        HashSet<String> errorSet = new HashSet<>();
         for (Product product : products)
         {
             for (Product product1 : products)
@@ -162,21 +162,21 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
                 {
                     if (product.isHttps() && product.getHttpsPort() != 0)
                     {
-                        checkPortConflicts(product.getHttpsPort(), "HTTPS", product, product1, errorList);
+                        checkPortConflicts(product.getHttpsPort(), "HTTPS", product, product1, errorSet);
                     }
                     else
                     {
-                        checkPortConflicts(product.getHttpPort(), "HTTP", product, product1, errorList);
+                        checkPortConflicts(product.getHttpPort(), "HTTP", product, product1, errorSet);
                     }
-                    checkPortConflicts(product.getAjpPort(), "AJP", product, product1, errorList);
-                    checkPortConflicts(product.getRmiPort(), "RMI", product, product1, errorList);
+                    checkPortConflicts(product.getAjpPort(), "AJP", product, product1, errorSet);
+                    checkPortConflicts(product.getRmiPort(), "RMI", product, product1, errorSet);
                 }
             }
             compared.add(product.getInstanceId());
         }
-        if (errorList.size() > 0)
+        if (errorSet.size() > 0)
         {
-            for (String error : errorList)
+            for (String error : errorSet)
             {
                 getLog().error(error);
             }
@@ -187,7 +187,7 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
     /**
      * Does the actual comparisons between two provided products and adds error messages to provided errorSet. This
      * method also ensures that duplicates are not reported.
-     * @param port The port number being compared to other portTypes
+     * @param port The port number being compared to the other portTypes
      * @param portType The port type of the provided port. E.g. HTTP or AJP.
      * @param product The first product
      * @param product1 The second product
@@ -195,6 +195,7 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
      */
     private void checkPortConflicts(int port, String portType, Product product, Product product1, Set<String> errorSet)
     {
+        portType = portType.toUpperCase();
         if (port != 0)
         {
             if (port == product1.getHttpsPort())
