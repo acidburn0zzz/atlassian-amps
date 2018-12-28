@@ -198,11 +198,11 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
         portType = portType.toUpperCase();
         if (port != 0)
         {
-            if (port == product1.getHttpsPort())
+            if (product1.isHttps() && port == product1.getHttpsPort())
             {
                 errorSet.add(String.format("Conflict between %s port of %s and HTTPS port of %s on %d", portType, product.getInstanceId(), product1.getInstanceId(), port));
             }
-            if (port == product1.getHttpPort())
+            if (!product1.isHttps() && port == product1.getHttpPort())
             {
                 errorSet.add(String.format("Conflict between %s port of %s and HTTP port of %s on %d", portType, product.getInstanceId(), product1.getInstanceId(), port));
             }
