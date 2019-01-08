@@ -144,7 +144,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 
     private Map<String,Object> copy(Map<String,Object> systemPropertyVariables)
     {
-        return new HashMap<String,Object>(systemPropertyVariables);
+        return new HashMap<>(systemPropertyVariables);
     }
 
     /**
@@ -159,9 +159,9 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         return Collections.emptyMap();
     }
 
-    private Set<String> getTestGroupIds() throws MojoExecutionException
+    private Set<String> getTestGroupIds()
     {
-        Set<String> ids = new HashSet<String>();
+        Set<String> ids = new HashSet<>();
 
         for (TestGroup group : getTestGroups())
         {
@@ -176,10 +176,6 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         List<String> includes = getIncludesForTestGroup(testGroupId);
         List<String> excludes = getExcludesForTestGroup(testGroupId);
 
-        if (products.size() > 1)
-        {
-            validatePortConfiguration();
-        }
         List<ProductExecution> productExecutions = getTestGroupProductExecutions(testGroupId);
         setParallelMode(productExecutions);
 
@@ -210,8 +206,8 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                         product.setJvmDebugPort(jvmDebugPort + counter++);
                     }
                     final int debugPort = product.getJvmDebugPort();
-                    String debugArgs = " -Xdebug -Xrunjdwp:transport=dt_socket,address=" +
-                            String.valueOf(debugPort) + ",suspend=" + (jvmDebugSuspend ? "y" : "n") + ",server=y ";
+                    String debugArgs = " -Xdebug -Xrunjdwp:transport=dt_socket,address=" + debugPort +
+                            ",suspend=" + (jvmDebugSuspend ? "y" : "n") + ",server=y ";
     
                     if (StringUtils.stripToNull(product.getJvmArgs()) == null)
                     {

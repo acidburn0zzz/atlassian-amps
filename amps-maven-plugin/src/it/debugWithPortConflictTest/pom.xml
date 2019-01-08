@@ -17,7 +17,6 @@
                 <configuration>
                     <wait>false</wait>
                     <writePropertiesToFile>true</writePropertiesToFile>
-                    <container>tomcat85x</container>
                     <productInheritConfiguration>true</productInheritConfiguration>
                     <systemPropertyVariables>
                         <invoker.artifactId>${invoker.artifactId}</invoker.artifactId>
@@ -39,6 +38,7 @@
                             <productIds>
                                 <productId>product-1</productId>
                                 <productId>product-2</productId>
+                                <productId>product-3</productId>
                             </productIds>
                             <includes>
                                 <include>**/bar/**</include>
@@ -49,14 +49,22 @@
                         <product>
                             <id>${invoker.product}</id>
                             <instanceId>product-1</instanceId>
-                            <ajpPort>10902</ajpPort>
-                            <httpPort>10901</httpPort>
+                            <ajpPort>10901</ajpPort>
+                            <httpPort>10900</httpPort>
                         </product>
                         <product>
                             <id>${invoker.product}</id>
                             <instanceId>product-2</instanceId>
-                            <ajpPort>10901</ajpPort> <!-- Collides with product-1's httpPort -->
-                            <httpPort>10900</httpPort>
+                            <ajpPort>10901</ajpPort> <!-- Collides with product-1's ajpPort -->
+                            <httpPort>10900</httpPort> <!-- Collides with product-1's httpPort -->
+                            <jvmDebugPort>9988</jvmDebugPort>
+                        </product>
+                        <product>
+                            <id>${invoker.product}</id>
+                            <instanceId>product-3</instanceId>
+                            <ajpPort>10900</ajpPort> <!-- Collides with product-1's httpPort -->
+                            <httpPort>10901</httpPort> <!-- Collides with product-1's ajpPort -->
+                            <jvmDebugPort>9999</jvmDebugPort>
                         </product>
                     </products>
                 </configuration>

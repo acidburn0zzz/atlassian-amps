@@ -3,23 +3,21 @@ package com.atlassian.maven.plugins.amps;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandlerMojo
@@ -34,7 +32,7 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
      * The list of configured test groups
      */
     @Parameter
-    private List<TestGroup> testGroups = new ArrayList<TestGroup>();
+    private List<TestGroup> testGroups = new ArrayList<>();
 
     protected final List<TestGroup> getTestGroups()
     {
@@ -44,9 +42,9 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
     protected final List<ProductExecution> getTestGroupProductExecutions(String testGroupId) throws MojoExecutionException
     {
         // Create a container object to hold product-related stuff
-        List<ProductExecution> products = new ArrayList<ProductExecution>();
+        List<ProductExecution> products = new ArrayList<>();
         int dupCounter = 0;
-        Set<String> uniqueProductIds = new HashSet<String>();
+        Set<String> uniqueProductIds = new HashSet<>();
         Map<String, Product> productContexts = getProductContexts();
         for (String instanceId : getTestGroupInstanceIds(testGroupId))
         {
@@ -70,6 +68,11 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
             products.add(new ProductExecution(ctx, productHandler));
         }
 
+        if (products.size() > 1)
+        {
+            validatePortConfiguration(products);
+        }
+
         return products;
     }
 
@@ -83,7 +86,7 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
      */
     private List<String> getTestGroupInstanceIds(String testGroupId) throws MojoExecutionException
     {
-        List<String> instanceIds = new ArrayList<String>();
+        List<String> instanceIds = new ArrayList<>();
         if (NO_TEST_GROUP.equals(testGroupId))
         {
             instanceIds.add(getProductId());
@@ -103,7 +106,7 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
 
         if (instanceIds.isEmpty())
         {
-            List<String> validTestGroups = new ArrayList<String>();
+            List<String> validTestGroups = new ArrayList<>();
             for (TestGroup group: testGroups)
             {
                 validTestGroups.add(group.getId());
@@ -119,10 +122,6 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
         final List<ProductExecution> productExecutions;
         if (!isBlank(testGroup))
         {
-            if (products.size() > 1)
-            {
-                validatePortConfiguration();
-            }
             productExecutions = getTestGroupProductExecutions(testGroup);
         }
         else if (!isBlank(instanceId))
@@ -147,103 +146,93 @@ public abstract class AbstractTestGroupsHandlerMojo extends AbstractProductHandl
     /**
      * Ensures that there are no port conflicts between products and raises an exception if there
      * are conflicts
-     * @throws MojoExecutionException
+     *
+     * @param executions two or more product executions, for which the configured ports should be validated
+     * @throws MojoExecutionException if any of the configured ports collide between products
      * @since 8.0
      */
-    protected void validatePortConfiguration() throws MojoExecutionException
+    void validatePortConfiguration(List<ProductExecution> executions) throws MojoExecutionException
     {
-        HashSet<String> compared = new HashSet<>();
-        HashSet<String> errorSet = new HashSet<>();
-        for (Product product : products)
-        {
-            for (Product product1 : products)
-            {
-                if (!product.getInstanceId().equals(product1.getInstanceId()) && !compared.contains(product1.getInstanceId()))
-                {
-                    if (product.isHttps() && product.getHttpsPort() != 0)
+        Map<Integer, ConfiguredPort> portsById = new HashMap<>();
+
+        MutableInt collisions = new MutableInt();
+        executions.stream()
+                .map(ProductExecution::getProduct)
+                .flatMap(AbstractTestGroupsHandlerMojo::streamConfiguredPorts)
+                .filter(ConfiguredPort::isStatic) // Only verify statically-configured ports
+                .forEach(configured -> {
+                    ConfiguredPort conflict = portsById.get(configured.port);
+                    if (conflict == null)
                     {
-                        checkPortConflicts(product.getHttpsPort(), "HTTPS", product, product1, errorSet);
+                        portsById.put(configured.port, configured);
                     }
                     else
                     {
-                        checkPortConflicts(product.getHttpPort(), "HTTP", product, product1, errorSet);
+                        getLog().error(configured.instanceId + ": The configured " + configured.type +
+                                " port, " + configured.port + ", is in use by the " + conflict.type +
+                                " port for " + conflict.instanceId);
+                        collisions.increment();
                     }
-                    checkPortConflicts(product.getAjpPort(), "AJP", product, product1, errorSet);
-                    checkPortConflicts(product.getRmiPort(), "RMI", product, product1, errorSet);
-                }
-            }
-            compared.add(product.getInstanceId());
-        }
-        if (errorSet.size() > 0)
+                });
+
+        int collisionCount = collisions.intValue();
+        if (collisionCount != 0)
         {
-            for (String error : errorSet)
-            {
-                getLog().error(error);
-            }
-            throw new MojoExecutionException("Port conflicts detected. Please see error log for details");
+            throw new MojoExecutionException(collisionCount + " port conflict" +
+                    ((collisionCount == 1) ? " was" : "s were") + " detected between the " +
+                    executions.size() + " products in the '" + testGroup + "' test group");
         }
     }
 
     /**
-     * Does the actual comparisons between two provided products and adds error messages to provided errorSet. This
-     * method also ensures that duplicates are not reported.
-     * @param port The port number being compared to the other portTypes
-     * @param portType The port type of the provided port. E.g. HTTP or AJP.
-     * @param product The first product
-     * @param product1 The second product
-     * @param errorSet The set to add error messages to
+     * Generates a {@code Stream} of {@link ConfiguredPort configured ports} for the specified {@link Product product}.
+     *
+     * @param product the product to stream configured ports for
+     * @return the configured ports for the specified product
      * @since 8.0
      */
-    private void checkPortConflicts(int port, String portType, Product product, Product product1, Set<String> errorSet)
+    private static Stream<ConfiguredPort> streamConfiguredPorts(Product product)
     {
-        portType = portType.toUpperCase();
-        if (port != 0)
+        String instanceId = product.getInstanceId();
+
+        ConfiguredPort primary;
+        if (product.isHttps())
         {
-            if (product1.isHttps() && port == product1.getHttpsPort())
-            {
-                errorSet.add(String.format("Conflict between %s port of %s and HTTPS port of %s on %d", portType, product.getInstanceId(), product1.getInstanceId(), port));
-            }
-            if (!product1.isHttps() && port == product1.getHttpPort())
-            {
-                errorSet.add(String.format("Conflict between %s port of %s and HTTP port of %s on %d", portType, product.getInstanceId(), product1.getInstanceId(), port));
-            }
-            if (port == product1.getAjpPort())
-            {
-                errorSet.add(String.format("Conflict between %s port of %s and AJP port of %s on %d", portType, product.getInstanceId(), product1.getInstanceId(), port));
-            }
-            if (port == product1.getRmiPort())
-            {
-                errorSet.add(String.format("Conflict between %s port of %s and RMI port of %s on %d", portType, product.getInstanceId(), product1.getInstanceId(), port));
-            }
-            if (!portType.equalsIgnoreCase("HTTP") && !portType.equalsIgnoreCase("HTTPS"))
-            {
-                if (port == product.getHttpsPort()) {
-                    if (!errorSet.contains(String.format("Conflict between HTTPS port of %s and %s port of %s on %d", product.getInstanceId(), portType, product.getInstanceId(), port))) {
-                        errorSet.add(String.format("Conflict between %s port of %s and HTTPS port of %s on %d", portType, product.getInstanceId(), product.getInstanceId(), port));
-                    }
-                }
-                if (port == product.getHttpPort())
-                {
-                    if (!errorSet.contains(String.format("Conflict between HTTP port of %s and %s port of %s on %d", product.getInstanceId(), portType, product.getInstanceId(), port)))
-                    {
-                        errorSet.add(String.format("Conflict between %s port of %s and HTTP port of %s on %d", portType, product.getInstanceId(), product.getInstanceId(), port));
-                    }
-                }
-            }
-            if (!portType.equalsIgnoreCase("AJP") && port == product.getAjpPort())
-            {
-                if (!errorSet.contains(String.format("Conflict between AJP port of %s and %s port of %s on %d", product.getInstanceId(), portType, product.getInstanceId(), port)))
-                {
-                    errorSet.add(String.format("Conflict between %s port of %s and AJP port of %s on %d", portType, product.getInstanceId(), product.getInstanceId(), port));
-                }
-            }
-            if (!portType.equalsIgnoreCase("RMI") && port == product.getRmiPort())
-            {
-                if (!errorSet.contains(String.format("Conflict between RMI port of %s and %s port of %s on %d", product.getInstanceId(), portType, product.getInstanceId(), port)))
-                {
-                    errorSet.add(String.format("Conflict between %s port of %s and RMI port of %s on %d", portType, product.getInstanceId(), product.getInstanceId(), port));
-                }
-            }
+            primary = new ConfiguredPort(instanceId, product.getHttpsPort(), "HTTPS");
+        }
+        else
+        {
+            primary = new ConfiguredPort(instanceId, product.getHttpPort(), "HTTP");
+        }
+
+        return Stream.of(primary,
+                new ConfiguredPort(instanceId, product.getAjpPort(), "AJP"),
+                new ConfiguredPort(instanceId, product.getRmiPort(), "RMI"));
+    }
+
+    /**
+     * Describes a configured port for a {@link Product}, detailing the instance ID as well as the port and its type.
+     * <p>
+     * This data class simplifies maintaining an instance+port+type association, which facilitates using descriptive
+     * error messages when the configured ports for two instances collide.
+     *
+     * @since 8.0
+     */
+    private static class ConfiguredPort
+    {
+        private final String instanceId;
+        private final int port;
+        private final String type;
+
+        ConfiguredPort(String instanceId, int port, String type)
+        {
+            this.instanceId = requireNonNull(instanceId, "instanceId");
+            this.port = port;
+            this.type = requireNonNull(type, "type");
+        }
+
+        boolean isStatic() {
+            return port != 0;
         }
     }
 }
