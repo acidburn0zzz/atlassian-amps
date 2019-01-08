@@ -15,8 +15,6 @@
                 <version>${project.version}</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <wait>false</wait>
-                    <writePropertiesToFile>true</writePropertiesToFile>
                     <container>tomcat85x</container>
                     <productInheritConfiguration>true</productInheritConfiguration>
                     <systemPropertyVariables>
@@ -28,7 +26,7 @@
                         <testGroup>
                             <id>foo</id>
                             <productIds>
-                                <productId>product-1</productId>
+                                <productId>${invoker.product}-1</productId>
                             </productIds>
                             <includes>
                                 <include>**/foo/**</include>
@@ -37,8 +35,8 @@
                         <testGroup>
                             <id>bar</id>
                             <productIds>
-                                <productId>product-1</productId>
-                                <productId>product-2</productId>
+                                <productId>${invoker.product}-1</productId>
+                                <productId>${invoker.product}-2</productId>
                             </productIds>
                             <includes>
                                 <include>**/bar/**</include>
@@ -48,19 +46,25 @@
                     <products>
                         <product>
                             <id>${invoker.product}</id>
-                            <instanceId>product-1</instanceId>
-                            <ajpPort>10902</ajpPort>
-                            <httpPort>10901</httpPort>
+                            <instanceId>${invoker.product}-1</instanceId>
+                            <ajpPort>10901</ajpPort>
+                            <httpPort>10900</httpPort>
                         </product>
                         <product>
                             <id>${invoker.product}</id>
-                            <instanceId>product-2</instanceId>
-                            <ajpPort>10901</ajpPort> <!-- Collides with product-1's httpPort -->
-                            <httpPort>10900</httpPort>
+                            <instanceId>${invoker.product}-2</instanceId>
+                            <ajpPort>10901</ajpPort> <!-- Collides with product-1's ajpPort -->
+                            <httpPort>10902</httpPort>
                         </product>
                     </products>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <properties>
+        <invoker.artifactId>${invoker.artifactId}</invoker.artifactId>
+        <invoker.groupId>${invoker.groupId}</invoker.groupId>
+        <invoker.product>${invoker.product}</invoker.product>
+    </properties>
 </project>

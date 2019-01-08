@@ -46,12 +46,13 @@
                 <product.database.type>no-database-type</product.database.type>
                 <tests>
                     amps1211, amps1454,
-                    compressResources, compressResourcesWithClosureOptionLanguageIn, compressResourcesWithIncludeParam, copyBundledDependencies, create, debug, debugWithTestGroup,
+                    compressResources, compressResourcesWithClosureOptionLanguageIn, compressResourcesWithIncludeParam,
+                    copyBundledDependencies, create, debug, debugWithPortConflict, debugWithTestGroup,
                     filterPluginDescriptorWithoutPluginDescriptor, filterPluginDescriptorWithPluginDescriptor,
                     generateManifestWithInstructions, generateManifestWithNoInstructions,
-                    generateObr, integrationTest,
-                    integrationTestWithTestGroup, jarWithExistingManifest, preIntegrationTest, quickreload,
-                    run, runParallel, runWithTestGroup, runWithPortConflict, unitTest, validateManifestSkipValidation,
+                    generateObr, integration, integrationTestWithPortConflict,
+                    integrationTestWithTestGroup, jarWithExistingManifest, preIntegration, quickreload,
+                    run, runParallel, runWithPortConflict, runWithTestGroup, unit, validateManifestSkipValidation,
                     validateManifestWithInvalidManifest, validateManifestWithValidManifest
                 </tests>
             </properties>

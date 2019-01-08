@@ -1,11 +1,15 @@
 package com.atlassian.maven.plugins.amps;
 
+import com.atlassian.maven.plugins.amps.product.ProductHandler;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static org.mockito.Mockito.mock;
 
 public class TestAbstractTestGroupsHandlerMojo
 {
@@ -33,15 +37,26 @@ public class TestAbstractTestGroupsHandlerMojo
         product2.setAjpPort(7301);
         product2.setRmiPort(7302);
 
-        AbstractTestGroupsHandlerMojo testGroupsHandlerMojo = Mockito.spy(AbstractTestGroupsHandlerMojo.class);
-        List<Product> products = Arrays.asList(product, product1, product2);
-        testGroupsHandlerMojo.products = products;
         //No conflicts should be detected
-        testGroupsHandlerMojo.validatePortConfiguration();
+        runValidationTest(product, product1, product2);
+    }
+
+    @Test(expected = MojoExecutionException.class)
+    public void testValidatePortConfigurationCatchesConflictsWithinSameProduct() throws MojoExecutionException
+    {
+        Product product = new Product();
+        product.setInstanceId("testProduct");
+        product.setUseHttps(false);
+        product.setHttpPort(7100);
+        product.setAjpPort(7100);
+        product.setRmiPort(7100);
+
+        //The AJP and RMI ports conflict with the HTTP port
+        runValidationTest(product);
     }
 
     @Test
-    public void testValidatePortConfigurationPreventHttpAndHttpsConflictWhenNotUsed() throws MojoExecutionException
+    public void testValidatePortConfigurationIgnoresHttpAndHttpsConflictWhenNotUsed() throws MojoExecutionException
     {
         Product product = new Product();
         product.setInstanceId("testProduct");
@@ -54,11 +69,8 @@ public class TestAbstractTestGroupsHandlerMojo
         product1.setHttpsPort(7000);
         product1.setHttpPort(7100);
 
-        AbstractTestGroupsHandlerMojo testGroupsHandlerMojo = Mockito.spy(AbstractTestGroupsHandlerMojo.class);
-        List<Product> products = Arrays.asList(product, product1);
-        testGroupsHandlerMojo.products = products;
         //Should not detect a conflict as http port of testProduct1 is not used
-        testGroupsHandlerMojo.validatePortConfiguration();
+        runValidationTest(product, product1);
     }
 
 
@@ -86,10 +98,22 @@ public class TestAbstractTestGroupsHandlerMojo
         product2.setAjpPort(7301);
         product2.setRmiPort(7302);
 
-        AbstractTestGroupsHandlerMojo testGroupsHandlerMojo = Mockito.spy(AbstractTestGroupsHandlerMojo.class);
-        List<Product> products = Arrays.asList(product, product1, product2);
-        testGroupsHandlerMojo.products = products;
         //Should detect and print errors for all conflicts before throwing an exception
-        testGroupsHandlerMojo.validatePortConfiguration();
+        runValidationTest(product, product1, product2);
+    }
+
+    private static List<ProductExecution> executionsFor(Product[] products)
+    {
+        ProductHandler productHandler = mock(ProductHandler.class);
+
+        return Stream.of(products)
+                .map(product -> new ProductExecution(product, productHandler))
+                .collect(toList());
+    }
+
+    private void runValidationTest(Product... products) throws MojoExecutionException
+    {
+        AbstractTestGroupsHandlerMojo testGroupsHandlerMojo = Mockito.spy(AbstractTestGroupsHandlerMojo.class);
+        testGroupsHandlerMojo.validatePortConfiguration(executionsFor(products));
     }
 }
