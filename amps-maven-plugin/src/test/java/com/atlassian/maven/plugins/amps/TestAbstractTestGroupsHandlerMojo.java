@@ -2,7 +2,9 @@ package com.atlassian.maven.plugins.amps;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
 import java.util.List;
@@ -13,6 +15,10 @@ import static org.mockito.Mockito.mock;
 
 public class TestAbstractTestGroupsHandlerMojo
 {
+
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
+
     @Test
     public void testValidatePortConfigurationPass() throws MojoExecutionException
     {
@@ -41,7 +47,7 @@ public class TestAbstractTestGroupsHandlerMojo
         runValidationTest(product, product1, product2);
     }
 
-    @Test(expected = MojoExecutionException.class)
+    @Test
     public void testValidatePortConfigurationCatchesConflictsWithinSameProduct() throws MojoExecutionException
     {
         Product product = new Product();
@@ -50,6 +56,9 @@ public class TestAbstractTestGroupsHandlerMojo
         product.setHttpPort(7100);
         product.setAjpPort(7100);
         product.setRmiPort(7100);
+
+        expectedEx.expect(MojoExecutionException.class);
+        expectedEx.expectMessage("2 port conflicts were detected between the 1 products");
 
         //The AJP and RMI ports conflict with the HTTP port
         runValidationTest(product);
@@ -74,7 +83,7 @@ public class TestAbstractTestGroupsHandlerMojo
     }
 
 
-    @Test(expected = MojoExecutionException.class)
+    @Test
     public void testValidatePortConfigurationDetectConflicts() throws MojoExecutionException
     {
         Product product = new Product();
@@ -98,11 +107,14 @@ public class TestAbstractTestGroupsHandlerMojo
         product2.setAjpPort(7301);
         product2.setRmiPort(7302);
 
+        expectedEx.expect(MojoExecutionException.class);
+        expectedEx.expectMessage("5 port conflicts were detected between the 3 products");
+
         //Should detect and print errors for all conflicts before throwing an exception
         runValidationTest(product, product1, product2);
     }
 
-    private static List<ProductExecution> executionsFor(Product[] products)
+    private static List<ProductExecution> executionsFor(Product... products)
     {
         ProductHandler productHandler = mock(ProductHandler.class);
 

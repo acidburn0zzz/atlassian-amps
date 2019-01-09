@@ -5,7 +5,8 @@
     <artifactId>amps-maven-plugin-run</artifactId>
     <packaging>atlassian-plugin</packaging>
     <version>testing</version>
-    <name>TestRun</name>
+    <name>TestRunWithPortConflictTest</name>
+    <description>This pom is responsible for ensuring that port conflict checking takes place for the run mojo</description>
 
     <build>
         <plugins>
