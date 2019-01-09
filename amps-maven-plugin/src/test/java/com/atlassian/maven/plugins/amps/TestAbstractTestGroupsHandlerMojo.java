@@ -15,9 +15,8 @@ import static org.mockito.Mockito.mock;
 
 public class TestAbstractTestGroupsHandlerMojo
 {
-
     @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
+    public final ExpectedException expectedEx = ExpectedException.none();
 
     @Test
     public void testValidatePortConfigurationPass() throws MojoExecutionException
