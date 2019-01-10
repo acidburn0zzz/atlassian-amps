@@ -973,15 +973,6 @@ public class MavenGoals
                      .toArray(Element[]::new);
     }
 
-    private Plugin bndPlugin()
-    {
-        log.info("using maven-bundle-plugin v" + pluginArtifactIdToVersionMap.get("maven-bundle-plugin"));
-        return plugin(
-                groupId("org.apache.felix"),
-                artifactId("maven-bundle-plugin"),
-                version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin")));
-    }
-
     /**
      * Wrap execute Mojo function for temporary removing global Cargo configuration
      * before starting AMPS internal Cargo
@@ -1627,7 +1618,11 @@ public class MavenGoals
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
         executeMojo(
-                bndPlugin(),
+                plugin(
+                        groupId("org.apache.felix"),
+                        artifactId("maven-bundle-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
+                ),
                 goal("manifest"),
                 configuration(
                         element(name("supportedProjectTypes"),
@@ -1659,7 +1654,11 @@ public class MavenGoals
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
         executeMojo(
-                bndPlugin(),
+                plugin(
+                        groupId("org.apache.felix"),
+                        artifactId("maven-bundle-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
+                ),
                 goal("manifest"),
                 configuration(
                         element(name("manifestLocation"),"${project.build.testOutputDirectory}/META-INF"),
@@ -1783,7 +1782,11 @@ public class MavenGoals
     public void generateObrXml(File dep, File obrXml) throws MojoExecutionException
     {
         executeMojo(
-                bndPlugin(),
+                plugin(
+                        groupId("org.apache.felix"),
+                        artifactId("maven-bundle-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-bundle-plugin"))
+                ),
                 goal("install-file"),
                 configuration(
                         element(name("obrRepository"), obrXml.getPath()),
