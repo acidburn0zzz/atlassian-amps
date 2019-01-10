@@ -45,7 +45,6 @@
                 <product.data.version>${refapp.data.version}</product.data.version>
                 <product.database.type>no-database-type</product.database.type>
                 <tests>
-                    amps1211,
                     cli, compressResources, compressResourcesWithClosureOptionLanguageIn, compressResourcesWithIncludeParam, copyBundledDependencies, create, debug, debugWithTestGroup,
                     filterPluginDescriptorWithoutPluginDescriptor, filterPluginDescriptorWithPluginDescriptor,
                     generateManifestWithInstructions, generateManifestWithNoInstructions,
