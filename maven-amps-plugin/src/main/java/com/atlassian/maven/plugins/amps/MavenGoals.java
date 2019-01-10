@@ -127,7 +127,7 @@ public class MavenGoals
                 put("org.codehaus.cargo:cargo-maven2-plugin", overrides.getProperty("org.codehaus.cargo:cargo-maven2-plugin","1.6.10"));
                 put("atlassian-pdk", overrides.getProperty("atlassian-pdk","2.3.3"));
                 put("maven-archetype-plugin", overrides.getProperty("maven-archetype-plugin","2.0-alpha-4"));
-                put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","3.5.0"));
+                put("maven-bundle-plugin", overrides.getProperty("maven-bundle-plugin","2.5.3"));
                 put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.3.0"));
                 put("build-helper-maven-plugin", overrides.getProperty("build-helper-maven-plugin","1.7"));
                 put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.3"));
