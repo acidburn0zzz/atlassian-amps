@@ -1,5 +1,0 @@
--Dproduct.version=${product.version}
--Dproduct.data.version=${product.data.version}
--DskipAllPrompts=true
-${invoker.product}:copy-bundled-dependencies
-${invoker.product}:generate-manifest
