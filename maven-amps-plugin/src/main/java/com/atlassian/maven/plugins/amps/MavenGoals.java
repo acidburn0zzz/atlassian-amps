@@ -96,9 +96,10 @@ public class MavenGoals
             put("tomcat6x", new Container("tomcat6x", "org.apache.tomcat", "apache-tomcat", "6.0.41"));
             put("tomcat7x", new Container("tomcat7x", "org.apache.tomcat", "apache-tomcat", "7.0.52", "windows-x64"));
             put("tomcat8x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.0.48-atlassian-hosted", "windows-x64"));
-            put("tomcat85x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.32-atlassian-hosted", "windows-x64"));
+            put("tomcat85x", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.35-atlassian-hosted", "windows-x64"));
             put("tomcat85_6", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.6-atlassian-hosted", "windows-x64"));
             put("tomcat85_29", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.29-atlassian-hosted", "windows-x64"));
+            put("tomcat85_32", new Container("tomcat8x", "org.apache.tomcat", "apache-tomcat", "8.5.32-atlassian-hosted", "windows-x64"));
             put("tomcat9x", new Container("tomcat9x", "org.apache.tomcat", "apache-tomcat", "9.0.11-atlassian-hosted", "windows-x64"));
             put("resin3x", new Container("resin3x", "com.caucho", "resin", "3.0.26"));
             put("jboss42x", new Container("jboss42x", "org.jboss.jbossas", "jbossas", "4.2.3.GA"));
