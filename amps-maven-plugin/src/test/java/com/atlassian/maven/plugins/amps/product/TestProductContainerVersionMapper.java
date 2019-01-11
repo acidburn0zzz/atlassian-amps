@@ -44,6 +44,16 @@ public class TestProductContainerVersionMapper
         assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.6.0"), is("tomcat85_29"));
         assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.12.3"), is("tomcat85_32"));
         assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.13.2"), is("tomcat85x"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.12.3"), is("tomcat85_32"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.13.2"), is("tomcat85x"));
+    }
+
+    @Test
+    public void testStashVersionMapping()
+    {
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("stash", "1"), is("tomcat6x"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("stash", "2"), is("tomcat7x"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("stash", "3.3"), is("tomcat8x"));
     }
 
     @Test
