@@ -1,6 +1,7 @@
 package com.atlassian.maven.plugins.amps;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandler;
+import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -24,6 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+
+import static com.atlassian.maven.plugins.amps.util.FecruFullVersionGetter.generateFullVersionMessage;
+import static com.atlassian.maven.plugins.amps.util.FecruFullVersionGetter.generateNoVersionMessage;
+import static com.atlassian.maven.plugins.amps.util.FecruFullVersionGetter.getFullVersion;
 
 /**
  * Run the webapp
@@ -81,11 +87,16 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
 
         final List<ProductExecution> productExecutions = getProductExecutions();
 
-        startProducts(productExecutions);
+        try {
+            startProducts(productExecutions);
+        }
+        catch (Exception e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+
     }
 
-    protected void startProducts(List<ProductExecution> productExecutions) throws MojoExecutionException
-    {
+    protected void startProducts(List<ProductExecution> productExecutions) throws MojoExecutionException, IOException {
         if (wait)
         {
             getLog().debug("=======> ADDING SHUTDOWN HOOK\n");
@@ -109,6 +120,18 @@ public class RunMojo extends AbstractTestGroupsHandlerMojo
         {
             final ProductHandler productHandler = productExecution.getProductHandler();
             final Product product = productExecution.getProduct();
+
+            if (product.getInstanceId().equals(ProductHandlerFactory.FECRU) && product.getVersion() != "LATEST" && !Pattern.matches(".*[0-9]{14}$", product.getVersion()))
+            {
+                String fullProductVersionMessage = getFullVersion(product.getVersion())
+                        .map((version) -> generateFullVersionMessage(product.getVersion(), version))
+                        .orElseGet(() -> generateNoVersionMessage(product.getVersion()));
+                getLog().error("=======================================================================");
+                getLog().error(fullProductVersionMessage);
+                getLog().error("=======================================================================");
+                System.exit(1);
+            }
+
             if (product.isInstallPlugin() == null)
             {
                 product.setInstallPlugin(shouldInstallPlugin());

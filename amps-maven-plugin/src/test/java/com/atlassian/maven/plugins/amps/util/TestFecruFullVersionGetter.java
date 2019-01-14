@@ -1,25 +1,18 @@
-package com.atlassian.maven.plugins.amps;
+package com.atlassian.maven.plugins.amps.util;
 
-import org.junit.Before;
 import org.junit.Test;
 import java.io.IOException;
 import java.util.Optional;
+
+import static com.atlassian.maven.plugins.amps.util.FecruFullVersionGetter.getFullVersion;
 import static org.junit.Assert.assertEquals;
 
 public class TestFecruFullVersionGetter
 {
-
-    RunStandaloneMojo rsm;
-
-    @Before
-    public void setUp() {
-        rsm = new RunStandaloneMojo();
-    }
-
     @Test
     public void TestInvalidVersion() {
         try {
-            assertEquals(Optional.empty(),rsm.getFullVersion("4.2"));
+            assertEquals(Optional.empty(),getFullVersion("4.2"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -28,7 +21,7 @@ public class TestFecruFullVersionGetter
     @Test
     public void TestValidShortVersion() {
         try {
-            assertEquals("4.2.0-20160928073034",rsm.getFullVersion("4.2.0").orElse("failed to find"));
+            assertEquals("4.2.0-20160928073034",getFullVersion("4.2.0").orElse("failed to find"));
         } catch (IOException e) {
             e.printStackTrace();
         }

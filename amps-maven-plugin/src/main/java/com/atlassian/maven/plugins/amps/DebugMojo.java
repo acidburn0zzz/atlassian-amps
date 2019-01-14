@@ -83,6 +83,11 @@ public class DebugMojo extends RunMojo
             }
         }
 
-        startProducts(productExecutions);
+        try {
+            startProducts(productExecutions);
+        }
+        catch (Exception e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
     }
 }
