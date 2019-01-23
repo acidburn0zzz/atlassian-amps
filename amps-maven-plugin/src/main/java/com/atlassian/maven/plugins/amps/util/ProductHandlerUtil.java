@@ -60,6 +60,39 @@ public final class ProductHandlerUtil
     }
 
     /**
+     * Tests to check if a port is available. If a {@code bindAddress} is provided, the
+     * selected port will be verified against that interface.
+     *
+     * @param requestedPort the port to check
+     * @param bindAddress the local address to bind to, which may be {@code null} to bind to any interface
+     * @return A boolean indicating if the port is free
+     * @since 8.0
+     */
+    public static boolean isPortFree(final int requestedPort, @Nullable final InetAddress bindAddress)
+    {
+        try (final ServerSocket socket = new ServerSocket(requestedPort, 1, bindAddress))
+        {
+            return true;
+        }
+        catch (final IOException e)
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Tests to check if a port is available.
+     *
+     * @param requestedPort the port to check
+     * @return A boolean indicating if the port is free
+     * @since 8.0
+     */
+    public static boolean isPortFree(final int requestedPort)
+    {
+        return isPortFree(requestedPort, null);
+    }
+
+    /**
      * Picks a free port, preferring the requested port if it's available. If a {@code bindAddress} is provided, the
      * selected port will be verified against that interface.
      * <p>

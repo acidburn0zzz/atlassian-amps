@@ -67,6 +67,7 @@ import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
+import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.isPortFree;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -872,46 +873,54 @@ public class MavenGoals
             protocol = "http";
         }
 
-        final int actualHttpPort = pickFreePort(httpPort);
-        if (actualHttpPort != httpPort)
+        final int actualHttpPort;
+        if (httpPort == 0)
         {
-            if (httpPort != 0)
+            actualHttpPort = pickFreePort(httpPort);
+        }
+        else
+        {
+            actualHttpPort = httpPort;
+            if (!isPortFree(actualHttpPort))
             {
-                log.warn(productInstanceId + " will start " + protocol + " on port " +
-                    actualHttpPort + " because the configured port, " + httpPort + ", is already in use");
-            }
-
-            // Update the Product to match the port that will actually be used
-            if (webappContext.isHttps())
-            {
-                webappContext.setHttpsPort(actualHttpPort);
-            }
-            else
-            {
-                webappContext.setHttpPort(actualHttpPort);
+                final String httpErrorMessage = String.format("%s: The configured HTTP port, %d, is in use", productInstanceId, httpPort);
+                log.error(httpErrorMessage);
+                throw new MojoExecutionException(httpErrorMessage);
             }
         }
 
         final int rmiPort = webappContext.getRmiPort();
-        final int actualRmiPort = pickFreePort(rmiPort);
-        if (actualRmiPort != rmiPort){
-            if (rmiPort != 0)
+        final int actualRmiPort;
+        if (rmiPort == 0)
+        {
+            actualRmiPort = pickFreePort(rmiPort);
+        }
+        else
+        {
+            actualRmiPort = rmiPort;
+            if (!isPortFree(actualRmiPort))
             {
-                log.warn(productInstanceId + " will start RMI on port " + actualRmiPort +
-                    " because the configured port, " + rmiPort + ", is already in use");
+                final String rmiErrorMessage = String.format("%s: The configured RMI port, %d, is in use", productInstanceId, rmiPort);
+                log.error(rmiErrorMessage);
+                throw new MojoExecutionException(rmiErrorMessage);
             }
-            webappContext.setRmiPort(actualRmiPort);
         }
 
         final int ajpPort = webappContext.getAjpPort();
-        final int actualAjpPort = pickFreePort(ajpPort);
-        if (actualAjpPort != ajpPort){
-            if (ajpPort != 0)
+        final int actualAjpPort;
+        if (ajpPort == 0)
+        {
+            actualAjpPort = pickFreePort(ajpPort);
+        }
+        else
+        {
+            actualAjpPort = ajpPort;
+            if (!isPortFree(actualAjpPort))
             {
-                log.warn(productInstanceId + " will start RMI on port " + actualRmiPort +
-                        " because the configured port, " + rmiPort + ", is already in use");
+                final String ajpErrorMessage = String.format("%s: The configured AJP port, %d, is in use", productInstanceId, ajpPort);
+                log.error(ajpErrorMessage);
+                throw new MojoExecutionException(ajpErrorMessage);
             }
-            webappContext.setAjpPort(actualAjpPort);
         }
 
         final List<Element> sysProps = new ArrayList<>();

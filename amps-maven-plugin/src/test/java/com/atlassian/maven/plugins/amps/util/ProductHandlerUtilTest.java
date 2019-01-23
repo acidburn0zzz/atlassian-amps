@@ -16,11 +16,46 @@ import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.toArtifac
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
 
 public class ProductHandlerUtilTest
 {
+
+    @Test
+    public void testIsPortFree() throws IOException
+    {
+        try (final ServerSocket ignored = new ServerSocket(16829))
+        {
+            //Ensure not free
+            assertFalse(ProductHandlerUtil.isPortFree(16829));
+
+            //Ensure free
+            assertTrue(ProductHandlerUtil.isPortFree(16828));
+        }
+    }
+
+    @Test
+    public void testIsPortFreeWithBindAddress() throws Exception
+    {
+        // Even on IPv6-enabled systems, use the IPv4 loopback address
+        InetAddress loopback = InetAddress.getByAddress("localhost", new byte[]{0x7f,0x00,0x00,0x01});
+
+        InetAddress other = getRandomAddress();
+        assumeFalse("Could not find a non-loopback address to test with", other == null);
+
+        try (final ServerSocket ignored = new ServerSocket(16829, 1, loopback))
+        {
+            //Check taken port
+            assertFalse(ProductHandlerUtil.isPortFree(16829, loopback));
+
+            //Check taken, but on a different interface
+            assertTrue(ProductHandlerUtil.isPortFree(16829, other));
+        }
+
+    }
+
     @Test
     public void testPickFreePort() throws IOException
     {

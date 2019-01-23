@@ -1,0 +1,75 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.atlassian.amps.it</groupId>
+    <artifactId>amps-maven-plugin-run</artifactId>
+    <packaging>atlassian-plugin</packaging>
+    <version>testing</version>
+    <name>TestDebugWithPortConflictTest</name>
+    <description>This pom is responsible for ensuring that port conflict checking takes place for the debug mojo</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>${invoker.groupId}</groupId>
+                <artifactId>${invoker.artifactId}</artifactId>
+                <version>${project.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <wait>false</wait>
+                    <writePropertiesToFile>true</writePropertiesToFile>
+                    <productInheritConfiguration>true</productInheritConfiguration>
+                    <systemPropertyVariables>
+                        <invoker.artifactId>${invoker.artifactId}</invoker.artifactId>
+                        <invoker.groupId>${invoker.groupId}</invoker.groupId>
+                        <invoker.product>${invoker.product}</invoker.product>
+                    </systemPropertyVariables>
+                    <testGroups>
+                        <testGroup>
+                            <id>foo</id>
+                            <productIds>
+                                <productId>product-1</productId>
+                            </productIds>
+                            <includes>
+                                <include>**/foo/**</include>
+                            </includes>
+                        </testGroup>
+                        <testGroup>
+                            <id>bar</id>
+                            <productIds>
+                                <productId>product-1</productId>
+                                <productId>product-2</productId>
+                                <productId>product-3</productId>
+                            </productIds>
+                            <includes>
+                                <include>**/bar/**</include>
+                            </includes>
+                        </testGroup>
+                    </testGroups>
+                    <products>
+                        <product>
+                            <id>${invoker.product}</id>
+                            <instanceId>product-1</instanceId>
+                            <ajpPort>10901</ajpPort>
+                            <httpPort>10900</httpPort>
+                        </product>
+                        <product>
+                            <id>${invoker.product}</id>
+                            <instanceId>product-2</instanceId>
+                            <ajpPort>10901</ajpPort> <!-- Collides with product-1's ajpPort -->
+                            <httpPort>10900</httpPort> <!-- Collides with product-1's httpPort -->
+                            <jvmDebugPort>9988</jvmDebugPort>
+                        </product>
+                        <product>
+                            <id>${invoker.product}</id>
+                            <instanceId>product-3</instanceId>
+                            <ajpPort>10900</ajpPort> <!-- Collides with product-1's httpPort -->
+                            <httpPort>10901</httpPort> <!-- Collides with product-1's ajpPort -->
+                            <jvmDebugPort>9999</jvmDebugPort>
+                        </product>
+                    </products>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
