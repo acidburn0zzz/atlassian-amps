@@ -7,6 +7,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -24,6 +25,7 @@ import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ import java.util.jar.Manifest;
 
 import static com.atlassian.maven.plugins.amps.MavenGoals.AJP_PORT_PROPERTY;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
+import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
@@ -214,6 +217,111 @@ public class TestMavenGoals
         temp.deleteOnExit();
     }
 
+    /**
+     * Tests that the application fails to start when a HTTP port is taken.
+     * @throws Exception
+     */
+    @Test(expected = MojoExecutionException.class)
+    public void testShouldFailWhenHttpPortTakenWhenStartWebapp() throws Exception
+    {
+        mockBuildPluginManager();
+        final File war = mock(File.class);
+
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+        when(product.isHttps()).thenReturn(false);
+
+        try (final ServerSocket serverSocket = new ServerSocket(0))
+        {
+            when(product.getHttpPort()).thenReturn(serverSocket.getLocalPort());
+            goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
+        }
+    }
+
+    /**
+     * Tests that the application fails to start when a HTTPS port is taken.
+     * @throws Exception
+     */
+    @Test(expected = MojoExecutionException.class)
+    public void testShouldFailWhenHttpsPortTakenWhenStartWebapp() throws Exception
+    {
+        mockBuildPluginManager();
+        final File war = mock(File.class);
+
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+        when(product.isHttps()).thenReturn(true);
+
+        try (final ServerSocket serverSocket = new ServerSocket(0))
+        {
+            when(product.getHttpsPort()).thenReturn(serverSocket.getLocalPort());
+            goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
+        }
+    }
+
+    /**
+     * Tests that the application fails to start when a RMI port is taken.
+     * @throws Exception
+     */
+    @Test(expected = MojoExecutionException.class)
+    public void testShouldFailWhenRmiPortTakenWhenStartWebapp() throws Exception
+    {
+        mockBuildPluginManager();
+        final File war = mock(File.class);
+
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+
+        try (final ServerSocket serverSocket = new ServerSocket(0))
+        {
+            when(product.getRmiPort()).thenReturn(serverSocket.getLocalPort());
+            goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
+        }
+    }
+
+    /**
+     * Tests that the application fails to start when a AJP port is taken.
+     * @throws Exception
+     */
+    @Test(expected = MojoExecutionException.class)
+    public void testShouldFailWhenAjpPortTakenWhenStartWebapp() throws Exception
+    {
+        mockBuildPluginManager();
+        final File war = mock(File.class);
+
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+
+        try (final ServerSocket serverSocket = new ServerSocket(0))
+        {
+            when(product.getAjpPort()).thenReturn(serverSocket.getLocalPort());
+            goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
+        }
+    }
+
+    /**
+     * Tests that the application starts when the specified ports are available.
+     * @throws Exception
+     */
+    @Test
+    public void testShouldStartWhenHttpPortNotTakenWhenStartWebapp() throws Exception
+    {
+        mockBuildPluginManager();
+        final File war = mock(File.class);
+        when(war.getPath()).thenReturn("/");
+
+        when(ctx.getExecutionEnvironment()).thenReturn(executionEnvironment);
+        when(product.getContainerId()).thenReturn("tomcat8x");
+        when(product.getServer()).thenReturn("server");
+        when(product.getContextPath()).thenReturn("/context");
+
+        final int freeHttpPort = pickFreePort(0);
+        when(product.getHttpPort()).thenReturn(freeHttpPort);
+
+        int httpPort = goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
+        assertEquals(httpPort, freeHttpPort);
+    }
+
     @Test
     public void testShouldUseHttpPortsConfiguredFromProductWhenStartWebapp() throws Exception
     {
@@ -226,7 +334,6 @@ public class TestMavenGoals
         when(product.getContainerId()).thenReturn("tomcat8x");
         when(product.getServer()).thenReturn("server");
         when(product.getContextPath()).thenReturn("/context");
-        when(product.isHttps()).thenReturn(false);
 
         goals.startWebapp("", war, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), product);
 

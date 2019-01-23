@@ -1,0 +1,67 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.atlassian.amps.it</groupId>
+    <artifactId>amps-maven-plugin-run</artifactId>
+    <packaging>atlassian-plugin</packaging>
+    <version>testing</version>
+    <name>TestRunWithPortConflictTest</name>
+    <description>This pom is responsible for ensuring that port conflict checking takes place for the run mojo</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>${invoker.groupId}</groupId>
+                <artifactId>${invoker.artifactId}</artifactId>
+                <version>${project.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <wait>false</wait>
+                    <writePropertiesToFile>true</writePropertiesToFile>
+                    <container>tomcat85x</container>
+                    <productInheritConfiguration>true</productInheritConfiguration>
+                    <systemPropertyVariables>
+                        <invoker.artifactId>${invoker.artifactId}</invoker.artifactId>
+                        <invoker.groupId>${invoker.groupId}</invoker.groupId>
+                        <invoker.product>${invoker.product}</invoker.product>
+                    </systemPropertyVariables>
+                    <testGroups>
+                        <testGroup>
+                            <id>foo</id>
+                            <productIds>
+                                <productId>product-1</productId>
+                            </productIds>
+                            <includes>
+                                <include>**/foo/**</include>
+                            </includes>
+                        </testGroup>
+                        <testGroup>
+                            <id>bar</id>
+                            <productIds>
+                                <productId>product-1</productId>
+                                <productId>product-2</productId>
+                            </productIds>
+                            <includes>
+                                <include>**/bar/**</include>
+                            </includes>
+                        </testGroup>
+                    </testGroups>
+                    <products>
+                        <product>
+                            <id>${invoker.product}</id>
+                            <instanceId>product-1</instanceId>
+                            <ajpPort>10902</ajpPort>
+                            <httpPort>10901</httpPort>
+                        </product>
+                        <product>
+                            <id>${invoker.product}</id>
+                            <instanceId>product-2</instanceId>
+                            <ajpPort>10901</ajpPort> <!-- Collides with product-1's httpPort -->
+                            <httpPort>10900</httpPort>
+                        </product>
+                    </products>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
