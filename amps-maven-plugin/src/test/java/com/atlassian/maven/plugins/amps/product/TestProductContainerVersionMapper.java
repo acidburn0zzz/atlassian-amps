@@ -49,14 +49,6 @@ public class TestProductContainerVersionMapper
     }
 
     @Test
-    public void testStashVersionMapping()
-    {
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("stash", "1"), is("tomcat6x"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("stash", "2"), is("tomcat7x"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("stash", "3.3"), is("tomcat8x"));
-    }
-
-    @Test
     public void testBitbucketVersionMapping()
     {
         assertThat(ProductContainerVersionMapper.containerForProductVersion("bitbucket", "1"), is("tomcat8x"));
