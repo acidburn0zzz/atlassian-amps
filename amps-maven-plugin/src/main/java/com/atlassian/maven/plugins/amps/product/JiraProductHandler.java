@@ -11,6 +11,7 @@ import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -163,7 +164,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     @Override
     protected Collection<String> getExtraJarsToSkipWhenScanningForTldsAndWebFragments() {
         // Fixes AMPS-1429 by skipping these JARs
-        return Arrays.asList("jotm*.jar", "xapool*.jar");
+        return ImmutableList.of("jotm*.jar", "xapool*.jar");
     }
 
     @Override
