@@ -1003,7 +1003,7 @@ public class MavenGoals
     }
 
     // See https://codehaus-cargo.github.io/cargo/Configuration+files+option.html
-    private Element[] getExtraContainerConfigurationFiles() {
+    private Element[] getExtraContainerConfigurationFiles() throws MojoExecutionException {
         return new Element[] {
                 // For AMPS-1429, apply a custom context.xml with a correctly configured JarScanFilter
                 element("configfile",
@@ -1020,7 +1020,7 @@ public class MavenGoals
      *
      * @return an extant file
      */
-    private File getContextXml() {
+    private File getContextXml() throws MojoExecutionException {
         try {
             // Because Cargo needs an absolute file path, we copy context.xml from the AMPS JAR to a temp file
             final File tempContextXml = createTempFile("context.xml", null);
@@ -1028,7 +1028,7 @@ public class MavenGoals
             copyInputStreamToFile(contextXmlToCopy, tempContextXml);
             return tempContextXml;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new MojoExecutionException("Failed to create Tomcat context.xml", e);
         }
     }
 
