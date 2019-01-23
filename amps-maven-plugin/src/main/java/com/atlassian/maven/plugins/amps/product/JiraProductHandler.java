@@ -11,6 +11,7 @@ import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -25,6 +26,7 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -156,6 +158,13 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     public String getDefaultContainerId()
     {
         return "tomcat7x";
+    }
+
+    @Nonnull
+    @Override
+    protected Collection<String> getExtraJarsToSkipWhenScanningForTldsAndWebFragments() {
+        // Fixes AMPS-1429 by skipping these JARs
+        return ImmutableList.of("jotm*.jar", "xapool*.jar");
     }
 
     @Override

@@ -66,8 +66,11 @@ import java.util.regex.Matcher;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.getJiraDatabaseFactory;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
-import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.isPortFree;
+import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
+import static java.io.File.createTempFile;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -981,6 +984,7 @@ public class MavenGoals
                                 element(name("timeout"), String.valueOf(startupTimeout))
                         ),
                         element(name("configuration"), removeNullElements(
+                                    element(name("configfiles"), getExtraContainerConfigurationFiles()),
                                     element(name("home"), container.getConfigDirectory(getBuildDirectory(), productInstanceId)),
                                     element(name("type"), "standalone"),
                                     element(name("properties"), props.toArray(new Element[0])),
@@ -996,6 +1000,36 @@ public class MavenGoals
                 executionEnvironment()
         );
         return actualHttpPort;
+    }
+
+    // See https://codehaus-cargo.github.io/cargo/Configuration+files+option.html
+    private Element[] getExtraContainerConfigurationFiles() throws MojoExecutionException {
+        return new Element[] {
+                // For AMPS-1429, apply a custom context.xml with a correctly configured JarScanFilter
+                element("configfile",
+                        element("file", getContextXml().getAbsolutePath()),
+                        element("todir", "conf"),
+                        element("tofile", "context.xml"),
+                        element("configfile", "true")
+                )
+        };
+    }
+
+    /**
+     * Returns the <code>context.xml</code> file to be copied into the Tomcat instance.
+     *
+     * @return an extant file
+     */
+    private File getContextXml() throws MojoExecutionException {
+        try {
+            // Because Cargo needs an absolute file path, we copy context.xml from the AMPS JAR to a temp file
+            final File tempContextXml = createTempFile("context.xml", null);
+            final InputStream contextXmlToCopy = requireNonNull(getClass().getResourceAsStream("context.xml"));
+            copyInputStreamToFile(contextXmlToCopy, tempContextXml);
+            return tempContextXml;
+        } catch (IOException e) {
+            throw new MojoExecutionException("Failed to create Tomcat context.xml", e);
+        }
     }
 
     private List<Element> extractDependencies(final List<ProductArtifact> extraContainerDependencies, final Product webappContext) throws MojoExecutionException {

@@ -6,12 +6,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
@@ -39,10 +40,14 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
+import javax.annotation.Nonnull;
+
 import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.JIRA;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.doesFileNameMatchArtifact;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
 import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
+import static java.lang.String.join;
+import static java.util.Collections.emptyList;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.iterateFiles;
 import static org.apache.commons.io.FileUtils.moveDirectory;
@@ -361,7 +366,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
     abstract protected File getUserInstalledPluginsDirectory(Product product, File webappDir, File homeDir);
 
     protected List<ProductArtifact> getAdditionalPlugins(Product ctx) throws MojoExecutionException {
-        return Collections.emptyList();
+        return emptyList();
     }
 
     protected String getLog4jPropertiesPath()
@@ -502,6 +507,9 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         // Start from the base properties
         final Map<String, String> properties = new HashMap<>(getSystemProperties(ctx));
 
+        // Set the JARs to be skipped when scanning for TLDs and web fragments (read from context.xml by Tomcat)
+        properties.put("jarsToSkip", getJarsToSkipWhenScanningForTldsAndWebFragments());
+
         // Enter the System Property Variables from product context, overwriting duplicates
         ctx.getSystemPropertyVariables().forEach((key, value) -> properties.put(key, (String) value));
 
@@ -512,6 +520,22 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
         return properties;
     }
 
+    private String getJarsToSkipWhenScanningForTldsAndWebFragments() {
+        final Set<String> jarsToSkip = new HashSet<>();
+        jarsToSkip.add("${tomcat.util.scan.StandardJarScanFilter.jarsToSkip}");  // the Tomcat default
+        jarsToSkip.addAll(getExtraJarsToSkipWhenScanningForTldsAndWebFragments());
+        return join(",", jarsToSkip);
+    }
+
+    /**
+     * Products should override this method in order to avoid scanning JARs known not to contain TLDs or web fragments.
+     *
+     * @return a list of any extra JAR name patterns to skip, e.g. "foo*.jar"
+     */
+    @Nonnull
+    protected Collection<String> getExtraJarsToSkipWhenScanningForTldsAndWebFragments() {
+        return emptyList();
+    }
 
     /**
      * System properties which are specific to the Product Handler
