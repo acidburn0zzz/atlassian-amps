@@ -436,6 +436,8 @@ public class BitbucketProductHandler extends AbstractProductHandler {
 
         java.setClassname("org.springframework.boot.loader.WarLauncher");
 
+        log.info("Starting Bitbucket Server " + ctx.getVersion() +
+                " using the following command:\n\t" + java.getCommandLine());
         AntJavaExecutorThread javaThread = new AntJavaExecutorThread(java);
         javaThread.start();
 
