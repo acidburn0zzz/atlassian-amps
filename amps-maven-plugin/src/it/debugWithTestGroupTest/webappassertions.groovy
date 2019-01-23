@@ -11,7 +11,6 @@ ampsFile.withInputStream { amps.load(it) }
 
 checkServices('product-1');
 checkServices('product-2');
-checkServices('product-3');
 
 def checkServices(instanceId)
 {

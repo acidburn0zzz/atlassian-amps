@@ -55,21 +55,21 @@
     <properties>
         <build.maven.version>3.5.4</build.maven.version>
         <bundled.maven.version>3.5.4</bundled.maven.version>
-        <refapp.version>5.0.0-m7</refapp.version>
+        <refapp.version>5.0.0</refapp.version>
         <refapp.data.version>${refapp.version}</refapp.data.version>
-        <platform.version>5.0.0-0aea465</platform.version>
-        <confluence.version>6.10.0</confluence.version>
+        <platform.version>5.0.0</platform.version>
+        <confluence.version>6.14.0</confluence.version>
         <confluence.data.version>${confluence.version}</confluence.data.version>
-        <jira.version>8.0.0-QR-20181022070220</jira.version>
+        <jira.version>8.0.0-m0033</jira.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <fugue.version>4.7.2</fugue.version>
-        <bamboo.version>6.5.0</bamboo.version>
+        <bamboo.version>6.7.2</bamboo.version>
         <bamboo.data.version>${bamboo.version}</bamboo.data.version>
-        <bitbucket.version>6.0.0-platform5-3</bitbucket.version>
+        <bitbucket.version>6.0.0-rc3</bitbucket.version>
         <bitbucket.data.version>${bitbucket.version}</bitbucket.data.version>
-        <fecru.version>4.5.0-20170908094439</fecru.version>
+        <fecru.version>4.6.1-20181008080545</fecru.version>
         <fecru.data.version>${fecru.version}</fecru.data.version>
-        <crowd.version>3.2.0</crowd.version>
+        <crowd.version>3.3.3</crowd.version>
         <crowd.data.version>${crowd.version}</crowd.data.version>
         <clover.version>3.1.7</clover.version>
         <plugin.testrunner.version>2.0.1</plugin.testrunner.version>
@@ -84,7 +84,7 @@
         <invoker.artifactId>${invoker.product}-maven-plugin</invoker.artifactId>
         <invoker.groupId>com.atlassian.maven.plugins</invoker.groupId>
         <invoker.product>amps</invoker.product>
-        <spring.version>5.0.7.RELEASE</spring.version>
+        <spring.version>5.0.12.RELEASE</spring.version>
     </properties>
 
     <dependencyManagement>
@@ -527,8 +527,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-invoker-plugin</artifactId>
-                <!-- Beware 3.1.0: https://issues.apache.org/jira/projects/MINVOKER/issues/MINVOKER-243 -->
-                <version>3.0.1</version>
+                <version>3.2.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
