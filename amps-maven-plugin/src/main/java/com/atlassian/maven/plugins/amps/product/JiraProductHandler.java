@@ -110,8 +110,17 @@ public class JiraProductHandler extends AbstractWebappProductHandler
 
     @Override
     protected void fixJvmArgs(Product ctx) {
-        // In JIRA 7.7+ we have a HealthCheck that requires min / max memory to be set to a certain minimums or it can block startup.
-        if (new ComparableVersion(ctx.getVersion()).compareTo(new ComparableVersion("7.7.0-ALPHA")) >= 0)
+        ComparableVersion productVersion = new ComparableVersion(ctx.getVersion());
+        // Jira 8 raises memory requirements, to account for increased memory usage by Lucene
+        if (productVersion.compareTo(new ComparableVersion("8.0.0-ALPHA")) >= 0)
+        {
+            ctx.setJvmArgs(JvmArgsFix.empty()
+                    .with("-Xmx", "2g")
+                    .with("-Xms", "1g")
+                    .apply(ctx.getJvmArgs()));
+        }
+        // In Jira 7.7+ we have a HealthCheck that requires min / max memory to be set to a certain minimums or it can block startup.
+        else if (productVersion.compareTo(new ComparableVersion("7.7.0-ALPHA")) >= 0)
         {
             ctx.setJvmArgs(JvmArgsFix.empty()
                     .with("-Xmx", "768m")

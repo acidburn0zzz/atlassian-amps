@@ -6,7 +6,6 @@ import com.atlassian.maven.plugins.amps.XmlOverride;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Build;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.dom4j.Node;
@@ -81,7 +80,7 @@ public class TestJiraProductHandler
     @Mock
     private Build build;
     @Captor
-    ArgumentCaptor<Collection<XmlOverride>> expectedOverridesCaptor;
+    private ArgumentCaptor<Collection<XmlOverride>> expectedOverridesCaptor;
 
     private JiraProductHandler productHandler;
 
@@ -124,6 +123,20 @@ public class TestJiraProductHandler
             FileUtils.deleteDirectory(TEMP_HOME);
             TEMP_HOME = null;
         }
+    }
+
+    @Test
+    public void itShouldSetNewJvmArgsForJira8_0_0AndHigher()
+    {
+        newArrayList(
+                newProduct("8.0.0-ALPHA"), newProduct("8.0.0-SNAPSHOT"), newProduct("8.0-EAP01"),
+                newProduct("8.0.0"), newProduct("8.0.1-SNAPSHOT"), newProduct("8.0.2"),
+                newProduct("8.0.0-m0030"), newProduct("8.1-rc1"), newProduct("8.1"))
+        .forEach(product -> {
+            productHandler.fixJvmArgs(product);
+            assertThat(format("Jira version %s does not have the correct Xmx", product.getVersion()), product.getJvmArgs(), containsString("-Xmx2g"));
+            assertThat(format("Jira version %s does not have the correct Xms", product.getVersion()), product.getJvmArgs(), containsString("-Xms1g"));
+        });
     }
 
     @Test
@@ -352,7 +365,7 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void testCustomiseInstanceForServerXmlOverridesForNewJiras() throws MojoExecutionException {
+    public void testCustomiseInstanceForServerXmlOverridesForNewJiras() {
         final Product ctx = mock(Product.class);
         when(ctx.getVersion()).thenReturn("7.12.0");
 
@@ -376,7 +389,7 @@ public class TestJiraProductHandler
     }
 
     @Test
-    public void testCustomiseInstanceForServerXmlOverridesForOlderJiras() throws MojoExecutionException {
+    public void testCustomiseInstanceForServerXmlOverridesForOlderJiras() {
         final Product ctx = mock(Product.class);
         when(ctx.getVersion()).thenReturn("7.11.0");
 
