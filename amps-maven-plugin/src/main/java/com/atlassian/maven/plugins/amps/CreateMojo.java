@@ -44,11 +44,11 @@ public class CreateMojo extends AbstractProductHandlerMojo
         if (a != null) {
             if (StringUtils.isNotBlank(a.latest)) {
                 getLog().info("using stable product version: " + a.latest);
-                getMavenContext().getExecutionEnvironment().getMavenSession().getExecutionProperties().setProperty(pid + "Version", a.latest);
+                getMavenContext().getExecutionEnvironment().getMavenSession().getUserProperties().setProperty(pid + "Version", a.latest);
             }
             if (StringUtils.isNotBlank(a.data)) {
                 getLog().info("using stable data version: " + a.data);
-                getMavenContext().getExecutionEnvironment().getMavenSession().getExecutionProperties().setProperty(pid + "DataVersion", a.data);
+                getMavenContext().getExecutionEnvironment().getMavenSession().getUserProperties().setProperty(pid + "DataVersion", a.data);
             }
         } else {
             // use the old way (grab version from artifact)
@@ -60,7 +60,7 @@ public class CreateMojo extends AbstractProductHandlerMojo
             if (StringUtils.isNotBlank(stableVersion))
             {
                 getLog().info("using latest stable product version: " + stableVersion);
-                getMavenContext().getExecutionEnvironment().getMavenSession().getExecutionProperties().setProperty(pid + "Version", stableVersion);
+                getMavenContext().getExecutionEnvironment().getMavenSession().getUserProperties().setProperty(pid + "Version", stableVersion);
             }
 
             getLog().info("determining latest stable data version...");
@@ -68,7 +68,7 @@ public class CreateMojo extends AbstractProductHandlerMojo
             if (StringUtils.isNotBlank(stableDataVersion))
             {
                 getLog().info("using latest stable data version: " + stableDataVersion);
-                getMavenContext().getExecutionEnvironment().getMavenSession().getExecutionProperties().setProperty(pid + "DataVersion", stableDataVersion);
+                getMavenContext().getExecutionEnvironment().getMavenSession().getUserProperties().setProperty(pid + "DataVersion", stableDataVersion);
             }
         }
 
