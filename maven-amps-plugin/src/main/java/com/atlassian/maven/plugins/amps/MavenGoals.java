@@ -1008,7 +1008,7 @@ public class MavenGoals
                            final Product webappContext) throws MojoExecutionException
     {
         final Container container = findContainer(webappContext.getContainerId());
-        File containerDir = new File(container.getRootDirectory(getBuildDirectory()));
+        File containerDir = new File(container.getInstallDirectory(getBuildDirectory()));
 
         // retrieve non-embedded containers
         if (!container.isEmbedded())
