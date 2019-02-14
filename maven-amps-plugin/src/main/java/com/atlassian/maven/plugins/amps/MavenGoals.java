@@ -953,6 +953,8 @@ public class MavenGoals
                                         element(name("version"), container.getVersion()),
                                         element(name("classifier"), container.getClassifier()),
                                         element(name("type"), "zip"))),
+                        element(name("overWriteReleases"), "true"),
+                        element(name("overWriteSnapshots"), "true"),
                         element(name("outputDirectory"), container.getRootDirectory(getBuildDirectory()))
                 ),
                 executionEnvironment());
