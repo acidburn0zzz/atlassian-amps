@@ -11,6 +11,7 @@ import com.atlassian.maven.plugins.amps.codegen.jira.CustomFieldSearcherFactory;
 import com.atlassian.maven.plugins.amps.codegen.jira.CustomFieldTypeFactory;
 import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompter;
 import com.atlassian.maven.plugins.amps.codegen.prompter.PluginModulePrompterFactory;
+import com.atlassian.maven.plugins.amps.osgi.AtlassianPluginContentValidator;
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
 import com.atlassian.maven.plugins.amps.util.GoogleAmpsTracker;
 import com.atlassian.plugins.codegen.MavenProjectRewriter;
@@ -22,6 +23,7 @@ import com.atlassian.plugins.codegen.modules.PluginModuleCreatorFactory;
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.modules.PluginModuleProperties;
 
+import com.atlassian.plugins.codegen.util.PluginXmlHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Resource;
@@ -136,9 +138,21 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
                 getLog().error("Unable to apply changes to POM: " + e);
             }
 
+
             // apply changes to project files
             new ProjectFilesRewriter(moduleLocation).applyChanges(changeset);
             new PluginXmlRewriter(moduleLocation).applyChanges(changeset);
+
+            //Validate the plugin if it contains forbidden modules
+            PluginXmlHelper xmlHelper =  new PluginXmlHelper(moduleLocation);
+            try{
+                new AtlassianPluginContentValidator().validate(xmlHelper.getXmlFile());
+            }catch(MojoFailureException e){
+                //Warn them if there is any exception. Warning here is intentional because if we throw exception they
+                //wont be able to create a new module recursively.
+                getLog().warn(e.getMessage());
+            }
+
 
             if (pluginModuleSelectionQueryer.addAnotherModule())
             {

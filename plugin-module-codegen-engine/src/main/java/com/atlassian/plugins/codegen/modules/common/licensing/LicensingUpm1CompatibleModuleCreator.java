@@ -155,8 +155,8 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
             .with(BUNDLED_ARTIFACTS)
             .with(mavenPlugin(artifactId(MAVEN_DEPENDENCY_PLUGIN_ID), noVersion(), MAVEN_DEPENDENCY_PLUGIN_CONFIG))
             .with(pluginParameter("atlassian-licensing-enabled", "true"))
-            .with(COMPONENT_IMPORTS)
-            .with(COMPONENTS)
+            //.with(COMPONENT_IMPORTS)
+            //.with(COMPONENTS)
             .with(licenseServlet)
             .with(resourceFile("", "license-admin.vm", fromFile(LICENSE_SERVLET_VELOCITY_TEMPLATE)))
             .with(createI18nStrings(props, PROPERTIES_TEMPLATE));
