@@ -143,17 +143,6 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
             new ProjectFilesRewriter(moduleLocation).applyChanges(changeset);
             new PluginXmlRewriter(moduleLocation).applyChanges(changeset);
 
-            //Validate the plugin if it contains forbidden modules
-            PluginXmlHelper xmlHelper =  new PluginXmlHelper(moduleLocation);
-            try{
-                new AtlassianPluginContentValidator().validate(xmlHelper.getXmlFile());
-            }catch(MojoFailureException e){
-                //Warn them if there is any exception. Warning here is intentional because if we throw exception they
-                //wont be able to create a new module recursively.
-                getLog().warn(e.getMessage());
-            }
-
-
             if (pluginModuleSelectionQueryer.addAnotherModule())
             {
                 runGeneration(productId, project, moduleLocation);
