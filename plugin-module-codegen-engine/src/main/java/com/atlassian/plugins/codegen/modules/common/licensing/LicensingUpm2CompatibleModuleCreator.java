@@ -40,7 +40,7 @@ public class LicensingUpm2CompatibleModuleCreator extends AbstractPluginModuleCr
 {
     public static final String MODULE_NAME = "Licensing API Support";
 
-    public static final String LICENSE_SERVLET_TEMPLATE = "templates/common/licensing/LicenseServlet.java.vtl";
+    public static final String LICENSE_SERVLET_TEMPLATE = "templates/common/licensing/LicenseServlet2.java.vtl";
     public static final String HELLO_WORLD_SERVLET_TEMPLATE = "templates/common/licensing/HelloWorldServlet.java.vtl";
     public static final String LICENSE_SERVLET_VELOCITY_TEMPLATE = "templates/common/licensing/license-admin.vm";
     public static final String PROPERTIES_TEMPLATE = "templates/common/licensing/license-admin.properties.vtl";
