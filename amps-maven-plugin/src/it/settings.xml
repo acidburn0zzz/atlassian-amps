@@ -66,7 +66,7 @@ under the License.
                 </repository>
                 <repository>
                     <id>atlassian-public</id>
-                    <url>https://packages.atlassian.com/maven/repository/public</url>
+                    <url>https://packages.atlassian.com/maven/repository/internal</url>
                     <snapshots>
                         <enabled>true</enabled>
                         <updatePolicy>daily</updatePolicy>
