@@ -65,8 +65,21 @@ under the License.
                     </snapshots>
                 </repository>
                 <repository>
-                    <id>atlassian-public</id>
+                    <id>atlassian-internal</id>
                     <url>https://packages.atlassian.com/maven/repository/internal</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
+                        <checksumPolicy>warn</checksumPolicy>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>
+                        <checksumPolicy>warn</checksumPolicy>
+                    </releases>
+                </repository>
+                <repository>
+                    <id>atlassian-public</id>
+                    <url>https://packages.atlassian.com/maven/repository/public</url>
                     <snapshots>
                         <enabled>true</enabled>
                         <updatePolicy>daily</updatePolicy>
