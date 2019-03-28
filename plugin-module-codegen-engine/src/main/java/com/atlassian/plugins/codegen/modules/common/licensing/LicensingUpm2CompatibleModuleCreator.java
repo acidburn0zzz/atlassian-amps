@@ -1,20 +1,7 @@
 package com.atlassian.plugins.codegen.modules.common.licensing;
 
-import com.atlassian.plugins.codegen.ArtifactDependency;
-import com.atlassian.plugins.codegen.BundleInstruction;
-import com.atlassian.plugins.codegen.ClassId;
-import com.atlassian.plugins.codegen.ComponentDeclaration;
-import com.atlassian.plugins.codegen.ComponentImport;
-import com.atlassian.plugins.codegen.PluginArtifact;
-import com.atlassian.plugins.codegen.PluginProjectChangeset;
-import com.atlassian.plugins.codegen.VersionId;
-import com.atlassian.plugins.codegen.annotations.BambooPluginModuleCreator;
-import com.atlassian.plugins.codegen.annotations.BitbucketPluginModuleCreator;
-import com.atlassian.plugins.codegen.annotations.ConfluencePluginModuleCreator;
-import com.atlassian.plugins.codegen.annotations.CrowdPluginModuleCreator;
-import com.atlassian.plugins.codegen.annotations.FeCruPluginModuleCreator;
-import com.atlassian.plugins.codegen.annotations.JiraPluginModuleCreator;
-import com.atlassian.plugins.codegen.annotations.RefAppPluginModuleCreator;
+import com.atlassian.plugins.codegen.*;
+import com.atlassian.plugins.codegen.annotations.*;
 import com.atlassian.plugins.codegen.modules.AbstractPluginModuleCreator;
 import com.atlassian.plugins.codegen.modules.BasicClassModuleProperties;
 import com.atlassian.plugins.codegen.modules.common.servlet.ServletModuleCreator;
@@ -36,25 +23,20 @@ import static com.atlassian.plugins.codegen.PluginParameter.pluginParameter;
 import static com.atlassian.plugins.codegen.ResourceFile.resourceFile;
 import static com.atlassian.plugins.codegen.VersionId.noVersion;
 import static com.atlassian.plugins.codegen.VersionId.versionProperty;
-import static com.atlassian.plugins.codegen.modules.Dependencies.APPLICATION_PROPERTIES_IMPORT;
-import static com.atlassian.plugins.codegen.modules.Dependencies.COMMONS_LANG;
-import static com.atlassian.plugins.codegen.modules.Dependencies.I18N_RESOLVER_IMPORT;
-import static com.atlassian.plugins.codegen.modules.Dependencies.SAL_API;
-import static com.atlassian.plugins.codegen.modules.Dependencies.TEMPLATE_RENDERER_API;
-import static com.atlassian.plugins.codegen.modules.Dependencies.TEMPLATE_RENDERER_IMPORT;
+import static com.atlassian.plugins.codegen.modules.Dependencies.*;
 import static io.atlassian.fugue.Option.some;
 
 /**
  * @since 3.9
  */
-//@RefAppPluginModuleCreator
-//@JiraPluginModuleCreator
-//@ConfluencePluginModuleCreator
-//@BambooPluginModuleCreator
-//@BitbucketPluginModuleCreator
-//@FeCruPluginModuleCreator
-//@CrowdPluginModuleCreator
-public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCreator<LicensingProperties>
+@RefAppPluginModuleCreator
+@JiraPluginModuleCreator
+@ConfluencePluginModuleCreator
+@BambooPluginModuleCreator
+@BitbucketPluginModuleCreator
+@FeCruPluginModuleCreator
+@CrowdPluginModuleCreator
+public class LicensingUpm2CompatibleModuleCreator extends AbstractPluginModuleCreator<LicensingProperties>
 {
     public static final String MODULE_NAME = "Licensing API Support";
 
@@ -155,8 +137,6 @@ public class LicensingUpm1CompatibleModuleCreator extends AbstractPluginModuleCr
             .with(BUNDLED_ARTIFACTS)
             .with(mavenPlugin(artifactId(MAVEN_DEPENDENCY_PLUGIN_ID), noVersion(), MAVEN_DEPENDENCY_PLUGIN_CONFIG))
             .with(pluginParameter("atlassian-licensing-enabled", "true"))
-            //.with(COMPONENT_IMPORTS)
-            //.with(COMPONENTS)
             .with(licenseServlet)
             .with(resourceFile("", "license-admin.vm", fromFile(LICENSE_SERVLET_VELOCITY_TEMPLATE)))
             .with(createI18nStrings(props, PROPERTIES_TEMPLATE));
