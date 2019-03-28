@@ -136,6 +136,7 @@ public class PluginModuleGenerationMojo extends AbstractProductAwareMojo
                 getLog().error("Unable to apply changes to POM: " + e);
             }
 
+
             // apply changes to project files
             new ProjectFilesRewriter(moduleLocation).applyChanges(changeset);
             new PluginXmlRewriter(moduleLocation).applyChanges(changeset);

@@ -4,7 +4,7 @@ import com.atlassian.maven.plugins.amps.codegen.annotations.ModuleCreatorClass;
 import com.atlassian.maven.plugins.amps.codegen.prompter.AbstractModulePrompter;
 import com.atlassian.plugins.codegen.modules.PluginModuleLocation;
 import com.atlassian.plugins.codegen.modules.common.licensing.LicensingProperties;
-import com.atlassian.plugins.codegen.modules.common.licensing.LicensingUpm1CompatibleModuleCreator;
+import com.atlassian.plugins.codegen.modules.common.licensing.LicensingUpm2CompatibleModuleCreator;
 import com.atlassian.plugins.codegen.util.ClassnameUtil;
 
 import org.codehaus.plexus.components.interactivity.Prompter;
@@ -13,7 +13,7 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 /**
  * @since 3.7
  */
-@ModuleCreatorClass(LicensingUpm1CompatibleModuleCreator.class)
+@ModuleCreatorClass(LicensingUpm2CompatibleModuleCreator.class)
 public class LicensingUpm1CompatiblePrompter extends AbstractModulePrompter<LicensingProperties>
 {
     public LicensingUpm1CompatiblePrompter(Prompter prompter)
@@ -26,14 +26,7 @@ public class LicensingUpm1CompatiblePrompter extends AbstractModulePrompter<Lice
     public LicensingProperties promptForBasicProperties(PluginModuleLocation moduleLocation) throws PrompterException
     {
         showExamplesPrompt = true;
-
-        boolean b = promptForBoolean("WARNING: This process applies to UPM versions prior to 2.0 only.\n" +
-                "This will be deprecated in the next major AMPS release.\n"
-                + "Proceed anyway?");
-        if (!b) {
-            throw new PrompterException("Not continuing further");
-        }
-
+        
         String className = promptJavaClassname("Enter License Servlet Classname", "LicenseServlet");
         String packageName = promptJavaPackagename("Enter Package Name", getDefaultBasePackage() + ".servlet");
         String licenseServletPath = prompt("Enter License Servlet URL Path (not including /plugins/servlet/)",

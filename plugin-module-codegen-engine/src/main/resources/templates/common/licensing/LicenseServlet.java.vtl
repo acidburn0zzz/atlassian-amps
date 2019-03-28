@@ -5,11 +5,13 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.message.I18nResolver;
@@ -34,18 +36,26 @@ import org.apache.commons.lang3.StringUtils;
  *
  * This servlet can be reached at http://localhost:2990/jira/plugins/servlet/${LICENSE_SERVLET_PATH}
  */
+@Scanned
 public class ${CLASSNAME} extends HttpServlet
 {
     private static final String TEMPLATE = "license-admin.vm";
-
+    @ComponentImport
     private final ThirdPartyPluginLicenseStorageManager licenseManager;
+    @ComponentImport
     private final AtlassianMarketplaceUriFactory uriFactory;
+    @ComponentImport
     private final ApplicationProperties applicationProperties;
+    @ComponentImport
     private final TemplateRenderer renderer;
+    @ComponentImport
     private final LoginUriProvider loginUriProvider;
+    @ComponentImport
     private final UserManager userManager;
+    @ComponentImport
     private final I18nResolver i18nResolver;
 
+    @Inject
     public ${CLASSNAME}(ThirdPartyPluginLicenseStorageManager licenseManager,
                               AtlassianMarketplaceUriFactory uriFactory,
                               ApplicationProperties applicationProperties,
