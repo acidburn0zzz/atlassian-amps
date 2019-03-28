@@ -50,12 +50,15 @@ public class LicensingUpm1CompatibleTest extends AbstractCodegenTestCase<Licensi
     @Test
     public void licenseStorageManagerComponentIsAdded() throws Exception
     {
+       // TODO - this checks the commponents are added however now we're using springscanner it's quite different
+       // for now we're leaving this out but we should find a better way to test this
        // getComponentOfClass(LicensingUpm2CompatibleModuleCreator.LICENSE_STORAGE_MANAGER_CLASS);
     }
     
     @Test
     public void bundleInstructionsAreAdded() throws Exception
     {
+        // TODO - we need to update this test instruction too
         // won't verify all the individual bundle instructions, just make sure we have some
         assertFalse(getChangesetForModule(BundleInstruction.class).isEmpty());
     }
