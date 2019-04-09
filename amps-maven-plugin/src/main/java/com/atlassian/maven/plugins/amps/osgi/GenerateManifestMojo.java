@@ -18,6 +18,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import aQute.bnd.osgi.Constants;
+import aQute.bnd.osgi.Analyzer;
 
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 
@@ -53,6 +54,11 @@ public class GenerateManifestMojo extends AbstractAmpsMojo
             }
 
             File metainfLib = file(project.getBuild().getOutputDirectory(), "META-INF", "lib");
+
+            if (!instructions.containsKey(Analyzer.NOEE)) {
+                instructions.put(Analyzer.NOEE, Boolean.TRUE.toString());
+            }
+
             if (metainfLib.exists())
             {
                 StringBuilder sb = new StringBuilder(".");
