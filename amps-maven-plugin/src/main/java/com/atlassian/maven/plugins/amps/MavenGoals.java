@@ -1210,7 +1210,7 @@ public class MavenGoals
     }
 
     public void runIntegrationTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties,
-            final File targetDirectory, final String category, final boolean skipVerifyGoal)
+            final File targetDirectory, final String category, final boolean skipVerifyGoal, final Boolean debug)
     		throws MojoExecutionException
 	{
         List<Element> includeElements = new ArrayList<>(includes.size());
@@ -1239,6 +1239,8 @@ public class MavenGoals
                 element(name("excludes"),
                         excludeElements.toArray(new Element[0])
                 ),
+                element(name("debugForkedProcess"),
+                        debug.toString()),
                 systemProps,
                 element(name(reportsDirectory), testOutputDir)
         );
