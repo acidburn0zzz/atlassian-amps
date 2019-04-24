@@ -1292,7 +1292,10 @@ public class MavenGoals
                 artifactId("sql-maven-plugin"),
                 version(defaultArtifactIdToVersionMap.get("sql-maven-plugin"))
         );
-        sqlMaven.getDependencies().addAll(libs);
+        List<Dependency> pluginDependencies = new ArrayList<>(sqlMaven.getDependencies().size() + libs.size());
+        pluginDependencies.addAll(sqlMaven.getDependencies());
+        pluginDependencies.addAll(libs);
+        sqlMaven.setDependencies(pluginDependencies);
         MojoUtils.executeWithMergedConfig(
                 sqlMaven,
                 goal("execute"),
