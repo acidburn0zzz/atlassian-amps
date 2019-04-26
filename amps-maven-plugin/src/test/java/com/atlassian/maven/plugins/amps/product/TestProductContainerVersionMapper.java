@@ -34,21 +34,6 @@ public class TestProductContainerVersionMapper
     }
 
     @Test
-    public void testJiraVersionMapping()
-    {
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "1"), is("tomcat6x"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "5.2"), is("tomcat7x"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.0.0"), is("tomcat8x"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.2.9"), is("tomcat8x"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.3.0"), is("tomcat85_6"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.6.0"), is("tomcat85_29"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.12.3"), is("tomcat85_32"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.13.2"), is("tomcat85x"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.12.3"), is("tomcat85_32"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.13.2"), is("tomcat85x"));
-    }
-
-    @Test
     public void testBitbucketVersionMapping()
     {
         assertThat(ProductContainerVersionMapper.containerForProductVersion("bitbucket", "1"), is("tomcat8x"));
