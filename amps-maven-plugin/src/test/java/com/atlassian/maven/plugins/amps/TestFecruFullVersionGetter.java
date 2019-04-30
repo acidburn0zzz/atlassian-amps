@@ -28,7 +28,7 @@ public class TestFecruFullVersionGetter
     @Test
     public void TestValidShortVersion() {
         try {
-            assertEquals("4.2.0-20160928073034",rsm.getFullVersion("4.2.0").orElse("failed to find"));
+            assertEquals("4.7.0-20190214100246",rsm.getFullVersion("4.7.0").orElse("failed to find"));
         } catch (IOException e) {
             e.printStackTrace();
         }
