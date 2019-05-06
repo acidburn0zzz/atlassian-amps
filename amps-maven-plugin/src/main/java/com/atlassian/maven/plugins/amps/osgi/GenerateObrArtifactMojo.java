@@ -97,7 +97,6 @@ public class GenerateObrArtifactMojo extends AbstractAmpsMojo
             if (!instructions.isEmpty()) {
                 Build build = getMavenContext().getProject().getBuild();
                 List<File> deps = resolvePluginDependencies();
-                // todo: we use build.getFinalName() here, but finalName (mojo parameter) in generateObrZip().  this seems weird.
                 getLog().info("the file name is  : " +this.finalName);
                 File obrDir = layoutObr(deps, new File(build.getDirectory(), finalName + ".jar"));
 
