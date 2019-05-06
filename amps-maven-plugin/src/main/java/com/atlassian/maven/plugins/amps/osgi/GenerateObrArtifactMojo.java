@@ -98,7 +98,9 @@ public class GenerateObrArtifactMojo extends AbstractAmpsMojo
                 Build build = getMavenContext().getProject().getBuild();
                 List<File> deps = resolvePluginDependencies();
                 // todo: we use build.getFinalName() here, but finalName (mojo parameter) in generateObrZip().  this seems weird.
-                File obrDir = layoutObr(deps, new File(build.getDirectory(), build.getFinalName() + ".jar"));
+                getLog().info("the file name is  : " +this.finalName);
+                File obrDir = layoutObr(deps, new File(build.getDirectory(), finalName + ".jar"));
+
                 generateObrZip(obrDir);
             } else {
                 getLog().info("Skipping OBR generation... no OSGi bundle manifest instructions found in pom.xml");
