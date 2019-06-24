@@ -38,6 +38,7 @@ import org.jdom.input.SAXBuilder;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -1211,7 +1212,7 @@ public class MavenGoals
     }
 
     public void runIntegrationTests(String testGroupId, String containerId, List<String> includes, List<String> excludes, Map<String, Object> systemProperties,
-            final File targetDirectory, final String category, final boolean skipVerifyGoal)
+            final File targetDirectory, final String category, final boolean skipVerifyGoal, @Nullable final String debug)
     		throws MojoExecutionException
 	{
         List<Element> includeElements = new ArrayList<>(includes.size());
@@ -1243,6 +1244,14 @@ public class MavenGoals
                 systemProps,
                 element(name(reportsDirectory), testOutputDir)
         );
+
+        if (debug != null) {
+            config.addChild(
+                    element(
+                            name("debugForkedProcess"),
+                            debug
+                    ).toDom());
+        }
 
         if (isRelevantCategory(category))
         {

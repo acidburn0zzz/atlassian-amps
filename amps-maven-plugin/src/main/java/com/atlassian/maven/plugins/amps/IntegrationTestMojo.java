@@ -74,6 +74,13 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
     protected boolean jvmDebugSuspend = false;
 
     /**
+     * Debugging for frontend of integration tests.
+     * This flag is forwarded as is.
+     */
+    @Parameter(property = "maven.failsafe.debug")
+    protected String mavenFailsafeDebug;
+
+    /**
      * Denotes test category as defined by surefire/failsafe notion of groups. In JUnit4, this affects tests annotated
      * with {@link org.junit.experimental.categories.Category @Category} annotation.
      */
@@ -259,7 +266,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         try
         {
             // Actually run the tests.
-            goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory, category, skipITVerification);
+            goals.runIntegrationTests("group-" + testGroupId, getClassifier(testGroupId), includes, excludes, systemProperties, targetDirectory, category, skipITVerification, mavenFailsafeDebug);
         }
         catch (MojoExecutionException e)
         {
