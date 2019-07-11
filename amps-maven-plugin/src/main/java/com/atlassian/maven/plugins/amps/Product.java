@@ -16,7 +16,17 @@ import java.util.Properties;
 public class Product
 {
     /**
-     * Container to run in
+     * Container artifact to run in if containerId is not specified or containerId is equals to "productSpecificContainer"
+     */
+    protected String productSpecificContainer;
+
+    /**
+     * Container id passed to maven-cargo-plugin if productSpecificContainer is set
+     */
+    protected String cargoIdForCustomContainer;
+
+    /**
+     * Id of container to run in
      */
     protected String containerId;
 
@@ -210,7 +220,7 @@ public class Product
      * Version of the PDE plugin
      */
     private String pdeVersion;
-    
+
     /**
      * Product id - nickname of the product to run
      */
@@ -327,7 +337,7 @@ public class Product
      * </products>
      * }
      * </pre>
-     * 
+     *
      */
     protected List<DataSource> dataSources;
 
@@ -388,6 +398,8 @@ public class Product
 
         prod.setServer(server == null ? product.getServer() : server);
         prod.setContextPath(contextPath == null ? product.getContextPath() : contextPath);
+        prod.setProductSpecificContainer(productSpecificContainer == null ? product.getProductSpecificContainer() : productSpecificContainer);
+        prod.setCargoIdForCustomContainer(cargoIdForCustomContainer == null ? product.getCargoIdForCustomContainer() : cargoIdForCustomContainer);
         prod.setContainerId(containerId == null ? product.getContainerId() : containerId);
         prod.setRmiPort(rmiPort == 0 ? product.getRmiPort() : rmiPort);
         prod.setHttpPort(httpPort == 0 ? product.getHttpPort() : httpPort);
@@ -412,6 +424,14 @@ public class Product
         prod.setAwaitFullInitialization(awaitFullInitialization==null ? product.isAwaitFullInitialization() : awaitFullInitialization);
 
         return prod;
+    }
+
+    public String getProductSpecificContainer() {
+        return productSpecificContainer;
+    }
+
+    public void setProductSpecificContainer(String productSpecificContainer) {
+        this.productSpecificContainer = productSpecificContainer;
     }
 
     public String getContainerId()
@@ -1013,7 +1033,7 @@ public class Product
      */
     public void setDataSources(List<DataSource> dataSources)
     {
-        this.dataSources = dataSources;    
+        this.dataSources = dataSources;
     }
 
     /**
@@ -1115,5 +1135,13 @@ public class Product
 
     public void setCargoXmlOverrides(final Collection<XmlOverride> cargoXmlOverrides) {
         this.cargoXmlOverrides = cargoXmlOverrides;
+    }
+
+    public String getCargoIdForCustomContainer() {
+        return this.cargoIdForCustomContainer;
+    }
+
+    public void setCargoIdForCustomContainer(String containerId) {
+        this.cargoIdForCustomContainer = containerId;
     }
 }

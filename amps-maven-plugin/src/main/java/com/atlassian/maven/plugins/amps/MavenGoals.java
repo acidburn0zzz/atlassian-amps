@@ -159,6 +159,7 @@ public class MavenGoals
                 .put("maven-surefire-plugin", overrides.getProperty("maven-surefire-plugin","2.22.1"))
                 .put("sql-maven-plugin", overrides.getProperty("sql-maven-plugin", "1.5"))
                 .put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.5.1"))
+                .put("maven-help-plugin", overrides.getProperty("maven-help-plugin", "3.2.0"))
                 .build();
     }
 
@@ -848,7 +849,7 @@ public class MavenGoals
                            final List<ProductArtifact> extraProductDeployables,
                            final Product webappContext) throws MojoExecutionException
     {
-        final Container container = findContainer(webappContext.getContainerId());
+        final Container container = getContainerFromWebappContext(webappContext);
         File containerDir = new File(container.getInstallDirectory(getBuildDirectory()));
 
         // retrieve non-embedded containers
@@ -1004,6 +1005,20 @@ public class MavenGoals
         return actualHttpPort;
     }
 
+    private Container getContainerFromWebappContext(Product webappContext) {
+        if (webappContext.getProductSpecificContainer() == null)
+            return findContainer(webappContext.getContainerId());
+        else return convertCustomContainerStringToContainerObject(webappContext);
+    }
+
+    private Container convertCustomContainerStringToContainerObject(Product webappContext) {
+        String[] containerData = webappContext.getProductSpecificContainer().trim().split(":");
+        String cargoContainerId = webappContext.getCargoIdForCustomContainer();
+        if (containerData.length == 4)
+            return new Container(cargoContainerId, containerData[0], containerData[1], containerData[2], containerData[3]);
+        return new Container(cargoContainerId, containerData[0], containerData[1], containerData[2]);
+    }
+
     // See https://codehaus-cargo.github.io/cargo/Configuration+files+option.html
     private Element[] getExtraContainerConfigurationFiles() throws MojoExecutionException {
         return new Element[] {
@@ -1117,7 +1132,7 @@ public class MavenGoals
 
     public void stopWebapp(final String productId, final String containerId, final Product webappContext) throws MojoExecutionException
     {
-        final Container container = findContainer(containerId);
+        final Container container = getContainerFromWebappContext(webappContext);
 
         String actualShutdownTimeout = webappContext.getSynchronousStartup() ? "0" : String.valueOf(webappContext.getShutdownTimeout());
 
@@ -1890,6 +1905,22 @@ public class MavenGoals
                                 element(name("argument"), "-jar"),
                                 element(name("argument"), "${project.build.directory}/remotable-plugins-container-standalone.jar"),
                                 element(name("argument"), pluginFile.getPath()))
+                ),
+                executionEnvironment()
+        );
+    }
+
+    public void generateEffectivePom(ProductArtifact artifact, File effectivePom) throws MojoExecutionException {
+        MojoUtils.executeWithMergedConfig(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-help-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-help-plugin"))
+                ),
+                goal("effective-pom"),
+                configuration(
+                        element(name("artifact"), artifact.getGroupId()+":"+artifact.getArtifactId()+":"+artifact.getVersion()),
+                        element(name("output"), effectivePom.getAbsolutePath())
                 ),
                 executionEnvironment()
         );

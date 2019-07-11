@@ -1,5 +1,33 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
+import com.atlassian.maven.plugins.amps.util.FileUtils;
+import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
+import com.atlassian.maven.plugins.amps.util.ZipUtils;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -15,36 +43,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
-import com.atlassian.maven.plugins.amps.util.FileUtils;
-import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
-import com.atlassian.maven.plugins.amps.util.ZipUtils;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
-
-import com.google.common.collect.Iterables;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
-import javax.annotation.Nonnull;
-
 import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.JIRA;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.doesFileNameMatchArtifact;
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.createDirectory;
+import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
 import static com.atlassian.maven.plugins.amps.util.ZipUtils.unzip;
 import static java.lang.String.join;
 import static java.util.Collections.emptyList;
@@ -84,10 +86,69 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
 
         final File finalApp = addArtifactsAndOverrides(ctx, homeDir, extractedApp);
 
+        final File effectivePom = addOverridesFromProductPom(ctx);
+
         // Ask for the system properties (from the ProductHandler and from the pom.xml)
         Map<String, String> systemProperties = mergeSystemProperties(ctx);
 
         return startApplication(ctx, finalApp, homeDir, systemProperties);
+    }
+
+    private File addOverridesFromProductPom(Product ctx) throws MojoExecutionException {
+        File effectivePom = new File(getBaseDirectory(ctx), "effectivePom.xml");
+        ProductArtifact defaults = getArtifact();
+        ProductArtifact artifact = new ProductArtifact(
+                firstNotNull(ctx.getGroupId(), defaults.getGroupId()),
+                firstNotNull(ctx.getArtifactId(), defaults.getArtifactId()),
+                firstNotNull(ctx.getVersion(), defaults.getVersion()));
+        goals.generateEffectivePom(artifact, effectivePom);
+
+        SAXReader reader = new SAXReader();
+        try {
+            Document document = reader.read(effectivePom.getAbsoluteFile());
+            Element properties = document.getRootElement().element("properties");
+
+
+            if (properties != null) {
+                Element customContainer = properties.element("amps.product.specific.container");
+                Element cargoId = properties.element("amps.product.specific.cargo.container");
+                Element overrideWith = properties.element("amps.container.to.override.with.product.specific");
+
+                if(customContainer == null || cargoId == null){
+                    if(customContainer != null || cargoId != null){
+                        log.warn("Both of amps.product.specific.container and amps.product.specific.cargo.container must be set in product");
+                    }
+                    customContainer = null;
+                    cargoId = null;
+                    overrideWith = null;
+                }
+
+                if (ctx.getProductSpecificContainer() == null && (
+                        ctx.getContainerId() == null
+                                || "productSpecific".equalsIgnoreCase(ctx.getContainerId())
+                )) {
+                    ctx.setProductSpecificContainer(customContainer.getStringValue());
+                    ctx.setCargoIdForCustomContainer(cargoId.getStringValue());
+                    ctx.setContainerId("productSpecific");
+                }
+
+                if (customContainer != null && overrideWith != null
+                        && overrideWith.getStringValue().equalsIgnoreCase(ctx.getContainerId())
+                        && ctx.getProductSpecificContainer() == null) {
+                    ctx.setProductSpecificContainer(customContainer.getStringValue());
+                    ctx.setCargoIdForCustomContainer(cargoId.getStringValue());
+                }
+
+                if ("productSpecific".equalsIgnoreCase(ctx.getContainerId()) && ctx.getProductSpecificContainer() == null) {
+                    ctx.setContainerId(null);
+                }
+            }
+
+        } catch (DocumentException e) {
+            log.error("Error when reading effective pom", e);
+        }
+
+        return effectivePom;
     }
 
     @Override
@@ -546,11 +607,11 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
      * The artifact of the product (a war, a jar, a binary...)
      */
     public abstract ProductArtifact getArtifact();
-    
+
     /**
      * Returns the directory where jars listed in  <libArtifacts> are
      * copied. Default is "WEB-INF/lib"
-     * 
+     *
      * @return the directory where lib artifacts should be written
      */
     protected String getLibArtifactTargetDir()
