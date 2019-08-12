@@ -43,7 +43,10 @@ public class TestProductContainerVersionMapper
         assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.3.0"), is("tomcat85_6"));
         assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.6.0"), is("tomcat85_29"));
         assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.12.3"), is("tomcat85_32"));
-        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.13.2"), is("tomcat85x"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.13.2"), is("tomcat85_35"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "8.2.1"), is("tomcat85_40"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "8.3.0"), is("tomcat85_40"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "8.4.0"), is("tomcat85x"));
     }
 
     @Test
@@ -70,6 +73,8 @@ public class TestProductContainerVersionMapper
         assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.0-beta2"), is("tomcat7x"));
         assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.0-m01"), is("tomcat7x"));
         assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "7.6.7-QR-20180626090405"), is("tomcat85_29"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "8.4.0-m0001"), is("tomcat85x"));
+        assertThat(ProductContainerVersionMapper.containerForProductVersion("jira", "8.4.0-m0002"), is("tomcat85x"));
     }
 
     @Test
