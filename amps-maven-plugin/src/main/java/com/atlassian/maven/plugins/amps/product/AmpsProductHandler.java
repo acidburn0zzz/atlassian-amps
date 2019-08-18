@@ -189,11 +189,25 @@ public abstract class AmpsProductHandler implements ProductHandler
         return productHomeZip;
     }
 
-    protected void overrideAndPatchHomeDir(File homeDir, final Product ctx) throws MojoExecutionException
-    {
+    protected void overrideAndPatchHomeDir(File homeDir, final Product ctx) throws MojoExecutionException {
+        File srcDir = null;
+        String overridesPath = ctx.getDataOverridesPath();
+        if (isNotBlank(overridesPath))
+        {
+            srcDir = new File(overridesPath);
+            if (!srcDir.exists())
+            {
+                srcDir = new File(project.getBasedir(), overridesPath);
+            }
+        }
+
+        if (srcDir == null || !srcDir.exists())
+        {
+            srcDir = new File(project.getBasedir(), "src/test/resources/" + ctx.getInstanceId() + "-home");
+        }
+
         try
         {
-            final File srcDir = new File(project.getBasedir(), "src/test/resources/" + ctx.getInstanceId() + "-home");
             if (srcDir.exists() && homeDir.exists())
             {
                 copyDirectory(srcDir, homeDir, false);
@@ -201,7 +215,7 @@ public abstract class AmpsProductHandler implements ProductHandler
         }
         catch (IOException e)
         {
-            throw new MojoExecutionException("Unable to override files using src/test/resources", e);
+            throw new MojoExecutionException("Unable to override files using " + srcDir.getAbsolutePath(), e);
         }
     }
 
