@@ -1,6 +1,7 @@
 package com.atlassian.maven.plugins.amps;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import java.io.IOException;
 import java.util.Optional;
@@ -25,6 +26,7 @@ public class TestFecruFullVersionGetter
         }
     }
 
+    @Ignore
     @Test
     public void TestValidShortVersion() {
         try {
