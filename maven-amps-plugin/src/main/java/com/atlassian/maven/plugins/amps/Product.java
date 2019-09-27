@@ -16,9 +16,22 @@ import java.util.Properties;
 public class Product
 {
     /**
-     * Container to run in
+     * Container artifact to run in if containerId is not specified or containerId is equals to "customContainerArtifact"
+     * It's
+     */
+    protected String customContainerArtifact;
+
+    /**
+     * Id of container to run in
      */
     protected String containerId;
+
+    /**
+     * Helper field set by AMPS when containerId in not provided in plugin pom or when containerId equals "productSpecified"
+     * It used to decide if AMPS should use container artifact defined in customContainerArfifact field or not
+     * Introduced to keep backward compatibility
+     */
+    protected boolean containerNotSpecified;
 
     /**
      * HTTP port for the servlet containers
@@ -220,7 +233,7 @@ public class Product
      * Version of the PDE plugin
      */
     private String pdeVersion;
-    
+
     /**
      * Product id - nickname of the product to run
      */
@@ -337,7 +350,7 @@ public class Product
      * </products>
      * }
      * </pre>
-     * 
+     *
      */
     protected List<DataSource> dataSources;
 
@@ -400,7 +413,9 @@ public class Product
 
         prod.setServer(server == null ? product.getServer() : server);
         prod.setContextPath(contextPath == null ? product.getContextPath() : contextPath);
+        prod.setCustomContainerArtifact(customContainerArtifact == null ? product.getCustomContainerArtifact() : customContainerArtifact);
         prod.setContainerId(containerId == null ? product.getContainerId() : containerId);
+        prod.setContainerNotSpecified(containerNotSpecified && product.isContainerNotSpecified());
         prod.setRmiPort(rmiPort == 0 ? product.getRmiPort() : rmiPort);
         prod.setHttpPort(httpPort == 0 ? product.getHttpPort() : httpPort);
         prod.setAjpPort(ajpPort == 0 ? product.getAjpPort() : ajpPort);
@@ -424,6 +439,14 @@ public class Product
         prod.setAwaitFullInitialization(awaitFullInitialization==null ? product.isAwaitFullInitialization() : awaitFullInitialization);
 
         return prod;
+    }
+
+    public String getCustomContainerArtifact() {
+        return customContainerArtifact;
+    }
+
+    public void setCustomContainerArtifact(String customContainerArtifact) {
+        this.customContainerArtifact = customContainerArtifact;
     }
 
     public String getContainerId()
@@ -1045,7 +1068,7 @@ public class Product
      */
     public void setDataSources(List<DataSource> dataSources)
     {
-        this.dataSources = dataSources;    
+        this.dataSources = dataSources;
     }
 
     /**
@@ -1147,5 +1170,13 @@ public class Product
 
     public void setCargoXmlOverrides(final Collection<XmlOverride> cargoXmlOverrides) {
         this.cargoXmlOverrides = cargoXmlOverrides;
+    }
+
+    public boolean isContainerNotSpecified() {
+        return containerNotSpecified;
+    }
+
+    public void setContainerNotSpecified(boolean containerNotSpecified) {
+        this.containerNotSpecified = containerNotSpecified;
     }
 }

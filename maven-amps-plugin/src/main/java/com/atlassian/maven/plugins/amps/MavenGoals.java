@@ -139,6 +139,7 @@ public class MavenGoals
                 // You can't actually override the version a plugin if defined in the project, so these don't actually do
                 // anything, since the super pom already defines versions.
                 // TODO upgrade maven-dependency-plugin to the version contains new feature overwriteFiles
+                put("maven-help-plugin", overrides.getProperty("maven-help-plugin", "3.2.0"));
                 put("maven-dependency-plugin", overrides.getProperty("maven-dependency-plugin","2.5.1"));
                 put("maven-resources-plugin", overrides.getProperty("maven-resources-plugin","2.3"));
                 put("maven-jar-plugin", overrides.getProperty("maven-jar-plugin","2.2"));
@@ -952,7 +953,7 @@ public class MavenGoals
                                         element(name("artifactId"), container.getArtifactId()),
                                         element(name("version"), container.getVersion()),
                                         element(name("classifier"), container.getClassifier()),
-                                        element(name("type"), "zip"))),
+                                        element(name("type"), "zip"))), //TODO allow to use other types
                         element(name("outputDirectory"), container.getRootDirectory(getBuildDirectory()))
                 ),
                 executionEnvironment());
@@ -1007,7 +1008,7 @@ public class MavenGoals
                            final List<ProductArtifact> extraProductDeployables,
                            final Product webappContext) throws MojoExecutionException
     {
-        final Container container = findContainer(webappContext.getContainerId());
+        final Container container = getContainerFromWebappContext(webappContext);
         File containerDir = new File(container.getRootDirectory(getBuildDirectory()));
 
         // retrieve non-embedded containers
@@ -1160,6 +1161,33 @@ public class MavenGoals
         return actualHttpPort;
     }
 
+    private Container getContainerFromWebappContext(Product webappContext) {
+        if (webappContext.getCustomContainerArtifact() == null) {
+            return findContainer(webappContext.getContainerId());
+        } else {
+            return convertCustomContainerStringToContainerObject(webappContext);
+        }
+    }
+
+    private Container convertCustomContainerStringToContainerObject(Product webappContext) {
+        String[] containerData = webappContext.getCustomContainerArtifact().trim().split(":");
+        String cargoContainerId = findContainer(webappContext.getContainerId()).getId();
+        switch (containerData.length) {
+            case 5: {
+                // cause unpack have hardcoded packaging
+                return new Container(cargoContainerId, containerData[0], containerData[1], containerData[2], containerData[4]);
+            }
+            case 4: {
+                return new Container(cargoContainerId, containerData[0], containerData[1], containerData[2], containerData[3]);
+            }
+            case 3: {
+                return new Container(cargoContainerId, containerData[0], containerData[1], containerData[2]);
+            }
+            default:
+                throw new IllegalArgumentException("Container artifact string must have format groupId:artifactId:version[:packaging:classifier] or groupId:artifactId:version:classifier");
+        }
+    }
+
     private List<Element> extractDependencies(final List<ProductArtifact> extraContainerDependencies, final Product webappContext) throws MojoExecutionException {
         final List<Element> deps = new ArrayList<>();
 
@@ -1243,7 +1271,7 @@ public class MavenGoals
 
     public void stopWebapp(final String productId, final String containerId, final Product webappContext) throws MojoExecutionException
     {
-        final Container container = findContainer(containerId);
+        final Container container = getContainerFromWebappContext(webappContext);
 
         String actualShutdownTimeout = webappContext.getSynchronousStartup() ? "0" : String.valueOf(webappContext.getShutdownTimeout());
 
@@ -2061,6 +2089,24 @@ public class MavenGoals
                 ),
                 executionEnvironment()
         );
+    }
+
+    public File generateEffectivePom(ProductArtifact artifact, File parentDir) throws MojoExecutionException {
+        File effectivePom = new File(parentDir, "effectivePom.xml");
+        executeMojo(
+                plugin(
+                        groupId("org.apache.maven.plugins"),
+                        artifactId("maven-help-plugin"),
+                        version(defaultArtifactIdToVersionMap.get("maven-help-plugin"))
+                ),
+                goal("effective-pom"),
+                configuration(
+                        element(name("artifact"), artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion()),
+                        element(name("output"), effectivePom.getAbsolutePath())
+                ),
+                executionEnvironment()
+        );
+        return effectivePom;
     }
 
     public void saveArtifactToCurrentDirectory(String groupId, String artifactId, String version, String type, String filename) throws MojoExecutionException
