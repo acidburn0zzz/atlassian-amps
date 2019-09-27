@@ -1,5 +1,29 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
+import com.atlassian.maven.plugins.amps.util.FileUtils;
+import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
+import com.atlassian.maven.plugins.amps.util.ZipUtils;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -14,33 +38,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import com.atlassian.maven.plugins.amps.AbstractProductHandlerMojo;
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
-import com.atlassian.maven.plugins.amps.util.FileUtils;
-import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
-import com.atlassian.maven.plugins.amps.util.ZipUtils;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
-
-import com.google.common.collect.Iterables;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
-import javax.annotation.Nonnull;
 
 import static com.atlassian.maven.plugins.amps.product.ProductHandlerFactory.JIRA;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.doesFileNameMatchArtifact;
@@ -84,10 +81,21 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
 
         final File finalApp = addArtifactsAndOverrides(ctx, homeDir, extractedApp);
 
+        addOverridesFromProductPom(ctx);
+
         // Ask for the system properties (from the ProductHandler and from the pom.xml)
         Map<String, String> systemProperties = mergeSystemProperties(ctx);
 
         return startApplication(ctx, finalApp, homeDir, systemProperties);
+    }
+
+    /**
+     * Override product context with properties inherited from product pom
+     *
+     * @param ctx product context
+     * @throws MojoExecutionException throw during creating effective pom
+     */
+    protected void addOverridesFromProductPom(Product ctx) throws MojoExecutionException {
     }
 
     @Override
@@ -546,11 +554,11 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
      * The artifact of the product (a war, a jar, a binary...)
      */
     public abstract ProductArtifact getArtifact();
-    
+
     /**
      * Returns the directory where jars listed in  <libArtifacts> are
      * copied. Default is "WEB-INF/lib"
-     * 
+     *
      * @return the directory where lib artifacts should be written
      */
     protected String getLibArtifactTargetDir()

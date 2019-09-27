@@ -79,6 +79,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected String containerId;
 
     /**
+     * Container to run in
+     */
+    @Parameter(property = "customContainerArtifact")
+    protected String customContainerArtifact;
+
+    /**
      * HTTP port for the servlet containers
      */
     @Parameter(property = "http.port", defaultValue = "0")
@@ -437,6 +443,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     {
         Product ctx = new Product();
         ctx.setId(getProductId());
+        ctx.setCustomContainerArtifact(customContainerArtifact);
         ctx.setContainerId(containerId);
         ctx.setServer(server);
         ctx.setContextPath(contextPath);
@@ -593,7 +600,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         product.setInstanceId(getProductInstanceId(product));
         product.setArtifactRetriever(new ArtifactRetriever(artifactResolver, artifactFactory, localRepository, repositories, repositoryMetadataManager));
 
-        if (product.getContainerId() == null)
+        if (containerIdNotDefinedOrProductSpecific(product))
         {
             try
             {
@@ -603,6 +610,8 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             {
                 product.setContainerId(handler.getDefaultContainerId());
             }
+
+            product.setContainerNotSpecified(true);
         }
 
         if (product.getServer() == null)
@@ -739,6 +748,14 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         {
             product.setDataSources(new ArrayList<>());
         }
+    }
+
+    private boolean containerIdNotDefinedOrProductSpecific(Product product) {
+        return product.getContainerId() == null || isProductSpecificContainerId(product);
+    }
+
+    private boolean isProductSpecificContainerId(Product product) {
+        return "productSpecific".equalsIgnoreCase(product.getContainerId());
     }
 
     @Override
