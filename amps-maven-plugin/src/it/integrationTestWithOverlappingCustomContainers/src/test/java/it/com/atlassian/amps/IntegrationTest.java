@@ -18,12 +18,6 @@ public class IntegrationTest
         assertPresent("/plugins/servlet/it");
     }
 
-    @Test
-    public void anIntegrationTestForTestPlugin() throws Exception
-    {
-        assertPresent("/plugins/servlet/it-tests");
-    }
-
     private void assertPresent(String resourceUrl) throws Exception
     {
         String httpPort = System.getProperty("http.port");

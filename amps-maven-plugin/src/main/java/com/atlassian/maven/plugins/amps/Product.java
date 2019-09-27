@@ -17,7 +17,7 @@ public class Product
 {
     /**
      * Container artifact to run in if containerId is not specified or containerId is equals to "customContainerArtifact"
-     * It's
+     * It has format groupId:artifactId:version[:packaging][:classifier].
      */
     protected String customContainerArtifact;
 

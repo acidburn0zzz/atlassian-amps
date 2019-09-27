@@ -811,7 +811,7 @@ public class MavenGoals
                                         element(name("artifactId"), container.getArtifactId()),
                                         element(name("version"), container.getVersion()),
                                         element(name("classifier"), container.getClassifier()),
-                                        element(name("type"), "zip"))), //TODO allow to use other types
+                                        element(name("type"), "zip"))), //TODO allow to use other types AMPSDEV-365
                         element(name("outputDirectory"), container.getRootDirectory(getBuildDirectory()))
                 ),
                 executionEnvironment());
