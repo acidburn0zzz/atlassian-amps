@@ -53,6 +53,41 @@
                 <product.version>${jira.version}</product.version>
                 <product.data.version>${jira.data.version}</product.data.version>
                 <product.database.type>no-database-type</product.database.type>
+                <invoker.test>
+                    amps1211Test,
+                    amps1454Test,
+                    compressLocalizedResourcesTest,
+                    compressResourcesTest,
+                    compressResourcesWithClosureOptionLanguageInTest,
+                    compressResourcesWithIncludeParamTest,
+                    copyBundledDependenciesTest,
+                    createTest,
+                    debugTest,
+                    debugWithPortConflictTest,
+                    debugWithTestGroupTest,
+                    filterPluginDescriptorWithPluginDescriptorTest,
+                    filterPluginDescriptorWithoutPluginDescriptorTest,
+                    generateManifestWithInstructionsTest,
+                    generateManifestWithNoInstructionsTest,
+                    generateObrTest,
+                    integrationTest,
+                    integrationTestWithCustomContainer,
+                    integrationTestWithOverlappingCustomContainers,
+                    integrationTestWithPortConflictTest,
+                    integrationTestWithProductSpecificContainer,
+                    integrationTestWithTestGroupTest,
+                    jarWithExistingManifestTest,
+                    preIntegrationTest,
+                    quickreloadTest,
+                    runParallelTest,
+                    runTest,
+                    runWithPortConflictTest,
+                    runWithTestGroupTest,
+                    unitTest,
+                    validateManifestSkipValidationTest,
+                    validateManifestWithInvalidManifestTest,
+                    validateManifestWithValidManifestTest,
+                </invoker.test>
             </properties>
         </profile>
     </profiles>

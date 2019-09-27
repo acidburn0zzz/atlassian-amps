@@ -139,7 +139,7 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
      * Overrides version of webapp container artifact based on product pom
      *
      * @param ctx product context
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException throw during creating effective pom
      */
     @Override
     protected void addOverridesFromProductPom(Product ctx) throws MojoExecutionException {

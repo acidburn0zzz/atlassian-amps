@@ -1,0 +1,76 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.atlassian.amps.it</groupId>
+    <artifactId>amps-maven-plugin-integration-test</artifactId>
+    <version>testing</version>
+    <name>IntegrationTestWithCustomContainerInPom</name>
+    <description>
+        Run product with custom container artifact specified in plugin pom.
+        Tests if product is ran with container artifact specified in pom and product is running as expected
+    </description>
+    <packaging>atlassian-plugin</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>${invoker.groupId}</groupId>
+                <artifactId>${invoker.artifactId}</artifactId>
+                <version>${project.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <!-- optional. default value is productSpecific -->
+                    <containerId>productSpecific</containerId>
+                    <customContainerArtifact>org.apache.tomcat:apache-tomcat:8.5.40-atlassian-hosted:windows-x64</customContainerArtifact>
+                    <!--for testing that libartifacts are copied to correct place  -->
+                    <libArtifacts>
+                        <libArtifact>
+                            <groupId>org.apache.avalon.logkit</groupId>
+                            <artifactId>avalon-logkit</artifactId>
+                            <version>2.2.1</version>
+                        </libArtifact>
+                    </libArtifacts>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <reportsDirectory>target/invoker-reports</reportsDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <invoker.artifactId>jira-maven-plugin</invoker.artifactId>
+        <invoker.groupId>com.atlassian.maven.plugins</invoker.groupId>
+        <invoker.product>jira</invoker.product>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.avalon.logkit</groupId>
+            <artifactId>avalon-logkit</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
