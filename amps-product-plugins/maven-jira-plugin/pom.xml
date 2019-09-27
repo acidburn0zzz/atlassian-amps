@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-product-plugins</artifactId>
-        <version>6.3.22-90fb3c317</version>
+        <version>6.3.22-SNAPSHOT</version>
     </parent>
 
     <groupId>com.atlassian.maven.plugins</groupId>
@@ -54,6 +54,9 @@
                 <product.data.version>${jira.data.version}</product.data.version>
                 <product.database.type>no-database-type</product.database.type>
                 <invoker.test>
+                    integrationTestWithCustomContainer,
+                    integrationTestWithOverlappingCustomContainers,
+                    integrationTestWithProductSpecificContainer,
                     amps1211Test,
                     amps1454Test,
                     compressLocalizedResourcesTest,
@@ -71,10 +74,7 @@
                     generateManifestWithNoInstructionsTest,
                     generateObrTest,
                     integrationTest,
-                    integrationTestWithCustomContainer,
-                    integrationTestWithOverlappingCustomContainers,
                     integrationTestWithPortConflictTest,
-                    integrationTestWithProductSpecificContainer,
                     integrationTestWithTestGroupTest,
                     jarWithExistingManifestTest,
                     preIntegrationTest,
