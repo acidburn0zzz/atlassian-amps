@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -755,7 +756,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     }
 
     private boolean isProductSpecificContainerId(Product product) {
-        return "productSpecific".equalsIgnoreCase(product.getContainerId());
+        return "productSpecific".toUpperCase(Locale.ENGLISH).equals(product.getContainerId().toUpperCase(Locale.ENGLISH));
     }
 
     @Override

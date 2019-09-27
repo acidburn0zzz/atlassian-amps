@@ -20,7 +20,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <!-- optional. default value is productSpecific -->
-                    <containerId>productSpecific</containerId>
+                    <containerId>productSpecıfıc</containerId>
                     <customContainerArtifact>org.apache.tomcat:apache-tomcat:8.5.40-atlassian-hosted:windows-x64</customContainerArtifact>
                     <!--for testing that libartifacts are copied to correct place  -->
                     <libArtifacts>
