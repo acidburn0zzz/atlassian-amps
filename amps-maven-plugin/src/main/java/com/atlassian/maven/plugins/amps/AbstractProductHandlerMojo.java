@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -77,6 +78,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
      */
     @Parameter(property = "container")
     protected String containerId;
+
+    /**
+     * Container to run in
+     */
+    @Parameter(property = "customContainerArtifact")
+    protected String customContainerArtifact;
 
     /**
      * HTTP port for the servlet containers
@@ -437,6 +444,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     {
         Product ctx = new Product();
         ctx.setId(getProductId());
+        ctx.setCustomContainerArtifact(customContainerArtifact);
         ctx.setContainerId(containerId);
         ctx.setServer(server);
         ctx.setContextPath(contextPath);
@@ -593,7 +601,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         product.setInstanceId(getProductInstanceId(product));
         product.setArtifactRetriever(new ArtifactRetriever(artifactResolver, artifactFactory, localRepository, repositories, repositoryMetadataManager));
 
-        if (product.getContainerId() == null)
+        if (containerIdNotDefinedOrProductSpecific(product))
         {
             try
             {
@@ -603,6 +611,8 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
             {
                 product.setContainerId(handler.getDefaultContainerId());
             }
+
+            product.setContainerNotSpecified(true);
         }
 
         if (product.getServer() == null)
@@ -739,6 +749,14 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         {
             product.setDataSources(new ArrayList<>());
         }
+    }
+
+    private boolean containerIdNotDefinedOrProductSpecific(Product product) {
+        return product.getContainerId() == null || isProductSpecificContainerId(product);
+    }
+
+    private boolean isProductSpecificContainerId(Product product) {
+        return "productSpecific".toUpperCase(Locale.ENGLISH).equals(product.getContainerId().toUpperCase(Locale.ENGLISH));
     }
 
     @Override

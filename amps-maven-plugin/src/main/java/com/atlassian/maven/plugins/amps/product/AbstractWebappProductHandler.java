@@ -1,27 +1,31 @@
 package com.atlassian.maven.plugins.amps.product;
 
-import java.io.File;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.google.common.collect.ImmutableMap;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.plugin.MojoExecutionException;
-
 import com.atlassian.maven.plugins.amps.DataSource;
+import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.MavenGoals;
 import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.google.common.collect.ImmutableMap;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static com.atlassian.maven.plugins.amps.util.ProjectUtils.firstNotNull;
 
 public abstract class AbstractWebappProductHandler extends AbstractProductHandler
 {
+    private static final String CARGO_CONTAINER_ID_PROPERTY = "amps.product.specific.cargo.container";
+    private static final String SPECIFIC_CONTAINER_PROPERTY= "amps.product.specific.container";
+
     public AbstractWebappProductHandler(final MavenContext context, final MavenGoals goals, PluginProvider pluginProvider, ArtifactFactory artifactFactory)
     {
         super(context, goals, pluginProvider, artifactFactory);
@@ -52,7 +56,7 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
             artifact.setVersion(stableVersion);
             ctx.setVersion(stableVersion);
         }
-        
+
         // Copy the webapp war to target
         return goals.copyWebappWar(ctx.getId(), getBaseDirectory(ctx), artifact);
     }
@@ -93,7 +97,7 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
         ImmutableMap.Builder<String, String> systemProperties = ImmutableMap.builder();
         List<DataSource> dataSources = context.getDataSources();
         DataSource defaultValues = getDefaultDataSource(context);
-        
+
         if (defaultValues != null)
         {
             if (dataSources.isEmpty())
@@ -128,5 +132,48 @@ public abstract class AbstractWebappProductHandler extends AbstractProductHandle
     protected DataSource getDefaultDataSource(Product ctx)
     {
         return null;
+    }
+
+    /**
+     * Overrides version of webapp container artifact based on product pom
+     *
+     * @param ctx product context
+     * @throws MojoExecutionException throw during creating effective pom
+     */
+    @Override
+    protected void addOverridesFromProductPom(Product ctx) throws MojoExecutionException {
+        ProductArtifact defaults = getArtifact();
+        ProductArtifact artifact = new ProductArtifact(
+                firstNotNull(ctx.getGroupId(), defaults.getGroupId()),
+                firstNotNull(ctx.getArtifactId(), defaults.getArtifactId()),
+                firstNotNull(ctx.getVersion(), defaults.getVersion()));
+        File effectivePom = goals.generateEffectivePom(artifact, getBaseDirectory(ctx));
+
+        SAXReader reader = new SAXReader();
+        try {
+            Document document = reader.read(effectivePom.getAbsoluteFile());
+            Element properties = document.getRootElement().element("properties");
+
+
+            if (properties != null) {
+                Element customContainer = properties.element(SPECIFIC_CONTAINER_PROPERTY);
+                Element cargoId = properties.element(CARGO_CONTAINER_ID_PROPERTY);
+                setPropertiesInProduct(ctx, customContainer, cargoId);
+            }
+
+        } catch (DocumentException e) {
+            log.error("Error when reading effective pom", e);
+        }
+    }
+
+    private void setPropertiesInProduct(Product ctx, Element customContainer, Element cargoId) {
+        if (customContainer != null) {
+            if (ctx.getCustomContainerArtifact() == null && ctx.isContainerNotSpecified()) {
+                ctx.setCustomContainerArtifact(customContainer.getStringValue());
+                if (cargoId != null) {
+                    ctx.setContainerId(cargoId.getStringValue());
+                }
+            }
+        }
     }
 }

@@ -137,6 +137,7 @@
                                 <postBuildHookScript>validate</postBuildHookScript>
                                 <preBuildHookScript>setup</preBuildHookScript>
                                 <addTestClassPath>true</addTestClassPath>
+                                <mavenOpts>-Xmx2G -Xms1G</mavenOpts>
                             </configuration>
                             <executions>
                                 <execution>
