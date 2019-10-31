@@ -186,12 +186,15 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
         List<ProductExecution> productExecutions = getTestGroupProductExecutions(testGroupId);
         setParallelMode(productExecutions);
 
+        List<String> instanceIds = new ArrayList<>();
+
         int counter = 0;
         // Install the plugin in each product and start it
         for (ProductExecution productExecution : productExecutions)
         {
             ProductHandler productHandler = productExecution.getProductHandler();
             Product product = productExecution.getProduct();
+            instanceIds.add(product.getInstanceId());
             if (product.isInstallPlugin() == null)
             {
                 product.setInstallPlugin(installPlugin);
@@ -255,6 +258,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
             systemProperties.putAll(getProductFunctionalTestProperties(product));
         }
         putIfNotOverridden(systemProperties, "testGroup", testGroupId);
+        putIfNotOverridden(systemProperties, "testGroup.instanceIds", String.join(",", instanceIds));
         systemProperties.putAll(getTestGroupSystemProperties(testGroupId));
 
         if (!noWebapp)
