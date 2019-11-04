@@ -463,7 +463,7 @@ public class MavenGoals
                         element(name("excludeScope"), "provided"),
                         element(name("excludeScope"), "test"),
                         element(name("includeTypes"), "jar"),
-                        element(name("excludes"), "atlassian-plugin.xml, META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
+                        element(name("excludes"), "atlassian-plugin.xml, module-info.class, META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
                         element(name("outputDirectory"), "${project.build.outputDirectory}")
                 ),
                 executionEnvironment()
@@ -494,7 +494,7 @@ public class MavenGoals
                         element(name("excludeScope"), "test"),
                         element(name("includeTypes"), "jar"),
                         element(name("excludeArtifactIds"),"junit" + customExcludes),
-                        element(name("excludes"), "META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
+                        element(name("excludes"), "atlassian-plugin.xml, module-info.class, META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
                         element(name("outputDirectory"), "${project.build.testOutputDirectory}")
                 ),
                 executionEnvironment()
@@ -525,6 +525,7 @@ public class MavenGoals
                         element(name("excludeArtifactIds"),"junit" + customExcludes),
                         element(name("includeTypes"), "jar"),
                         element(name("useSubDirectoryPerScope"),"true"),
+                        element(name("excludes"), "atlassian-plugin.xml, module-info.class, META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
                         element(name("outputDirectory"), "${project.build.directory}/testlibs")
                 ),
                 executionEnvironment()
