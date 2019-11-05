@@ -1,16 +1,11 @@
 package com.atlassian.maven.plugins.amps;
 
-import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
-import org.apache.commons.lang3.StringUtils;
+import java.io.*;
+import java.util.*;
+import javax.annotation.*;
 
-import javax.annotation.Nullable;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import com.atlassian.maven.plugins.amps.util.*;
+import org.apache.commons.lang3.*;
 
 
 public class Product
@@ -677,11 +672,13 @@ public class Product
         this.productDataPath = productDataPath;
     }
 
-    public String getDataOverridesPath() {
+    public String getDataOverridesPath()
+    {
         return dataOverridesPath;
     }
 
-    public void setDataOverridesPath(String productHomeOverridesPath) {
+    public void setDataOverridesPath(String productHomeOverridesPath)
+    {
         this.dataOverridesPath = productHomeOverridesPath;
     }
 

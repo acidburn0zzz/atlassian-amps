@@ -1,32 +1,25 @@
 package com.atlassian.maven.plugins.amps.product;
 
 
-import static com.atlassian.maven.plugins.amps.util.FileUtils.copyDirectory;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.URLEncoder;
-import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.List;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 import com.atlassian.maven.plugins.amps.*;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
-
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
+import com.atlassian.maven.plugins.amps.util.*;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
-import com.atlassian.maven.plugins.amps.util.ZipUtils;
-import com.google.common.collect.Lists;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.*;
+import com.google.common.collect.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.*;
+import org.apache.maven.artifact.*;
+import org.apache.maven.artifact.factory.*;
+import org.apache.maven.plugin.*;
+import org.apache.maven.plugin.logging.*;
+import org.apache.maven.project.*;
+
+import static com.atlassian.maven.plugins.amps.util.FileUtils.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * This abstract class is common to real applications (which inherit from AbstractProductHandler, like JIRA or Confluence)
@@ -189,7 +182,8 @@ public abstract class AmpsProductHandler implements ProductHandler
         return productHomeZip;
     }
 
-    protected void overrideAndPatchHomeDir(File homeDir, final Product ctx) throws MojoExecutionException {
+    protected void overrideAndPatchHomeDir(File homeDir, final Product ctx) throws MojoExecutionException
+    {
         File srcDir = null;
         String overridesPath = ctx.getDataOverridesPath();
         if (isNotBlank(overridesPath))
