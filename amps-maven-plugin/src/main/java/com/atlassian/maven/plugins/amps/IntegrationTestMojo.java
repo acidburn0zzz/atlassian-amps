@@ -245,7 +245,6 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 
 
             putIfNotOverridden(systemProperties, "baseurl." + product.getInstanceId(), baseUrl);
-            putIfNotOverridden(systemProperties, "plugin.jar", pluginJar);
 
             // yes, this means you only get one base url if multiple products, but that is what selenium would expect
             putIfNotOverridden(systemProperties, "baseurl", baseUrl);
@@ -257,6 +256,7 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
 
             systemProperties.putAll(getProductFunctionalTestProperties(product));
         }
+        putIfNotOverridden(systemProperties, "plugin.jar", pluginJar);
         putIfNotOverridden(systemProperties, "testGroup", testGroupId);
         putIfNotOverridden(systemProperties, "testGroup.instanceIds", String.join(",", instanceIds));
         systemProperties.putAll(getTestGroupSystemProperties(testGroupId));
