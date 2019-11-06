@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- IntegratedTestMojo: Fixed name of the product version property
+
 ### Removed
 
 ##8.0.0
