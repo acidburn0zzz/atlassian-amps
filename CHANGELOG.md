@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - IntegratedTestMojo: Fixed name of the product version property
+- MavenGoals: Update maven-javadoc-plugin to fix rest doc generation for plain maven builds
 
 ### Removed
 
