@@ -12,8 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AbstractWebappProductHandler: Added overrides for webapp container artifact and _containerId_ with properties defined in product's pom. Properties' names:
     - _amps.product.specific.cargo.container_ for cargo container id
     - _amps.product.specific.container_ for container artifact
+- IntegratedTestMojo: Added testGroup.instanceIds property, a comma separated list of all product instances in the current testgroup.
+  This can be used as an entrypoint to discover each instances complete configuration through the properties.
 
 ### Changed
+
+- IntegratedTestMojo: Fixed name of the product version property
 
 ### Removed
 
