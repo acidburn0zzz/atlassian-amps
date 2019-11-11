@@ -154,7 +154,7 @@ public class MavenGoals
                 .put("maven-help-plugin", overrides.getProperty("maven-help-plugin", "3.2.0"))
                 .put("maven-install-plugin", overrides.getProperty("maven-install-plugin","2.5.2"))
                 .put("maven-jar-plugin", overrides.getProperty("maven-jar-plugin","3.0.2"))
-                .put("maven-javadoc-plugin", overrides.getProperty("maven-javadoc-plugin", "3.0.1"))
+                .put("maven-javadoc-plugin", overrides.getProperty("maven-javadoc-plugin", "3.1.1"))
                 .put("maven-release-plugin", overrides.getProperty("maven-release-plugin", "2.5.3"))
                 .put("maven-resources-plugin", overrides.getProperty("maven-resources-plugin","2.6"))
                 .put("maven-surefire-plugin", overrides.getProperty("maven-surefire-plugin","2.22.1"))
