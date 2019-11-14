@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  database:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: confluence
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
+    volumes:
+      - ./${TARGET_DIR}/postgresql/data:/var/lib/postgresql/data
+  confluence:
+    image: atlassian/confluence-server:${VERSION}
+    depends_on:
+      - database
+    restart: always
+    environment:
+      ATL_PROXY_NAME: localhost
+      ATL_PROXY_PORT: 1990
+      ATL_TOMCAT_CONTEXTPATH: /confluence
+      ATL_JDBC_URL: jdbc:postgresql://database/confluence
+      ATL_JDBC_USER: confluence
+      ATL_JDBC_PASSWORD: password
+      ATL_DB_TYPE: postgresql
+    ports:
+      - 8090
+      - 8091
+    volumes:
+      - /var/atlassian/application-data/confluence
+  load-balancer:
+    image: nginx:latest
+    depends_on:
+      - confluence
+    restart: always
+    ports:
+      - ${HTTP_PORT}:${HTTP_PORT}
+    volumes:
+      - ./confluence-nginx.conf:/etc/nginx/confluence-nginx.conf:ro

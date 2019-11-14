@@ -16,6 +16,9 @@ dependency-reduced-pom.xml
 *.backup
 *.versionsBackup
 
+# OS files
+.DS_Store
+
 # These were here when I got here, honest
 *~
 *.log

@@ -205,6 +205,11 @@ public class Product
     private String quickReloadVersion;
 
     /**
+     * Should Clustering be enable.
+     */
+    private Boolean enableClustering;
+
+    /**
      * If PluginViewer should be used.
      */
     private Boolean enablePluginViewer;
@@ -374,6 +379,7 @@ public class Product
         prod.setEnableDevToolbox(enableDevToolbox == null ? product.isEnableDevToolbox() : enableDevToolbox);
         prod.setDevToolboxVersion(devToolboxVersion == null ? product.getDevToolboxVersion() : devToolboxVersion);
         prod.setEnableQuickReload(enableQuickReload == null ? product.isEnableQuickReload() : enableQuickReload);
+        prod.setEnableClustering(enableClustering == null ? product.isEnableClustering() : enableClustering);
         prod.setQuickReloadVersion(quickReloadVersion == null ? product.getQuickReloadVersion() : quickReloadVersion);
         prod.setEnablePluginViewer(enablePluginViewer == null ? product.isEnablePluginViewer() : enablePluginViewer);
         prod.setPluginViewerVersion(pluginViewerVersion == null ? product.getPluginViewerVersion() : pluginViewerVersion);
@@ -852,6 +858,16 @@ public class Product
     public void setEnableQuickReload(final Boolean enableQuickReload)
     {
         this.enableQuickReload = enableQuickReload;
+    }
+
+    public Boolean isEnableClustering()
+    {
+        return enableClustering;
+    }
+
+    public void setEnableClustering(final Boolean enableClustering)
+    {
+        this.enableClustering = enableClustering;
     }
 
     public String getPluginViewerVersion() {

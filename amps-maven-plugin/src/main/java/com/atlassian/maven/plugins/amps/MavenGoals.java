@@ -160,6 +160,7 @@ public class MavenGoals
                 .put("maven-surefire-plugin", overrides.getProperty("maven-surefire-plugin","2.22.1"))
                 .put("sql-maven-plugin", overrides.getProperty("sql-maven-plugin", "1.5"))
                 .put("yuicompressor-maven-plugin", overrides.getProperty("yuicompressor-maven-plugin","1.5.1"))
+                .put("docker-maven-plugin", overrides.getProperty("docker-maven-plugin", "0.31.0"))
                 .build();
     }
 
@@ -848,161 +849,184 @@ public class MavenGoals
     public int startWebapp(final String productInstanceId, final File war, final Map<String, String> systemProperties,
                            final List<ProductArtifact> extraContainerDependencies,
                            final List<ProductArtifact> extraProductDeployables,
-                           final Product webappContext) throws MojoExecutionException
-    {
-        final Container container = getContainerFromWebappContext(webappContext);
-        File containerDir = new File(container.getInstallDirectory(getBuildDirectory()));
-
-        // retrieve non-embedded containers
-        if (!container.isEmbedded())
-        {
-            if (containerDir.exists())
-            {
-                log.info("Reusing unpacked container '" + container.getId() + "' from " + containerDir.getPath());
-            }
-            else
-            {
-                log.info("Unpacking container '" + container.getId() + "' from container artifact: " + container.toString());
-                unpackContainer(container);
-            }
-        }
-
+                           final Product webappContext) throws MojoExecutionException {
         final int httpPort;
         final String protocol;
-        if (webappContext.isHttps())
-        {
+        if (webappContext.isHttps()) {
             httpPort = webappContext.getHttpsPort();
             protocol = "https";
         }
-        else
-        {
+        else {
             httpPort = webappContext.getHttpPort();
             protocol = "http";
         }
 
         final int actualHttpPort;
-        if (httpPort == 0)
-        {
+        if (httpPort == 0) {
             actualHttpPort = pickFreePort(httpPort);
         }
-        else
-        {
+        else {
             actualHttpPort = httpPort;
-            if (!isPortFree(actualHttpPort))
-            {
+            if (!isPortFree(actualHttpPort)) {
                 final String httpErrorMessage = String.format("%s: The configured HTTP port, %d, is in use", productInstanceId, httpPort);
                 log.error(httpErrorMessage);
                 throw new MojoExecutionException(httpErrorMessage);
             }
         }
 
-        final int rmiPort = webappContext.getRmiPort();
-        final int actualRmiPort;
-        if (rmiPort == 0)
-        {
-            actualRmiPort = pickFreePort(rmiPort);
-        }
-        else
-        {
-            actualRmiPort = rmiPort;
-            if (!isPortFree(actualRmiPort))
+        if (webappContext.isEnableClustering()) {
+            final Plugin docker = docker(webappContext);
+            MojoUtils.execute(
+                    docker,
+                    goal("start"),
+                    configurationWithoutNullElements(
+                            element(name("images"),
+                                element(name("image"),
+                                        element(name("alias"), "cluster"),
+                                        element(name("name"), "clustered-amps"),
+                                        element(name("external"),
+                                                element(name("type"), "compose"),
+                                                element(name("basedir"), "src/main/resources/docker"),
+                                                element(name("composeFile"), getContextProject().getBuild().getOutputDirectory() + "/docker/" + webappContext.instanceId + "-docker-compose.yml")
+                                        ),
+                                        element(name("build"),
+                                                element(name("env"),
+                                                        element(name("TARGET_DIR"), webappContext.dataHome),
+                                                        element(name("VERSION"), webappContext.version),
+                                                        element(name("HTTP_PORT"), String.valueOf(actualHttpPort))
+                                                )
+                                        )
+                                )
+                            )
+                    ),
+                    executionEnvironment()
+            );
+        } else {
+            final Container container = getContainerFromWebappContext(webappContext);
+            File containerDir = new File(container.getInstallDirectory(getBuildDirectory()));
+
+            // retrieve non-embedded containers
+            if (!container.isEmbedded())
             {
-                final String rmiErrorMessage = String.format("%s: The configured RMI port, %d, is in use", productInstanceId, rmiPort);
-                log.error(rmiErrorMessage);
-                throw new MojoExecutionException(rmiErrorMessage);
+                if (containerDir.exists())
+                {
+                    log.info("Reusing unpacked container '" + container.getId() + "' from " + containerDir.getPath());
+                }
+                else
+                {
+                    log.info("Unpacking container '" + container.getId() + "' from container artifact: " + container.toString());
+                    unpackContainer(container);
+                }
             }
-        }
 
-        final int ajpPort = webappContext.getAjpPort();
-        final int actualAjpPort;
-        if (ajpPort == 0)
-        {
-            actualAjpPort = pickFreePort(ajpPort);
-        }
-        else
-        {
-            actualAjpPort = ajpPort;
-            if (!isPortFree(actualAjpPort))
+            final int rmiPort = webappContext.getRmiPort();
+            final int actualRmiPort;
+            if (rmiPort == 0)
             {
-                final String ajpErrorMessage = String.format("%s: The configured AJP port, %d, is in use", productInstanceId, ajpPort);
-                log.error(ajpErrorMessage);
-                throw new MojoExecutionException(ajpErrorMessage);
+                actualRmiPort = pickFreePort(rmiPort);
             }
-        }
+            else
+            {
+                actualRmiPort = rmiPort;
+                if (!isPortFree(actualRmiPort))
+                {
+                    final String rmiErrorMessage = String.format("%s: The configured RMI port, %d, is in use", productInstanceId, rmiPort);
+                    log.error(rmiErrorMessage);
+                    throw new MojoExecutionException(rmiErrorMessage);
+                }
+            }
 
-        final List<Element> sysProps = new ArrayList<>();
-        systemProperties.forEach((key, value) -> sysProps.add(element(name(key), value)));
+            final int ajpPort = webappContext.getAjpPort();
+            final int actualAjpPort;
+            if (ajpPort == 0)
+            {
+                actualAjpPort = pickFreePort(ajpPort);
+            }
+            else
+            {
+                actualAjpPort = ajpPort;
+                if (!isPortFree(actualAjpPort))
+                {
+                    final String ajpErrorMessage = String.format("%s: The configured AJP port, %d, is in use", productInstanceId, ajpPort);
+                    log.error(ajpErrorMessage);
+                    throw new MojoExecutionException(ajpErrorMessage);
+                }
+            }
 
-        log.info("Starting " + productInstanceId + " on the " + container.getId() + " container on ports "
-                + actualHttpPort + " (" + protocol + "), " + actualRmiPort + " (rmi) and " + actualAjpPort + " (ajp)");
+            final List<Element> sysProps = new ArrayList<>();
+            systemProperties.forEach((key, value) -> sysProps.add(element(name(key), value)));
 
-        final String baseUrl = getBaseUrl(webappContext, actualHttpPort);
-        sysProps.add(element(name("baseurl"), baseUrl));
+            log.info("Starting " + productInstanceId + " on the " + container.getId() + " container on ports "
+                    + actualHttpPort + " (" + protocol + "), " + actualRmiPort + " (rmi) and " + actualAjpPort + " (ajp)");
 
-        final List<Element> deps = extractDependencies(extraContainerDependencies, webappContext);
+            final String baseUrl = getBaseUrl(webappContext, actualHttpPort);
+            sysProps.add(element(name("baseurl"), baseUrl));
 
-        final List<Element> deployables = new ArrayList<>();
-        deployables.add(element(name("deployable"),
-                element(name("groupId"), "foo"),
-                element(name("artifactId"), "bar"),
-                element(name("type"), "war"),
-                element(name("location"), war.getPath()),
-                element(name("properties"),
-                        element(name("context"), webappContext.getContextPath())
-                )
-        ));
+            final List<Element> deps = extractDependencies(extraContainerDependencies, webappContext);
 
-        for (final ProductArtifact extra : extraProductDeployables)
-        {
+            final List<Element> deployables = new ArrayList<>();
             deployables.add(element(name("deployable"),
-                    element(name("groupId"), extra.getGroupId()),
-                    element(name("artifactId"), extra.getArtifactId()),
-                    element(name("type"), extra.getType()),
-                    element(name("location"), extra.getPath())
+                    element(name("groupId"), "foo"),
+                    element(name("artifactId"), "bar"),
+                    element(name("type"), "war"),
+                    element(name("location"), war.getPath()),
+                    element(name("properties"),
+                            element(name("context"), webappContext.getContextPath())
+                    )
             ));
-        }
 
-        final List<Element> props =
-                getConfigurationProperties(systemProperties, webappContext, actualRmiPort, actualHttpPort, actualAjpPort, protocol);
+            for (final ProductArtifact extra : extraProductDeployables)
+            {
+                deployables.add(element(name("deployable"),
+                        element(name("groupId"), extra.getGroupId()),
+                        element(name("artifactId"), extra.getArtifactId()),
+                        element(name("type"), extra.getType()),
+                        element(name("location"), extra.getPath())
+                ));
+            }
 
-        int startupTimeout = webappContext.getStartupTimeout();
-        if (Boolean.FALSE.equals(webappContext.getSynchronousStartup()))
-        {
-            startupTimeout = 0;
-        }
+            final List<Element> props =
+                    getConfigurationProperties(systemProperties, webappContext, actualRmiPort, actualHttpPort, actualAjpPort, protocol);
 
-        Plugin cargo = cargo(webappContext);
-        MojoUtils.execute(
-                cargo,
-                goal("start"),
-                configurationWithoutNullElements(
-                        element(name("deployables"), deployables.toArray(new Element[0])),
-                        waitElement(cargo), // This may be null
-                        element(name("container"),
-                                element(name("containerId"), container.getId()),
-                                element(name("type"), container.getType()),
-                                element(name("home"), container.getInstallDirectory(getBuildDirectory())),
-                                element(name("output"), webappContext.getOutput()),
-                                element(name("systemProperties"), sysProps.toArray(new Element[0])),
-                                element(name("dependencies"), deps.toArray(new Element[0])),
-                                element(name("timeout"), String.valueOf(startupTimeout))
-                        ),
-                        element(name("configuration"), removeNullElements(
+            int startupTimeout = webappContext.getStartupTimeout();
+            if (Boolean.FALSE.equals(webappContext.getSynchronousStartup()))
+            {
+                startupTimeout = 0;
+            }
+
+            final Plugin cargo = cargo(webappContext);
+            MojoUtils.execute(
+                    cargo,
+                    goal("start"),
+                    configurationWithoutNullElements(
+                            element(name("deployables"), deployables.toArray(new Element[0])),
+                            waitElement(cargo), // This may be null
+                            element(name("container"),
+                                    element(name("containerId"), container.getId()),
+                                    element(name("type"), container.getType()),
+                                    element(name("home"), container.getInstallDirectory(getBuildDirectory())),
+                                    element(name("output"), webappContext.getOutput()),
+                                    element(name("systemProperties"), sysProps.toArray(new Element[0])),
+                                    element(name("dependencies"), deps.toArray(new Element[0])),
+                                    element(name("timeout"), String.valueOf(startupTimeout))
+                            ),
+                            element(name("configuration"), removeNullElements(
                                     element(name("configfiles"), getExtraContainerConfigurationFiles()),
                                     element(name("home"), container.getConfigDirectory(getBuildDirectory(), productInstanceId)),
                                     element(name("type"), "standalone"),
                                     element(name("properties"), props.toArray(new Element[0])),
                                     xmlReplacementsElement(webappContext.getCargoXmlOverrides())) // This may be null
+                            ),
+                            // Fix issue AMPS copy 2 War files to container
+                            // Refer to Cargo documentation: when project's packaging is war, ear, ejb
+                            // the generated artifact will automatic copy to target container.
+                            // For avoiding this behavior, just add an empty <deployer/> element
+                            element(name("deployer"))
+                    ),
+                    executionEnvironment()
+            );
+        }
 
-                        ),
-                        // Fix issue AMPS copy 2 War files to container
-                        // Refer to Cargo documentation: when project's packaging is war, ear, ejb
-                        // the generated artifact will automatic copy to target container.
-                        // For avoiding this behavior, just add an empty <deployer/> element
-                        element(name("deployer"))
-                ),
-                executionEnvironment()
-        );
         return actualHttpPort;
     }
 
@@ -1144,33 +1168,40 @@ public class MavenGoals
         return props;
     }
 
-    public void stopWebapp(final String productId, final String containerId, final Product webappContext) throws MojoExecutionException
-    {
-        final Container container = getContainerFromWebappContext(webappContext);
+    public void stopWebapp(final String productId, final String containerId, final Product webappContext) throws MojoExecutionException {
+        if (webappContext.isEnableClustering()) {
+            MojoUtils.execute(
+                    docker(webappContext),
+                    goal("stop"),
+                    configuration(element(name("allContainers"), "true")),
+                    executionEnvironment()
+            );
+        } else {
+            final Container container = getContainerFromWebappContext(webappContext);
 
-        String actualShutdownTimeout = webappContext.getSynchronousStartup() ? "0" : String.valueOf(webappContext.getShutdownTimeout());
-
-        MojoUtils.execute(
-                cargo(webappContext),
-                goal("stop"),
-                configuration(
-                        element(name("container"),
-                                element(name("containerId"), container.getId()),
-                                element(name("type"), container.getType()),
-                                element(name("timeout"), actualShutdownTimeout),
-                                // org.codehaus.cargo
-                                element(name("home"), container.getInstallDirectory(getBuildDirectory()))
-                        ),
-                        element(name("configuration"),
-                                // org.twdata.maven
-                                element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId)),
-                                //we don't need that atm. since timeout is 0 for org.codehaus.cargo
-                                //hoping this will fix AMPS-987
-                                element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext))
-                        )
-                ),
-                executionEnvironment()
-        );
+            final String actualShutdownTimeout = webappContext.getSynchronousStartup() ? "0" : String.valueOf(webappContext.getShutdownTimeout());
+            MojoUtils.execute(
+                    cargo(webappContext),
+                    goal("stop"),
+                    configuration(
+                            element(name("container"),
+                                    element(name("containerId"), container.getId()),
+                                    element(name("type"), container.getType()),
+                                    element(name("timeout"), actualShutdownTimeout),
+                                    // org.codehaus.cargo
+                                    element(name("home"), container.getInstallDirectory(getBuildDirectory()))
+                            ),
+                            element(name("configuration"),
+                                    // org.twdata.maven
+                                    element(name("home"), container.getConfigDirectory(getBuildDirectory(), productId)),
+                                    //we don't need that atm. since timeout is 0 for org.codehaus.cargo
+                                    //hoping this will fix AMPS-987
+                                    element(name("properties"), createShutdownPortsPropertiesConfiguration(webappContext))
+                            )
+                    ),
+                    executionEnvironment()
+            );
+        }
     }
 
     /**
@@ -1196,6 +1227,16 @@ public class MavenGoals
         properties.add(element(name("cargo.servlet.port"), httpPort));
         properties.add(element(name(AJP_PORT_PROPERTY), httpPort));
         return properties.toArray(new Element[properties.size()]);
+    }
+
+    protected Plugin docker(Product context)
+    {
+        final String dockerVersion = defaultArtifactIdToVersionMap.get("docker-maven-plugin");
+        log.info("using docker maven v" + dockerVersion);
+        return plugin(
+                groupId("io.fabric8"),
+                artifactId("docker-maven-plugin"),
+                version(dockerVersion));
     }
 
     /**

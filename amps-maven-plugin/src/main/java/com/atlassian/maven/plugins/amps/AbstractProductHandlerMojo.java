@@ -250,6 +250,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     protected boolean enableQuickReload;
 
     /**
+     * If Clustering should be used.
+     */
+    @Parameter(property = "clustering.enable", defaultValue = "false")
+    protected boolean enableClustering;
+
+    /**
      * QuickReload version should be used.
      */
     @Parameter(property = "quickreload.version", defaultValue = DEFAULT_QUICK_RELOAD_VERSION)
@@ -491,6 +497,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setWebConsoleVersion(webConsoleVersion);
 
         ctx.setEnableQuickReload(enableQuickReload);
+        ctx.setEnableClustering(enableClustering);
         ctx.setQuickReloadVersion(quickReloadVersion);
 
         ctx.setEnablePluginViewer(enablePluginViewer);
@@ -648,6 +655,11 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         if (product.getQuickReloadVersion() == null)
         {
             product.setQuickReloadVersion(DEFAULT_QUICK_RELOAD_VERSION);
+        }
+
+        if (product.isEnableClustering() == null)
+        {
+            product.setEnableClustering(false);
         }
 
         if (product.isEnablePluginViewer() == null)
