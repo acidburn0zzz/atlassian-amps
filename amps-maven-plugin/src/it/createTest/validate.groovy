@@ -34,7 +34,7 @@ assert pluginXml.'plugin-info'.version.text() == '${project.version}'
 
 final File packageDir = new File("$projectDir/src/main/java/${'com.atlassian.it'.replace('.', '/')}")
 assert packageDir.exists(), "Package should exist at $packageDir"
-assert packageDir.list().length == 2, "Package should contain two subpackages" // api and impl
+assert packageDir.list().length == 3, "Package should contain three subpackages" // api, config and impl
 assert new File(packageDir, 'api/MyPluginComponent.java').exists(), "api should contain MyPluginComponent interface"
 assert new File(packageDir, 'impl/MyPluginComponentImpl.java').exists(), "impl should contain MyPluginComponentImpl class"
 

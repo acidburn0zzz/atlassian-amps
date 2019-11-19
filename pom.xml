@@ -73,7 +73,7 @@
         <crowd.data.version>${crowd.version}</crowd.data.version>
         <clover.version>3.1.7</clover.version>
         <plugin.testrunner.version>2.0.1</plugin.testrunner.version>
-        <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
+        <osgi.javaconfig.version>0.2.0</osgi.javaconfig.version>
         <maven.cli.version>1.0.11</maven.cli.version>
         <postgres.version>42.2.5</postgres.version>
         <mysql.version>5.1.47</mysql.version>
