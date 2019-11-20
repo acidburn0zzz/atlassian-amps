@@ -203,7 +203,8 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                 plugins.addAll(getTestFrameworkPlugins());
             }
 
-            int actualHttpPort = 0;
+            // setting it to a real port allows running tests with an externally run server.
+            int actualHttpPort = product.httpPort;
             if (!noWebapp)
             {
                 if(jvmDebugPort > 0)
