@@ -1,11 +1,16 @@
 package com.atlassian.maven.plugins.amps;
 
-import java.io.*;
-import java.util.*;
-import javax.annotation.*;
+import com.atlassian.maven.plugins.amps.util.ArtifactRetriever;
+import org.apache.commons.lang3.StringUtils;
 
-import com.atlassian.maven.plugins.amps.util.*;
-import org.apache.commons.lang3.*;
+import javax.annotation.Nullable;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 
 public class Product
@@ -211,7 +216,7 @@ public class Product
      * Version of the PDE plugin
      */
     private String pdeVersion;
-    
+
     /**
      * Product id - nickname of the product to run
      */
@@ -328,7 +333,7 @@ public class Product
      * </products>
      * }
      * </pre>
-     * 
+     *
      */
     protected List<DataSource> dataSources;
 
@@ -677,8 +682,7 @@ public class Product
         return dataOverridesPath;
     }
 
-    public void setDataOverridesPath(String productHomeOverridesPath)
-    {
+    public void setDataOverridesPath(String productHomeOverridesPath) {
         this.dataOverridesPath = productHomeOverridesPath;
     }
 
@@ -1025,7 +1029,7 @@ public class Product
      */
     public void setDataSources(List<DataSource> dataSources)
     {
-        this.dataSources = dataSources;    
+        this.dataSources = dataSources;
     }
 
     /**
