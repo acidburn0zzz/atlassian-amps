@@ -14,7 +14,7 @@
 #else
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:atlassian-scanner="http://www.atlassian.com/schema/atlassian-scanner/2"
+       xmlns:atlassian-scanner="http://www.atlassian.com/schema/atlassian-scanner"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.atlassian.com/schema/atlassian-scanner

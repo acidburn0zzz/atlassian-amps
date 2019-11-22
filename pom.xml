@@ -35,7 +35,7 @@
         <module>maven-3-tests</module>
         <module>amps-dispatcher-maven-plugin</module>
         <module>amps-product-plugins</module>
-    </modules>
+  </modules>
 
     <scm>
         <connection>scm:git:git@bitbucket.org:atlassian/amps.git</connection>
@@ -73,7 +73,8 @@
         <crowd.data.version>${crowd.version}</crowd.data.version>
         <clover.version>3.1.7</clover.version>
         <plugin.testrunner.version>2.0.1</plugin.testrunner.version>
-        <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
+        <atlassian.spring.scanner.version>2.1.7</atlassian.spring.scanner.version>
+        <osgi.javaconfig.version>0.2.0</osgi.javaconfig.version>
         <maven.cli.version>1.0.11</maven.cli.version>
         <postgres.version>42.2.5</postgres.version>
         <mysql.version>5.1.47</mysql.version>
@@ -85,6 +86,8 @@
         <invoker.groupId>com.atlassian.maven.plugins</invoker.groupId>
         <invoker.product>amps</invoker.product>
         <spring.version>5.0.12.RELEASE</spring.version>
+        <!-- version of Spring used for OSGi Java Config projects. It's a lower bound of what products may launch with -->
+        <osgi.javaconfig.spring.version>4.2.5.RELEASE</osgi.javaconfig.spring.version>
     </properties>
 
     <dependencyManagement>
@@ -193,7 +196,13 @@
             <dependency>
                 <groupId>org.apache.maven.archetype</groupId>
                 <artifactId>archetype-common</artifactId>
-                <version>2.2</version>
+                <version>3.0.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Other Atlassian libraries -->
@@ -579,7 +588,7 @@
             <id>nosdk</id>
             <properties>
                 <release.profiles>release</release.profiles>
-                <release.arguments />
+                <release.arguments/>
             </properties>
         </profile>
     </profiles>

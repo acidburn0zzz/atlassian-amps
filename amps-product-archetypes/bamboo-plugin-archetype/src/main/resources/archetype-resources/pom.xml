@@ -1,4 +1,5 @@
 #set( $dollar = '$' )
+#set( $useOsgiJavaConfigParsed = $useOsgiJavaConfig.equalsIgnoreCase('Y') )
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -23,7 +24,12 @@
         <bamboo.data.version>\${bambooDataVersion}</bamboo.data.version>
         <amps.version>${project.version}</amps.version>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
+#if ($useOsgiJavaConfigParsed)
+        <spring.version>${osgi.javaconfig.spring.version}</spring.version>
+        <osgi.javaconfig.version>${osgi.javaconfig.version}</osgi.javaconfig.version>
+#else
         <atlassian.spring.scanner.version>${atlassian.spring.scanner.version}</atlassian.spring.scanner.version>
+#end
         <!-- This property ensures consistency between the key in atlassian-plugin.xml and the OSGi bundle's key. -->
         <atlassian.plugin.key>\${dollar}{project.groupId}.\${dollar}{project.artifactId}</atlassian.plugin.key>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -39,26 +45,45 @@
             <scope>provided</scope>
         </dependency>
 
+#if ($useOsgiJavaConfigParsed)
+        <dependency>
+            <groupId>com.atlassian.plugins</groupId>
+            <artifactId>atlassian-plugins-osgi-javaconfig</artifactId>
+            <version>${dollar}{osgi.javaconfig.version}</version>
+        </dependency>
+        <!-- OSGi Java Config dependencies -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>4.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${dollar}{spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${dollar}{spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+#else
         <dependency>
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-annotation</artifactId>
             <version>\${dollar}{atlassian.spring.scanner.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.atlassian.plugin</groupId>
-            <artifactId>atlassian-spring-scanner-runtime</artifactId>
-            <version>\${dollar}{atlassian.spring.scanner.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
             <scope>provided</scope>
         </dependency>
+#end
         
         <dependency>
             <groupId>junit</groupId>
@@ -121,7 +146,7 @@
                     </instructions>
                 </configuration>
             </plugin>
-
+#if (!$useOsgiJavaConfigParsed)
             <plugin>
                 <groupId>com.atlassian.plugin</groupId>
                 <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
@@ -135,15 +160,10 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <scannedDependencies>
-                        <dependency>
-                            <groupId>com.atlassian.plugin</groupId>
-                            <artifactId>atlassian-spring-scanner-external-jar</artifactId>
-                        </dependency>
-                    </scannedDependencies>
                     <verbose>false</verbose>
                 </configuration>
             </plugin>
+#end
         </plugins>
     </build>
 </project>
