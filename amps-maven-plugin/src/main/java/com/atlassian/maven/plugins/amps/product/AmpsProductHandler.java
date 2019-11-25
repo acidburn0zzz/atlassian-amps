@@ -198,13 +198,13 @@ public abstract class AmpsProductHandler implements ProductHandler
         if (isNotBlank(overridesPath))
         {
             srcDir = new File(overridesPath);
-            if (!srcDir.exists() || !srcDir.isDirectory())
+            if (!srcDir.isDirectory())
             {
                 srcDir = new File(project.getBasedir(), overridesPath);
             }
         }
 
-        if (srcDir == null || !srcDir.exists())
+        if (srcDir == null || !srcDir.isDirectory())
         {
             srcDir = new File(project.getBasedir(), "src/test/resources/" + ctx.getInstanceId() + "-home");
         }
