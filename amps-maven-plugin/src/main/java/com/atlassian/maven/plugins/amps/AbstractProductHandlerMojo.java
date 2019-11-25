@@ -225,6 +225,12 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
     private String productDataPath;
 
     /**
+     * The path to a directory with home directory overrides.
+     */
+    @Parameter(property = "product.data.overrides.path")
+    private String productDataOverridesPath;
+
+    /**
      * If DevToolbox should be enabled
      */
     @Parameter(property = "devtoolbox.enable", defaultValue = "true")
@@ -475,6 +481,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         ctx.setVersion(productVersion);
         ctx.setDataVersion(productDataVersion);
         ctx.setDataPath(productDataPath);
+        ctx.setDataOverridesPath(productDataOverridesPath);
 
         // continue to have these work for now
         ctx.setRestVersion(restVersion);
