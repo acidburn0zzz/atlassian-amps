@@ -198,7 +198,7 @@ public class MavenGoals
         {
             props = new CreatePluginProperties(systemProps.getProperty("groupId"),
                     systemProps.getProperty("artifactId"), systemProps.getProperty("version"),
-                    systemProps.getProperty("package"));
+                    systemProps.getProperty("package"), systemProps.getProperty("useOsgiJavaConfig", "N"));
         }
         if (null == props)
         {
@@ -221,6 +221,7 @@ public class MavenGoals
             userProperties.setProperty("artifactId", props.getArtifactId());
             userProperties.setProperty("version", props.getVersion());
             userProperties.setProperty("package", props.getThePackage());
+            userProperties.setProperty("useOsgiJavaConfig", props.getUseOsgiJavaConfigInMavenInvocationFormat());
 
             MojoUtils.executeWithMergedConfig(
                     plugin(

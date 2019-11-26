@@ -83,6 +83,7 @@
                     compressResourcesWithIncludeParamTest,
                     copyBundledDependenciesTest,
                     createTest,
+                    createOsgiJavaConfigTest,
                     debugTest,
                     debugWithPortConflictTest,
                     debugWithTestGroupTest,
