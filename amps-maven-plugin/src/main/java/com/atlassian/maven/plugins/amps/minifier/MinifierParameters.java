@@ -1,28 +1,27 @@
 package com.atlassian.maven.plugins.amps.minifier;
 
-import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.logging.Log;
 
-import java.io.File;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.Map;
 
-public class MinifierParameters
-{
+/**
+ * Stores configuration values from the build that are relevant for any minification
+ * operations to be performed on resources in the current build.
+ */
+public class MinifierParameters {
     private boolean compressJs;
     private boolean compressCss;
     private boolean useClosureForJs;
     private Charset cs;
     private Log log;
-    private Map<String,String> closureOptions;
+    private Map<String, String> closureOptions;
 
     public MinifierParameters(boolean compressJs,
                               boolean compressCss,
                               boolean useClosureForJs,
                               Charset cs, Log log,
-                              Map<String, String> closureOptions)
-    {
+                              Map<String, String> closureOptions) {
         this.compressJs = compressJs;
         this.compressCss = compressCss;
         this.useClosureForJs = useClosureForJs;
@@ -31,33 +30,27 @@ public class MinifierParameters
         this.closureOptions = closureOptions;
     }
 
-    public boolean isCompressJs()
-    {
+    public boolean isCompressJs() {
         return compressJs;
     }
 
-    public boolean isCompressCss()
-    {
+    public boolean isCompressCss() {
         return compressCss;
     }
 
-    public boolean isUseClosureForJs()
-    {
+    public boolean isUseClosureForJs() {
         return useClosureForJs;
     }
 
-    public Charset getCs()
-    {
+    public Charset getCs() {
         return cs;
     }
 
-    public Log getLog()
-    {
+    public Log getLog() {
         return log;
     }
 
-    public Map<String, String> getClosureOptions()
-    {
+    public Map<String, String> getClosureOptions() {
         return closureOptions;
     }
 

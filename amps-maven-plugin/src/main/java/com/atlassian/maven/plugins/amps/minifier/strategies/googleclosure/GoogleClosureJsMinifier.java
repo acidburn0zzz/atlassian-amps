@@ -1,4 +1,4 @@
-package com.atlassian.maven.plugins.amps.util.minifier;
+package com.atlassian.maven.plugins.amps.minifier.strategies.googleclosure;
 
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -11,10 +11,7 @@ import org.apache.maven.plugin.logging.Log;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * @since version
- */
-public class GoogleClosureJSMinifier
+public class GoogleClosureJsMinifier
 {
     /**
      * Needed as a tuple to return two things from the method - compiled code and source map.

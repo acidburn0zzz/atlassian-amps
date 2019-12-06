@@ -1,4 +1,4 @@
-package com.atlassian.maven.plugins.amps.util.minifier;
+package com.atlassian.maven.plugins.amps.minifier.strategies.googleclosure;
 
 import com.google.javascript.jscomp.CompilerOptions;
 import org.apache.maven.plugin.logging.Log;
