@@ -1,4 +1,4 @@
-package com.atlassian.maven.plugins.amps.util.minifier;
+package com.atlassian.maven.plugins.amps.minifier;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.atlassian.maven.plugins.amps.util.minifier.GoogleClosureJSMinifier;
+import com.atlassian.maven.plugins.amps.util.minifier.YUIErrorReporter;
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
 import com.yahoo.platform.yui.compressor.CssCompressor;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;

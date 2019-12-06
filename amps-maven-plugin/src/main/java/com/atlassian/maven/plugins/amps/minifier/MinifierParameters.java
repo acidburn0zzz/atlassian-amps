@@ -1,4 +1,4 @@
-package com.atlassian.maven.plugins.amps.util.minifier;
+package com.atlassian.maven.plugins.amps.minifier;
 
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.logging.Log;

@@ -19,7 +19,7 @@ public class GoogleClosureJSMinifier
     /**
      * Needed as a tuple to return two things from the method - compiled code and source map.
      */
-    static class CompiledSourceWithSourceMap
+    public static class CompiledSourceWithSourceMap
     {
         private final String compiled;
         private final String sourceMap;
@@ -30,12 +30,12 @@ public class GoogleClosureJSMinifier
             this.sourceMap = sourceMap;
         }
 
-        String getCompiled()
+        public String getCompiled()
         {
             return compiled;
         }
 
-        String getSourceMap()
+        public String getSourceMap()
         {
             return sourceMap;
         }
