@@ -632,14 +632,14 @@ public class MavenGoals
 
     public void compressResources(boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Map<String,String> closureOptions) throws MojoExecutionException
     {
-        MinifierParameters closureParameters = new MinifierParameters(compressJs,
+        MinifierParameters minifierParameters = new MinifierParameters(compressJs,
                 compressCss,
                 useClosureForJs,
                 cs,
                 log,
                 closureOptions
         );
-        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), ctx.getProject().getBuild().getOutputDirectory(), closureParameters);
+        new ResourcesMinifier(minifierParameters).minify(ctx.getProject().getBuild().getResources(), ctx.getProject().getBuild().getOutputDirectory());
     }
 
     public void filterPluginDescriptor() throws MojoExecutionException

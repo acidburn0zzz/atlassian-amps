@@ -30,22 +30,19 @@ import static java.util.Collections.singletonList;
  */
 public class ResourcesMinifier {
     private static final List<String> SUFFIXES = Arrays.asList("-min", ".min");
-    private static ResourcesMinifier INSTANCE;
+    private final MinifierParameters minifierParameters;
 
-    private ResourcesMinifier() {
+    public ResourcesMinifier(MinifierParameters minifierParameters) {
+        this.minifierParameters = minifierParameters;
     }
 
-    public static void minify(List<Resource> resources, String outputDir, MinifierParameters minifierParameters) throws MojoExecutionException {
-        if (null == INSTANCE) {
-            INSTANCE = new ResourcesMinifier();
-        }
-
+    public void minify(List<Resource> resources, String outputDir) throws MojoExecutionException {
         for (Resource resource : resources) {
-            INSTANCE.processResource(resource, new File(outputDir), minifierParameters);
+            processResource(resource, new File(outputDir));
         }
     }
 
-    public void processResource(Resource resource, File outputDir, MinifierParameters minifierParameters) throws MojoExecutionException {
+    public void processResource(Resource resource, File outputDir) throws MojoExecutionException {
         File destDir = outputDir;
         if (StringUtils.isNotBlank(resource.getTargetPath())) {
             destDir = new File(outputDir, resource.getTargetPath());
@@ -56,38 +53,39 @@ public class ResourcesMinifier {
             return;
         }
 
-        // Determine which filetypes to process
-        List<String> types = new ArrayList<>();
-        if (minifierParameters.isCompressJs()) {
-            types.add("js");
-        }
-        if (minifierParameters.isCompressCss()) {
-            types.add("css");
-        }
-        types.add("xml");
-
         // Process all relevant filetypes in the resource dir
-        for (String type : types) {
-            processFiletype(type, resourceDir, destDir, resource.getIncludes(), resource.getExcludes(), minifierParameters);
+        for (String type : getFiletypesToProcess()) {
+            processFiletype(type, resourceDir, destDir, resource.getIncludes(), resource.getExcludes());
         }
     }
 
-    private void processFiletype(@Nonnull final String extname, final File resourceDir, final File destDir, List<String> includes, final List<String> excludes, MinifierParameters minifierParameters) throws MojoExecutionException {
+    private void processFiletype(
+            @Nonnull final String extname,
+            final File resourceDir,
+            final File destDir,
+            final List<String> includes,
+            final List<String> excludes) throws MojoExecutionException {
         Log log = minifierParameters.getLog();
         Minifier strategy = getMinifierStrategy(extname, minifierParameters);
 
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(resourceDir);
-        if (includes == null || includes.isEmpty()) {
-            includes = singletonList("**/*." + extname);
-        }
-        scanner.setIncludes(includes.toArray(new String[0]));
 
+        // Add included files to the scanner from the build, if they are configured.
+        // Otherwise, fall back to finding all files of type extname.
+        if (includes != null && !includes.isEmpty()) {
+            scanner.setIncludes(includes.toArray(new String[0]));
+        } else {
+            scanner.setIncludes(singletonList("**/*." + extname).toArray(new String[0]));
+        }
+
+        // Add excluded files to the scanner from the build, if they are configured.
         if (excludes != null && !excludes.isEmpty()) {
             scanner.setExcludes(excludes.toArray(new String[0]));
         }
         scanner.addDefaultExcludes();
 
+        // Collect all files to be processed.
         scanner.scan();
 
         int minified = 0;
@@ -101,7 +99,7 @@ public class ResourcesMinifier {
             File sourceFile = new File(resourceDir, name);
             if (sourceFile.exists() && sourceFile.canRead()) {
                 final String minifiedExtension = "-min." + extname;
-                if (maybeCopyPreminifiedFileToDest(sourceFile, destDir, minifiedExtension, minifierParameters)) {
+                if (maybeCopyPreminifiedFileToDest(sourceFile, destDir, minifiedExtension)) {
                     copied++;
                     continue;
                 }
@@ -130,17 +128,16 @@ public class ResourcesMinifier {
      * If the file is determined to be already minified (by checking the file basename for a ".min" or "-min" suffix),
      * then it will copy the file to the destination.
      *
-     * @param sourceFile         Source file
-     * @param minifiedExtension  The correct suffix to apply to the file if the source is considered minified
-     * @param minifierParameters Minifier parameters are constructed higher in the call-chain
+     * @param sourceFile        Source file
+     * @param destDir           The output directory where the minified code should end up
+     * @param minifiedExtension The correct suffix to apply to the file if the source is considered minified
      * @return true if and only if the file name ends with .min.js or -min.js
      * @throws MojoExecutionException If an IOException is encountered reading or writing the source
      *                                or destination file.
      */
     private boolean maybeCopyPreminifiedFileToDest(final File sourceFile,
                                                    final File destDir,
-                                                   final String minifiedExtension,
-                                                   final MinifierParameters minifierParameters) throws MojoExecutionException {
+                                                   final String minifiedExtension) throws MojoExecutionException {
         final Log log = minifierParameters.getLog();
         try {
             final String name = sourceFile.getName();
@@ -158,6 +155,19 @@ public class ResourcesMinifier {
         } catch (IOException e) {
             throw new MojoExecutionException("IOException when trying to copy pre-minified file to target", e);
         }
+    }
+
+    // Determine which filetypes to process based on build parameters
+    private List<String> getFiletypesToProcess() {
+        List<String> types = new ArrayList<>();
+        if (minifierParameters.isCompressJs()) {
+            types.add("js");
+        }
+        if (minifierParameters.isCompressCss()) {
+            types.add("css");
+        }
+        types.add("xml");
+        return types;
     }
 
     private Minifier getMinifierStrategy(String extname, MinifierParameters parameters) {
