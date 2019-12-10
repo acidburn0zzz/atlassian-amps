@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps.minifier.strategies.googleclosure;
 
+import com.atlassian.maven.plugins.amps.code.Sources;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -18,9 +19,9 @@ public class GoogleClosureJsMinifierTest
     @Test
     public void minification()
     {
-        GoogleClosureJsMinifier.CompiledSourceWithSourceMap compiled =
-            GoogleClosureJsMinifier.compile("var a = 1;" + "\nvar b = 2;", "/path-to-source", new HashMap<>(), log);
-        assertThat(compiled.getCompiled(), not(isEmptyString()));
-        assertThat(compiled.getSourceMap(), not(isEmptyString()));
+        final HashMap<String, String> closureOptions = new HashMap<>();
+        Sources compiled = GoogleClosureJsMinifier.compile("var a = 1;" + "\nvar b = 2;", closureOptions, log);
+        assertThat(compiled.getContent(), not(isEmptyString()));
+        assertThat(compiled.getSourceMapContent(), not(isEmptyString()));
     }
 }

@@ -1,5 +1,6 @@
 package com.atlassian.maven.plugins.amps.minifier;
 
+import com.atlassian.maven.plugins.amps.code.Sources;
 import com.atlassian.maven.plugins.amps.minifier.strategies.NoMinificationStrategy;
 import com.atlassian.maven.plugins.amps.minifier.strategies.XmlMinifierStrategy;
 import com.atlassian.maven.plugins.amps.minifier.strategies.googleclosure.GoogleClosureJsMinifierStrategy;
@@ -16,6 +17,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -113,8 +115,16 @@ public class ResourcesMinifier {
 
                 try {
                     log.debug("minifying to " + destFile.getAbsolutePath());
+                    final Charset cs = minifierParameters.getCs();
+                    final Sources input = new Sources(FileUtils.readFileToString(sourceFile, cs));
+                    final Sources output = strategy.minify(input, minifierParameters);
                     FileUtils.forceMkdir(destFile.getParentFile());
-                    strategy.minify(sourceFile, destFile, minifierParameters);
+                    FileUtils.writeStringToFile(destFile, output.getContent(), cs);
+
+                    if (output.hasSourceMap()) {
+                        final File sourceMapFile = new File(destFile.getAbsolutePath() + ".map");
+                        FileUtils.writeStringToFile(sourceMapFile, output.getSourceMapContent(), cs);
+                    }
                     minified++;
                 } catch (IOException e) {
                     throw new MojoExecutionException("IOException when minifying '" + name + "'", e);

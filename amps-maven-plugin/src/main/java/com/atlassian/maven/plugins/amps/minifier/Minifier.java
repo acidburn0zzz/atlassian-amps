@@ -1,6 +1,7 @@
 package com.atlassian.maven.plugins.amps.minifier;
 
-import java.io.File;
+import com.atlassian.maven.plugins.amps.code.Sources;
+
 import java.io.IOException;
 
 /**
@@ -12,8 +13,8 @@ public interface Minifier {
     /**
      * Take a source file and output a minified equivalent for use in production.
      *
-     * @param source the file with content to minify
-     * @param dest the location on the filesystem to output the minified content
+     * @param source the contents to minify, along with any metadata about the contents
+     *               that would be relevant to the transformation.
      * @param params any options passed in to the build
      * @throws IOException
      * <p>This will be thrown if there are any problems reading or writing to disk,
@@ -25,5 +26,5 @@ public interface Minifier {
      *  <li>fail loudly: exit the whole build with an error.</li>
      * </ul>
      */
-    void minify(File source, File dest, MinifierParameters params) throws IOException;
+    Sources minify(Sources source, MinifierParameters params) throws IOException;
 }
