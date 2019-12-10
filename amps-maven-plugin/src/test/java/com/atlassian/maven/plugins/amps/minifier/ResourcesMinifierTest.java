@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,7 +45,7 @@ public class ResourcesMinifierTest {
         when(resource.getIncludes()).thenReturn(Lists.newArrayList());
         when(resource.getExcludes()).thenReturn(Lists.newArrayList());
 
-        new ResourcesMinifier(params).minify(Collections.singletonList(resource), out.toString());
+        new ResourcesMinifier(params).minify(resource, out.toString());
 
         List<String> results = Arrays.stream(out.toFile().listFiles()).map(File::getName).collect(Collectors.toList());
         assertThat(results, hasItems(endsWith("myapp1-min.css")));
@@ -63,7 +62,7 @@ public class ResourcesMinifierTest {
         when(resource.getIncludes()).thenReturn(Lists.newArrayList());
         when(resource.getExcludes()).thenReturn(Lists.newArrayList());
 
-        new ResourcesMinifier(params).minify(Collections.singletonList(resource), out.toString());
+        new ResourcesMinifier(params).minify(resource, out.toString());
 
         List<String> results = Arrays.stream(out.toFile().listFiles()).map(File::getName).collect(Collectors.toList());
         assertThat(results, hasItems(endsWith("myapp1-min.js")));
@@ -83,7 +82,7 @@ public class ResourcesMinifierTest {
         when(resource.getIncludes()).thenReturn(Lists.newArrayList());
         when(resource.getExcludes()).thenReturn(Lists.newArrayList());
 
-        new ResourcesMinifier(params).minify(Collections.singletonList(resource), out.toString());
+        new ResourcesMinifier(params).minify(resource, out.toString());
 
         List<String> results = Arrays.stream(out.toFile().listFiles()).map(File::getName).collect(Collectors.toList());
         assertThat(results, hasItems(

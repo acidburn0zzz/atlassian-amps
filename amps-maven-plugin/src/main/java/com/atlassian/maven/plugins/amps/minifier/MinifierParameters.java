@@ -1,33 +1,38 @@
 package com.atlassian.maven.plugins.amps.minifier;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.maven.plugin.logging.Log;
 
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Map;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
- * Stores configuration values from the build that are relevant for any minification
- * operations to be performed on resources in the current build.
+ * Stores configuration values from the build that are relevant for any minification operations to be performed on
+ * resources in the current build.
  */
 public class MinifierParameters {
-    private boolean compressJs;
-    private boolean compressCss;
-    private boolean useClosureForJs;
-    private Charset cs;
-    private Log log;
-    private Map<String, String> closureOptions;
+    private final boolean compressJs;
+    private final boolean compressCss;
+    private final boolean useClosureForJs;
+    private final Charset cs;
+    private final Log log;
+    private final Map<String, String> closureOptions;
 
     public MinifierParameters(boolean compressJs,
                               boolean compressCss,
                               boolean useClosureForJs,
-                              Charset cs, Log log,
-                              Map<String, String> closureOptions) {
+                              Charset cs,
+                              Log log,
+                              @Nullable Map<String, String> closureOptions) {
         this.compressJs = compressJs;
         this.compressCss = compressCss;
-        this.useClosureForJs = useClosureForJs;
         this.cs = cs;
         this.log = log;
-        this.closureOptions = closureOptions;
+        this.closureOptions = closureOptions != null ? ImmutableMap.copyOf(closureOptions) : Collections.emptyMap();
+        this.useClosureForJs = useClosureForJs;
     }
 
     public boolean isCompressJs() {
@@ -50,6 +55,7 @@ public class MinifierParameters {
         return log;
     }
 
+    @Nonnull
     public Map<String, String> getClosureOptions() {
         return closureOptions;
     }
