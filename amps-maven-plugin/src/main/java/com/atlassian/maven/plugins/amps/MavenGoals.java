@@ -51,6 +51,10 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,6 +62,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
@@ -70,8 +75,17 @@ import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.isPortFree;
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
 import static java.io.File.createTempFile;
+import static java.lang.String.format;
+import static java.nio.file.FileVisitResult.CONTINUE;
+import static java.nio.file.Files.createTempDirectory;
+import static java.nio.file.Files.walkFileTree;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -451,28 +465,120 @@ public class MavenGoals
         );
     }
 
-    public void extractBundledDependencies() throws MojoExecutionException
-    {
-         MojoUtils.executeWithMergedConfig(
-                 plugin(
+    private void extractDependencies(final Xpp3Dom configuration) throws MojoExecutionException {
+        // Save a copy of the given config (it's mutated when we do the first extraction)
+        final Xpp3Dom copyOfConfiguration = new Xpp3Dom(configuration);
+
+        // Do the extraction they asked for ...
+        doExtractDependencies(configuration);
+
+        // ... but check whether that caused any files to be overwritten
+        warnAboutOverwrites(copyOfConfiguration);
+    }
+
+    private void warnAboutOverwrites(final Xpp3Dom configuration) throws MojoExecutionException {
+        final Path tempDirectory = createTempDirectoryForOverwriteDetection();
+        configuration.getChild("outputDirectory").setValue(tempDirectory.toString());
+        configuration.addChild(element("useSubDirectoryPerArtifact", "true").toDom());
+        // We set these overWrite flags so that Maven will allow each dependency to be unpacked again (see MDEP-586)
+        configuration.addChild(element("overWriteReleases", "true").toDom());
+        configuration.addChild(element("overWriteSnapshots", "true").toDom());
+        configuration.addChild(element("silent", "true").toDom());
+        doExtractDependencies(configuration);
+        checkForOverwrites(tempDirectory);
+        try {
+            deleteDirectory(tempDirectory.toFile());
+        } catch (IOException ignored) {
+            // Ignore; it's in the temp folder anyway
+        }
+    }
+
+    private void checkForOverwrites(final Path dependencyDirectory) {
+        try {
+            // Map all dependency files to the artifacts that contain them
+            final PathCollector pathCollector = new PathCollector();
+            walkFileTree(dependencyDirectory, pathCollector);
+            final Map<Path, List<Path>> artifactsByPath = pathCollector.getPaths().stream()
+                    .map(dependencyDirectory::relativize)
+                    .collect(groupingBy(MavenGoals::tail, mapping(MavenGoals::head, toList())));
+            // Find any clashes
+            final Map<Path, List<Path>> clashes = artifactsByPath.entrySet().stream()
+                    .filter(e -> e.getValue().size() > 1)
+                    .collect(toMap(Entry::getKey, Entry::getValue));
+            if (!clashes.isEmpty()) {
+                logWarnings(clashes);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void logWarnings(final Map<Path, List<Path>> clashes) {
+        log.warn("Extracting your plugin's dependencies caused the following file(s) to overwrite each other:");
+        clashes.forEach((key, value) -> log.warn(format("-- %s from %s", key, value)));
+        log.warn("To prevent this, set <extractDependencies> to false in your AMPS configuration");
+    }
+
+    private static Path head(final Path path) {
+        return path.subpath(0, 1);
+    }
+
+    private static Path tail(final Path path) {
+        return path.subpath(1, path.getNameCount());
+    }
+
+    private static Path createTempDirectoryForOverwriteDetection() {
+        try {
+            return createTempDirectory("amps-overwrite-detection-");
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * A {@link java.nio.file.FileVisitor} that simply collects the paths of the visited files.
+     */
+    private static class PathCollector extends SimpleFileVisitor<Path> {
+
+        private final List<Path> paths = new ArrayList<>();
+
+        @Override
+        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
+            paths.add(file);
+            return CONTINUE;
+        }
+
+        public List<Path> getPaths() {
+            return new ArrayList<>(paths);
+        }
+    }
+
+    private void doExtractDependencies(final Xpp3Dom configuration) throws MojoExecutionException {
+        MojoUtils.executeWithMergedConfig(
+                plugin(
                         groupId("org.apache.maven.plugins"),
                         artifactId("maven-dependency-plugin"),
                         version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
                 ),
                 goal("unpack-dependencies"),
-                configuration(
-                        element(name("includeScope"), "runtime"),
-                        element(name("excludeScope"), "provided"),
-                        element(name("excludeScope"), "test"),
-                        element(name("includeTypes"), "jar"),
-                        element(name("excludes"), "atlassian-plugin.xml, module-info.class, META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
-                        element(name("outputDirectory"), "${project.build.outputDirectory}")
-                ),
+                configuration,
                 executionEnvironment()
         );
     }
 
-    public void extractTestBundledDependenciesExcludingTestScope(List<ProductArtifact> testBundleExcludes) throws MojoExecutionException
+    public void extractBundledDependencies() throws MojoExecutionException {
+        extractDependencies(configuration(
+                element(name("includeScope"), "runtime"),
+                element(name("excludeScope"), "provided"),
+                element(name("excludeScope"), "test"),
+                element(name("includeTypes"), "jar"),
+                element(name("excludes"), "atlassian-plugin.xml, module-info.class, META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
+                element(name("outputDirectory"), "${project.build.outputDirectory}")
+        ));
+    }
+
+    public void extractTestBundledDependenciesExcludingTestScope(List<ProductArtifact> testBundleExcludes)
+            throws MojoExecutionException
     {
         StringBuilder sb = new StringBuilder();
 
@@ -483,24 +589,15 @@ public class MavenGoals
 
         String customExcludes = sb.toString();
 
-        MojoUtils.executeWithMergedConfig(
-                plugin(
-                        groupId("org.apache.maven.plugins"),
-                        artifactId("maven-dependency-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
-                ),
-                goal("unpack-dependencies"),
-                configuration(
-                        element(name("includeScope"), "runtime"),
-                        element(name("excludeScope"), "provided"),
-                        element(name("excludeScope"), "test"),
-                        element(name("includeTypes"), "jar"),
-                        element(name("excludeArtifactIds"),"junit" + customExcludes),
-                        element(name("excludes"), "atlassian-plugin.xml, module-info.class, META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
-                        element(name("outputDirectory"), "${project.build.testOutputDirectory}")
-                ),
-                executionEnvironment()
-        );
+        extractDependencies(configuration(
+                element(name("includeScope"), "runtime"),
+                element(name("excludeScope"), "provided"),
+                element(name("excludeScope"), "test"),
+                element(name("includeTypes"), "jar"),
+                element(name("excludeArtifactIds"),"junit" + customExcludes),
+                element(name("excludes"), "atlassian-plugin.xml, module-info.class, META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
+                element(name("outputDirectory"), "${project.build.testOutputDirectory}")
+        ));
     }
 
     public void extractTestBundledDependencies(List<ProductArtifact> testBundleExcludes) throws MojoExecutionException
@@ -514,24 +611,15 @@ public class MavenGoals
 
         String customExcludes = sb.toString();
 
-        MojoUtils.executeWithMergedConfig(
-                plugin(
-                        groupId("org.apache.maven.plugins"),
-                        artifactId("maven-dependency-plugin"),
-                        version(defaultArtifactIdToVersionMap.get("maven-dependency-plugin"))
-                ),
-                goal("unpack-dependencies"),
-                configuration(
-                        element(name("includeScope"), "test"),
-                        element(name("excludeScope"), "provided"),
-                        element(name("excludeArtifactIds"),"junit" + customExcludes),
-                        element(name("includeTypes"), "jar"),
-                        element(name("useSubDirectoryPerScope"),"true"),
-                        element(name("excludes"), "atlassian-plugin.xml, module-info.class, META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
-                        element(name("outputDirectory"), "${project.build.directory}/testlibs")
-                ),
-                executionEnvironment()
-        );
+        extractDependencies(configuration(
+                element(name("includeScope"), "test"),
+                element(name("excludeScope"), "provided"),
+                element(name("excludeArtifactIds"),"junit" + customExcludes),
+                element(name("includeTypes"), "jar"),
+                element(name("useSubDirectoryPerScope"),"true"),
+                element(name("excludes"), "atlassian-plugin.xml, module-info.class, META-INF/MANIFEST.MF, META-INF/*.DSA, META-INF/*.SF"),
+                element(name("outputDirectory"), "${project.build.directory}/testlibs")
+        ));
 
         File targetDir = new File(ctx.getProject().getBuild().getDirectory());
         File testlibsDir = new File(targetDir,"testlibs");
