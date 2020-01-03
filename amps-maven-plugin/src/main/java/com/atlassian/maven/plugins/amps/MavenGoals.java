@@ -52,7 +52,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -486,7 +488,7 @@ public class MavenGoals
         checkForOverwrites(tempDirectory);
         try {
             deleteDirectory(tempDirectory.toFile());
-        } catch (IOException ignored) {
+        } catch (final IOException ignored) {
             // Ignore; it's in the temp folder anyway
         }
     }
@@ -495,7 +497,7 @@ public class MavenGoals
         try {
             // Map all dependency files to the artifacts that contain them
             final Map<Path, List<Path>> artifactsByPath = walk(dependencyDirectory)
-                    .filter(path -> path.toFile().isFile())
+                    .filter(Files::isRegularFile)
                     .map(dependencyDirectory::relativize)
                     .collect(groupingBy(MavenGoals::tail, mapping(MavenGoals::head, toList())));
             // Find any clashes
@@ -526,11 +528,12 @@ public class MavenGoals
         return path.subpath(1, path.getNameCount());
     }
 
-    private static Path createTempDirectoryForOverwriteDetection() {
+    private Path createTempDirectoryForOverwriteDetection() {
+        final Path targetDirectory = Paths.get(ctx.getProject().getBuild().getDirectory());
         try {
-            return createTempDirectory("amps-overwrite-detection-");
+            return createTempDirectory(targetDirectory, "amps-overwrite-detection-");
         } catch (final IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
