@@ -46,15 +46,13 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -76,9 +74,9 @@ import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.isPortFre
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
 import static java.io.File.createTempFile;
 import static java.lang.String.format;
-import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.Files.createTempDirectory;
-import static java.nio.file.Files.walkFileTree;
+import static java.nio.file.Files.walk;
+import static java.util.Map.Entry.comparingByKey;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
@@ -496,9 +494,8 @@ public class MavenGoals
     private void checkForOverwrites(final Path dependencyDirectory) {
         try {
             // Map all dependency files to the artifacts that contain them
-            final PathCollector pathCollector = new PathCollector();
-            walkFileTree(dependencyDirectory, pathCollector);
-            final Map<Path, List<Path>> artifactsByPath = pathCollector.getPaths().stream()
+            final Map<Path, List<Path>> artifactsByPath = walk(dependencyDirectory)
+                    .filter(path -> path.toFile().isFile())
                     .map(dependencyDirectory::relativize)
                     .collect(groupingBy(MavenGoals::tail, mapping(MavenGoals::head, toList())));
             // Find any clashes
@@ -509,13 +506,15 @@ public class MavenGoals
                 logWarnings(clashes);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
     private void logWarnings(final Map<Path, List<Path>> clashes) {
         log.warn("Extracting your plugin's dependencies caused the following file(s) to overwrite each other:");
-        clashes.forEach((key, value) -> log.warn(format("-- %s from %s", key, value)));
+        clashes.entrySet().stream()
+                .sorted(comparingByKey())
+                .forEach(e -> log.warn(format("-- %s from %s", e.getKey(), e.getValue())));
         log.warn("To prevent this, set <extractDependencies> to false in your AMPS configuration");
     }
 
@@ -532,24 +531,6 @@ public class MavenGoals
             return createTempDirectory("amps-overwrite-detection-");
         } catch (final IOException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * A {@link java.nio.file.FileVisitor} that simply collects the paths of the visited files.
-     */
-    private static class PathCollector extends SimpleFileVisitor<Path> {
-
-        private final List<Path> paths = new ArrayList<>();
-
-        @Override
-        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
-            paths.add(file);
-            return CONTINUE;
-        }
-
-        public List<Path> getPaths() {
-            return new ArrayList<>(paths);
         }
     }
 
