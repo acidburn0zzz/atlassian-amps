@@ -30,7 +30,7 @@ public class GoogleClosureOptionsHandlerTest {
         CompilerOptions results = opts.getCompilerOptions();
 
         assertThat(results.getLanguageIn(), equalTo(CompilerOptions.LanguageMode.ECMASCRIPT_2018));
-        assertThat(results.shouldEmitUseStrict(), equalTo(true));
+        assertThat(results.shouldEmitUseStrict(), equalTo(false));
     }
 
     @Test
@@ -51,10 +51,10 @@ public class GoogleClosureOptionsHandlerTest {
 
     @Test
     public void canSetUseStrict() {
-        opts.setOption("emitUseStrict", "false");
+        opts.setOption("emitUseStrict", "true");
         CompilerOptions results = opts.getCompilerOptions();
 
-        assertThat(results.shouldEmitUseStrict(), equalTo(false));
+        assertThat(results.shouldEmitUseStrict(), equalTo(true));
     }
 
     @Test

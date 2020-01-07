@@ -3,12 +3,12 @@ package com.atlassian.maven.plugins.amps.util.minifier;
 import com.google.javascript.jscomp.CompilerOptions;
 import org.apache.maven.plugin.logging.Log;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nonnull;
 
 public class GoogleClosureOptionsHandler {
     private CompilerOptions compilerOptions;
@@ -21,6 +21,10 @@ public class GoogleClosureOptionsHandler {
 
         // Set sensible default language levels.
         this.compilerOptions.setLanguageIn(CompilerOptions.LanguageMode.ECMASCRIPT_2018);
+
+        // Disable 'use strict' by default, as in batch files,
+        // a top-level scoped statement may cause older non-strict-compatible code to fail.
+        this.compilerOptions.setEmitUseStrict(false);
 
         // Set what we've allowed users to configure.
         // Assume it is whatever we've created a private setter method on this class for.
