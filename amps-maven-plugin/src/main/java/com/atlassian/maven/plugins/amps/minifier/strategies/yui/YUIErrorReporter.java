@@ -5,6 +5,7 @@ import org.mozilla.javascript.EvaluatorException;
 import org.apache.maven.plugin.logging.Log;
 
 /**
+ * @deprecated YUI will be removed in AMPS 9. There is no replacement for this class.
  * @since version
  */
 public class YUIErrorReporter implements ErrorReporter

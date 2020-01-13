@@ -12,6 +12,7 @@ import java.io.StringWriter;
 
 /**
  * Minifies JavaScript using the YUI compressor library.
+ * @deprecated YUI will be removed in AMPS 9. Use {@link com.atlassian.maven.plugins.amps.minifier.strategies.googleclosure.GoogleClosureJsMinifierStrategy} instead.
  */
 public class YUICompressorJsMinifierStrategy implements Minifier {
     @Override

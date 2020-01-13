@@ -16,14 +16,14 @@ import javax.annotation.Nullable;
 public class MinifierParameters {
     private final boolean compressJs;
     private final boolean compressCss;
-    private final boolean useClosureForJs;
     private final Charset cs;
     private final Log log;
     private final Map<String, String> closureOptions;
 
+    private boolean useClosureForJs = true;
+
     public MinifierParameters(boolean compressJs,
                               boolean compressCss,
-                              boolean useClosureForJs,
                               Charset cs,
                               Log log,
                               @Nullable Map<String, String> closureOptions) {
@@ -32,6 +32,15 @@ public class MinifierParameters {
         this.cs = cs;
         this.log = log;
         this.closureOptions = closureOptions != null ? ImmutableMap.copyOf(closureOptions) : Collections.emptyMap();
+    }
+
+    @Deprecated
+    public MinifierParameters(boolean compressJs,
+                              boolean compressCss,
+                              boolean useClosureForJs,
+                              Charset cs, Log log,
+                              Map<String, String> closureOptions) {
+        this(compressJs, compressCss, cs, log, closureOptions);
         this.useClosureForJs = useClosureForJs;
     }
 
@@ -43,6 +52,7 @@ public class MinifierParameters {
         return compressCss;
     }
 
+    @Deprecated
     public boolean isUseClosureForJs() {
         return useClosureForJs;
     }
