@@ -66,6 +66,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
@@ -82,7 +83,7 @@ import static java.util.Map.Entry.comparingByKey;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
@@ -496,12 +497,12 @@ public class MavenGoals
     private void checkForOverwrites(final Path dependencyDirectory) {
         try {
             // Map all dependency files to the artifacts that contain them
-            final Map<Path, List<Path>> artifactsByPath = walk(dependencyDirectory)
+            final Map<Path, Set<Path>> artifactsByPath = walk(dependencyDirectory)
                     .filter(Files::isRegularFile)
                     .map(dependencyDirectory::relativize)
-                    .collect(groupingBy(MavenGoals::tail, mapping(MavenGoals::head, toList())));
+                    .collect(groupingBy(MavenGoals::tail, mapping(MavenGoals::head, toCollection(TreeSet::new))));
             // Find any clashes
-            final Map<Path, List<Path>> clashes = artifactsByPath.entrySet().stream()
+            final Map<Path, Set<Path>> clashes = artifactsByPath.entrySet().stream()
                     .filter(e -> e.getValue().size() > 1)
                     .collect(toMap(Entry::getKey, Entry::getValue));
             if (!clashes.isEmpty()) {
@@ -512,7 +513,7 @@ public class MavenGoals
         }
     }
 
-    private void logWarnings(final Map<Path, List<Path>> clashes) {
+    private void logWarnings(final Map<Path, Set<Path>> clashes) {
         log.warn("Extracting your plugin's dependencies caused the following file(s) to overwrite each other:");
         clashes.entrySet().stream()
                 .sorted(comparingByKey())
