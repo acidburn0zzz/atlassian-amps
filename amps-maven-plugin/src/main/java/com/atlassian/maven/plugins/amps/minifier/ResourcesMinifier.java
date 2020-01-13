@@ -35,7 +35,7 @@ import static org.apache.commons.io.FilenameUtils.getExtension;
  * Iterates through Maven {@link Resource} declarations, applying a {@link Minifier} to files inside them as
  * appropriate.
  *
- * @since 4.1
+ * @since 8.1
  */
 public class ResourcesMinifier {
     private static final List<String> MINIFIED_FILENAME_SUFFIXES = Arrays.asList("-min", ".min");
@@ -68,8 +68,20 @@ public class ResourcesMinifier {
         }
     }
 
-    private void processFiletypeInDirectory(
-        @Nonnull final String extname,
+    /**
+     * Discovers all files in a directory with the given filetype, then runs their contents through an appropriate
+     * minifier. The minified content of each input file will be written to a file with a `-min.[extname]` suffix
+     * in the provided destination directory.
+     *
+     * @param filetype the filetype to find in the resource dir, such as "js", "css", "xml", etc.
+     * @param resourceDir the folder in which to search for input files.
+     * @param destDir the folder where minified files will be written.
+     * @param includes a list of filepaths that should be processed, regardless of their filetype.
+     * @param excludes any filepath in this list will not be processed, even if it matches the given filetype.
+     * @throws MojoExecutionException
+     */
+    public void processFiletypeInDirectory(
+        @Nonnull final String filetype,
         final File resourceDir,
         final File destDir,
         final List<String> includes,
@@ -83,7 +95,7 @@ public class ResourcesMinifier {
         if (isNotEmpty(includes)) {
             scanner.setIncludes(includes.toArray(new String[0]));
         } else {
-            scanner.setIncludes(singletonList("**/*." + extname).toArray(new String[0]));
+            scanner.setIncludes(singletonList("**/*." + filetype).toArray(new String[0]));
         }
 
         // Add excluded files to the scanner from the build, if they are configured.
@@ -94,8 +106,8 @@ public class ResourcesMinifier {
 
         // Collect all files to be processed.
         scanner.scan();
-        processFileList(extname, destDir, Arrays.stream(scanner.getIncludedFiles())
-            .filter(s -> getExtension(s).endsWith(extname))
+        processFileList(filetype, destDir, Arrays.stream(scanner.getIncludedFiles())
+            .filter(s -> getExtension(s).endsWith(filetype))
             .map(s -> new File(resourceDir, s))
             .collect(Collectors.toList()));
     }
