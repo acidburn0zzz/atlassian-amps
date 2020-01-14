@@ -6,8 +6,15 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Represents the contents of a file to perform transformations on, along with
- * any metadata about the contents that would be relevant to the transformation step.
+ * Represents multiple related content sources, such as source code along with source maps.
+ *
+ * Is typically used to encapsulate the input to or result of code transformations,
+ * such as minification of front-end code.
+ *
+ * Should be used to encapsulate co-dependent contents, along with any metadata
+ * about the contents that would be relevant to or a by-product of a code transformation.
+ *
+ * @since 8.1.0
  */
 public class Sources {
     private final String content;
