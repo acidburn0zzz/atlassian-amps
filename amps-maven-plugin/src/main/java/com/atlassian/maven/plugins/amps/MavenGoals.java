@@ -77,6 +77,7 @@ import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.isPortFre
 import static com.atlassian.maven.plugins.amps.util.ProductHandlerUtil.pickFreePort;
 import static java.io.File.createTempFile;
 import static java.lang.String.format;
+import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.createTempDirectory;
 import static java.nio.file.Files.walk;
 import static java.util.Map.Entry.comparingByKey;
@@ -532,6 +533,7 @@ public class MavenGoals
     private Path createTempDirectoryForOverwriteDetection() {
         final Path targetDirectory = Paths.get(ctx.getProject().getBuild().getDirectory());
         try {
+            createDirectories(targetDirectory);
             return createTempDirectory(targetDirectory, "amps-overwrite-detection-");
         } catch (final IOException e) {
             throw new UncheckedIOException(e);
