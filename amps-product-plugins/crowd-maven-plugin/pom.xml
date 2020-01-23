@@ -48,7 +48,15 @@
                 </plugins>
             </build>
             <properties>
-                <invoker.test>copyBundledDependenciesTest,createTest,createOsgiJavaConfigTest,debugTest,debugWithPortConflictTest,extractDependenciesTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateObrTest,integrationTest,integrationTestWithPortConflictTest,jarWithExistingManifestTest,quickreloadTest,runTest,runParallelTest,runWithPortConflictTest,stopTest,unitTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest</invoker.test>
+                <invoker.test>copyBundledDependenciesTest, createTest, createOsgiJavaConfigTest, debugTest,
+                    debugWithPortConflictTest, extractDependenciesTest,
+                    filterPluginDescriptorWithoutPluginDescriptorTest, filterPluginDescriptorWithPluginDescriptorTest,
+                    generateManifestWithInstructionsTest, generateManifestWithNoInstructionsTest, generateObrTest,
+                    integrationTest, integrationTestWithPortConflictTest, jarWithExistingManifestTest, quickreloadTest,
+                    runTest, runParallelTest, runWithPortConflictTest, stopTest, unitTest,
+                    validateManifestSkipValidationTest, validateManifestWithInvalidManifestTest,
+                    validateManifestWithValidManifestTest
+                </invoker.test>
                 <invoker.product>crowd</invoker.product>
                 <product.version>${crowd.version}</product.version>
                 <product.data.version>${crowd.data.version}</product.data.version>

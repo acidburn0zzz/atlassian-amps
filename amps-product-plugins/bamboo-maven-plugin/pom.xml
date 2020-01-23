@@ -48,7 +48,15 @@
                 </plugins>
             </build>
             <properties>
-                <invoker.test>copyBundledDependenciesTest,createTest,createOsgiJavaConfigTest,debugTest,debugWithPortConflictTest,extractDependenciesTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateObrTest,integrationTest,integrationTestWithPortConflictTest,jarWithExistingManifestTest,quickreloadTest,runTest,runParallelTest,runWithPortConflictTest,stopTest,unitTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest</invoker.test>
+                <invoker.test>copyBundledDependenciesTest, createTest, createOsgiJavaConfigTest, debugTest,
+                    debugWithPortConflictTest, extractDependenciesTest,
+                    filterPluginDescriptorWithoutPluginDescriptorTest, filterPluginDescriptorWithPluginDescriptorTest,
+                    generateManifestWithInstructionsTest, generateManifestWithNoInstructionsTest, generateObrTest,
+                    integrationTest, integrationTestWithPortConflictTest, jarWithExistingManifestTest, quickreloadTest,
+                    runTest, runParallelTest, runWithPortConflictTest, stopTest, unitTest,
+                    validateManifestSkipValidationTest, validateManifestWithInvalidManifestTest,
+                    validateManifestWithValidManifestTest, validateBannedDependenciesTest
+                </invoker.test>
                 <invoker.product>bamboo</invoker.product>
                 <product.version>${bamboo.version}</product.version>
                 <product.data.version>${bamboo.data.version}</product.data.version>
