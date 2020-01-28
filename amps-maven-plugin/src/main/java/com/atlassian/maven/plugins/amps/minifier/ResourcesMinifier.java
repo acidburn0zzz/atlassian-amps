@@ -133,7 +133,9 @@ public class ResourcesMinifier {
                         continue;
                     }
 
-                    final File destFile = new File(destDir, getMinifiedFilepath(path));
+                    // I do not like this... but until I refactor to extract a config signal for minifying "in-place", this will have to do...
+                    final String destFilename = "xml".equals(extname) ? path : getMinifiedFilepath(path);
+                    final File destFile = new File(destDir, destFilename);
 
                     if (destFile.exists() && destFile.lastModified() > sourceFile.lastModified()) {
                         log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");

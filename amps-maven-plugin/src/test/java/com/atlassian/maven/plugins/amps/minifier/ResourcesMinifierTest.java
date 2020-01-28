@@ -34,6 +34,21 @@ public class ResourcesMinifierTest {
     @Rule
     public TemporaryFolder out = new TemporaryFolder();
 
+    // I know this is not the best behaviour, but alas, it's how it has always been...
+    @Test
+    public void testXmlGetsMinifiedInPlace() throws Exception {
+        MinifierParameters params = new MinifierParameters(true, true, StandardCharsets.UTF_8, log, new HashMap<>());
+
+        dir.newFile("myapp1.xml");
+        Resource resource = getBaseResourceMock();
+
+        new ResourcesMinifier(params).minify(resource, out.getRoot().toString());
+
+        List<String> results = getFilesystemFor(out);
+        assertThat(results, not(hasItems(endsWith("myapp1-min.xml"))));
+        assertThat(results, hasItems(endsWith("myapp1.xml")));
+    }
+
     @Test
     public void testCssGetsMinified() throws Exception {
         MinifierParameters params = new MinifierParameters(true, true, StandardCharsets.UTF_8, log, new HashMap<>());
