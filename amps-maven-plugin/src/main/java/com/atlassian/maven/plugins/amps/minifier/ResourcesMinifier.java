@@ -18,7 +18,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
@@ -28,8 +30,8 @@ import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.forceMkdir;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
-import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.FilenameUtils.getExtension;
+import static org.apache.commons.io.FilenameUtils.removeExtension;
 
 /**
  * Iterates through Maven {@link Resource} declarations, applying a {@link Minifier} to files inside them as
@@ -108,36 +110,36 @@ public class ResourcesMinifier {
         scanner.scan();
         processFileList(filetype, destDir, Arrays.stream(scanner.getIncludedFiles())
             .filter(s -> getExtension(s).endsWith(filetype))
-            .map(s -> new File(resourceDir, s))
-            .collect(Collectors.toList()));
+            .collect(Collectors.toMap(s -> s, s -> new File(resourceDir, s))));
     }
 
     private void processFileList(
         @Nonnull final String extname,
         final File destDir,
-        final List<File> filenames) throws MojoExecutionException {
+        final Map<String, File> filenames) throws MojoExecutionException {
         final Log log = minifierParameters.getLog();
         final Minifier strategy = getMinifierStrategy(extname);
         int minified = 0;
         int copied = 0;
 
-        for (File sourceFile : filenames) {
-            if (sourceFile.canRead()) {
-                final String minifiedExtension = "-min." + extname;
-                if (maybeCopyPreminifiedFileToDest(sourceFile, destDir, minifiedExtension)) {
-                    copied++;
-                    continue;
-                }
+        for (Map.Entry<String, File> entry : filenames.entrySet()) {
+            final String path = entry.getKey();
+            final File sourceFile = entry.getValue();
 
-                final String name = sourceFile.getName();
-                final File destFile = new File(destDir, getBaseName(name) + minifiedExtension);
+            try {
+                if (sourceFile.canRead()) {
+                    if (maybeCopyPreminifiedFileToDest(sourceFile, destDir)) {
+                        copied++;
+                        continue;
+                    }
 
-                if (destFile.exists() && destFile.lastModified() > sourceFile.lastModified()) {
-                    log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
-                    continue;
-                }
+                    final File destFile = new File(destDir, getMinifiedFilepath(path));
 
-                try {
+                    if (destFile.exists() && destFile.lastModified() > sourceFile.lastModified()) {
+                        log.debug("Nothing to do, " + destFile.getAbsolutePath() + " is younger than the original");
+                        continue;
+                    }
+
                     log.debug("minifying to " + destFile.getAbsolutePath());
                     final Charset cs = minifierParameters.getCs();
                     final Sources input = new Sources(readFileToString(sourceFile, cs));
@@ -150,9 +152,10 @@ public class ResourcesMinifier {
                         writeStringToFile(sourceMapFile, output.getSourceMapContent(), cs);
                     }
                     minified++;
-                } catch (IOException e) {
-                    throw new MojoExecutionException("IOException when minifying '" + name + "'", e);
                 }
+            }
+            catch (IOException e) {
+                throw new MojoExecutionException("IOException when minifying '" + path + "'", e);
             }
         }
         log.info(String.format("%d %s file(s) were output to target directory %s", minified + copied, extname, destDir.getAbsolutePath()));
@@ -164,31 +167,23 @@ public class ResourcesMinifier {
      *
      * @param sourceFile        Source file
      * @param destDir           The output directory where the minified code should end up
-     * @param minifiedExtension The correct suffix to apply to the file if the source is considered minified
      * @return true if and only if the file name ends with .min.js or -min.js
-     * @throws MojoExecutionException If an IOException is encountered reading or writing the source or destination
-     *                                file.
+     * @throws IOException If an error is encountered reading or writing the source or destination file.
      */
-    private boolean maybeCopyPreminifiedFileToDest(final File sourceFile,
-        final File destDir,
-        final String minifiedExtension) throws MojoExecutionException {
+    private boolean maybeCopyPreminifiedFileToDest(final File sourceFile, final File destDir) throws IOException {
         final Log log = minifierParameters.getLog();
-        try {
-            final String name = sourceFile.getName();
-            final String baseName = getBaseName(name);
-            for (String s : MINIFIED_FILENAME_SUFFIXES) {
-                if (baseName.endsWith(s)) {
-                    String newName = baseName.substring(0, baseName.length() - s.length());
-                    File destFile = new File(destDir, newName + minifiedExtension);
-                    log.debug(String.format("Copying pre-minified file '%s' to destination '%s' file ends in '%s'", name, destFile.getName(), s));
-                    copyFile(sourceFile, destFile);
-                    return true;
-                }
+        final String path = sourceFile.getName();
+        final String pathNoExt = removeExtension(path);
+        for (String s : MINIFIED_FILENAME_SUFFIXES) {
+            if (pathNoExt.endsWith(s)) {
+                String pathNoSuffix = pathNoExt.substring(0, pathNoExt.length() - s.length()) + "." + getExtension(path);
+                File destFile = new File(destDir, getMinifiedFilepath(pathNoSuffix));
+                log.debug(String.format("Copying pre-minified file '%s' to destination '%s' file ends in '%s'", path, destFile.getName(), s));
+                copyFile(sourceFile, destFile);
+                return true;
             }
-            return false;
-        } catch (IOException e) {
-            throw new MojoExecutionException("IOException when trying to copy pre-minified file to target", e);
         }
+        return false;
     }
 
     // Determine which filetypes to process based on build parameters
@@ -216,5 +211,11 @@ public class ResourcesMinifier {
             default:
                 return new NoMinificationStrategy();
         }
+    }
+
+    private static String getMinifiedFilepath(String path) {
+        final String filepathSansExtension = removeExtension(path);
+        final String minifiedExtension = "-min." + getExtension(path);
+        return filepathSansExtension + minifiedExtension;
     }
 }
