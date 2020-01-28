@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [8.1.0] - unreleased
 
 ### Added 
 - Changelog
@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - IntegratedTestMojo: Added testGroup.instanceIds property, a comma separated list of all product instances in the current testgroup.
   This can be used as an entrypoint to discover each instances complete configuration through the properties.
 
+### Fixed
+
+- [AMPS-1514] -Dno.webapp now correctly sets http port.
+
 ### Changed
 
 - Google Closure Compiler is the default minifier for JS files.
@@ -28,7 +32,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 - All usage of YUI Compressor is deprecated and will be removed in AMPS v9.
-
-### Removed
 
 ##8.0.0

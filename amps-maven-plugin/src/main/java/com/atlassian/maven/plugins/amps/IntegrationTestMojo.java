@@ -206,7 +206,8 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                 plugins.addAll(getTestFrameworkPlugins());
             }
 
-            int actualHttpPort = 0;
+            // setting it to a real port allows running tests with an externally run server.
+            int actualHttpPort = product.httpPort;
             if (!noWebapp)
             {
                 if(jvmDebugPort > 0)
@@ -229,7 +230,14 @@ public class IntegrationTestMojo extends AbstractTestGroupsHandlerMojo
                 
                 actualHttpPort = productHandler.start(product);
             }
-
+            else
+            {
+                if(actualHttpPort <= 0)
+                {
+                    throw new MojoExecutionException("Http server port must be set when using no.webapp flag.");
+                }
+            }
+            
             if (productExecutions.size() == 1)
             {
                 putIfNotOverridden(systemProperties, "http.port", String.valueOf(actualHttpPort));
