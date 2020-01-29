@@ -10,7 +10,7 @@
 
     <groupId>com.atlassian.amps</groupId>
     <artifactId>atlassian-amps-parent</artifactId>
-    <version>6.3.22-SNAPSHOT</version>
+    <version>6.3.22-90fb3c317</version>
     <packaging>pom</packaging>
 
     <name>Atlassian Maven Plugin Suite (parent pom)</name>
