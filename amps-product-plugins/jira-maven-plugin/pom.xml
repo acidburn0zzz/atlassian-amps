@@ -107,6 +107,7 @@
                     validateManifestSkipValidationTest,
                     validateManifestWithInvalidManifestTest,
                     validateManifestWithValidManifestTest,
+                    validateBannedDependenciesTest
                 </invoker.test>
             </properties>
         </profile>
