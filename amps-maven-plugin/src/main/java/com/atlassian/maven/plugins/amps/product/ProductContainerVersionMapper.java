@@ -38,7 +38,8 @@ public class ProductContainerVersionMapper
                 .put("7.6.0", "tomcat85_29")
                 .put("7.12.0", "tomcat85_32")
                 .put("7.13.0", "tomcat85_35")
-                .put("8.2.1", "tomcat85x")
+                .put("8.2.1", "tomcat85_40")
+                .put("8.8.0", "tomcat85x")
                 .build()
         );
         populateVersionMapForProduct(ProductHandlerFactory.REFAPP, "0", "2.21.0", "3.0.0", "5.0.0");
