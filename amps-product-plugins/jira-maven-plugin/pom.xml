@@ -87,6 +87,7 @@
                     debugTest,
                     debugWithPortConflictTest,
                     debugWithTestGroupTest,
+                    extractDependenciesTest,
                     filterPluginDescriptorWithPluginDescriptorTest,
                     filterPluginDescriptorWithoutPluginDescriptorTest,
                     generateManifestWithInstructionsTest,
