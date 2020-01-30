@@ -1,6 +1,6 @@
-#set( $useOsgiJavaConfigParsed = $useOsgiJavaConfig.equalsIgnoreCase('Y') )
-        <?xml version="1.0" encoding="UTF-8"?>
-        #if ($useOsgiJavaConfigParsed)
+#set( $useOsgiJavaConfigParsed = $useOsgiJavaConfig.equalsIgnoreCase('Y') )##
+<?xml version="1.0" encoding="UTF-8"?>
+#if ($useOsgiJavaConfigParsed)
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
@@ -11,7 +11,7 @@
     <!-- Package with Spring configuration -->
     <context:component-scan base-package="${package}.config" />
 </beans>
-        #else
+#else
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:atlassian-scanner="http://www.atlassian.com/schema/atlassian-scanner"

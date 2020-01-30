@@ -9,8 +9,8 @@ import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
 import com.atlassian.maven.plugins.amps.util.MojoUtils;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
-import com.atlassian.maven.plugins.amps.util.minifier.MinifierParameters;
-import com.atlassian.maven.plugins.amps.util.minifier.ResourcesMinifier;
+import com.atlassian.maven.plugins.amps.minifier.MinifierParameters;
+import com.atlassian.maven.plugins.amps.minifier.ResourcesMinifier;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
@@ -655,14 +655,14 @@ public class MavenGoals
 
     public void compressResources(boolean compressJs, boolean compressCss, boolean useClosureForJs, Charset cs, Map<String,String> closureOptions) throws MojoExecutionException
     {
-        MinifierParameters closureParameters = new MinifierParameters(compressJs,
+        MinifierParameters minifierParameters = new MinifierParameters(compressJs,
                 compressCss,
                 useClosureForJs,
                 cs,
                 log,
                 closureOptions
         );
-        ResourcesMinifier.minify(ctx.getProject().getBuild().getResources(), ctx.getProject().getBuild().getOutputDirectory(), closureParameters);
+        new ResourcesMinifier(minifierParameters).minify(ctx.getProject().getBuild().getResources(), ctx.getProject().getBuild().getOutputDirectory());
     }
 
     public void filterPluginDescriptor() throws MojoExecutionException

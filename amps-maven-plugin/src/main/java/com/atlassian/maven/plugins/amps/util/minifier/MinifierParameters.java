@@ -1,64 +1,49 @@
 package com.atlassian.maven.plugins.amps.util.minifier;
 
-import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.logging.Log;
 
-import java.io.File;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.Map;
 
-public class MinifierParameters
-{
-    private boolean compressJs;
-    private boolean compressCss;
-    private boolean useClosureForJs;
-    private Charset cs;
-    private Log log;
-    private Map<String,String> closureOptions;
+/**
+ * @deprecated This will be removed in AMPS 9. Use {@link com.atlassian.maven.plugins.amps.minifier.MinifierParameters} instead.
+ */
+@Deprecated
+public class MinifierParameters {
+    private com.atlassian.maven.plugins.amps.minifier.MinifierParameters impl;
 
+    @Deprecated
     public MinifierParameters(boolean compressJs,
-                              boolean compressCss,
-                              boolean useClosureForJs,
-                              Charset cs, Log log,
-                              Map<String, String> closureOptions)
-    {
-        this.compressJs = compressJs;
-        this.compressCss = compressCss;
-        this.useClosureForJs = useClosureForJs;
-        this.cs = cs;
-        this.log = log;
-        this.closureOptions = closureOptions;
+        boolean compressCss,
+        boolean useClosureForJs,
+        Charset cs, Log log,
+        Map<String, String> closureOptions) {
+        impl = new com.atlassian.maven.plugins.amps.minifier.MinifierParameters(compressJs, compressCss, useClosureForJs, cs, log, closureOptions);
     }
 
-    public boolean isCompressJs()
-    {
-        return compressJs;
+    public boolean isCompressJs() {
+        return impl.isCompressJs();
     }
 
-    public boolean isCompressCss()
-    {
-        return compressCss;
+    public boolean isCompressCss() {
+        return impl.isCompressCss();
     }
 
-    public boolean isUseClosureForJs()
-    {
-        return useClosureForJs;
+    @Deprecated
+    public boolean isUseClosureForJs() {
+        return impl.isUseClosureForJs();
     }
 
-    public Charset getCs()
-    {
-        return cs;
+    public Charset getCs() {
+        return impl.getCs();
     }
 
-    public Log getLog()
-    {
-        return log;
+    public Log getLog() {
+        return impl.getLog();
     }
 
-    public Map<String, String> getClosureOptions()
-    {
-        return closureOptions;
+    public Map<String, String> getClosureOptions() {
+        return impl.getClosureOptions();
     }
 
 }
