@@ -1,0 +1,17 @@
+{namespace myapp}
+
+/**
+ * Main layout which loads React app and all resources.
+ */
+{template .init}
+    {webResourceManager_requireResourcesForContext('atlassian-frontend-bootstrap')}
+    <html>
+        <head>
+            <title>{getText('myApp.title')}</title>
+            <meta name="decorator" content="atl.admin"/>
+        </head>
+        <body>
+            <div id="rate-limit-app-container"></div>
+        </body>
+    </html>
+{/template}

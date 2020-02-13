@@ -1,0 +1,59 @@
+<archetype-descriptor xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd"
+                      name="atlaskit-plugin-archetype">
+    <fileSets>
+
+        <fileSet encoding="UTF-8">
+            <directory></directory>
+            <includes>
+                <include>**/*.json</include>
+                <include>**/*.js</include>
+                <include>**/*.lock</include>
+                <include>.eslintignore</include>
+                <include>.gitignore</include>
+            </includes>
+        </fileSet>
+
+        <fileSet encoding="UTF-8">
+            <directory>src/main/my-app</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
+        <fileSet encoding="UTF-8">
+            <directory>config</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+            <directory>src/main/java</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
+        <fileSet filtered="true" encoding="UTF-8">
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/atlassian-plugin.xml</include>
+                <include>**/META-INF/spring/*.xml</include>
+            </includes>
+        </fileSet>
+
+        <fileSet encoding="UTF-8">
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <excludes>
+                <exclude>**/atlassian-plugin.xml</exclude>
+                <exclude>**/META-INF/spring/*.xml</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
+
+</archetype-descriptor>

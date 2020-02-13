@@ -1,0 +1,53 @@
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+    </plugin-info>
+
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="myapp" location="i18n/myapp"/>
+    
+    <servlet key="myapp-servlet" name="Ratelimiting Servlet"
+             class="${package}.TemplateServlet">
+        <url-pattern>/myapp</url-pattern>
+    </servlet>
+
+    <web-resource key="myapp-templates" name="MyApp Soy Templates">
+        <resource type="soy" name="myapp.soy" location="/templates/myapp.soy"/>
+        <dependency>com.atlassian.auiplugin:soy</dependency>
+        <dependency>com.atlassian.soy.soy-template-plugin:soy-deps</dependency>
+    </web-resource>
+
+    <web-item key="refapp-menu-item" name="Refapp MyApp" section="system.admin/general" weight="10"
+              application="refapp">
+        <label>MyApp</label>
+        <label key="myApp.title"/>
+        <link linkId="myapp">/plugins/servlet/myapp</link>
+    </web-item>
+
+    <web-item key="jira-menu-item" name="Jira MyApp" section="advanced_menu_section/advanced_section"
+              weight="200"
+              application="jira">
+        <label key="myApp.title"/>
+        <description>MyApp</description>
+        <link linkId="myapp">/plugins/servlet/myapp</link>
+    </web-item>
+
+    <web-item key="bitbucket-menu-item" name="Bitbucket MyApp" section="atl.admin/admin-support-section"
+              weight="10"
+              application="bitbucket">
+        <label key="myApp.title"/>
+        <description>MyApp</description>
+        <link linkId="myapp">/plugins/servlet/myapp</link>
+    </web-item>
+
+    <web-item key="confluence-menu-item" name="Confluence MyApp" section="system.admin/administration"
+              weight="10"
+              application="confluence">
+        <label key="myApp.title"/>
+        <description>MyApp</description>
+        <link linkId="myapp">/plugins/servlet/myapp</link>
+    </web-item>
+
+</atlassian-plugin>
