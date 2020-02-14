@@ -206,8 +206,8 @@
         <yarn.cmd.install.dev>install --pure-lockfile --prefer-offline --mutex network</yarn.cmd.install.dev>
         <yarn.cmd.build>build</yarn.cmd.build>
         <yarn.cmd.build.dev>build:dev</yarn.cmd.build.dev>
-        <node.modules>${project.basedir}/src/main/my-app/node_modules</node.modules>
-        <frontend.working.directory>${project.basedir}/src/main/my-app</frontend.working.directory>
+        <node.modules>${project.basedir}/src/main/app/node_modules</node.modules>
+        <frontend.working.directory>${project.basedir}/src/main/app</frontend.working.directory>
         <sal.version>4.0.0</sal.version>
         <atlassian.spring.scanner.version>2.1.9</atlassian.spring.scanner.version>
         <spring.version>5.0.10.RELEASE</spring.version>

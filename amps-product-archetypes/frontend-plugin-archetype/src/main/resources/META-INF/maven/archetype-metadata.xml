@@ -16,7 +16,7 @@
         </fileSet>
 
         <fileSet encoding="UTF-8">
-            <directory>src/main/my-app</directory>
+            <directory>src/main/app</directory>
             <includes>
                 <include>**/*</include>
             </includes>

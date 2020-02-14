@@ -7,6 +7,7 @@ import com.atlassian.maven.plugins.amps.AbstractAmpsMojo;
 import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
 import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
 import com.atlassian.maven.plugins.amps.util.MojoUtils;
+import com.atlassian.maven.plugins.amps.util.VersionUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -55,7 +56,7 @@ public class FrontendCreateMojo extends AbstractAmpsMojo {
                         element(name("archetypeGroupId"), ARCHETYPE_GROUP_ID),
                         element(name("archetypeArtifactId"), ARCHETYPE_ARTIFACT_ID),
                         element(name("interactiveMode"), "false")
-                ), getMavenContext().getExecutionEnvironment());
+                ),getMavenContext().getExecutionEnvironment());
     }
 
     private CreatePluginProperties getCreatePluginProperties() throws MojoExecutionException {
@@ -65,7 +66,7 @@ public class FrontendCreateMojo extends AbstractAmpsMojo {
         if (Stream.of(GROUP_ID, ARTIFACT_ID, VERSION, PACKAGE).allMatch(systemProps::containsKey)) {
             pluginProperties = new CreatePluginProperties(systemProps.getProperty(GROUP_ID),
                     systemProps.getProperty(ARTIFACT_ID), systemProps.getProperty(VERSION),
-                    systemProps.getProperty(PACKAGE));
+                    systemProps.getProperty(PACKAGE), systemProps.getProperty("useOsgiJavaConfig", "N"));
         }
 
         if (pluginProperties == null) {
