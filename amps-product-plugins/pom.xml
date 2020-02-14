@@ -21,6 +21,7 @@
         <module>refapp-maven-plugin</module>
         <module>fecru-maven-plugin</module>
         <module>crowd-maven-plugin</module>
+        <module>frontend-maven-plugin</module>
     </modules>
 
     <dependencies>
