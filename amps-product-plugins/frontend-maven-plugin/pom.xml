@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>com.atlassian.maven.archetypes</groupId>
-            <artifactId>atlaskit-plugin-archetype</artifactId>
+            <artifactId>frontend-plugin-archetype</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
