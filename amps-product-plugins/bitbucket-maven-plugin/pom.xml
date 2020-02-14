@@ -52,7 +52,19 @@
                 </plugins>
             </build>
             <properties>
-                <invoker.test>compressLocalizedResourcesTest,compressResourcesTest,compressResourcesWithClosureOptionLanguageInTest,compressResourcesWithIncludeParamTest,copyBundledDependenciesTest,createTest,debugTest,debugWithPortConflictTest,debugWithTestGroupTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateObrTest,integrationTest,integrationTestWithPortConflictTest,integrationTestWithTestGroupTest,jarWithExistingManifestTest,quickreloadTest,runParallelTest,runTest,runWithPortConflictTest,unitTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest</invoker.test>
+                <invoker.test>
+                    compressLocalizedResourcesTest,
+                    compressResourcesTest, compressResourcesWithClosureOptionLanguageInTest,
+                    compressResourcesWithIncludeParamTest, copyBundledDependenciesTest, createTest,
+                    createOsgiJavaConfigTest, debugTest, debugWithPortConflictTest, debugWithTestGroupTest,
+                    extractDependenciesTest, filterPluginDescriptorWithoutPluginDescriptorTest,
+                    filterPluginDescriptorWithPluginDescriptorTest, generateManifestWithInstructionsTest,
+                    generateManifestWithNoInstructionsTest, generateObrTest, integrationTest,
+                    integrationTestWithPortConflictTest, integrationTestWithTestGroupTest, jarWithExistingManifestTest,
+                    quickreloadTest, runParallelTest, runTest, runWithPortConflictTest, unitTest,
+                    validateManifestSkipValidationTest, validateManifestWithInvalidManifestTest,
+                    validateManifestWithValidManifestTest, validateBannedDependenciesTest
+                </invoker.test>
                 <invoker.product>bitbucket</invoker.product>
                 <product.version>${bitbucket.version}</product.version>
                 <product.data.version>${bitbucket.data.version}</product.data.version>

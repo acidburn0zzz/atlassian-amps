@@ -149,6 +149,12 @@ public class Product
     protected String dataHome = "";
 
     /**
+     * The path to a zip or a directory to use for home directory overrides. Takes precedence
+     * over src/test/resources/{@link #instanceId}-home.
+     */
+    protected String dataOverridesPath = "";
+
+    /**
      */
     private List<Application> applications = new ArrayList<Application>();
 
@@ -391,6 +397,7 @@ public class Product
         prod.setDataPath(StringUtils.isBlank(productDataPath) ? product.getDataPath() : productDataPath);
         prod.setDataVersion(productDataVersion == null ? product.getDataVersion() : productDataVersion);
         prod.setDataHome(dataHome == null ? product.getDataHome() : dataHome);
+        prod.setDataOverridesPath(dataOverridesPath == null ? product.getDataOverridesPath() : dataOverridesPath);
         prod.setLog4jProperties(log4jProperties == null ? product.getLog4jProperties() : log4jProperties);
         prod.setJvmArgs(StringUtils.stripToNull(jvmArgs) == null ? product.getJvmArgs() : jvmArgs);
         prod.setDebugArgs(StringUtils.stripToNull(debugArgs) == null ? product.getDebugArgs() : debugArgs);
@@ -691,6 +698,15 @@ public class Product
     public void setDataPath(String productDataPath)
     {
         this.productDataPath = productDataPath;
+    }
+
+    public String getDataOverridesPath()
+    {
+        return dataOverridesPath;
+    }
+
+    public void setDataOverridesPath(String productHomeOverridesPath) {
+        this.dataOverridesPath = productHomeOverridesPath;
     }
 
     /**

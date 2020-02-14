@@ -54,13 +54,13 @@
                 <product.database.type>no-database-type</product.database.type>
                 <tests>
                     compressResources, compressResourcesWithClosureOptionLanguageIn, compressResourcesWithIncludeParam,
-                    copyBundledDependencies, create, debug, debugWithPortConflict, debugWithTestGroup,
+                    copyBundledDependencies, create, debug, debugWithPortConflict, debugWithTestGroup, extractDependencies,
                     filterPluginDescriptorWithoutPluginDescriptor, filterPluginDescriptorWithPluginDescriptor,
                     generateManifestWithInstructions, generateManifestWithNoInstructions,
                     generateObr, integration, integrationTestWithPortConflict,
                     integrationTestWithTestGroup, jarWithExistingManifest, preIntegration, quickreload,
                     run, runParallel, runWithPortConflict, runWithTestGroup, unit, validateManifestSkipValidation,
-                    validateManifestWithInvalidManifest, validateManifestWithValidManifest
+                    validateManifestWithInvalidManifest, validateManifestWithValidManifest, validateBannedDependenciesTest
                 </tests>
             </properties>
         </profile>

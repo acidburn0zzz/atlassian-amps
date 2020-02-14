@@ -1,63 +1,32 @@
 package com.atlassian.maven.plugins.amps.util.minifier;
 
+import org.apache.maven.plugin.logging.Log;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
-import org.apache.maven.plugin.logging.Log;
 
 /**
- * @since version
+ * @deprecated This will be removed in AMPS 9. There is no replacement.
  */
-public class YUIErrorReporter implements ErrorReporter
-{
-    private final Log log;
+@Deprecated
+public class YUIErrorReporter implements ErrorReporter {
+    private final ErrorReporter impl;
 
-    public YUIErrorReporter(Log log)
-    {
-        this.log = log;
+    public YUIErrorReporter(Log log) {
+        this.impl = new com.atlassian.maven.plugins.amps.minifier.strategies.yui.YUIErrorReporter(log);
     }
 
     @Override
-    public void warning(String message, String sourceName, int line, String lineSource, int lineOffset)
-    {
-        log.warn(getMessage(message,sourceName,line,lineSource,lineOffset));
+    public void warning(final String s, final String s1, final int i, final String s2, final int i1) {
+        impl.warning(s, s1, i, s2, i1);
     }
 
     @Override
-    public void error(String message, String sourceName, int line, String lineSource, int lineOffset)
-    {
-        log.error(getMessage(message,sourceName,line,lineSource,lineOffset));
+    public void error(final String s, final String s1, final int i, final String s2, final int i1) {
+        impl.error(s, s1, i, s2, i1);
     }
 
     @Override
-    public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset)
-    {
-        error(message,sourceName,line,lineSource,lineOffset);
-        throw new EvaluatorException(message,sourceName,line,lineSource,lineOffset);
+    public EvaluatorException runtimeError(final String s, final String s1, final int i, final String s2, final int i1) {
+        return impl.runtimeError(s, s1, i, s2, i1);
     }
-
-    private String getMessage(String message, String sourceName, int line, String lineSource, int lineOffset) {
-        StringBuilder builder = new StringBuilder();
-
-        if (sourceName != null) {
-            builder.append(sourceName)
-                .append(":line ")
-                .append(line)
-                .append(":column ")
-                .append(lineOffset)
-                .append(':')
-            ;
-        }
-        if ((message != null) && (message.length() != 0)) {
-            builder.append(message);
-        } else {
-            builder.append("unknown error");
-        }
-        if ((lineSource != null) && (lineSource.length() != 0)) {
-            builder.append("\n\t")
-                .append(lineSource)
-            ;
-        }
-        return builder.toString();
-    }
-
 }

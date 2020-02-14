@@ -14,4 +14,8 @@
 
     <name>Atlassian Crucible Plugin Archetype</name>
     <description>This archetype can be used to create a new Atlassian FishEye / Crucible plugin project</description>
+
+    <properties>
+        <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
+    </properties>
 </project>

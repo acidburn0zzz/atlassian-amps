@@ -47,13 +47,13 @@
                 <tests>
                     amps1211, amps1454,
                     compressResources, compressResourcesWithClosureOptionLanguageIn, compressResourcesWithIncludeParam,
-                    copyBundledDependencies, create, debug, debugWithPortConflict, debugWithTestGroup,
+                    copyBundledDependencies, create, debug, debugWithPortConflict, debugWithTestGroup, extractDependenciesTest,
                     filterPluginDescriptorWithoutPluginDescriptor, filterPluginDescriptorWithPluginDescriptor,
                     generateManifestWithInstructions, generateManifestWithNoInstructions,
                     generateObr, integration, integrationTestWithPortConflict,
                     integrationTestWithTestGroup, jarWithExistingManifest, preIntegration, quickreload,
                     run, runParallel, runWithPortConflict, runWithTestGroup, unit, validateManifestSkipValidation,
-                    validateManifestWithInvalidManifest, validateManifestWithValidManifest
+                    validateManifestWithInvalidManifest, validateManifestWithValidManifest, validateBannedDependenciesTest
                 </tests>
             </properties>
         </profile>

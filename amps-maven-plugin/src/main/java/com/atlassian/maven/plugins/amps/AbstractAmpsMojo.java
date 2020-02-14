@@ -93,7 +93,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     /**
      * Flag to use google closure instead of YUI for js compilation
      */
-    @Parameter(property = "closure.js.compiler", defaultValue = "false")
+    @Parameter(property = "closure.js.compiler", defaultValue = "true")
     protected boolean closureJsCompiler;
 
     /**

@@ -1,0 +1,50 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.atlassian.amps.it</groupId>
+    <artifactId>amps-maven-plugin-validate-banned-dependencies-test</artifactId>
+    <version>testing</version>
+    <name>TestValidateBannedDependencies</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>${invoker.groupId}</groupId>
+                <artifactId>${invoker.artifactId}</artifactId>
+                <version>${project.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.plugin</groupId>
+            <artifactId>atlassian-spring-scanner-annotation</artifactId>
+            <version>1.2.13</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>

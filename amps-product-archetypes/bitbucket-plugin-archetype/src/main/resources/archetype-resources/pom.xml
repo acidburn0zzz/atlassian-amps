@@ -1,4 +1,5 @@
 #set( $dollar = '$' )
+#set( $useOsgiJavaConfigParsed = $useOsgiJavaConfig.equalsIgnoreCase('Y') )
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -28,7 +29,12 @@
         <!-- This property ensures consistency between the key in atlassian-plugin.xml and the OSGi bundle's key. -->
         <atlassian.plugin.key>\${dollar}{project.groupId}.\${dollar}{project.artifactId}</atlassian.plugin.key>
 
+#if ($useOsgiJavaConfigParsed)
+        <osgi.javaconfig.version>${osgi.javaconfig.version}</osgi.javaconfig.version>
+        <spring.version>${osgi.javaconfig.spring.version}</spring.version>
+#else
         <atlassian.spring.scanner.version>${atlassian.spring.scanner.version}</atlassian.spring.scanner.version>
+#end
         <javax.inject.version>${javax.inject.version}</javax.inject.version>
         <jsr311.version>${jsr311.version}</jsr311.version>
         <plugin.testrunner.version>${plugin.testrunner.version}</plugin.testrunner.version>
@@ -57,12 +63,45 @@
             <scope>provided</scope>
         </dependency>
 
+#if ($useOsgiJavaConfigParsed)
+        <dependency>
+            <groupId>com.atlassian.plugins</groupId>
+            <artifactId>atlassian-plugins-osgi-javaconfig</artifactId>
+            <version>${dollar}{osgi.javaconfig.version}</version>
+        </dependency>
+        <!-- OSGi Java Config dependencies -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>4.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${dollar}{spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${dollar}{spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+#else
         <dependency>
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-annotation</artifactId>
             <version>\${dollar}{atlassian.spring.scanner.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+            <scope>provided</scope>
+        </dependency>
+#end
         <dependency>
             <groupId>com.atlassian.sal</groupId>
             <artifactId>sal-api</artifactId>
@@ -72,12 +111,6 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>\${dollar}{javax.inject.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -146,6 +179,7 @@
                     </instructions>
                 </configuration>
             </plugin>
+#if (!$useOsgiJavaConfigParsed)
             <plugin>
                 <groupId>com.atlassian.plugin</groupId>
                 <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
@@ -159,15 +193,10 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <scannedDependencies>
-                        <dependency>
-                            <groupId>com.atlassian.plugin</groupId>
-                            <artifactId>atlassian-spring-scanner-external-jar</artifactId>
-                        </dependency>
-                    </scannedDependencies>
                     <verbose>false</verbose>
                 </configuration>
             </plugin>
+#end
         </plugins>
     </build>
 </project>

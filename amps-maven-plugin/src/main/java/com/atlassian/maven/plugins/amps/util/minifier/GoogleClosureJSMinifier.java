@@ -1,92 +1,39 @@
 package com.atlassian.maven.plugins.amps.util.minifier;
 
-import com.google.javascript.jscomp.CompilationLevel;
-import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.Compiler;
-import com.google.javascript.jscomp.Result;
-import com.google.javascript.jscomp.SourceFile;
-import com.google.javascript.jscomp.SourceMap;
+import com.atlassian.maven.plugins.amps.code.Sources;
+import com.atlassian.maven.plugins.amps.minifier.strategies.googleclosure.GoogleClosureJsMinifier;
 import org.apache.maven.plugin.logging.Log;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
- * @since version
+ * @deprecated This will be removed in AMPS 9. Use {@link com.atlassian.maven.plugins.amps.minifier.strategies.googleclosure.GoogleClosureJsMinifier} instead.
  */
-public class GoogleClosureJSMinifier
-{
+public class GoogleClosureJSMinifier {
     /**
-     * Needed as a tuple to return two things from the method - compiled code and source map.
+     * @deprecated use {@link com.atlassian.maven.plugins.amps.code.Sources} instead.
      */
-    static class CompiledSourceWithSourceMap
-    {
-        private final String compiled;
-        private final String sourceMap;
+    static class CompiledSourceWithSourceMap {
+        private final Sources impl;
 
-        CompiledSourceWithSourceMap(final String compiled, final String sourceMap)
-        {
-            this.compiled = compiled;
-            this.sourceMap = sourceMap;
+        CompiledSourceWithSourceMap(final String compiled, final String sourceMap) {
+            impl = new Sources(compiled, sourceMap);
         }
 
-        String getCompiled()
-        {
-            return compiled;
+        String getCompiled() {
+            return impl.getContent();
         }
 
-        String getSourceMap()
-        {
-            return sourceMap;
+        String getSourceMap() {
+            return impl.getSourceMapContent();
         }
     }
 
-    private static CompilerOptions getOptions(Map<String, String> closureOptions, Log log)
-    {
-        GoogleClosureOptionsHandler googleClosureOptionsHandler = new GoogleClosureOptionsHandler(log);
-        if(closureOptions != null && !closureOptions.isEmpty()) {
-            for(String optionName : closureOptions.keySet())
-            {
-                googleClosureOptionsHandler.setOption(optionName, closureOptions.get(optionName));
-            }
-        }
-
-        return googleClosureOptionsHandler.getCompilerOptions();
-    }
-
+    /**
+     * @deprecated use {@link GoogleClosureJsMinifier#compile} instead.
+     */
     public static CompiledSourceWithSourceMap compile(String code, String sourcePath, Map<String, String> closureOptions, Log log) {
-        Compiler compiler = new Compiler();
-        CompilerOptions options = getOptions(closureOptions, log);
-        CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
-
-        // Dummy file paths used for source map, all those paths will be replaced at runtime.
-        options.setSourceMapFormat(SourceMap.Format.V3);
-        options.setSourceMapOutputPath("/dummy-file-path");
-
-        SourceFile extern = SourceFile.fromCode("externs.js","function alert(x) {}");
-
-        // The dummy input name "input.js" is used here so that any warnings or
-        // errors will cite line numbers in terms of input.js.
-        SourceFile input = SourceFile.fromCode("input.js", code);
-
-        // compile() returns a Result, but it is not needed here.
-        Result result = compiler.compile(extern, input, options);
-        String min = compiler.toSource();
-
-        // Getting the source map.
-        // Note that it should be called after the `compiler.toSource` otherwise it would be empty.
-        StringBuilder sourceMapStream = new StringBuilder();
-        try
-        {
-            result.sourceMap.appendTo(sourceMapStream, "/dummy-file-path");
-        }
-        catch (IOException e)
-        {
-            log.warn("can't create source map for " + sourcePath);
-        }
-
-        // The compiler is responsible for generating the compiled code; it is not
-        // accessible via the Result.
-        return new CompiledSourceWithSourceMap(min, sourceMapStream.toString());
+        Sources result = GoogleClosureJsMinifier.compile(code, closureOptions, log);
+        return new CompiledSourceWithSourceMap(result.getContent(), result.getSourceMapContent());
     }
 }

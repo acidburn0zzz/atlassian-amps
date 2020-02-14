@@ -59,7 +59,17 @@
                 </testResources>
             </build>
             <properties>
-                <invoker.test>compressResourcesTest,copyBundledDependenciesTest,createTest,debugTest,debugWithPortConflictTest,!debugWithTestGroupTest,filterPluginDescriptorWithoutPluginDescriptorTest,filterPluginDescriptorWithPluginDescriptorTest,generateManifestWithInstructionsTest,generateManifestWithNoInstructionsTest,generateManifestWithNoInstructionsButIsAtlassianPluginTest,generateManifestWithNoInstructionsNorIsAtlassianPluginTest,generateObrTest,!integrationTest,integrationTestWithPortConflictTest,!integrationTestWithTestGroupTest,jarWithExistingManifestTest,quickreloadTest,runTest,runParallelTest,runWithPortConflictTest,!runWithTestGroupTest,unitTest,validateManifestSkipValidationTest,validateManifestWithInvalidManifestTest,validateManifestWithValidManifestTest</invoker.test>
+                <invoker.test>compressResourcesTest, copyBundledDependenciesTest, createTest, createOsgiJavaConfigTest,
+                    debugTest, debugWithPortConflictTest, !debugWithTestGroupTest, extractDependenciesTest,
+                    filterPluginDescriptorWithoutPluginDescriptorTest, filterPluginDescriptorWithPluginDescriptorTest,
+                    generateManifestWithInstructionsTest, generateManifestWithNoInstructionsTest,
+                    generateManifestWithNoInstructionsButIsAtlassianPluginTest,
+                    generateManifestWithNoInstructionsNorIsAtlassianPluginTest, generateObrTest, !integrationTest,
+                    integrationTestWithPortConflictTest, !integrationTestWithTestGroupTest, jarWithExistingManifestTest,
+                    quickreloadTest, runTest, runParallelTest, runWithPortConflictTest, !runWithTestGroupTest, unitTest,
+                    validateManifestSkipValidationTest, validateManifestWithInvalidManifestTest,
+                    validateManifestWithValidManifestTest, validateBannedDependenciesTest
+                </invoker.test>
                 <invoker.product>fecru</invoker.product>
                 <product.version>${fecru.version}</product.version>
                 <product.data.version>${fecru.data.version}</product.data.version>
