@@ -30,7 +30,7 @@ public class FrontendCreateMojo extends AbstractAmpsMojo {
     private static final String ARTIFACT_ID = "artifactId";
     private static final String VERSION = "version";
     private static final String PACKAGE = "package";
-    private static final String ARCHETYPE_ARTIFACT_ID = "atlaskit-plugin-archetype";
+    private static final String ARCHETYPE_ARTIFACT_ID = "frontend-plugin-archetype";
     private static final String ARCHETYPE_GROUP_ID = "com.atlassian.maven.archetypes";
 
     @Component
@@ -55,8 +55,9 @@ public class FrontendCreateMojo extends AbstractAmpsMojo {
                 configuration(
                         element(name("archetypeGroupId"), ARCHETYPE_GROUP_ID),
                         element(name("archetypeArtifactId"), ARCHETYPE_ARTIFACT_ID),
+                        element(name("archetypeVersion"), VersionUtils.getVersion()),
                         element(name("interactiveMode"), "false")
-                ),getMavenContext().getExecutionEnvironment());
+                ), getMavenContext().getExecutionEnvironment());
     }
 
     private CreatePluginProperties getCreatePluginProperties() throws MojoExecutionException {
@@ -64,6 +65,7 @@ public class FrontendCreateMojo extends AbstractAmpsMojo {
         final Properties systemProps = System.getProperties();
 
         if (Stream.of(GROUP_ID, ARTIFACT_ID, VERSION, PACKAGE).allMatch(systemProps::containsKey)) {
+            
             pluginProperties = new CreatePluginProperties(systemProps.getProperty(GROUP_ID),
                     systemProps.getProperty(ARTIFACT_ID), systemProps.getProperty(VERSION),
                     systemProps.getProperty(PACKAGE), systemProps.getProperty("useOsgiJavaConfig", "N"));
