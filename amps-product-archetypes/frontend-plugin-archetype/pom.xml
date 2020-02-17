@@ -6,7 +6,6 @@
     <groupId>com.atlassian.maven.archetypes</groupId>
     <artifactId>frontend-plugin-archetype</artifactId>
     <version>8.1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
 
     <build>
         <extensions>
@@ -19,6 +18,5 @@
     </build>
 
     <name>Atlassian Frontend Plugin Archetype</name>
-    <description>This archetype can be used to create a new Atassian plugin with React, Typescript and Webpack
-    </description>
+    <description>This archetype creates a new Atassian plugin with React, Typescript and Webpack</description>
 </project>
