@@ -8,7 +8,7 @@
     <!-- add our i18n resource -->
     <resource type="i18n" name="myapp" location="i18n/myapp"/>
     
-    <servlet key="myapp-servlet" name="Ratelimiting Servlet"
+    <servlet key="myapp-servlet" name="App Servlet"
              class="${package}.TemplateServlet">
         <url-pattern>/myapp</url-pattern>
     </servlet>

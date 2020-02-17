@@ -27,7 +27,7 @@ const plugins = shouldWatch => [
                 },
             },
         },
-        singleRuntimeWebResourceKey: 'rate-limiting-plugin-runtime',
+        singleRuntimeWebResourceKey: 'frontend-plugin',
         watch: shouldWatch,
         watchPrepare: shouldWatch,
     }),

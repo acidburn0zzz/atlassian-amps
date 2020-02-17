@@ -8,7 +8,7 @@ import * as formatter from '@atlassian/wrm-react-i18n';
 import { App } from './components/App';
 
 whenDomReady().then(function example() {
-    const container = document.getElementById('rate-limit-app-container');
+    const container = document.getElementById('app-container');
     // eslint-disable-next-line no-undef
     const MyApp = hot(module)(() => <App example={formatter.I18n.getText('myApp.title')} />);
     ReactDOM.render(<MyApp />, container);
