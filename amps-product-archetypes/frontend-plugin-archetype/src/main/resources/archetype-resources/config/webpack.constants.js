@@ -20,17 +20,6 @@ const WRM_OUTPUT = path.resolve(
     'wr-webpack-bundles.xml'
 );
 
-const JQUERY_EXTERNAL = {
-    jquery: {
-        commonjs: 'jquery',
-        commonjs2: 'jquery',
-        amd: 'jquery',
-        root: 'jQuery',
-        global: 'jQuery',
-        var: 'jQuery',
-    },
-};
-
 const DEV_SERVER_PORT = 3333;
 const DEV_SERVER_HOST = 'localhost';
 
@@ -41,7 +30,6 @@ module.exports = {
     FRONTEND_OUTPUT_DIR,
     MY_I18N_FILES,
     WRM_OUTPUT,
-    JQUERY_EXTERNAL,
     PLUGIN_KEY,
     ENTRY_POINT,
     DEV_SERVER_PORT,
