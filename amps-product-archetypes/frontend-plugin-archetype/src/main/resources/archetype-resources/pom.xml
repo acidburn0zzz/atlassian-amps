@@ -201,7 +201,7 @@
 
     <properties>
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
-        <frontend.maven.plugin.version>1.6</frontend.maven.plugin.version>
+        <frontend.maven.plugin.version>1.9.1</frontend.maven.plugin.version>
         <frontend.maven.plugin.install.directory>${project.build.directory}</frontend.maven.plugin.install.directory>
         <nodeVersion>v12.13.0</nodeVersion>
         <yarnVersion>v1.19.1</yarnVersion>
@@ -214,7 +214,6 @@
         <sal.version>4.0.0</sal.version>
         <atlassian.spring.scanner.version>2.1.9</atlassian.spring.scanner.version>
         <spring.version>5.0.10.RELEASE</spring.version>
-        <atlassian.spring.scanner.version>2.1.9</atlassian.spring.scanner.version>
         <atlassian.plugins.version>5.2.1</atlassian.plugins.version>
         <amps.version>8.0.0</amps.version>
         <soy.version>5.0.0</soy.version>
