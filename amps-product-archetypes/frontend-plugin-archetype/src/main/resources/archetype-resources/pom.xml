@@ -82,6 +82,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <enableQuickReload>true</enableQuickReload>
+                    <extractDependencies>false</extractDependencies>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <Atlassian-Scan-Folders>META-INF/plugin-descriptors</Atlassian-Scan-Folders>
@@ -89,7 +90,6 @@
                         <Import-Package>
                             org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
-                            org.slf4j,
                             *
                         </Import-Package>
                     </instructions>
