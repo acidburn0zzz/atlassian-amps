@@ -9,7 +9,7 @@
     <parent>
         <groupId>com.atlassian.pom</groupId>
         <artifactId>closedsource-pom</artifactId>
-        <version>5.0.21</version>
+        <version>5.0.29</version>
     </parent>
 
     <groupId>${groupId}</groupId>
@@ -17,9 +17,7 @@
     <version>${version}</version>
 
     <name>${artifactId}</name>
-    <description>This is the ${groupId}:${artifactId} plugin for bootstrapping your Atlassian plugin with Webpack,
-        TypeScript and React.
-    </description>
+    <description>This is the ${groupId}:${artifactId} plugin for bootstrapping your Atlassian plugin with Webpack, TypeScript and React.</description>
     <packaging>atlassian-plugin</packaging>
 
     <dependencies>
@@ -48,9 +46,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
+            <groupId>javax.servlet-api</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
+            <version>${javax.servlet.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -218,6 +216,7 @@
         <amps.version>8.0.0</amps.version>
         <soy.version>5.0.0</soy.version>
         <webfragments.version>5.1.0</webfragments.version>
+        <javax.servlet.version>3.1.0</javax.servlet.version>
     </properties>
 
 </project>
