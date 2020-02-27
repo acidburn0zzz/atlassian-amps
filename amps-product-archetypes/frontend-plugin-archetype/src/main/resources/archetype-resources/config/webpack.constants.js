@@ -6,7 +6,7 @@ const srcDir = path.join(rootDir, 'src', 'main');
 const I18N_SRC_DIR = path.join(srcDir, 'resources');
 const FRONTEND_SRC_DIR = path.join(srcDir, 'app');
 const FRONTEND_OUTPUT_DIR = path.join(rootDir, 'target', 'classes');
-const PLUGIN_KEY = 'com.atlassian.myapp.atlassian-frontend-bootstrap';
+const PLUGIN_KEY = process.env.PLUGIN_KEY;
 const ENTRY_POINT = { 'atlassian-frontend-bootstrap': path.join(FRONTEND_SRC_DIR, 'index.tsx') };
 
 const MY_I18N_FILES = ['myapp.properties'].map(file => path.join(I18N_SRC_DIR, 'i18n', file));
