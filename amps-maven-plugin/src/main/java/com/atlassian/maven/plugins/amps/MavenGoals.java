@@ -1,6 +1,8 @@
 package com.atlassian.maven.plugins.amps;
 
 import aQute.bnd.osgi.Constants;
+import com.atlassian.maven.plugins.amps.minifier.MinifierParameters;
+import com.atlassian.maven.plugins.amps.minifier.ResourcesMinifier;
 import com.atlassian.maven.plugins.amps.product.ImportMethod;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabase;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory;
@@ -9,12 +11,34 @@ import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
 import com.atlassian.maven.plugins.amps.util.MojoUtils;
 import com.atlassian.maven.plugins.amps.util.PluginXmlUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
-import com.atlassian.maven.plugins.amps.minifier.MinifierParameters;
-import com.atlassian.maven.plugins.amps.minifier.ResourcesMinifier;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import com.googlecode.htmlcompressor.compressor.XmlCompressor;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.archetype.common.DefaultPomManager;
+import org.apache.maven.archetype.common.MavenJDOMWriter;
+import org.apache.maven.archetype.common.util.Format;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Resource;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.jdom.Document;
+import org.jdom.input.SAXBuilder;
+import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
+import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
+
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -45,29 +69,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
-import javax.annotation.Nullable;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.archetype.common.DefaultPomManager;
-import org.apache.maven.archetype.common.MavenJDOMWriter;
-import org.apache.maven.archetype.common.util.Format;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.Resource;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.components.interactivity.PrompterException;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
-import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
 import static com.atlassian.maven.plugins.amps.BannedDependencies.getBannedElements;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.getJiraDatabaseFactory;
@@ -2012,6 +2013,7 @@ public class MavenGoals
                         element(name("executable"), "java"),
                         element(name("arguments"),
                                 element(name("argument"), "-Datlassian.dev.mode=true"),
+                                element(name("argument"), "-Datlassian.allow.insecure.url.parameter.login=true"),
                                 element(name("argument"), "-Dplugin.resource.directories=" + resourceProp),
                                 element(name("argument"), "-Xdebug"),
                                 element(name("argument"), "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5004"),
