@@ -463,6 +463,7 @@ public abstract class AbstractProductHandlerMojo extends AbstractProductHandlerA
         Map<String, Object> properties = new HashMap<>(systemPropertyVariables);
         properties.put("atlassian.sdk.version", getAmpsPluginVersion());
         setDefaultSystemProperty(properties, "atlassian.dev.mode", "true");
+        setDefaultSystemProperty(properties, "atlassian.allow.insecure.url.parameter.login", "true");
         setDefaultSystemProperty(properties, "java.awt.headless", "true");
         setDefaultSystemProperty(properties, "plugin.resource.directories", buildResourcesList());
         setDefaultSystemProperty(properties, "plugin.root.directories", buildRootProperty());

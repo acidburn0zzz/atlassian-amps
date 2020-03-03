@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - _amps.product.specific.container_ for container artifact
 - IntegratedTestMojo: Added testGroup.instanceIds property, a comma separated list of all product instances in the current testgroup.
   This can be used as an entrypoint to discover each instances complete configuration through the properties.
+- System property "atlassian.allow.insecure.url.parameter.login" as default for products.
 
 ### Fixed
 
