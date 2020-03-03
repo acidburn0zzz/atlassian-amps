@@ -25,7 +25,6 @@
                             <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
                             <test>com.atlassian.maven.plugins:amps-maven-plugin:unit-test</test>
                             <prepare-package>
-                                com.atlassian.maven.plugins:amps-maven-plugin:validate-banned-dependencies,
                                 com.atlassian.maven.plugins:amps-maven-plugin:copy-bundled-dependencies,
                                 com.atlassian.maven.plugins:amps-maven-plugin:copy-test-bundled-dependencies,
                                 com.atlassian.maven.plugins:amps-maven-plugin:generate-manifest,

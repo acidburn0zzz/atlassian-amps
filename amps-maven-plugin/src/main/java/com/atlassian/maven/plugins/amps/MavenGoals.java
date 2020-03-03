@@ -70,7 +70,6 @@ import java.util.TreeSet;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 
-import static com.atlassian.maven.plugins.amps.BannedDependencies.getBannedElements;
 import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseFactory.getJiraDatabaseFactory;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.file;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
@@ -377,29 +376,6 @@ public class MavenGoals
                         element(name("excludeScope"), "test"),
                         element(name("includeTypes"), "jar"),
                         element(name("outputDirectory"), "${project.build.outputDirectory}/META-INF/lib")
-                ),
-                executionEnvironment()
-        );
-    }
-
-    void validateBannedDependencies(Set<String> banExcludes) throws MojoExecutionException
-    {
-        log.info("validate banned dependencies");
-        MojoUtils.executeWithMergedConfig(
-                plugin(
-                        groupId("org.apache.maven.plugins"),
-                        artifactId("maven-enforcer-plugin"),
-                        version("3.0.0-M3")
-                ),
-                goal("enforce"),
-                configuration(
-                        element(name("rules"),
-                                element(name("bannedDependencies"),
-                                        element(name("searchTransitive"), "true"),
-                                        element(name("message"), "make sure platform artifacts are not bundled into plugin"),
-                                        element(name("excludes"),
-                                                getBannedElements(banExcludes).stream().toArray(Element[]::new)))
-                        )
                 ),
                 executionEnvironment()
         );
@@ -990,7 +966,7 @@ public class MavenGoals
             actualHttpPort = httpPort;
             if (!isPortFree(actualHttpPort))
             {
-                final String httpErrorMessage = format("%s: The configured HTTP port, %d, is in use", productInstanceId, httpPort);
+                final String httpErrorMessage = String.format("%s: The configured HTTP port, %d, is in use", productInstanceId, httpPort);
                 log.error(httpErrorMessage);
                 throw new MojoExecutionException(httpErrorMessage);
             }
@@ -1007,7 +983,7 @@ public class MavenGoals
             actualRmiPort = rmiPort;
             if (!isPortFree(actualRmiPort))
             {
-                final String rmiErrorMessage = format("%s: The configured RMI port, %d, is in use", productInstanceId, rmiPort);
+                final String rmiErrorMessage = String.format("%s: The configured RMI port, %d, is in use", productInstanceId, rmiPort);
                 log.error(rmiErrorMessage);
                 throw new MojoExecutionException(rmiErrorMessage);
             }
@@ -1024,7 +1000,7 @@ public class MavenGoals
             actualAjpPort = ajpPort;
             if (!isPortFree(actualAjpPort))
             {
-                final String ajpErrorMessage = format("%s: The configured AJP port, %d, is in use", productInstanceId, ajpPort);
+                final String ajpErrorMessage = String.format("%s: The configured AJP port, %d, is in use", productInstanceId, ajpPort);
                 log.error(ajpErrorMessage);
                 throw new MojoExecutionException(ajpErrorMessage);
             }
@@ -1206,7 +1182,7 @@ public class MavenGoals
             final Product webappContext, final int rmiPort, final int actualHttpPort, final int actualAjpPort, final String protocol)
     {
         final List<Element> props = new ArrayList<>();
-        for (final Entry<String, String> entry : systemProperties.entrySet())
+        for (final Map.Entry<String, String> entry : systemProperties.entrySet())
         {
             props.add(element(name(entry.getKey()), entry.getValue()));
         }
@@ -1494,7 +1470,7 @@ public class MavenGoals
     private Element convertPropsToElements(Map<String, Object> systemProperties)
     {
         ArrayList<Element> properties = new ArrayList<>();
-        for (Entry<String, Object> entry: systemProperties.entrySet())
+        for (Map.Entry<String, Object> entry: systemProperties.entrySet())
         {
             log.info("adding system property to configuration: " + entry.getKey() + "::" + entry.getValue());
 
@@ -1588,7 +1564,7 @@ public class MavenGoals
     public void generateBundleManifest(final Map<String, String> instructions, final Map<String, String> basicAttributes) throws MojoExecutionException
     {
         final List<Element> instlist = new ArrayList<>();
-        for (final Entry<String, String> entry : instructions.entrySet())
+        for (final Map.Entry<String, String> entry : instructions.entrySet())
         {
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
@@ -1598,7 +1574,7 @@ public class MavenGoals
             // BND will expand the wildcard to a list of actually-used packages, but this tells it to mark
             // them all as optional
         }
-        for (final Entry<String, String> entry : basicAttributes.entrySet())
+        for (final Map.Entry<String, String> entry : basicAttributes.entrySet())
         {
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
@@ -1620,7 +1596,7 @@ public class MavenGoals
     public void generateTestBundleManifest(final Map<String, String> instructions, final Map<String, String> basicAttributes) throws MojoExecutionException
     {
         final List<Element> instlist = new ArrayList<>();
-        for (final Entry<String, String> entry : instructions.entrySet())
+        for (final Map.Entry<String, String> entry : instructions.entrySet())
         {
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
@@ -1630,7 +1606,7 @@ public class MavenGoals
             // BND will expand the wildcard to a list of actually-used packages, but this tells it to mark
             // them all as optional
         }
-        for (final Entry<String, String> entry : basicAttributes.entrySet())
+        for (final Map.Entry<String, String> entry : basicAttributes.entrySet())
         {
             instlist.add(element(entry.getKey(), entry.getValue()));
         }
@@ -1660,7 +1636,7 @@ public class MavenGoals
         File mf = file(ctx.getProject().getBuild().getOutputDirectory(), "META-INF", "MANIFEST.MF");
         Manifest m = new Manifest();
         m.getMainAttributes().putValue("Manifest-Version", "1.0");
-        for (Entry<String, String> entry : basicAttributes.entrySet())
+        for (Map.Entry<String, String> entry : basicAttributes.entrySet())
         {
             m.getMainAttributes().putValue(entry.getKey(), entry.getValue());
         }
@@ -1685,7 +1661,7 @@ public class MavenGoals
         File mf = file(ctx.getProject().getBuild().getTestOutputDirectory(), "META-INF", "MANIFEST.MF");
         Manifest m = new Manifest();
         m.getMainAttributes().putValue("Manifest-Version", "1.0");
-        for (Entry<String, String> entry : basicAttributes.entrySet())
+        for (Map.Entry<String, String> entry : basicAttributes.entrySet())
         {
             m.getMainAttributes().putValue(entry.getKey(), entry.getValue());
         }

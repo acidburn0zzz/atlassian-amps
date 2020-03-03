@@ -60,7 +60,7 @@
                     generateObr, integration, integrationTestWithPortConflict,
                     integrationTestWithTestGroup, jarWithExistingManifest, preIntegration, quickreload,
                     run, runParallel, runWithPortConflict, runWithTestGroup, unit, validateManifestSkipValidation,
-                    validateManifestWithInvalidManifest, validateManifestWithValidManifest, validateBannedDependenciesTest
+                    validateManifestWithInvalidManifest, validateManifestWithValidManifest
                 </tests>
             </properties>
         </profile>
