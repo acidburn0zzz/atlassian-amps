@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>8.1.0-5fe8f94a6</version>
+        <version>8.1.0-6fe8f94a6-SNAPSHOT</version>
     </parent>
 
     <artifactId>maven-3-tests</artifactId>
