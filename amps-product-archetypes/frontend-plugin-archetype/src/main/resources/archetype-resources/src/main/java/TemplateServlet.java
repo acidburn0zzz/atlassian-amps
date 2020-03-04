@@ -15,7 +15,9 @@ import com.atlassian.soy.renderer.SoyTemplateRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+/**
+ * Render template for React
+ */
 public class TemplateServlet extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(TemplateServlet.class);

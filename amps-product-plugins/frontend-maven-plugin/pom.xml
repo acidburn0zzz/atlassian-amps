@@ -14,6 +14,7 @@
     <packaging>maven-plugin</packaging>
 
     <name>Frontend Maven Plugin</name>
+    <description>Allows for the creation of a new Atlassian plugin bootstrapped with React, Typescript and Webpack</description>
 
     <dependencies>
         <dependency>

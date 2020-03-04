@@ -1,13 +1,16 @@
 package com.atlassian.maven.plugins.frontend;
 
+import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Stream;
 
 import com.atlassian.maven.plugins.amps.AbstractAmpsMojo;
+import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
 import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
 import com.atlassian.maven.plugins.amps.util.MojoUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
+import com.google.common.collect.ImmutableMap;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -49,7 +52,7 @@ public class FrontendCreateMojo extends AbstractAmpsMojo {
         MojoUtils.executeWithMergedConfig(plugin(
                 groupId("org.apache.maven.plugins"),
                 artifactId("maven-archetype-plugin"),
-                version("3.0.1")
+                version(getMavenContext().getVersionOverrides().getProperty("maven-archetype-plugin", "3.0.1"))
                 ),
                 goal("generate"),
                 configuration(
@@ -65,7 +68,6 @@ public class FrontendCreateMojo extends AbstractAmpsMojo {
         final Properties systemProps = System.getProperties();
 
         if (Stream.of(GROUP_ID, ARTIFACT_ID, VERSION, PACKAGE).allMatch(systemProps::containsKey)) {
-            
             pluginProperties = new CreatePluginProperties(systemProps.getProperty(GROUP_ID),
                     systemProps.getProperty(ARTIFACT_ID), systemProps.getProperty(VERSION),
                     systemProps.getProperty(PACKAGE), systemProps.getProperty("useOsgiJavaConfig", "N"));
