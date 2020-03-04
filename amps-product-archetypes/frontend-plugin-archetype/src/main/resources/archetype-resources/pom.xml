@@ -110,12 +110,6 @@
                     <includeExclude>
                         -com.atlassian.myapp.internal.properties.*,-com.atlassian.myapp.internal.requesthandler.logging.*
                     </includeExclude>
-                    <scannedDependencies>
-                        <dependency>
-                            <groupId>com.atlassian.plugin</groupId>
-                            <artifactId>atlassian-spring-scanner-external-jar</artifactId>
-                        </dependency>
-                    </scannedDependencies>
                     <verbose>false</verbose>
                 </configuration>
             </plugin>
