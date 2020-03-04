@@ -4,7 +4,7 @@
     "private": true,
     "author": "Atlassian Pty Ltd",
     "license": "Atlassian End User License",
-    "dependencies": {
+    "devDependencies": {
         "@testing-library/react": "^9.3.2",
         "@atlassian/wrm-react-i18n": "^0.4.3",
         "@babel/core": "^7.5.5",
@@ -13,7 +13,6 @@
         "@babel/preset-env": "^7.5.5",
         "@babel/preset-react": "^7.0.0",
         "@babel/runtime": "^7.6.3",
-        "@reduxjs/toolkit": "^1.0.4",
         "@types/jest": "^24.0.23",
         "@types/when-dom-ready": "^1.2.0",
         "awesome-typescript-loader": "^5.2.1",
@@ -21,7 +20,6 @@
         "less": "3.9.0",
         "less-loader": "^4.1.0",
         "mini-css-extract-plugin": "0.5.0",
-        "moment": "^2.22.2",
         "postcss-icss-values": "^2.0.2",
         "prop-types": "^15.7.2",
         "react": "^16.8.6",
@@ -30,9 +28,7 @@
         "react-intl": "^2.6.0",
         "react-redux": "^5.0.7",
         "react-scripts": "3.0.1",
-        "react-select": "^1.2.1",
         "source-map-loader": "^0.2.4",
-        "styled-components": "^3.4.10",
         "terser-webpack-plugin": "^2.2.1",
         "ts-jest": "^24.2.0",
         "webpack": "^4.39.1",
@@ -42,9 +38,7 @@
         "webpack-sources": "^1.4.3",
         "when-dom-ready": "^1.2.12",
         "atlassian-webresource-webpack-plugin": "^4.6.0",
-        "duplicate-package-checker-webpack-plugin": "^3.0.0"
-    },
-    "devDependencies": {
+        "duplicate-package-checker-webpack-plugin": "^3.0.0",
         "@atlassian/i18n-properties-loader": "^0.4.4",
         "@testing-library/jest-dom": "^4.2.3",
         "@typescript-eslint/eslint-plugin": "^2.9.0",
@@ -68,24 +62,16 @@
         "typescript": "^3.6.3"
     },
     "scripts": {
-        "watch": "node_modules/.bin/webpack --watch --display-modules --config ./config/webpack.config.js",
+        "watch": "node_modules/.bin/webpack --watch --display-modules --config ./webpack.config.js",
         "start": "atlas-mvn package -DskipTests -Pwatch-mode && yarn dev-server ",
-        "build": "node_modules/.bin/webpack --config ./config/webpack.config.js",
-        "build:dev": "node_modules/.bin/webpack --config ./config/webpack.config.js --mode=development",
-        "dev-server": "node_modules/.bin/webpack-dev-server --config ./config/webpack.config.js --mode=development --env=dev-server",
-        "test": "node_modules/.bin/jest --config ./config/jest/jest.config.js --passWithNoTests",
-        "eject": "node_modules/.bin/react-scripts eject",
+        "build": "node_modules/.bin/webpack --config ./webpack.config.js",
+        "build:dev": "node_modules/.bin/webpack --config ./webpack.config.js --mode=development",
+        "dev-server": "node_modules/.bin/webpack-dev-server --config ./webpack.config.js --mode=development --env=dev-server",
+        "test": "node_modules/.bin/jest --config jest.config.js --passWithNoTests",
         "lint": "node_modules/.bin/eslint './**/*.{jsx,ts,tsx}'"
     },
     "browserslist": [
         "last 1 version",
         "IE 11"
-    ],
-    "prettier": {
-        "tabWidth": 4,
-        "semi": true,
-        "trailingComma": "es5",
-        "singleQuote": true,
-        "printWidth": 100
-    }
+    ]
 }

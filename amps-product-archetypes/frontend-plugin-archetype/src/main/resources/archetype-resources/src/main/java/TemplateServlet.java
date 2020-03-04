@@ -52,7 +52,7 @@ public class TemplateServlet extends HttpServlet {
         response.setContentType(MediaType.TEXT_HTML);
         templateRenderer.render(
             response.getWriter(),
-            "${package}.${artifactId}:myapp-templates",
+            "${package}.${artifactId}:app-templates",
             "myapp.init", 
             Collections.emptyMap()
         );
