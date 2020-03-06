@@ -15,8 +15,6 @@
     <artifactId>${artifactId}</artifactId>
     <version>${version}</version>
 
-    <name>${artifactId}</name>
-    <description>This is the ${groupId}:${artifactId} plugin for bootstrapping your Atlassian plugin with Webpack, TypeScript and React.</description>
     <packaging>atlassian-plugin</packaging>
 
     <dependencies>
@@ -24,6 +22,12 @@
             <groupId>com.atlassian.sal</groupId>
             <artifactId>sal-api</artifactId>
             <version>${sal.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.plugins</groupId>
+            <artifactId>atlassian-plugins-webresource</artifactId>
+            <version>${webresource.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -151,7 +155,8 @@
                         <configuration>
                             <arguments>${yarn.cmd.build}</arguments>
                             <environmentVariables>
-                                <PLUGIN_KEY>${groupId}.${artifactId}</PLUGIN_KEY>
+                                <PLUGIN_KEY>${atlassian.plugin.key}</PLUGIN_KEY>
+                                <ARTIFACT_ID>${artifactId}</ARTIFACT_ID>
                             </environmentVariables>
                         </configuration>
                     </execution>
@@ -191,6 +196,7 @@
     </profiles>
 
     <properties>
+        <plugin.context.key>${atlassian.plugin.key}</plugin.context.key>
         <amps.version>8.0.0</amps.version>
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
         <atlassian.plugins.version>5.2.1</atlassian.plugins.version>
@@ -204,6 +210,7 @@
         <soy.version>5.0.0</soy.version>
         <spring.version>5.0.10.RELEASE</spring.version>
         <webfragments.version>5.1.0</webfragments.version>
+        <webresource.version>4.2.0</webresource.version>
         <yarn.cmd.build.dev>build:dev</yarn.cmd.build.dev>
         <yarn.cmd.build>build</yarn.cmd.build>
         <yarn.cmd.install.dev>install --pure-lockfile --prefer-offline --mutex network</yarn.cmd.install.dev>

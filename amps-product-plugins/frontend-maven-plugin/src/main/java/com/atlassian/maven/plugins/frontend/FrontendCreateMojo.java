@@ -1,18 +1,14 @@
 package com.atlassian.maven.plugins.frontend;
 
-import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Stream;
 
 import com.atlassian.maven.plugins.amps.AbstractAmpsMojo;
-import com.atlassian.maven.plugins.amps.MavenContext;
 import com.atlassian.maven.plugins.amps.util.AmpsCreatePluginPrompter;
 import com.atlassian.maven.plugins.amps.util.CreatePluginProperties;
 import com.atlassian.maven.plugins.amps.util.MojoUtils;
 import com.atlassian.maven.plugins.amps.util.VersionUtils;
-import com.google.common.collect.ImmutableMap;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.codehaus.plexus.components.interactivity.PrompterException;
@@ -39,7 +35,7 @@ public class FrontendCreateMojo extends AbstractAmpsMojo {
     @Component
     private AmpsCreatePluginPrompter ampsCreatePluginPrompter;
 
-    @Override public void execute() throws MojoExecutionException, MojoFailureException {
+    @Override public void execute() throws MojoExecutionException {
 
         final CreatePluginProperties pluginProperties = getCreatePluginProperties();
         final Properties userProperties = getMavenContext().getExecutionEnvironment().getMavenSession().getUserProperties();

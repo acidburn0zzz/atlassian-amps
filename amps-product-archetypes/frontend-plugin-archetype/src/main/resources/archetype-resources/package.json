@@ -1,9 +1,9 @@
 {
-    "name": "atlassian-frontend-bootstrap",
-    "version": "0.1.0",
+    "name": "",
+    "version": "",
     "private": true,
-    "author": "Atlassian Pty Ltd",
-    "license": "Atlassian End User License",
+    "author": "",
+    "license": "",
     "devDependencies": {
         "@testing-library/react": "^9.3.2",
         "@atlassian/wrm-react-i18n": "^0.4.3",
@@ -69,9 +69,5 @@
         "dev-server": "node_modules/.bin/webpack-dev-server --config ./webpack.config.js --mode=development --env=dev-server",
         "test": "node_modules/.bin/jest --config jest.config.js --passWithNoTests",
         "lint": "node_modules/.bin/eslint './**/*.{jsx,ts,tsx}'"
-    },
-    "browserslist": [
-        "last 1 version",
-        "IE 11"
-    ]
+    }
 }

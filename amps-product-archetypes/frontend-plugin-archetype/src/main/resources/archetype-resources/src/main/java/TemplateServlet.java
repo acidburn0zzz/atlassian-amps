@@ -3,11 +3,13 @@ package ${package};
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 
+import com.atlassian.webresource.api.assembler.PageBuilderService;
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.permission.PermissionEnforcer;
@@ -25,13 +27,16 @@ public class TemplateServlet extends HttpServlet {
     private final SoyTemplateRenderer templateRenderer;
     private final PermissionEnforcer permissionEnforcer;
     private final LoginUriProvider loginUriProvider;
+    private final PageBuilderService pageBuilderService;
 
     public TemplateServlet(@ComponentImport final SoyTemplateRenderer templateRenderer,
                            @ComponentImport final PermissionEnforcer permissionEnforcer,
-                           @ComponentImport final LoginUriProvider loginUriProvider) {
+                           @ComponentImport final LoginUriProvider loginUriProvider,
+                           @ComponentImport final PageBuilderService pageBuilderService) {
         this.templateRenderer = templateRenderer;
         this.permissionEnforcer = permissionEnforcer;
         this.loginUriProvider = loginUriProvider;
+        this.pageBuilderService = pageBuilderService;
     }
 
     @Override
@@ -50,7 +55,9 @@ public class TemplateServlet extends HttpServlet {
         }
     }
 
-    private void render(HttpServletResponse response) throws IOException {
+    private void render(HttpServletResponse response) throws IOException { 
+        pageBuilderService.assembler().resources().requireContext("${groupId}.${artifactId}");
+        
         response.setContentType(MediaType.TEXT_HTML);
         templateRenderer.render(
             response.getWriter(),

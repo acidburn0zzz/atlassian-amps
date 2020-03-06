@@ -8,14 +8,12 @@ const merge = require("webpack-merge");
 const webpack = require("webpack");
 
 const PLUGIN_KEY = process.env.PLUGIN_KEY;
+const ARTIFACT_ID = process.env.ARTIFACT_ID;
 const ROOT_DIR = path.join(__dirname, ".");
 const SRC_DIR = path.join(ROOT_DIR, "src", "main");
 const I18N_DIR = path.join(SRC_DIR, "resources");
 const FRONTEND_SRC_DIR = path.join(SRC_DIR, "app");
 const FRONTEND_OUTPUT_DIR = path.join(ROOT_DIR, "target", "classes");
-const ENTRY_POINT = {
-    "atlassian-frontend-bootstrap": path.join(FRONTEND_SRC_DIR, "index.tsx")
-};
 const I18N_FILES = ["app.properties"].map(file =>
     path.join(I18N_DIR, "i18n", file)
 );
@@ -88,7 +86,9 @@ module.exports = (env, argv = {}) => {
     return merge([
         {
             mode: argv.mode,
-            entry: ENTRY_POINT,
+            entry: {
+                "${groupId}.${artifactId}": path.join(FRONTEND_SRC_DIR, "index.tsx")
+            },
             resolve: {
                 extensions: ["*", ".ts", ".tsx", ".js", ".jsx"]
             },
@@ -100,27 +100,8 @@ module.exports = (env, argv = {}) => {
                 new WrmPlugin({
                     pluginKey: PLUGIN_KEY,
                     xmlDescriptors: WRM_OUTPUT,
-                    providedDependencies: {
-                        "wrm/context-path": {
-                            dependency:
-                                "com.atlassian.plugins.atlassian-plugins-webresource-plugin:context-path",
-                            import: {
-                                var: "require('wrm/context-path')",
-                                amd: "wrm/context-path"
-                            }
-                        },
-                        "wrm/format": {
-                            dependency:
-                                "com.atlassian.plugins.atlassian-plugins-webresource-plugin:format",
-                            import: {
-                                var: 'require("wrm/format")',
-                                amd: "wrm/format"
-                            }
-                        }
-                    },
-                    singleRuntimeWebResourceKey: "frontend-plugin",
                     watch: !isProduction,
-                    watchPrepare: !isProduction
+                    watchPrepare: !isProduction,
                 }),
                 new DuplicatePackageCheckerPlugin()
             ],
