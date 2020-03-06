@@ -22,14 +22,14 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
 
-@Mojo(name = "create-frontend-plugin", requiresProject = false)
+@Mojo(name = "create-react-frontend-plugin", requiresProject = false)
 public class FrontendCreateMojo extends AbstractAmpsMojo {
 
     private static final String GROUP_ID = "groupId";
     private static final String ARTIFACT_ID = "artifactId";
     private static final String VERSION = "version";
     private static final String PACKAGE = "package";
-    private static final String ARCHETYPE_ARTIFACT_ID = "frontend-plugin-archetype";
+    private static final String ARCHETYPE_ARTIFACT_ID = "react-frontend-plugin-archetype";
     private static final String ARCHETYPE_GROUP_ID = "com.atlassian.maven.archetypes";
 
     @Component

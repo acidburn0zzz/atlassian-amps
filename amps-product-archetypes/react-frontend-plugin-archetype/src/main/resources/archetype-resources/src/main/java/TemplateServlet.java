@@ -57,7 +57,6 @@ public class TemplateServlet extends HttpServlet {
 
     private void render(HttpServletResponse response) throws IOException { 
         pageBuilderService.assembler().resources().requireContext("${groupId}.${artifactId}");
-        
         response.setContentType(MediaType.TEXT_HTML);
         templateRenderer.render(
             response.getWriter(),

@@ -10,16 +10,16 @@
     </parent>
 
     <groupId>com.atlassian.maven.plugins</groupId>
-    <artifactId>frontend-maven-plugin</artifactId>
+    <artifactId>react-frontend-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
-    <name>Frontend Maven Plugin</name>
+    <name>React Frontend Maven Plugin</name>
     <description>Allows for the creation of a new Atlassian plugin bootstrapped with React, Typescript and Webpack</description>
 
     <dependencies>
         <dependency>
             <groupId>com.atlassian.maven.archetypes</groupId>
-            <artifactId>frontend-plugin-archetype</artifactId>
+            <artifactId>react-frontend-plugin-archetype</artifactId>
             <version>8.1.0-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>

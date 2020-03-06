@@ -8,7 +8,6 @@ import { App } from './components/App';
 
 whenDomReady().then(function example() {
     const container = document.getElementById('app-container');
-    // eslint-disable-next-line no-undef
     const MyApp = hot(module)(() => <App example={formatter.I18n.getText('app.title')} />);
     ReactDOM.render(<MyApp />, container);
 });

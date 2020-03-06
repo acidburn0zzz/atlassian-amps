@@ -1,7 +1,7 @@
 <archetype-descriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                       xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
                       xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd"
-                      name="frontend-plugin-archetype">
+                      name="react-frontend-plugin-archetype">
     <fileSets>
 
         <fileSet filtered="true" encoding="UTF-8">
@@ -10,7 +10,6 @@
                 <include>**/*.json</include>
                 <include>**/*.js</include>
                 <include>**/*.lock</include>
-                <include>.eslintignore</include>
                 <include>.gitignore</include>
             </includes>
         </fileSet>
