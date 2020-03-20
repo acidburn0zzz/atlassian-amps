@@ -42,9 +42,11 @@ public class SchemeUpdaterModule implements TransformationModule {
         }
         // mysql, oracle
         else {
-            // remove schema node
-            schemaNode.detach();
-            return true;
+            if (schemaNode != null) {
+                // remove schema node
+                schemaNode.detach();
+                return true;
+            }
         }
         return false;
     }

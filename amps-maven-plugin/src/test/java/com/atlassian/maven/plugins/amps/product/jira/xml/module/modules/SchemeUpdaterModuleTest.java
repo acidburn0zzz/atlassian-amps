@@ -31,5 +31,13 @@ public class SchemeUpdaterModuleTest {
         assertNull(document.selectSingleNode("//jira-database-config/schema-name"));
     }
 
+    @Test
+    public void givenMissingSchemaAndOracleWhenModuleExecutedThenSchemaIsUntouched() throws MojoExecutionException {
+        SchemeUpdaterModule schemeUpdaterModule = new SchemeUpdaterModule(JiraDatabaseType.ORACLE_12C, null);
+
+        assertFalse(schemeUpdaterModule.transform(document));
+
+        assertNull(document.selectSingleNode("//jira-database-config/schema-name"));
+    }
 
 }
