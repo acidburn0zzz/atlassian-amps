@@ -8,6 +8,9 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 
+// depend on database type which Jira supported schema or schema-less
+// please refer this Jira documentation
+// http://www.atlassian.com/software/jira/docs/latest/databases/index.html
 public class SchemeUpdaterModule implements TransformationModule {
     private final JiraDatabaseType jiraDatabaseType;
     private final String schema;

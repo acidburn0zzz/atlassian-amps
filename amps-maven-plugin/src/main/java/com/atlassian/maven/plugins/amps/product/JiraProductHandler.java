@@ -7,6 +7,7 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.XmlOverride;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
+import com.atlassian.maven.plugins.amps.product.jira.xml.module.CompositeTransformationModule;
 import com.atlassian.maven.plugins.amps.product.jira.xml.module.modules.DatabaseTypeUpdaterModule;
 import com.atlassian.maven.plugins.amps.product.jira.xml.module.modules.H2UrlUpdaterModule;
 import com.atlassian.maven.plugins.amps.product.jira.xml.module.modules.SchemeUpdaterModule;
@@ -369,24 +370,12 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             throw new MojoExecutionException("Cannot parse database configuration xml file", de);
         }
 
-        boolean modified = false;
+        boolean modified = new CompositeTransformationModule(
+                new DatabaseTypeUpdaterModule(dbType),
+                new H2UrlUpdaterModule(homeDir, dbType, log),
+                new SchemeUpdaterModule(dbType, schema)
+        ).transform(dbConfigDoc);
 
-        if (new DatabaseTypeUpdaterModule(dbType).transform(dbConfigDoc)) {
-            modified = true;
-        }
-
-        if (new H2UrlUpdaterModule(homeDir, dbType, log).transform(dbConfigDoc)) {
-            modified = true;
-        }
-
-        if(new SchemeUpdaterModule(dbType, schema).transform(dbConfigDoc)){
-            modified = true;
-        }
-
-
-        // depend on database type which Jira supported schema or schema-less
-        // please refer this Jira documentation
-        // http://www.atlassian.com/software/jira/docs/latest/databases/index.html
         if (modified)
         {
             try

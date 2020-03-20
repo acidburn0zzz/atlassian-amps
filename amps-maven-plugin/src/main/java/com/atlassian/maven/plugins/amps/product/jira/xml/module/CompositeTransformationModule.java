@@ -9,7 +9,7 @@ import java.util.Collection;
 public class CompositeTransformationModule implements TransformationModule {
     Collection<TransformationModule> transformationModules;
 
-    CompositeTransformationModule(TransformationModule... transformationModules) {
+    public CompositeTransformationModule(TransformationModule... transformationModules) {
         this.transformationModules = Arrays.asList(transformationModules);
     }
 
