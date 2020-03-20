@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
 
-public class DatabaseTypeUpdaterModule implements TransformationModule {
+public class DatabaseTypeUpdaterModule implements TransformationModule<Document> {
 
     private final JiraDatabaseType dbType;
 
@@ -15,8 +15,8 @@ public class DatabaseTypeUpdaterModule implements TransformationModule {
     }
 
     @Override
-    public boolean transform(Document document) {
-        final Node dbTypeNode = document.selectSingleNode("//jira-database-config/database-type");
+    public boolean transform(Document entity) {
+        final Node dbTypeNode = entity.selectSingleNode("//jira-database-config/database-type");
 
         // update database type
         if (null != dbTypeNode && StringUtils.isNotEmpty(dbTypeNode.getStringValue())) {

@@ -15,7 +15,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -35,42 +34,33 @@ public class H2UrlUpdaterModuleTest {
 
     @Test
     public void givenExistingJDBCUrlWhenTransformedWithH2ThenConfigurationIsUpdated() throws Exception {
-        // given
         document.getRootElement().addElement("jdbc-datasource").addElement("url").setText(DUMMY_URL);
 
-        // when
         H2UrlUpdaterModule h2UrlUpdaterModule = new H2UrlUpdaterModule(SAMPLE_FILE, H2, null);
         assertTrue(h2UrlUpdaterModule.transform(document));
 
-        // then
         assertNotNull(document.selectSingleNode("//jira-database-config/jdbc-datasource/url"));
         assertEquals(document.selectSingleNode("//jira-database-config/jdbc-datasource/url").getText(), DATABASE_URI);
     }
 
     @Test
     public void givenExistingJDBCUrlWhenTransformedWithMySQLThenConfigurationIsNotUpdated() throws Exception {
-        // given
         document.getRootElement().addElement("jdbc-datasource").addElement("url").setText(DUMMY_URL);
 
-        // when
         H2UrlUpdaterModule h2UrlUpdaterModule = new H2UrlUpdaterModule(SAMPLE_FILE, MYSQL, null);
         assertFalse(h2UrlUpdaterModule.transform(document));
 
-        // then
         assertNotNull(document.selectSingleNode("//jira-database-config/jdbc-datasource/url"));
         assertEquals(document.selectSingleNode("//jira-database-config/jdbc-datasource/url").getText(), DUMMY_URL);
     }
 
     @Test
     public void givenMissingJDBCUrlWhenTransformedWithH2ThenConfigurationIsNotUpdatedAndWarnIsPrinted() throws Exception {
-        // given
         Log logger = mock(Log.class);
 
-        // when
         H2UrlUpdaterModule h2UrlUpdaterModule = new H2UrlUpdaterModule(SAMPLE_FILE, H2, logger);
         assertFalse(h2UrlUpdaterModule.transform(document));
 
-        // then
         assertNull(document.selectSingleNode("//jira-database-config/jdbc-datasource/url"));
         verify(logger).warn(anyString());
     }

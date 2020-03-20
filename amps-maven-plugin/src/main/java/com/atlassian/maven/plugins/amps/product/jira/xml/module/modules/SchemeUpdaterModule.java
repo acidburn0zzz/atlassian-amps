@@ -11,7 +11,7 @@ import org.dom4j.Node;
 // depend on database type which Jira supported schema or schema-less
 // please refer this Jira documentation
 // http://www.atlassian.com/software/jira/docs/latest/databases/index.html
-public class SchemeUpdaterModule implements TransformationModule {
+public class SchemeUpdaterModule implements TransformationModule<Document> {
     private final JiraDatabaseType jiraDatabaseType;
     private final String schema;
 
@@ -21,8 +21,8 @@ public class SchemeUpdaterModule implements TransformationModule {
     }
 
     @Override
-    public boolean transform(Document document) throws MojoExecutionException {
-        final Node schemaNode = document.selectSingleNode("//jira-database-config/schema-name");
+    public boolean transform(Document entity) throws MojoExecutionException {
+        final Node schemaNode = entity.selectSingleNode("//jira-database-config/schema-name");
 
         // postgres, mssql, hsql
         if (jiraDatabaseType.hasSchema()) {
@@ -32,7 +32,7 @@ public class SchemeUpdaterModule implements TransformationModule {
             if (null == schemaNode) {
                 // add schema-name node
                 try {
-                    ((Element) document.selectSingleNode("//jira-database-config"))
+                    ((Element) entity.selectSingleNode("//jira-database-config"))
                             .addElement("schema-name").addText(schema);
                     return true;
                 } catch (NullPointerException npe) {

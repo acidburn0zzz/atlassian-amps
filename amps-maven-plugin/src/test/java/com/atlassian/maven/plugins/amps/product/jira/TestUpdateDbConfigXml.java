@@ -69,27 +69,21 @@ public class TestUpdateDbConfigXml {
 
     @Test
     public void givenH2DatabaseWhenConfigIsModifiedThenPathIsChangedToCorrectH2DbLocation() throws Exception {
-        // given
         String correctJDBCURL = String.format("jdbc:h2:file:%s;MV_STORE=FALSE;MVCC=TRUE", getH2DbFile().toPath());
         copySampleDbConfig();
 
-        // when
         jiraProductHandler.updateDbConfigXml(getTempDir("test"), JiraDatabaseType.H2, "PUBLIC");
 
-        // then
         Document doc = getDocumentFrom(getConfigFile());
         assertThat(doc, hasXPath("//jira-database-config/jdbc-datasource/url", containsString(correctJDBCURL)));
     }
 
     @Test
     public void givenNotConsistentDatabaseTypesWhenConfigIsModifiedThenDatabaseTypeIsUpdated() throws Exception {
-        // given
         copySampleDbConfig();
 
-        // when
         jiraProductHandler.updateDbConfigXml(getTempDir("test"), JiraDatabaseType.POSTGRES, "PUBLIC");
 
-        // then
         Document doc = getDocumentFrom(getConfigFile());
         assertThat(doc, hasXPath(
                 "//jira-database-config/database-type",
@@ -99,13 +93,10 @@ public class TestUpdateDbConfigXml {
 
     @Test
     public void givenNoSchemaAndSQLServerWhenConfigIsModifiedThenSchemaIsCreated() throws Exception {
-        // given
         copySampleDbConfig();
 
-        // when
         jiraProductHandler.updateDbConfigXml(getTempDir("test"), JiraDatabaseType.MSSQL, "PUBLIC");
 
-        // then
         Document doc = getDocumentFrom(getConfigFile());
         assertThat(doc, hasXPath(
                 "//jira-database-config/schema-name",

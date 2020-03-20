@@ -1,12 +1,11 @@
 package com.atlassian.maven.plugins.amps.product.jira.xml.module;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.dom4j.Document;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-public class CompositeTransformationModule implements TransformationModule {
+public class CompositeTransformationModule<T> implements TransformationModule<T> {
     Collection<TransformationModule> transformationModules;
 
     public CompositeTransformationModule(TransformationModule... transformationModules) {
@@ -14,10 +13,10 @@ public class CompositeTransformationModule implements TransformationModule {
     }
 
     @Override
-    public boolean transform(Document document) throws MojoExecutionException {
+    public boolean transform(T entity) throws MojoExecutionException {
         boolean accumulator = false;
         for (TransformationModule transformationModule : transformationModules) {
-            accumulator |= transformationModule.transform(document);
+            accumulator |= transformationModule.transform(entity);
         }
         return accumulator;
     }
