@@ -81,6 +81,22 @@ public class TestUpdateDbConfigXml {
         assertThat(doc, hasXPath("//jira-database-config/jdbc-datasource/url", containsString(correctJDBCURL)));
     }
 
+    @Test
+    public void givenNotConsistentDatabaseTypesWhenConfigIsModifiedThenDatabaseTypeIsUpdated() throws Exception {
+        // given
+        copySampleDbConfig();
+
+        // when
+        jiraProductHandler.updateDbConfigXml(getTempDir("test"), JiraDatabaseType.POSTGRES, "PUBLIC");
+
+        // then
+        Document doc = getDocumentFrom(getConfigFile());
+        assertThat(doc, hasXPath(
+                "//jira-database-config/database-type",
+                containsString(JiraDatabaseType.POSTGRES.getDbType())
+        ));
+    }
+
 
 
 
