@@ -5,6 +5,7 @@ import com.atlassian.maven.plugins.amps.product.jira.xml.module.TransformationMo
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.dom4j.Document;
+import org.dom4j.Element;
 import org.dom4j.Node;
 
 public class SchemeUpdaterModule implements TransformationModule {
@@ -28,7 +29,8 @@ public class SchemeUpdaterModule implements TransformationModule {
             if (null == schemaNode) {
                 // add schema-name node
                 try {
-                    document.selectSingleNode("//jira-database-config").getDocument().addElement("schema-name").addText(schema);
+                    ((Element) document.selectSingleNode("//jira-database-config"))
+                            .addElement("schema-name").addText(schema);
                     return true;
                 } catch (NullPointerException npe) {
                     throw new MojoExecutionException(npe.getMessage());

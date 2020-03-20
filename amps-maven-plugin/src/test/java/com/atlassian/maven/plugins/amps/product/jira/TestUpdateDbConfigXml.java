@@ -97,8 +97,19 @@ public class TestUpdateDbConfigXml {
         ));
     }
 
+    @Test
+    public void givenNoSchemaAndSQLServerWhenConfigIsModifiedThenSchemaIsCreated() throws Exception {
+        // given
+        copySampleDbConfig();
 
+        // when
+        jiraProductHandler.updateDbConfigXml(getTempDir("test"), JiraDatabaseType.MSSQL, "PUBLIC");
 
-
-
+        // then
+        Document doc = getDocumentFrom(getConfigFile());
+        assertThat(doc, hasXPath(
+                "//jira-database-config/schema-name",
+                containsString("PUBLIC")
+        ));
+    }
 }

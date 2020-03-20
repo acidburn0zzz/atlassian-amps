@@ -4,7 +4,6 @@
     <name>defaultDS</name>
     <delegator-name>default</delegator-name>
     <database-type>h2</database-type>
-    <schema-name>PUBLIC</schema-name>
     <jdbc-datasource>
         <url>jdbc:h2:file:/Users/psuwala/platform/repos/atlassian-streams/aggregator-plugin/target/jira-applinks/home/database/h2db;MV_STORE=FALSE;MVCC=TRUE</url>
         <driver-class>org.h2.Driver</driver-class>

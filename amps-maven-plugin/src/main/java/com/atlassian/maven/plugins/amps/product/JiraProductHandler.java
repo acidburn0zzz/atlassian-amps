@@ -9,6 +9,7 @@ import com.atlassian.maven.plugins.amps.XmlOverride;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
 import com.atlassian.maven.plugins.amps.product.jira.xml.module.modules.DatabaseTypeUpdaterModule;
 import com.atlassian.maven.plugins.amps.product.jira.xml.module.modules.H2UrlUpdaterModule;
+import com.atlassian.maven.plugins.amps.product.jira.xml.module.modules.SchemeUpdaterModule;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import com.google.common.annotations.VisibleForTesting;
@@ -375,6 +376,10 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         }
 
         if (new H2UrlUpdaterModule(homeDir, dbType, log).transform(dbConfigDoc)) {
+            modified = true;
+        }
+
+        if(new SchemeUpdaterModule(dbType, schema).transform(dbConfigDoc)){
             modified = true;
         }
 
