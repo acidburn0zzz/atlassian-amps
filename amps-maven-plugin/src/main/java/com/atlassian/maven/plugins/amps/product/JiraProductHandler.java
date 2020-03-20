@@ -368,9 +368,6 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             throw new MojoExecutionException("Cannot parse database configuration xml file", de);
         }
 
-
-        final Node schemaNode = dbConfigDoc.selectSingleNode("//jira-database-config/schema-name");
-
         boolean modified = false;
 
         if (new DatabaseTypeUpdaterModule(dbType).transform(dbConfigDoc)) {
@@ -385,43 +382,6 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         // depend on database type which Jira supported schema or schema-less
         // please refer this Jira documentation
         // http://www.atlassian.com/software/jira/docs/latest/databases/index.html
-
-        // postgres, mssql, hsql
-        if (dbType.hasSchema())
-        {
-            if (StringUtils.isEmpty(schema))
-            {
-                throw new MojoExecutionException("Database configuration missed schema");
-            }
-            if (null == schemaNode)
-            {
-                // add schema-name node
-                try
-                {
-                    dbConfigDoc.selectSingleNode("//jira-database-config").getDocument().addElement("schema-name").addText(schema);
-                    modified = true;
-                }
-                catch (NullPointerException npe)
-                {
-                    throw new MojoExecutionException(npe.getMessage());
-                }
-            }
-            else
-            {
-                if(StringUtils.isNotEmpty(schemaNode.getText()) && !schema.equals(schemaNode.getText()))
-                {
-                    schemaNode.setText(schema);
-                    modified = true;
-                }
-            }
-        }
-        // mysql, oracle
-        else
-        {
-            // remove schema node
-            schemaNode.detach();
-            modified = true;
-        }
         if (modified)
         {
             try
