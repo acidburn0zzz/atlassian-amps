@@ -44,6 +44,7 @@ import static com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType.get
 import static com.atlassian.maven.plugins.amps.util.ConfigFileUtils.RegexReplacement;
 import static com.atlassian.maven.plugins.amps.util.FileUtils.fixWindowsSlashes;
 import static java.lang.String.format;
+import static org.apache.commons.io.FileUtils.getFile;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class JiraProductHandler extends AbstractWebappProductHandler
@@ -69,6 +70,9 @@ public class JiraProductHandler extends AbstractWebappProductHandler
     private static final String JIRADS_PROPERTIES_FILE = "JiraDS.properties";
 
     private static final String JIRA_HOME_PLACEHOLDER = "${jirahome}";
+
+    protected static final String H2_JDBC_URL_TEMPLATE = "jdbc:h2:file:%s;MV_STORE=FALSE;MVCC=TRUE";
+    public static final String H2_SUFFIX = "database/h2db";
 
     private static void checkNotFile(final File sharedHomeDir)
     {
@@ -347,7 +351,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
      * @throws MojoExecutionException if {@code dbconfig.xml} can't be updated
      */
     @VisibleForTesting
-    void updateDbConfigXml(final File homeDir, final JiraDatabaseType dbType, final String schema)
+    public void updateDbConfigXml(final File homeDir, final JiraDatabaseType dbType, final String schema)
             throws MojoExecutionException
     {
         final File dbConfigXml = new File(homeDir, FILENAME_DBCONFIG);
@@ -365,8 +369,11 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         {
             throw new MojoExecutionException("Cannot parse database configuration xml file", de);
         }
+        
         final Node dbTypeNode = dbConfigDoc.selectSingleNode("//jira-database-config/database-type");
         final Node schemaNode = dbConfigDoc.selectSingleNode("//jira-database-config/schema-name");
+        final Node jdbcUrl = dbConfigDoc.selectSingleNode("//jira-database-config/jdbc-datasource/url");
+
         boolean modified = false;
         // update database type
         if (null != dbTypeNode && StringUtils.isNotEmpty(dbTypeNode.getStringValue()))
@@ -380,6 +387,21 @@ public class JiraProductHandler extends AbstractWebappProductHandler
                 dbTypeNode.setText(dbType.getDbType());
             }
         }
+
+        switch (dbType) {
+            case H2:
+                if (jdbcUrl != null) {
+                    jdbcUrl.setText(String.format(H2_JDBC_URL_TEMPLATE, getFile(homeDir, H2_SUFFIX)));
+                    modified = true;
+                } else {
+                    log.warn("dbconfig.xml doesn't contain jdbc-url");
+                }
+                break;
+            case HSQL: // HSQL seems not to be used in jira anymore
+                log.warn("HSQL jdbc-url modification is not supported in this implementation");
+        }
+
+
         // depend on database type which Jira supported schema or schema-less
         // please refer this Jira documentation
         // http://www.atlassian.com/software/jira/docs/latest/databases/index.html

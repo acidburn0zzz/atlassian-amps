@@ -138,7 +138,7 @@ public abstract class AbstractProductHandler extends AmpsProductHandler
 
             // Only create the home dir if it doesn't exist
             if (!homeDir.exists())
-            {
+            { // IT CREATES hOME?
                 extractProductHomeData(productHomeData, homeDir, ctx);
 
                 // just in case
