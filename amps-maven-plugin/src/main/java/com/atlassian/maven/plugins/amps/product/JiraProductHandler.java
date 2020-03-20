@@ -7,6 +7,7 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.XmlOverride;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
+import com.atlassian.maven.plugins.amps.product.jira.xml.module.modules.DatabaseTypeUpdaterModule;
 import com.atlassian.maven.plugins.amps.product.jira.xml.module.modules.H2UrlUpdaterModule;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
@@ -367,21 +368,13 @@ public class JiraProductHandler extends AbstractWebappProductHandler
             throw new MojoExecutionException("Cannot parse database configuration xml file", de);
         }
 
-        final Node dbTypeNode = dbConfigDoc.selectSingleNode("//jira-database-config/database-type");
+
         final Node schemaNode = dbConfigDoc.selectSingleNode("//jira-database-config/schema-name");
 
         boolean modified = false;
-        // update database type
-        if (null != dbTypeNode && StringUtils.isNotEmpty(dbTypeNode.getStringValue()))
-        {
-            String currentDbType = dbTypeNode.getStringValue();
-            // check null and difference value from dbType
-            if (!currentDbType.equals(dbType.getDbType()))
-            {
-                // update database type
-                modified = true;
-                dbTypeNode.setText(dbType.getDbType());
-            }
+
+        if (new DatabaseTypeUpdaterModule(dbType).transform(dbConfigDoc)) {
+            modified = true;
         }
 
         if (new H2UrlUpdaterModule(homeDir, dbType, log).transform(dbConfigDoc)) {
