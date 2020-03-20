@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.atlassian.amps</groupId>
         <artifactId>atlassian-amps-parent</artifactId>
-        <version>8.1.0-SNAPSHOT</version>
+        <version>8.1.0-fe17e8096</version>
     </parent>
 
     <artifactId>plugin-module-codegen-maven-client</artifactId>
