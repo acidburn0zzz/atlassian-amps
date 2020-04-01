@@ -7,6 +7,9 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.XmlOverride;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
+import com.atlassian.maven.plugins.amps.product.jira.module.CompositeDocumentTransformer;
+import com.atlassian.maven.plugins.amps.product.jira.module.modules.xml.DatabaseTypeUpdaterTransformer;
+import com.atlassian.maven.plugins.amps.product.jira.module.modules.xml.SchemeUpdaterTransformer;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import com.google.common.annotations.VisibleForTesting;
@@ -15,13 +18,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
@@ -347,7 +348,7 @@ public class JiraProductHandler extends AbstractWebappProductHandler
      * @throws MojoExecutionException if {@code dbconfig.xml} can't be updated
      */
     @VisibleForTesting
-    void updateDbConfigXml(final File homeDir, final JiraDatabaseType dbType, final String schema)
+    public void updateDbConfigXml(final File homeDir, final JiraDatabaseType dbType, final String schema)
             throws MojoExecutionException
     {
         final File dbConfigXml = new File(homeDir, FILENAME_DBCONFIG);
@@ -365,61 +366,16 @@ public class JiraProductHandler extends AbstractWebappProductHandler
         {
             throw new MojoExecutionException("Cannot parse database configuration xml file", de);
         }
-        final Node dbTypeNode = dbConfigDoc.selectSingleNode("//jira-database-config/database-type");
-        final Node schemaNode = dbConfigDoc.selectSingleNode("//jira-database-config/schema-name");
-        boolean modified = false;
-        // update database type
-        if (null != dbTypeNode && StringUtils.isNotEmpty(dbTypeNode.getStringValue()))
-        {
-            String currentDbType = dbTypeNode.getStringValue();
-            // check null and difference value from dbType
-            if (!currentDbType.equals(dbType.getDbType()))
-            {
-                // update database type
-                modified = true;
-                dbTypeNode.setText(dbType.getDbType());
-            }
-        }
-        // depend on database type which Jira supported schema or schema-less
-        // please refer this Jira documentation
-        // http://www.atlassian.com/software/jira/docs/latest/databases/index.html
 
-        // postgres, mssql, hsql
-        if (dbType.hasSchema())
-        {
-            if (StringUtils.isEmpty(schema))
-            {
-                throw new MojoExecutionException("Database configuration missed schema");
-            }
-            if (null == schemaNode)
-            {
-                // add schema-name node
-                try
-                {
-                    dbConfigDoc.selectSingleNode("//jira-database-config").getDocument().addElement("schema-name").addText(schema);
-                    modified = true;
-                }
-                catch (NullPointerException npe)
-                {
-                    throw new MojoExecutionException(npe.getMessage());
-                }
-            }
-            else
-            {
-                if(StringUtils.isNotEmpty(schemaNode.getText()) && !schema.equals(schemaNode.getText()))
-                {
-                    schemaNode.setText(schema);
-                    modified = true;
-                }
-            }
+        if (dbConfigDoc.selectSingleNode("//jira-database-config") == null) {
+            throw new MojoExecutionException("Database configuration file is invalid - missing root entity 'jira-database-config'");
         }
-        // mysql, oracle
-        else
-        {
-            // remove schema node
-            schemaNode.detach();
-            modified = true;
-        }
+
+        boolean modified = new CompositeDocumentTransformer<Document>(
+                new DatabaseTypeUpdaterTransformer(dbType),
+                new SchemeUpdaterTransformer(dbType, schema)
+        ).transform(dbConfigDoc);
+
         if (modified)
         {
             try
