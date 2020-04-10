@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [8.2.0] - Unreleased
+
+### Changed
+- Upgraded to Jackson 2. This means that Jackson 1 will no longer be provided to the classpath of generate-rest-docs. This should not cause issues, but to be on the safe side failure to generate REST documentation will not fail the Maven build. Jackson 1.x is required to be on the classpath if at least one rest module is defined in the plugin XML and if the jacksonModules option is passed to the goal.
+
 ## [8.1.1] - Unreleased
 
 ### Fixed
@@ -11,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 - Upgraded commons-compress to 1.20 (CVE-2019-1240)
-- Upgraded mysql-connector to 8.0.16 (CVE-2018-3258, CVE-2019-2692)
+- Upgraded mysql-connector to 8.0.16 (CVE-2018-3258, CVE-2019-2692) 
 
 ## [8.1.0] - 2020-03-10
 

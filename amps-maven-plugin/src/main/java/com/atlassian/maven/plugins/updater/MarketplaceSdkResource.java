@@ -1,9 +1,10 @@
 package com.atlassian.maven.plugins.updater;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.BufferedInputStream;
@@ -148,6 +149,11 @@ public class MarketplaceSdkResource extends AbstractLogEnabled implements SdkRes
             }
         }
 
+        return parseJsonToMap(json);
+    }
+
+    @VisibleForTesting
+    Map<?, ?> parseJsonToMap(String json) {
         Map<?, ?> rootAsMap;
         try {
             if (StringUtils.isNotEmpty(json)) {
