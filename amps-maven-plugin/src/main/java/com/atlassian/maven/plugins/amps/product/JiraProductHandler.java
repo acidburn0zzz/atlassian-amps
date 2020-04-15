@@ -7,9 +7,12 @@ import com.atlassian.maven.plugins.amps.Product;
 import com.atlassian.maven.plugins.amps.ProductArtifact;
 import com.atlassian.maven.plugins.amps.XmlOverride;
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
-import com.atlassian.maven.plugins.amps.product.jira.module.CompositeDocumentTransformer;
-import com.atlassian.maven.plugins.amps.product.jira.module.modules.xml.DatabaseTypeUpdaterTransformer;
-import com.atlassian.maven.plugins.amps.product.jira.module.modules.xml.SchemeUpdaterTransformer;
+import com.atlassian.maven.plugins.amps.product.common.ValidationException;
+import com.atlassian.maven.plugins.amps.product.jira.config.DatabaseTypeUpdaterTransformer;
+import com.atlassian.maven.plugins.amps.product.jira.config.DbConfigValidator;
+import com.atlassian.maven.plugins.amps.product.jira.config.SchemeUpdaterTransformer;
+import com.atlassian.maven.plugins.amps.product.common.XMLDocumentProcessor;
+import com.atlassian.maven.plugins.amps.product.common.XMLDocumentHandler;
 import com.atlassian.maven.plugins.amps.util.ConfigFileUtils.Replacement;
 import com.atlassian.maven.plugins.amps.util.JvmArgsFix;
 import com.google.common.annotations.VisibleForTesting;
@@ -21,16 +24,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
 
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -349,54 +346,21 @@ public class JiraProductHandler extends AbstractWebappProductHandler
      */
     @VisibleForTesting
     public void updateDbConfigXml(final File homeDir, final JiraDatabaseType dbType, final String schema)
-            throws MojoExecutionException
-    {
+            throws MojoExecutionException {
         final File dbConfigXml = new File(homeDir, FILENAME_DBCONFIG);
-        if (!dbConfigXml.exists() || dbType == null)
-        {
+        if (!dbConfigXml.exists() || dbType == null) {
             return;
         }
-        final SAXReader reader = new SAXReader();
-        final Document dbConfigDoc;
-        try
-        {
-            dbConfigDoc = reader.read(dbConfigXml);
-        }
-        catch (DocumentException de)
-        {
-            throw new MojoExecutionException("Cannot parse database configuration xml file", de);
-        }
 
-        if (dbConfigDoc.selectSingleNode("//jira-database-config") == null) {
-            throw new MojoExecutionException("Database configuration file is invalid - missing root entity 'jira-database-config'");
-        }
-
-        boolean modified = new CompositeDocumentTransformer<Document>(
-                new DatabaseTypeUpdaterTransformer(dbType),
-                new SchemeUpdaterTransformer(dbType, schema)
-        ).transform(dbConfigDoc);
-
-        if (modified)
-        {
-            try
-            {
-                writeDbConfigXml(dbConfigXml, dbConfigDoc);
-            }
-            catch (IOException ioe)
-            {
-                throw new MojoExecutionException("Could not write database configuration file: " + FILENAME_DBCONFIG, ioe);
-            }
-        }
-    }
-
-    private void writeDbConfigXml(final File dbConfigXml, final Document dbConfigDoc) throws IOException
-    {
-        // write dbconfig.xml
-        try (FileOutputStream fos = new FileOutputStream(dbConfigXml))
-        {
-            XMLWriter writer = new XMLWriter(fos, OutputFormat.createPrettyPrint());
-            writer.write(dbConfigDoc);
-            writer.close();
+        try {
+            new XMLDocumentProcessor(new XMLDocumentHandler(dbConfigXml))
+                    .load()
+                    .validate(new DbConfigValidator())
+                    .transform(new DatabaseTypeUpdaterTransformer(dbType))
+                    .transform(new SchemeUpdaterTransformer(dbType, schema))
+                    .saveIfModified();
+        } catch (ValidationException e) {
+            throw new MojoExecutionException("Validation of dbconfig.xml file failed", e);
         }
     }
 

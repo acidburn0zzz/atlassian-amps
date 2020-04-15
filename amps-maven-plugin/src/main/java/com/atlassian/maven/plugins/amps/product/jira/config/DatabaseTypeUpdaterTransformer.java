@@ -1,12 +1,15 @@
-package com.atlassian.maven.plugins.amps.product.jira.module.modules.xml;
+package com.atlassian.maven.plugins.amps.product.jira.config;
 
 import com.atlassian.maven.plugins.amps.product.jira.JiraDatabaseType;
-import com.atlassian.maven.plugins.amps.product.jira.module.DocumentTransformer;
+import com.atlassian.maven.plugins.amps.product.common.XMLDocumentTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
 
-public class DatabaseTypeUpdaterTransformer implements DocumentTransformer {
+/**
+ * This transformer will update or create database-type node in dbconfig.xml to represent configured database type.
+ */
+public class DatabaseTypeUpdaterTransformer implements XMLDocumentTransformer {
 
     private final JiraDatabaseType dbType;
 
@@ -15,11 +18,11 @@ public class DatabaseTypeUpdaterTransformer implements DocumentTransformer {
     }
 
     @Override
-    public boolean transform(Document entity) {
-        final Node dbTypeNode = entity.selectSingleNode("//jira-database-config/database-type");
+    public boolean transform(Document document) {
+        final Node dbTypeNode = document.selectSingleNode("/jira-database-config/database-type");
 
         // update database type
-        if (null != dbTypeNode && StringUtils.isNotEmpty(dbTypeNode.getStringValue())) {
+        if (dbTypeNode != null && StringUtils.isNotEmpty(dbTypeNode.getStringValue())) {
             String currentDbType = dbTypeNode.getStringValue();
             if (!currentDbType.equals(dbType.getDbType())) {
                 dbTypeNode.setText(dbType.getDbType());
