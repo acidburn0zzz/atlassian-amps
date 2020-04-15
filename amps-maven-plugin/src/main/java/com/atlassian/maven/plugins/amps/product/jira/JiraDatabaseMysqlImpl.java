@@ -59,7 +59,7 @@ public class JiraDatabaseMysqlImpl extends AbstractJiraDatabase
     }
 
     /**
-     * Reference mysql 5.1 documentation 5.1 Driver/Datasource Class Names, URL Syntax and Configuration Properties for
+     * Reference mysql 8.0 documentation 8.0 Driver/Datasource Class Names, URL Syntax and Configuration Properties for
      * Connector/J http://dev.mysql.com/doc/connector-j/en/connector-j-reference-configuration-properties.html sample
      * connection URL: jdbc:mysql://localhost:3306/sakila?profileSQL=true
      *
@@ -84,7 +84,7 @@ public class JiraDatabaseMysqlImpl extends AbstractJiraDatabase
             {
                 for(DriverPropertyInfo driverPropertyInfo : driverPropertyInfos)
                 {
-                    if ("DBNAME".equals(driverPropertyInfo.name))
+                    if ("DBNAME".equals(driverPropertyInfo.name.toUpperCase()))
                     {
                         return driverPropertyInfo.value;
                     }
