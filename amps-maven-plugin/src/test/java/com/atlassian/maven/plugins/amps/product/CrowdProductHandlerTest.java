@@ -19,10 +19,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -136,5 +138,15 @@ public class CrowdProductHandlerTest
                 path +
                 "/database/defaultdb" +
                 "</property";
+    }
+
+    @Test
+    public void getExtraJarsToSkipWhenScanningForTldsAndWebFragments_shouldContainActivationJar() {
+        // Invoke
+        final Collection<String> extraJarsToSkip =
+                crowdProductHandler.getExtraJarsToSkipWhenScanningForTldsAndWebFragments();
+
+        // Check
+        assertTrue(extraJarsToSkip.contains("mail-*.jar"));
     }
 }
