@@ -1,5 +1,16 @@
 package com.atlassian.maven.plugins.amps.product;
 
+import com.atlassian.maven.plugins.amps.MavenContext;
+import com.atlassian.maven.plugins.amps.MavenGoals;
+import com.atlassian.maven.plugins.amps.Product;
+import com.atlassian.maven.plugins.amps.ProductArtifact;
+import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.plugin.MojoExecutionException;
+
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -11,17 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.atlassian.maven.plugins.amps.MavenContext;
-import com.atlassian.maven.plugins.amps.MavenGoals;
-import com.atlassian.maven.plugins.amps.Product;
-import com.atlassian.maven.plugins.amps.ProductArtifact;
-import com.atlassian.maven.plugins.amps.util.ConfigFileUtils;
-
-import com.google.common.collect.ImmutableMap;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.plugin.MojoExecutionException;
+import static java.util.Collections.singleton;
 
 public class CrowdProductHandler extends AbstractWebappProductHandler
 {
@@ -61,7 +62,7 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
     @Override
     public Map<String, String> getSystemProperties(final Product ctx)
     {
-        ImmutableMap.Builder<String, String> systemProperties = ImmutableMap.<String, String>builder();
+        ImmutableMap.Builder<String, String> systemProperties = ImmutableMap.builder();
         systemProperties.putAll(super.getSystemProperties(ctx));
         systemProperties.put("crowd.home", getHomeDirectory(ctx).getPath());
         systemProperties.put("cargo.servlet.uriencoding", "UTF-8");
@@ -90,6 +91,13 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
                 new ProductArtifact("javax.mail", "mail", "1.4"),
                 new ProductArtifact("javax.activation", "activation", "1.0.2")
         );
+    }
+
+    @Nonnull
+    @Override
+    protected Collection<String> getExtraJarsToSkipWhenScanningForTldsAndWebFragments() {
+        // AMPS-1524: mail-1.4.jar has `activation.jar` in its Class-Path manifest header, not activation-1.0.2.jar
+        return singleton("mail-*.jar");
     }
 
     @Override
@@ -180,8 +188,7 @@ public class CrowdProductHandler extends AbstractWebappProductHandler
         @Override
         protected Collection<ProductArtifact> getPdkInstallArtifacts(final String pdkInstallVersion)
         {
-            final List<ProductArtifact> plugins = new ArrayList<ProductArtifact>();
-            plugins.addAll(super.getPdkInstallArtifacts(pdkInstallVersion));
+            final List<ProductArtifact> plugins = new ArrayList<>(super.getPdkInstallArtifacts(pdkInstallVersion));
             plugins.add(new ProductArtifact("commons-fileupload", "commons-fileupload", "1.2.1"));
             return plugins;
         }

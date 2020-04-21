@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [8.1.1] - Unreleased
+
+### Fixed
+- [AMPS-1524] Fixed spurious warnings about missing `common/lib/activation.jar`
+
+### Security
+- Upgraded commons-compress to 1.20 (CVE-2019-1240)
+- Upgraded mysql-connector to 8.0.16 (CVE-2018-3258, CVE-2019-2692)
+
 ## [8.1.0] - 2020-03-10
 
 ### Added 
