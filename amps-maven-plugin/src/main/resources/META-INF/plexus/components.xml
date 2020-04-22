@@ -165,5 +165,11 @@
             </requirements>
         </component>
 
+        <component>
+            <role>com.atlassian.maven.plugins.amps.util.MojoExecutorWrapper</role>
+            <role-hint>component for wrapping Maven's MojoExecutor so that it could be mocked-out/replaced with another implementation</role-hint>
+            <implementation>com.atlassian.maven.plugins.amps.util.MojoExecutorWrapperImpl</implementation>
+        </component>
+
     </components>
 </component-set>

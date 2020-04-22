@@ -131,7 +131,7 @@ public class RunStandaloneMojo extends AbstractProductHandlerMojo {
                 newReactor,
                 newSession);
 
-        return new MavenGoals(newContext);
+        return new MavenGoals(newContext, mojoExecutorWrapper);
     }
 
     private String generateNoVersionMessage(String productVersion) {

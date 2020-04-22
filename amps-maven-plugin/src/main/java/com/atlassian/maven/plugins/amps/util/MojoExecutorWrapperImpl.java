@@ -13,51 +13,24 @@ import org.twdata.maven.mojoexecutor.MojoExecutor;
 import java.util.List;
 
 /**
- * Utilities for executing mojos.
+ * A wrapper around Maven's {@link MojoExecutor}. Adds support for merging default goal configuration with configuration
+ * explicitly specified for a given goal in the built project's POM.
  *
- * @since 8.0
+ * @since 8.0 (as static util class MojoUtils)
+ * @since 8.2 (as a component)
  */
-public class MojoUtils {
+public class MojoExecutorWrapperImpl implements MojoExecutorWrapper {
 
-    /**
-     * Executes the specified mojo, <i>using only the provided configuration</i>. Any configuration that has been
-     * applied at the project level is <i>ignored</i>.
-     *
-     * @param plugin               the Maven plugin to execute
-     * @param goal                 the goal (mojo) to execute
-     * @param configuration        the <i>complete configuration</i> to apply
-     * @param executionEnvironment the execution environment, providing access to the Maven project and session
-     *                             and the plugin manager
-     * @throws MojoExecutionException if executing the mojo fails
-     */
-    public static void execute(Plugin plugin, String goal, Xpp3Dom configuration,
-                               MojoExecutor.ExecutionEnvironment executionEnvironment)
+    @Override
+    public void execute(Plugin plugin, String goal, Xpp3Dom configuration,
+                        MojoExecutor.ExecutionEnvironment executionEnvironment)
             throws MojoExecutionException {
         MojoExecutor.executeMojo(plugin, goal, configuration, executionEnvironment);
     }
 
-    /**
-     * Executes the specified mojo, after first merging the provided configuration with any configuration that has
-     * been applied in the project.
-     * <p>
-     * In {@code org.twdata.maven:mojo-executor} 1.5.x, {@code MojoExecutor.executeMojo} would automatically merge
-     * the supplied configuration into the project-level configuration, treating the supplied configuration as
-     * <i>defaults</i> which could be overridden in the project. <i>That behavior was removed in 2.0.0</i>. Now
-     * only the provided configuration is considered, and any project- level configuration is <i>ignored</i>.
-     * <p>
-     * This method essentially restores the 1.5.x behavior, taking the supplied configuration and merging it with
-     * any project-level configuration prior to executing the mojo.
-     *
-     * @param plugin               the Maven plugin to execute
-     * @param goal                 the goal (mojo) to execute
-     * @param configuration        the <i>default configuration</i> to apply, which may be overridden by project-
-     *                             level configuration loaded from the POM(s)
-     * @param executionEnvironment the execution environment, providing access to the Maven project and session
-     *                             and the plugin manager
-     * @throws MojoExecutionException if the configuration cannot be merged, or if executing the mojo fails
-     */
-    public static void executeWithMergedConfig(Plugin plugin, String goal, Xpp3Dom configuration,
-                                               MojoExecutor.ExecutionEnvironment executionEnvironment)
+    @Override
+    public void executeWithMergedConfig(Plugin plugin, String goal, Xpp3Dom configuration,
+                                        MojoExecutor.ExecutionEnvironment executionEnvironment)
             throws MojoExecutionException {
         // If the target plugin has configuration applied, we have to _manually_ supply that configuration in
         // MojoExecutor 2+ (1.5.x would find the configuration and apply it automatically; 2.x no longer does).
@@ -74,7 +47,7 @@ public class MojoUtils {
      * @param project the Maven project
      * @return the project-level configuration, which may be {@code null} per Maven's API
      */
-    private static Xpp3Dom getGoalConfig(Plugin plugin, String goal, MavenProject project) {
+    private Xpp3Dom getGoalConfig(Plugin plugin, String goal, MavenProject project) {
         String executionId;
 
         int index = goal.indexOf('#');
@@ -105,7 +78,7 @@ public class MojoUtils {
      * @return the specified goal's parameters, which may be {@code null} per Maven's API
      * @throws MojoExecutionException if the Maven plugin's descriptor cannot be loaded
      */
-    private static List<Parameter> getGoalParameters(Plugin plugin, String goal,
+    private List<Parameter> getGoalParameters(Plugin plugin, String goal,
                                                      MojoExecutor.ExecutionEnvironment executionEnvironment)
             throws MojoExecutionException
     {
@@ -137,7 +110,7 @@ public class MojoUtils {
      * @return the merged and filtered configuration
      * @throws MojoExecutionException if the Maven plugin's descriptor cannot be loaded
      */
-    private static Xpp3Dom mergeConfig(Plugin plugin, String goal, Xpp3Dom defaultConfig,
+    private Xpp3Dom mergeConfig(Plugin plugin, String goal, Xpp3Dom defaultConfig,
                                        MojoExecutor.ExecutionEnvironment executionEnvironment)
             throws MojoExecutionException {
         Xpp3Dom goalConfig = getGoalConfig(plugin, goal, executionEnvironment.getMavenProject());

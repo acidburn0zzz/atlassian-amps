@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.atlassian.maven.plugins.amps.util.AmpsPluginVersionChecker;
+import com.atlassian.maven.plugins.amps.util.MojoExecutorWrapper;
 import com.atlassian.maven.plugins.amps.util.ProjectUtils;
 import com.atlassian.maven.plugins.amps.util.UpdateChecker;
 import com.atlassian.maven.plugins.updater.LocalSdk;
@@ -186,6 +187,9 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     @Parameter(property = "encoding", defaultValue = "${project.build.sourceEncoding}")
     protected String encoding;
 
+    @Component
+    protected MojoExecutorWrapper mojoExecutorWrapper;
+
     protected MavenContext getMavenContext()
     {
         if (mavenContext == null)
@@ -202,7 +206,7 @@ public abstract class AbstractAmpsMojo extends AbstractMojo
     {
         if (mavenGoals == null)
         {
-            mavenGoals = new MavenGoals(getMavenContext());
+            mavenGoals = new MavenGoals(getMavenContext(), mojoExecutorWrapper);
         }
         return mavenGoals;
     }

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.atlassian.maven.plugins.amps.product.ProductHandlerFactory;
-import com.atlassian.maven.plugins.amps.util.MojoUtils;
+import com.atlassian.maven.plugins.amps.util.MojoExecutorWrapper;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.maven.execution.MavenSession;
@@ -43,6 +43,9 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo {
     @Component
     BuildPluginManager buildPluginManager;
 
+    @Component
+    MojoExecutorWrapper mojoExecutorWrapper;
+
     public final void execute() throws MojoExecutionException, MojoFailureException {
         String goal = session.getGoals().stream()
                 // We only pass in the first goal since we know the shell scripts only pass in one goal
@@ -53,7 +56,7 @@ public abstract class AbstractAmpsDispatcherMojo extends AbstractMojo {
         Plugin plugin = findProductPlugin()
                 .orElseThrow(() -> new MojoFailureException("Couldn't detect an AMPS plugin to dispatch to"));
 
-        MojoUtils.executeWithMergedConfig(plugin, goal, configuration(),
+        mojoExecutorWrapper.executeWithMergedConfig(plugin, goal, configuration(),
                 executionEnvironment(project, session, buildPluginManager));
     }
 
